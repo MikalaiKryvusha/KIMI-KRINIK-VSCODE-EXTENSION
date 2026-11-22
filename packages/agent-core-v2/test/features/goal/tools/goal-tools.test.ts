@@ -51,6 +51,7 @@ describe('goal tools', () => {
       maxOutputSize: undefined,
       alwaysThinking: undefined,
       thinkingLevel: 'off',
+      autoCompact: undefined,
       reservedContextSize: undefined,
       compactionTriggerRatio: undefined,
       compactionMaxAttempts: undefined,

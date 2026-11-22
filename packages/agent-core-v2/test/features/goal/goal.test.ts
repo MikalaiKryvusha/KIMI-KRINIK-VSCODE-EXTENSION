@@ -983,6 +983,7 @@ describe('AgentGoalService core workflow hooks', () => {
       maxOutputSize: undefined,
       alwaysThinking: undefined,
       thinkingLevel: 'off',
+      autoCompact: undefined,
       reservedContextSize: undefined,
       compactionTriggerRatio: undefined,
       compactionMaxAttempts: undefined,

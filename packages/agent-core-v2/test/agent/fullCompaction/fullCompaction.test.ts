@@ -2884,6 +2884,135 @@ describe('FullCompaction', () => {
     await ctx.expectResumeMatches();
   });
 
+  it('does not auto compact before a step when autoCompact is false', async () => {
+    const ctx = testAgent({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false, reservedContextSize: 500 },
+      },
+    });
+    ctx.configure({
+      provider: CATALOGUED_PROVIDER,
+      modelCapabilities: {
+        ...CATALOGUED_MODEL_CAPABILITIES,
+        maxContextSize: 2_000,
+      },
+    });
+    ctx.appendExchange(1, 'old user one', 'old assistant one', 1_400);
+    ctx.mockNextResponse({ type: 'text', text: 'Answer without compaction.' });
+    ctx.mockNextResponse({ type: 'text', text: 'Unexpected compaction summary.' });
+
+    await ctx.rpc.prompt({ input: [{ type: 'text', text: 'x'.repeat(440) }] });
+    const events = await ctx.untilTurnEnd();
+
+    expect(ctx.llmCalls).toHaveLength(1);
+    expect(eventIndex(events, 'compaction.started')).toBe(-1);
+    expect(eventIndex(events, 'context.apply_compaction')).toBe(-1);
+    expect(ctx.compactHistory()).toEqual([
+      { role: 'user', text: 'old user one' },
+      { role: 'assistant', text: 'old assistant one' },
+      { role: 'user', text: 'x'.repeat(440) },
+      { role: 'assistant', text: 'Answer without compaction.' },
+    ]);
+    await ctx.expectResumeMatches();
+  });
+
+  it('refuses an after-step automatic begin when autoCompact is false', async () => {
+    const ctx = testAgent({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false },
+      },
+    });
+    ctx.configure({
+      provider: CATALOGUED_PROVIDER,
+      modelCapabilities: CATALOGUED_MODEL_CAPABILITIES,
+    });
+    ctx.appendExchange(1, 'old user one', 'old assistant one', 20);
+    ctx.appendExchange(2, 'recent user two', 'recent assistant two', 80);
+    ctx.mockNextResponse({ type: 'text', text: 'Turn response.' });
+    ctx.mockNextResponse({ type: 'text', text: 'Unexpected compaction summary.' });
+    const compacted = ctx.once('compaction.completed');
+    let automaticBegin: boolean | undefined;
+    ctx.get(IAgentLoopService).hooks.onDidFinishStep.register(
+      'test-auto-compaction-disabled',
+      async (_step, next) => {
+        automaticBegin ??= ctx.get(IAgentFullCompactionService).begin({ source: 'auto' });
+        await next();
+      },
+    );
+
+    await ctx.rpc.prompt({ input: [{ type: 'text', text: 'Start a turn' }] });
+    const events = await ctx.untilTurnEnd();
+    if (automaticBegin) await compacted;
+
+    expect(automaticBegin).toBe(false);
+    expect(ctx.llmCalls).toHaveLength(1);
+    expect(eventIndex(events, 'compaction.started')).toBe(-1);
+    expect(eventIndex(events, 'context.apply_compaction')).toBe(-1);
+    await ctx.expectResumeMatches();
+  });
+
+  it('returns provider overflow without compaction when autoCompact is false', async () => {
+    const generate: GenerateFn = createMockProvider(async () => {
+      return providerHttpError(413, 'Request Entity Too Large', { requestId: 'req-disabled-auto-compact' });
+    });
+    const ctx = testAgent({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false },
+      },
+      generate,
+    });
+    ctx.configure({
+      provider: CATALOGUED_PROVIDER,
+      modelCapabilities: {
+        ...CATALOGUED_MODEL_CAPABILITIES,
+        maxContextSize: 200_000,
+      },
+    });
+    ctx.appendExchange(1, 'old user one', `old assistant one ${'x'.repeat(600_000)}`, 150_000);
+    ctx.newEvents();
+
+    await ctx.rpc.prompt({ input: [{ type: 'text', text: 'Return the overflow' }] });
+    const events = await ctx.untilTurnEnd();
+
+    expect(eventIndex(events, 'compaction.started')).toBe(-1);
+    expect(eventIndex(events, 'context.apply_compaction')).toBe(-1);
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        event: 'turn.ended',
+        args: expect.objectContaining({ turnId: 0, reason: 'failed' }),
+      }),
+    );
+    await ctx.expectResumeMatches();
+  });
+
+  it('keeps manual compaction available when autoCompact is false', async () => {
+    const ctx = testAgent({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false },
+      },
+    });
+    ctx.configure({
+      provider: CATALOGUED_PROVIDER,
+      modelCapabilities: CATALOGUED_MODEL_CAPABILITIES,
+    });
+    ctx.appendExchange(1, 'old user one', 'old assistant one', 20);
+    ctx.appendExchange(2, 'recent user two', 'recent assistant two', 80);
+    const completed = ctx.once('compaction.completed');
+    ctx.mockNextResponse({ type: 'text', text: 'Manual summary with automatic compaction disabled.' });
+
+    await ctx.rpc.beginCompaction({});
+    await completed;
+
+    expect(ctx.llmCalls).toHaveLength(1);
+    expect(eventIndex(ctx.newEvents(), 'context.apply_compaction')).toBeGreaterThanOrEqual(0);
+    expect(ctx.compactHistory().some((message) => message.text.includes('Manual summary with automatic compaction disabled.'))).toBe(true);
+    await ctx.expectResumeMatches();
+  });
+
   it('does not reset the step budget after provider context overflow compaction', async () => {
     let callCount = 0;
     const generate: GenerateFn = createMockProvider(async () => {

@@ -339,8 +339,13 @@ export class AgentFullCompactionService extends Service implements IAgentFullCom
     this.observedMaxContextTokensByModel.set(modelAlias, observed);
   }
 
+  private autoCompactionDisabled(): boolean {
+    return this.resolveModelContextWithEffectiveMax().autoCompact === false;
+  }
+
   begin(input: FullCompactionInput): boolean {
     if (this._compacting) return false;
+    if (input.source === 'auto' && this.autoCompactionDisabled()) return false;
     const data: CompactionBeginData = { source: input.source, instruction: input.instruction };
     if (data.source === 'manual') {
       this.runGate.begin();
@@ -480,6 +485,7 @@ export class AgentFullCompactionService extends Service implements IAgentFullCom
   private async recoverFromContextOverflow(
     context: LoopErrorContext,
   ): Promise<boolean> {
+    if (this.autoCompactionDisabled()) return false;
     this.recordOverflowRecovery(context.error);
     const didStartCompaction = this.beginAutoCompaction();
     if (!didStartCompaction && !this._compacting) return false;

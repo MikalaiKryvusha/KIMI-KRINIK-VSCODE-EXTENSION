@@ -318,6 +318,7 @@ Configuration errors fail loudly instead of falling back silently. Session creat
 | --- | --- | --- | --- |
 | `max_steps_per_turn` | `integer` | — | Maximum steps per turn; unset or `0` means unlimited |
 | `max_attempts_per_step` | `integer` | `10` | Maximum total attempts for a failing step, including the initial attempt |
+| `auto_compact` | `boolean` | `true` | Set to `false` to disable automatic compaction, including overflow recovery; manual `/compact` remains available. If the context window fills up, the provider error is returned |
 | `reserved_context_size` | `integer` | — | Number of tokens reserved for model output; automatic compaction is triggered when the remaining context window falls below this value |
 | `compaction_max_attempts` | `integer` | `5` | Maximum total attempts for a failing compaction request, including the initial attempt |
 

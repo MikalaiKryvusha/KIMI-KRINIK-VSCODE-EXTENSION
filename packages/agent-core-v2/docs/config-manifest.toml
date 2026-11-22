@@ -247,6 +247,7 @@ extra_skill_dirs = []
 # max_steps_per_turn: integer
 # max_attempts_per_step: integer
 # max_ralph_iterations: integer
+# auto_compact: boolean
 # reserved_context_size: integer
 # compaction_trigger_ratio: number
 # compaction_max_attempts: integer
