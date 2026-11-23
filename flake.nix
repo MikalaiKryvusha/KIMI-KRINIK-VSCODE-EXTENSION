@@ -122,7 +122,7 @@
         "@moonshot-ai/vite-preset"
         "kimi-code-app"
         "@moonshot-ai/kimi-code"
-        "kimi-code"
+        "kimi-code-kaif"
         "@moonshot-ai/vis"
         "@moonshot-ai/vis-server"
         "@moonshot-ai/vis-web"

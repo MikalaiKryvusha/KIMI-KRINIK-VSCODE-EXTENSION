@@ -99,7 +99,7 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter kimi-code test
+      - run: pnpm --filter kimi-code-kaif test
         env:
           KIMI_CODE_LEGACY_FLAG: "1"
 
@@ -173,7 +173,7 @@ jobs:
       - name: Typecheck desktop
         run: pnpm --filter kimi-code-app run typecheck
       - name: Typecheck VS Code extension
-        run: pnpm --filter kimi-code run typecheck
+        run: pnpm --filter kimi-code-kaif run typecheck
       - name: Typecheck vis-server
         run: pnpm --filter @moonshot-ai/vis-server run typecheck
       - name: Typecheck vis-web
