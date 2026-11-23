@@ -9,6 +9,9 @@ export const Methods = {
   Logout: "logout",
   GetManagedUsage: "getManagedUsage",
   NotifyAttention: "notifyAttention",
+  UpdateExtensionSetting: "updateExtensionSetting",
+  GetAutoCompact: "getAutoCompact",
+  SetAutoCompact: "setAutoCompact",
   SaveConfig: "saveConfig",
   GetExtensionConfig: "getExtensionConfig",
   OpenSettings: "openSettings",
@@ -88,6 +91,7 @@ export const Events = {
   FileChangesUpdated: "fileChangesUpdated",
   RollbackInput: "rollbackInput",
   LoginUrl: "loginUrl",
+  AutoCompactChanged: "autoCompactChanged",
 } as const;
 
 const rpcMethods = new Set<string>(Object.values(Methods));
@@ -139,6 +143,7 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.ClearTrackedFiles:
     case Methods.ShowLogs:
     case Methods.ReloadWebview:
+    case Methods.GetAutoCompact:
       return params === undefined;
 
     case Methods.AddInputHistory:
@@ -148,6 +153,10 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
         || (isPlainObject(params) && isOptionalType(params["provider"], "string"));
     case Methods.NotifyAttention:
       return isPlainObject(params) && hasNonEmptyString(params, "message");
+    case Methods.UpdateExtensionSetting:
+      return isPlainObject(params) && params["key"] === "autoSteer" && typeof params["value"] === "boolean";
+    case Methods.SetAutoCompact:
+      return isPlainObject(params) && hasBoolean(params, "enabled");
     case Methods.SaveConfig:
       return isPlainObject(params)
         && typeof params["model"] === "string"

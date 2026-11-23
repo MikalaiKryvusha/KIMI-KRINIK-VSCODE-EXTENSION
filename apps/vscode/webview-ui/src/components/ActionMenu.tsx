@@ -3,6 +3,7 @@ import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefre
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { useSettingsStore } from "@/stores";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
@@ -41,10 +42,22 @@ function MenuItem({ onClick, disabled, danger, children }: { onClick: () => void
   );
 }
 
+function SwitchItem({ label, hint, checked, disabled, onChange }: { label: string; hint: string; checked: boolean; disabled?: boolean; onChange: (checked: boolean) => void }) {
+  return (
+    <label className={cn("w-full flex items-center gap-2 px-2.5 py-1.5 text-xs hover:bg-accent transition-colors cursor-pointer", disabled && "opacity-50 cursor-not-allowed")}>
+      <span className="flex-1 flex flex-col">
+        <span>{label}</span>
+        <span className="text-[10px] text-muted-foreground">{hint}</span>
+      </span>
+      <Switch size="sm" checked={checked} disabled={disabled} onCheckedChange={onChange} aria-label={label} />
+    </label>
+  );
+}
+
 export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig } = useSettingsStore();
+  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, autoCompact, autoCompactPending, changeAutoCompact, changeAutoSteer } = useSettingsStore();
 
   const handleOpenSettings = () => {
     void bridge.openSettings();
@@ -114,6 +127,24 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
             <span className="flex-1">General Config</span>
             <span className="text-[10px] text-muted-foreground">↗</span>
           </MenuItem>
+        </MenuSection>
+
+        <Separator className="my-px" />
+
+        <MenuSection title="Behavior">
+          <SwitchItem
+            label="Auto Compact"
+            hint={autoCompact === false ? "Off: the KAIF thresholds guard the context" : "On: Kimi compacts the context by itself"}
+            checked={autoCompact !== false}
+            disabled={autoCompact === null || autoCompactPending}
+            onChange={(enabled) => void changeAutoCompact(enabled)}
+          />
+          <SwitchItem
+            label="AUTO STEER"
+            hint={extensionConfig.autoSteer ? "On: a message joins the running turn" : "Off: a message waits in the queue"}
+            checked={extensionConfig.autoSteer}
+            onChange={(enabled) => void changeAutoSteer(enabled)}
+          />
         </MenuSection>
 
         <Separator className="my-px" />

@@ -27,6 +27,7 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
   enableNewConversationShortcut: false,
   showThinkingContent: true,
   showThinkingExpanded: true,
+  autoSteer: true,
   version: "",
 };
 
@@ -162,6 +163,8 @@ interface SettingsState {
   wireSlashCommands: SlashCommandInfo[];
   slashCommands: SlashCommandInfo[];
   isLoggedIn: boolean;
+  autoCompact: boolean | null;
+  autoCompactPending: boolean;
 
   setCurrentModel: (model: string) => void;
   setModels: (models: ModelConfig[]) => void;
@@ -178,6 +181,9 @@ interface SettingsState {
   setWireSlashCommands: (commands: SlashCommandInfo[]) => void;
   setIsLoggedIn: (loggedIn: boolean) => void;
   getCurrentThinkingMode: () => ThinkingMode;
+  setAutoCompact: (enabled: boolean | null) => void;
+  changeAutoCompact: (enabled: boolean) => Promise<void>;
+  changeAutoSteer: (enabled: boolean) => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -195,8 +201,37 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   wireSlashCommands: [],
   slashCommands: [],
   isLoggedIn: false,
+  autoCompact: null,
+  autoCompactPending: false,
 
   setCurrentModel: (currentModel) => set({ currentModel }),
+
+  setAutoCompact: (autoCompact) => set({ autoCompact }),
+
+  changeAutoCompact: async (enabled) => {
+    set({ autoCompactPending: true });
+    try {
+      const result = await bridge.setAutoCompact(enabled);
+      set({ autoCompact: result.enabled });
+      if (!result.ok) {
+        toast.error(`Auto Compact stayed ${result.enabled ? "on" : "off"}: ${result.error}`);
+      } else if (!result.enabled && result.kaif === "absent") {
+        toast.warning("Auto Compact is off. This project has no KAIF marker, so no KAIF closure guards the context window.");
+      }
+    } catch (error) {
+      toast.error(`Auto Compact was not changed: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      set({ autoCompactPending: false });
+    }
+  },
+
+  changeAutoSteer: async (enabled) => {
+    try {
+      await bridge.updateExtensionSetting("autoSteer", enabled);
+    } catch (error) {
+      toast.error(`AUTO STEER was not changed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  },
 
   setModels: (models) => set({ models }),
 

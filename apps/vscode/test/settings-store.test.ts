@@ -11,6 +11,7 @@ const boundary = vi.hoisted(() => ({
   toastError: vi.fn(),
   toastWarning: vi.fn(),
   notifyAttention: vi.fn(),
+  setAutoCompact: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
@@ -21,6 +22,7 @@ vi.mock("@/services", () => ({
     abortChat: boundary.abortChat,
     trackFiles: boundary.trackFiles,
     notifyAttention: boundary.notifyAttention,
+    setAutoCompact: boundary.setAutoCompact,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -588,5 +590,41 @@ describe("Webview mid-turn warnings", () => {
     useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" } });
     expect(useChatStore.getState().isStreaming).toBe(false);
     expect(boundary.streamChat).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Webview Auto Compact switch", () => {
+  it("shows the value the host confirmed after the engine took the change", async () => {
+    boundary.setAutoCompact.mockReset();
+    boundary.setAutoCompact.mockResolvedValue({ ok: true, enabled: false, kaif: "projected" });
+    useSettingsStore.setState({ autoCompact: true, autoCompactPending: false });
+
+    const change = useSettingsStore.getState().changeAutoCompact(false);
+    expect(useSettingsStore.getState().autoCompactPending).toBe(true);
+    await change;
+
+    expect(boundary.setAutoCompact).toHaveBeenCalledWith(false);
+    expect(useSettingsStore.getState()).toMatchObject({ autoCompact: false, autoCompactPending: false });
+    expect(boundary.toastError).not.toHaveBeenCalled();
+  });
+
+  it("keeps the engine value and shows the reason when the host refused", async () => {
+    boundary.setAutoCompact.mockReset();
+    boundary.setAutoCompact.mockResolvedValue({ ok: false, enabled: true, error: "marker is not JSON" });
+    useSettingsStore.setState({ autoCompact: true, autoCompactPending: false });
+
+    await useSettingsStore.getState().changeAutoCompact(false);
+
+    expect(useSettingsStore.getState()).toMatchObject({ autoCompact: true, autoCompactPending: false });
+    expect(boundary.toastError).toHaveBeenCalledWith("Auto Compact stayed on: marker is not JSON");
+  });
+
+  it("warns that no KAIF closure guards a project without a marker", async () => {
+    boundary.setAutoCompact.mockReset();
+    boundary.setAutoCompact.mockResolvedValue({ ok: true, enabled: false, kaif: "absent" });
+
+    await useSettingsStore.getState().changeAutoCompact(false);
+
+    expect(boundary.toastWarning).toHaveBeenCalledWith(expect.stringContaining("no KAIF marker"));
   });
 });

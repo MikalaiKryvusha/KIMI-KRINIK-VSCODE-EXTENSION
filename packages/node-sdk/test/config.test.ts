@@ -24,6 +24,13 @@ async function makeTempDir(): Promise<string> {
 }
 
 describe('SDK config TOML', () => {
+  it('keeps the loop_control auto_compact switch through parse and write', () => {
+    const config = parseConfigString('[loop_control]\nauto_compact = false\nreserved_context_size = 500\n');
+
+    expect(config.loopControl).toEqual({ autoCompact: false, reservedContextSize: 500 });
+    expect(configToTomlData(config)['loop_control']).toEqual({ auto_compact: false, reserved_context_size: 500 });
+  });
+
   it('resolves config paths through the config RPC wrapper', async () => {
     const dir = await makeTempDir();
     const rpc = createKimiConfigRpc();

@@ -238,7 +238,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   sendMessage: (text) => {
     if (get().isStreaming) {
-      get().steerNow(text);
+      if (useSettingsStore.getState().extensionConfig.autoSteer) {
+        get().steerNow(text);
+        return;
+      }
+      const media = sendableDraftMedia(get().draftMedia);
+      const content = buildDraftContent(text, media);
+      if (Content.isEmpty(content)) return;
+      const queuedMediaIds = new Set(media.map((item) => item.id));
+      get().enqueue(content, useSettingsStore.getState().currentModel);
+      set((state) => ({ draftMedia: state.draftMedia.filter((item) => !queuedMediaIds.has(item.id)) }));
       return;
     }
     const { currentModel } = useSettingsStore.getState();

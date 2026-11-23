@@ -10,6 +10,7 @@ import type {
   UpdateMCPServerRequest,
 } from "shared/legacy-sdk";
 import type {
+  AutoCompactResult,
   FileChange,
   SessionConfig,
   ExtensionConfig,
@@ -149,6 +150,18 @@ class Bridge {
 
   getExtensionConfig() {
     return this.call<ExtensionConfig>(Methods.GetExtensionConfig);
+  }
+
+  updateExtensionSetting(key: "autoSteer", value: boolean) {
+    return this.call<{ ok: boolean }>(Methods.UpdateExtensionSetting, { key, value });
+  }
+
+  getAutoCompact() {
+    return this.call<AutoCompactResult>(Methods.GetAutoCompact);
+  }
+
+  setAutoCompact(enabled: boolean) {
+    return this.call<AutoCompactResult>(Methods.SetAutoCompact, { enabled });
   }
 
   openSettings() {

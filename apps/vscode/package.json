@@ -71,6 +71,39 @@
           "default": false,
           "description": "Use Ctrl/Cmd+Enter to send prompts instead of Enter"
         },
+        "kimi.autoSteer": {
+          "type": "boolean",
+          "default": true,
+          "description": "AUTO STEER: a message sent during a running turn joins that turn at once. Off: the message waits in the queue until the turn ends."
+        },
+        "kimi.kaif.warnPercent": {
+          "type": "number",
+          "default": 70,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "KAIF context-window warning threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
+        "kimi.kaif.cutPercent": {
+          "type": "number",
+          "default": 75,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "KAIF context-window trim threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
+        "kimi.kaif.closePercent": {
+          "type": "number",
+          "default": 80,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "KAIF context-window soft closure threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
+        "kimi.kaif.forcePercent": {
+          "type": "number",
+          "default": 90,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "KAIF context-window forced closure threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
         "kimi.attentionVoiceCommand": {
           "type": "array",
           "default": [],

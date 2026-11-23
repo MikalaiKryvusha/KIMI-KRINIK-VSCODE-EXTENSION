@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import type { ExtensionConfig } from "../../shared/types";
+import type { ExtensionConfig, KaifThresholds } from "../../shared/types";
 
 declare const __EXTENSION_VERSION__: string;
 const EXTENSION_VERSION = typeof __EXTENSION_VERSION__ !== "undefined" ? __EXTENSION_VERSION__ : "0.0.0";
@@ -33,6 +33,20 @@ export const VSCodeSettings = {
     return getConfig().get<boolean>("showThinkingExpanded", false);
   },
 
+  get autoSteer(): boolean {
+    return getConfig().get<boolean>("autoSteer", true);
+  },
+
+  get kaifThresholds(): KaifThresholds {
+    const config = getConfig();
+    return {
+      warnPct: config.get<number>("kaif.warnPercent", 70),
+      cutPct: config.get<number>("kaif.cutPercent", 75),
+      closePct: config.get<number>("kaif.closePercent", 80),
+      forcePct: config.get<number>("kaif.forcePercent", 90),
+    };
+  },
+
   get editorContext(): "never" | "onConversationStart" | "onFileChange" {
     return getConfig().get<"never" | "onConversationStart" | "onFileChange">("editorContext", "never");
   },
@@ -45,6 +59,7 @@ export const VSCodeSettings = {
       enableNewConversationShortcut: this.enableNewConversationShortcut,
       showThinkingContent: this.showThinkingContent,
       showThinkingExpanded: this.showThinkingExpanded,
+      autoSteer: this.autoSteer,
       version: EXTENSION_VERSION,
     };
   },
@@ -55,7 +70,7 @@ export function onSettingsChange(callback: (changedKeys: string[]) => void): vsc
     if (!e.affectsConfiguration("kimi")) {
       return;
     }
-    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext"];
+    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer"];
     const changedKeys = keys.filter((key) => e.affectsConfiguration(`kimi.${key}`));
     if (changedKeys.length > 0) {
       callback(changedKeys);

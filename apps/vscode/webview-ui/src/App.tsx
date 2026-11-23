@@ -17,7 +17,7 @@ import "./styles/index.css";
 
 function MainContent({ onAuthAction }: { onAuthAction: () => void }) {
   const { processEvent, startNewConversation, sessionId } = useChatStore();
-  const { setExtensionConfig, extensionConfig } = useSettingsStore();
+  const { setExtensionConfig, extensionConfig, setAutoCompact } = useSettingsStore();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -40,6 +40,7 @@ function MainContent({ onAuthAction }: { onAuthAction: () => void }) {
     const unsubs = [
       bridge.on(Events.MCPServersChanged, () => void queryClient.invalidateQueries({ queryKey: ["mcpServers"] })),
       bridge.on(Events.ExtensionConfigChanged, ({ config }: { config: ExtensionConfig }) => setExtensionConfig(config)),
+      bridge.on(Events.AutoCompactChanged, ({ enabled }: { enabled: boolean }) => setAutoCompact(enabled)),
       bridge.on(Events.FocusInput, () => document.querySelector<HTMLTextAreaElement>("textarea")?.focus()),
       bridge.on(Events.NewConversation, () => {
         void startNewConversation().catch((error: unknown) => {
@@ -47,8 +48,12 @@ function MainContent({ onAuthAction }: { onAuthAction: () => void }) {
         });
       }),
     ];
+    void bridge.getAutoCompact().then(
+      (result) => setAutoCompact(result.enabled),
+      () => setAutoCompact(null),
+    );
     return () => unsubs.forEach((u) => u());
-  }, [queryClient, setExtensionConfig, startNewConversation]);
+  }, [queryClient, setExtensionConfig, setAutoCompact, startNewConversation]);
 
   useEffect(() => {
     if (!extensionConfig.enableNewConversationShortcut) return;

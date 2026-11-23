@@ -28,8 +28,22 @@ export interface ExtensionConfig {
   enableNewConversationShortcut: boolean;
   showThinkingContent: boolean;
   showThinkingExpanded: boolean;
+  autoSteer: boolean;
   version: string;
 }
+
+export interface KaifThresholds {
+  warnPct: number;
+  cutPct: number;
+  closePct: number;
+  forcePct: number;
+}
+
+export type KaifProjection = "projected" | "absent";
+
+export type AutoCompactResult =
+  | { ok: true; enabled: boolean; kaif?: KaifProjection }
+  | { ok: false; enabled: boolean; error: string };
 
 export interface WorkspaceStatus {
   hasWorkspace: boolean;

@@ -25,7 +25,7 @@ vi.mock("../../webview-ui/src/lib/attention", () => ({
   notifyAttention: boundary.notifyAttention,
 }));
 
-import { useSettingsStore } from "../../webview-ui/src/stores/settings.store";
+import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 
 const MODELS = [{ id: "plain", name: "Plain", provider: "managed:kimi-code", capabilities: [] }];
@@ -44,6 +44,7 @@ beforeEach(() => {
   boundary.toastWarning.mockReset();
   boundary.notifyAttention.mockReset();
   useSettingsStore.getState().initModels(MODELS, "plain", false);
+  useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG } });
   useChatStore.setState({
     sessionId: null,
     messages: [],
@@ -275,5 +276,19 @@ describe("automatic follow-up steer", () => {
       { type: "text", text: "look again" },
       { type: "image_url", image_url: { url: IMAGE } },
     ]);
+  });
+
+  it("queues a running Enter with its ready attachments when AUTO STEER is off", () => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, autoSteer: false } });
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.setState({ draftMedia: [{ id: "image-queued", dataUri: IMAGE }, { id: "image-uploading" }] });
+    useChatStore.getState().sendMessage("second");
+
+    expect(boundary.steerChat).not.toHaveBeenCalled();
+    expect(useChatStore.getState().queue).toMatchObject([
+      { content: [{ type: "text", text: "second" }, { type: "image_url", image_url: { url: IMAGE } }], model: "plain" },
+    ]);
+    expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-uploading" }]);
   });
 });
