@@ -1,6 +1,6 @@
 # Bug 03 — File picker replays stale search states on opening
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 fix pending live Extension Host verification
 **Version/build:** 1.0.0 · owner live report during K1 · **Severity:** S2
 **Fixing:** this session
 **Fix accepted when (observable):** reopening the picker with an empty `@` query never displays results from the previous query; only the empty-query loading/result state appears before the current response.

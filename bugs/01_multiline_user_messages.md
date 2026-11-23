@@ -1,6 +1,6 @@
 # Bug 01 — User-message line breaks collapse in the chat bubble
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 fix pending live Extension Host verification
 **Version/build:** 1.0.0 · `kaif/no-auto-compaction` working tree · **When/context:** 2026-11-23, owner screenshot during K1 implementation
 **Severity:** S2
 **Fixing:** this session

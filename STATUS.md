@@ -25,6 +25,12 @@
 
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
+### 2026-11-23 late evening — K1/K2 functionality and brand assets ✅ hygiene, committed
+- `80f882851` Control Panel visibility settings, Compact / Steer / Control, independent Context Window Control, KAIF ownership handoff and picker fixes; `a27da7a8c` context ring + live viewer, multiline messages and Working/logo.
+- `bugs/01`–`03`: multiline rendering, attachment-toggle outside-click race and stale picker results have red-to-green component/store guards; live Extension Host acceptance is still pending.
+- Auto is turquoise, Stop is a filled square; Working uses the acid-pink `#FF1A8C` face with slight top chamfers and clipped ±1 px eye travel. `krinik-robot-logo.svg` + 1024 px PNG are used in all three README sections.
+- Independent Context Window Control: no `.kaif` marker or wire file required; settings + four thresholds, SDK status → self-contained `promptWithSkills(..., steerIfActive: true)`, exact boundary/once/re-arm tests. Built-in ownership and vanilla ON both make the KAIF context hook dormant; no dual delivery.
+
 ### 2026-11-23 evening — K1–K4 features (Claude) ✅ hygiene, live run pending
 - `365af86cd` Auto Compact and AUTO STEER switches (K2.1/K2.2/K2.4/K2.5/K2.7); `08a22d393` brand KIMI KRINIK (K1.4);
   `bd0f2e569`…`53bda319b` EN / 中文 / RU (K3.1–K3.6); `61fcdd449` dark tooltips and menus (K3.7/K3.8, the owner saw it live);
@@ -52,15 +58,15 @@ external publication wait for the owner's `AUTH:`.
 | Phase | State | Note |
 |---|---|---|
 | K0 baseline and contracts | 🔧 in progress | KAIF deployed; inventory and red tests for K1–K4 left |
-| K1 UI convergence | 🔧 in progress | brand and composer modes done; left: status pills, Working, context ring with the context view, the combined model + effort picker, the secondary model, the session header |
-| K2 behavior controls | 🔧 in progress | switches done; left: K2.3 KAIF dormant mode while Auto Compact is ON, K2.6 an in-flight compaction |
+| K1 UI convergence | 🔧 in progress | context ring/viewer, Control Panel and Working are committed and hygiene-green; left: status pills, the combined model + effort picker, the secondary model + robot visibility setting, the session header |
+| K2 behavior controls | 🔧 in progress | independent Context Window Control and KAIF handoff are committed and hygiene-green; left: K2.6 an in-flight compaction |
 | K3 localization and theme | ✅ hygiene | three languages and the theme tokens; live acceptance in K5 |
 | K4 sound settings | 🔧 in progress | the window is done; B5/B6/B8 not re-checked against it |
 | K5 live acceptance and release | 🔲 todo | `plans/153`; publishing only on the owner's `AUTH:` |
-| K6 README | 🔧 started | the README exists with ✅/🚧 rows; no 🚧 row may remain at release |
+| K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last run (2026-11-23 19:33 +03:00, Windows): 469 passed, 1 skipped, 0 failed.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-23 22:40 +03:00, Windows): 503 passed, 1 skipped, 0 failed; typecheck and lint green. Judge re-ran the same claims at 22:40 and found no weakened checks.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -76,14 +82,17 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
+PARKED: 2026-11-23 23:05 +03:00 — product commits `80f882851` and `a27da7a8c` are in place; the remaining documentation/voice-rules commit is next, then resume K1. All seven changesets are written and the owner confirmed the requested feature content. Full hygiene: 503 passed, 1 skipped; typecheck, lint, KAIF selftest and judge green. Live Extension Host acceptance has not run.
+
 1. In a Kimi session in this root: `node .kaif/hooks/context-window.mjs --alive` — proves the KAIF hooks run here.
-2. `/skill:resume`, then the adaptation item `study` of `KAIF_ADAPTATION_TASK.md` and `node .kaif/kaif-core.mjs verify-final`.
-3. K1: a live Extension Host run of the composer modes, then status pills, Working, the context ring, the combined picker.
+2. K1: secondary model + robot visibility, combined model + effort picker, status pills and session header; keep Control Panel's fixed paperclip/model/rings/settings/stop-send boundaries.
+3. K5 preparation: drive the new controls and multiline/picker fixes in a real Extension Host before marking `bugs/01`–`03` DONE.
 4. Claude sessions here get no KAIF skills or hooks: `.kaif/kaif.json` → `agents` lists only `kimi-code`, and the checked-out
    `CLAUDE.md` is a git symlink that Windows writes as the text `AGENTS.md`. `[OWNER] "пока не нужно" · 2026-11-23` (chat) —
 not adding `claude-code` for now.
 
 ## Open bugs
 
+- 🟠 `bugs/01`–`03` — fixes and red-to-green guards are in the working tree; live Extension Host acceptance remains before DONE.
 - 🔴 `bugs/152` (KAIF origin) — the extension can stay on «Starting Kimi Code…»; not reproduced; check B10 when it recurs.
 - 🟠 `bugs/151` (KAIF origin) — follow-up steer race; store-level fixes in place, live acceptance left.

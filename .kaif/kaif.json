@@ -10,6 +10,17 @@
   ],
   "language": "ru",
   "canonArtifacts": [],
+  "contour": {
+    "callName": "Николай",
+    "spokenProjectName": "Кими Криник",
+    "voiceFileTool": [
+      "D:/work/ai_sandbox/tools/silero_tts/venv/Scripts/python.exe",
+      "-I",
+      "D:/work/ai_sandbox/tools/silero_tts/say.py",
+      "--file",
+      "{file}"
+    ]
+  },
   "build": "a8297ab35775",
   "projectName": "KIMI KRINIK"
 }

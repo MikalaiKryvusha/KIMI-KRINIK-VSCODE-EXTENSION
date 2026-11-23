@@ -1,0 +1,1 @@
+Mikalai, Confirm the five changelog texts so the verified packages can be committed.

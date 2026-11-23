@@ -18,7 +18,8 @@
 | **Chat store** | webview state of one conversation: messages, streaming flag, draft media, `pendingInput` (retry), `composerRestore`, queue | `apps/vscode/webview-ui/src/stores/chat.store.ts`, `event-handlers.ts` |
 | **Settings store** | models, current model and effort, login, extension config | `webview-ui/src/stores/settings.store.ts` |
 | **Engine** | the agent loop and compaction; `loopControl.autoCompact === false` refuses every automatic compaction | `packages/agent-core-v2/src/agent/fullCompaction/fullCompactionService.ts` |
-| **KAIF contour** | hooks run by Kimi on its events: context-window closure, STATUS/test-debt Stop guards, voice before a permission wait | `.kaif/hooks/`, wired through `~/.kimi-code/config.toml` |
+| **Context Window Control** | independent per-session threshold decisions and serialized self-contained prompt delivery from SDK status; no KAIF marker or wire file required | `apps/vscode/src/runtime/context-window-control.ts`, wired by `kimi-runtime.ts` and `session-runtime.ts` |
+| **KAIF contour** | optional hooks run by Kimi on its events: context-window closure, STATUS/test-debt Stop guards, voice before a permission wait | `.kaif/hooks/`, wired through `~/.kimi-code/config.toml` |
 
 ## The flows
 
@@ -32,10 +33,15 @@
 4. **Managed quota.** `UsageStatusBar` polls `bridge.getManagedUsage` every 60 s for the `managed:kimi-code` provider →
    `auth.handler` → `harness.auth.getManagedUsage` → `shared/managed-usage.ts` view.
 5. **Compaction.** The engine checks before and after each step and on context overflow; with `auto_compact = false` none of the
-   three starts, manual `/compact` stays. With KAIF the context-window hook closes the session by thresholds.
+   three starts, manual `/compact` stays.
+6. **Context Window Control.** `agent.status.updated` → `ContextWindowController` reads the current VS Code thresholds and engine
+   loop config → one highest newly reached stage → `session.promptWithSkills(..., steerIfActive: true)`. A compaction re-arms the
+   stages. With a valid KAIF marker, `contextWindow.owner = "kimi-krinik"` makes the KAIF context hook dormant; removing the owner
+   hands the contour back. The KAIF hook is also dormant while stock Auto Compact is ON.
 
 ## Invariants
 
 1. One authority per setting: the engine config owns `auto_compact`; the extension never keeps a second copy.
 2. `pendingInput` belongs to the running turn (retry); composer restoration goes through `composerRestore` only.
 3. Replayed history never triggers attention.
+4. Only one contour delivers context-window stage prompts: built-in KIMI KRINIK ownership excludes the KAIF context hook.

@@ -1,6 +1,6 @@
 # Bug 02 — Attachment button reopens the file picker instead of closing it
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 fix pending live Extension Host verification
 **Version/build:** 1.0.0 · owner live report during K1 · **Severity:** S2
 **Fixing:** this session
 **Fix accepted when (observable):** with the file picker open, one click on the attachment button closes it and removes the trigger `@`; no new `@` is appended and the picker stays closed.

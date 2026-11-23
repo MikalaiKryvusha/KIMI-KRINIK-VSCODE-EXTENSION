@@ -81,6 +81,16 @@
 
 ## Entries
 
+### EXP-0003 · 2026-11-23 · ❌→✅ · #voice #windows #kaif
+class: text-in-agents-world
+**Context:** a voice request used an English phrase, omitted the owner/project names and fell back to the generic KAIF beep path.
+**Tried / did:** inspected the actual machine engine and KUMM's accepted voice rules, then wrote a Cyrillic-only phrase file with the owner and project names.
+**Result:** ✅ — the local Silero + Glass route and `soft voice:` output were observed; the permanent route now lives in `HOUSE_RULES.md` R1.
+**Lesson:** voice is an owner-facing surface with its own existing route: read `HOUSE_RULES.md` and the machine's voice rules before calling; never synthesize an English argv phrase or omit the calling identity.   → link: `D:/work/ai_sandbox/KUMM/HOUSE_RULES.md` §13
+**Repro:** `node .kaif/hooks/kimi-permission-call.mjs --selftest` — then inspect the phrase file against `HOUSE_RULES.md` R1 and read the `soft voice:` line on every real call.
+**Trigger:** any voice call or spoken narration → open `HOUSE_RULES.md` R1 and `D:/work/ai_sandbox/tools/silero_tts/VOICE_RULES.md` first.
+**Not for:** text-only chat replies, dry runs and technical logs that are not played as sound.
+
 ### EXP-0002 · 2026-11-23 · ❌→✅ · #testing #windows #flaky #vscode
 class: red-accepted-unread
 **Context:** `apps/vscode/test` carried three "Windows baseline" failures and one "flaky" test across several sessions.

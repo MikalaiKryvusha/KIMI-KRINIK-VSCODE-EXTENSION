@@ -36,7 +36,8 @@ function selftest() {
   let bad = 0;
   const ok = (condition, name) => { console.log((condition ? 'v ' : 'x ') + name); if (!condition) bad++; };
   const root = projectRoot(process.cwd());
-  const command = voiceCommand(root || process.cwd(), 'voice/phrase.txt', {});
+  const emptyRoot = join(root || process.cwd(), '.kaif', 'selftest-no-marker');
+  const command = voiceCommand(emptyRoot, 'voice/phrase.txt', {});
   const usesDefault = (cmd) => cmd.some((part) => part.endsWith('voice-soft.mjs'));
   ok(usesDefault(command) && command.includes('voice/phrase.txt') && command.includes('--play'),
     'default: the shipped file-based voice runs with playback');
@@ -45,7 +46,7 @@ function selftest() {
   });
   ok(custom.join(' ') === 'pythonw.exe -I say.py --file voice/\u0444\u0440\u0430\u0437\u0430.txt',
     'custom: KAIF_VOICE_FILE_TOOL substitutes the UTF-8 phrase path without putting the phrase in argv');
-  ok(usesDefault(voiceCommand(root || process.cwd(), 'x.txt', { KAIF_VOICE_FILE_TOOL: 'not json' })),
+  ok(usesDefault(voiceCommand(emptyRoot, 'x.txt', { KAIF_VOICE_FILE_TOOL: 'not json' })),
     'a malformed custom command falls back to the shipped voice');
   console.log(bad ? `selftest: ${bad} failed` : 'selftest: all ok');
   return bad ? 1 : 0;
