@@ -106,7 +106,7 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
           <KimiMascot className="h-10 mx-auto opacity-50" />
           <div className="inline-flex items-center gap-2 text-muted-foreground">
             <IconLoader2 className="size-4 animate-spin" />
-            <span className="text-sm">Starting Kimi Code…</span>
+            <span className="text-sm">Starting KIMI KRINIK…</span>
           </div>
         </div>
       </div>
@@ -123,7 +123,7 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
               <IconFolderOpen className="size-5" />
               <span className="text-sm font-medium">No workspace open</span>
             </div>
-            <p className="text-xs text-muted-foreground">Open a folder to start using Kimi Code.</p>
+            <p className="text-xs text-muted-foreground">Open a folder to start using KIMI KRINIK.</p>
           </div>
           <Button
             onClick={() => {
@@ -157,7 +157,7 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 text-red-500">
             <IconAlertTriangle className="size-5" />
-            <span className="text-sm font-medium">Kimi Code could not start</span>
+            <span className="text-sm font-medium">KIMI KRINIK could not start</span>
           </div>
           <p className="text-xs text-muted-foreground">Check the error below. Full diagnostics are available in the Kimi Code output channel.</p>
         </div>

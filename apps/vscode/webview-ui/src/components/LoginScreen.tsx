@@ -137,7 +137,7 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
         <div className="max-w-sm w-full text-center space-y-6">
           <KimiMascot className="h-12 mx-auto" />
           <div className="space-y-2">
-            <h1 className="text-lg font-semibold">Welcome to Kimi Code</h1>
+            <h1 className="text-lg font-semibold">Welcome to KIMI KRINIK</h1>
             <div className="text-left space-y-2">
               <p className="text-xs leading-5">Use Kimi Code with your Kimi account subscription or your existing API setup.</p>
             </div>

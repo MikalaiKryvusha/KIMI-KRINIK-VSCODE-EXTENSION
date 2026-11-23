@@ -1,8 +1,8 @@
 {
   "name": "kimi-code-kaif",
   "publisher": "mikalai-kryvusha",
-  "displayName": "Kimi Code (KAIF fork)",
-  "description": "KAIF fork of the Kimi Code plugin for VS Code",
+  "displayName": "KIMI KRINIK",
+  "description": "An improved and advanced Kimi Code extension for VS Code based on vanilla Kimi Code and Kimi Fork",
   "version": "1.0.0",
   "private": true,
   "license": "Apache-2.0",
@@ -49,7 +49,7 @@
   "icon": "resources/kimi-icon-storefront.png",
   "contributes": {
     "configuration": {
-      "title": "Kimi Code",
+      "title": "KIMI KRINIK",
       "properties": {
         "kimi.yoloMode": {
           "type": "boolean",
@@ -139,51 +139,51 @@
     "commands": [
       {
         "command": "kimiKaif.clearAllState",
-        "title": "Kimi Code: [DEBUG] Clear All State"
+        "title": "KIMI KRINIK: [DEBUG] Clear All State"
       },
       {
         "command": "kimiKaif.openInTab",
-        "title": "Kimi Code: Open in New Tab",
+        "title": "KIMI KRINIK: Open in New Tab",
         "icon": "$(link-external)"
       },
       {
         "command": "kimiKaif.openInSideBar",
-        "title": "Kimi Code: Open in Side Panel",
+        "title": "KIMI KRINIK: Open in Side Panel",
         "icon": "$(layout-sidebar-left)"
       },
       {
         "command": "kimiKaif.focusInput",
-        "title": "Kimi Code: Focus Input",
+        "title": "KIMI KRINIK: Focus Input",
         "icon": "$(edit)"
       },
       {
         "command": "kimiKaif.insertMention",
-        "title": "Kimi Code: Insert Current File",
+        "title": "KIMI KRINIK: Insert Current File",
         "icon": "$(mention)"
       },
       {
         "command": "kimiKaif.newConversation",
-        "title": "Kimi Code: New Conversation",
+        "title": "KIMI KRINIK: New Conversation",
         "icon": "$(add)"
       },
       {
         "command": "kimiKaif.showLogs",
-        "title": "Kimi Code: Show Logs",
+        "title": "KIMI KRINIK: Show Logs",
         "icon": "$(output)"
       },
       {
         "command": "kimiKaif.resetKimi",
-        "title": "Kimi Code: Reset Kimi (in case of any issues/no response)",
+        "title": "KIMI KRINIK: Reset Kimi (in case of any issues/no response)",
         "icon": "$(refresh)"
       },
       {
         "command": "kimiKaif.logout",
-        "title": "Kimi Code: Logout",
+        "title": "KIMI KRINIK: Logout",
         "icon": "$(sign-out)"
       },
       {
         "command": "kimiKaif.migrateLegacyData",
-        "title": "Kimi Code: Migrate Legacy Data"
+        "title": "KIMI KRINIK: Migrate Legacy Data"
       }
     ],
     "keybindings": [
@@ -203,7 +203,7 @@
       "activitybar": [
         {
           "id": "kimi-kaif-sidebar",
-          "title": "Kimi Code (KAIF fork)",
+          "title": "KIMI KRINIK",
           "icon": "resources/kimi-icon.svg"
         }
       ]
@@ -213,7 +213,7 @@
         {
           "type": "webview",
           "id": "kimiKaif.webview",
-          "name": "Kimi Code"
+          "name": "KIMI KRINIK"
         }
       ]
     },
