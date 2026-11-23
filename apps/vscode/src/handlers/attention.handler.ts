@@ -18,11 +18,18 @@ export function attentionVoiceCommand(workDir: string | null): string[] | null {
   if (configured.length > 0) return configured;
   if (workDir === null) return null;
   try {
-    const marker = JSON.parse(readFileSync(join(workDir, ".kaif", "kaif.json"), "utf8").replace(/^\uFEFF/, ""));
-    return parseCommand(marker.contour?.voiceFileTool);
+    const marker: unknown = JSON.parse(readFileSync(join(workDir, ".kaif", "kaif.json"), "utf8").replace(/^\uFEFF/, ""));
+    return parseCommand(contourVoiceFileTool(marker));
   } catch {
     return null;
   }
+}
+
+function contourVoiceFileTool(marker: unknown): unknown {
+  if (typeof marker !== "object" || marker === null || !("contour" in marker)) return undefined;
+  const { contour } = marker;
+  if (typeof contour !== "object" || contour === null || !("voiceFileTool" in contour)) return undefined;
+  return contour.voiceFileTool;
 }
 
 function parseCommand(value: unknown): string[] | null {
@@ -43,8 +50,8 @@ function writeAttentionLog(workDir: string | null, message: string): string {
   return file;
 }
 
-export const attentionHandlers: Record<string, Handler<any, any>> = {
-  [Methods.NotifyAttention]: async (params: NotifyAttentionParams, ctx) => {
+export const attentionHandlers: Record<string, Handler<NotifyAttentionParams, { ok: boolean }>> = {
+  [Methods.NotifyAttention]: async (params, ctx) => {
     const command = attentionVoiceCommand(ctx.workDir);
     if (command === null) return { ok: false };
     const phraseFile = writeAttentionLog(ctx.workDir, params.message);
