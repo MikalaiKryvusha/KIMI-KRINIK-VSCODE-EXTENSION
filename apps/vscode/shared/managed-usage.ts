@@ -48,6 +48,26 @@ export function formatUsagePercent(ratio: number): number {
   return Math.round(Math.min(ratio, 1) * 1000) / 10;
 }
 
+export function usageRatio(used: number, limit: number): number {
+  if (!Number.isFinite(used) || !Number.isFinite(limit) || limit <= 0) return 0;
+  return Math.max(0, Math.min(used / limit, 1));
+}
+
+export function formatTokenCount(count: number): string {
+  if (!Number.isFinite(count) || count < 0) return "0";
+  if (count >= 1024 * 1024) return `${trimDecimal(count / (1024 * 1024))}M`;
+  if (count >= 1024) {
+    const k = count / 1024;
+    return `${k >= 100 ? Math.round(k) : trimDecimal(k)}k`;
+  }
+  return String(count);
+}
+
+function trimDecimal(value: number): string {
+  const formatted = value.toFixed(1);
+  return formatted.endsWith(".0") ? formatted.slice(0, -2) : formatted;
+}
+
 export type ResetCountdown =
   | { readonly kind: "refreshing" }
   | { readonly kind: "soon" }

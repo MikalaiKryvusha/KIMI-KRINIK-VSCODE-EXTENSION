@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 
 import { bridge } from "@/services";
-import { getModelById, useSettingsStore } from "@/stores";
+import { getModelById, useChatStore, useSettingsStore } from "@/stores";
 import {
   resetCountdown,
+  formatTokenCount,
   formatUsagePercent,
   secondaryQuotaWindow,
+  usageRatio,
   type ManagedUsageView,
   type ManagedUsageWindowView,
 } from "shared/managed-usage";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { t as translateNow, useT } from "@/i18n";
+import { ContextViewerDialog } from "./ContextViewerDialog";
 
 const USAGE_POLL_INTERVAL_MS = 60_000;
 const COUNTDOWN_TICK_MS = 60_000;
+const CONTEXT_RING_COLOR = "#3B82F6";
 
 function quotaRingColor(ratio: number): string | undefined {
   if (ratio < 0.7) return undefined;
@@ -50,6 +54,49 @@ function RingCircles({ center, radius, strokeWidth, ratio }: RingCirclesProps) {
           strokeDasharray={`${filled} ${circumference - filled}`}
         />
       )}
+    </>
+  );
+}
+
+interface ContextRingProps {
+  readonly ratio: number;
+  readonly label: string;
+  readonly detail?: string;
+}
+
+function ContextRing({ ratio, label, detail }: ContextRingProps) {
+  const t = useT();
+  const [contextOpen, setContextOpen] = useState(false);
+  const size = 14;
+  const strokeWidth = 2;
+
+  return (
+    <>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            data-testid="context-ring"
+            onClick={() => setContextOpen(true)}
+            className="flex items-center rounded-full cursor-pointer outline-none transition-opacity hover:opacity-75 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            style={{ color: CONTEXT_RING_COLOR }}
+            aria-label={t("context.tooltip")}
+          >
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block -rotate-90" aria-hidden="true">
+              <RingCircles center={size / 2} radius={(size - strokeWidth) / 2} strokeWidth={strokeWidth} ratio={ratio} />
+            </svg>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="flex flex-col gap-0.5">
+            <span>{label}</span>
+            {detail !== undefined && <span>{detail}</span>}
+            <span>{t("usage.percentUsed", { percent: formatUsagePercent(ratio) })}</span>
+            <span className="text-muted-foreground">{t("context.tooltip")}</span>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+      <ContextViewerDialog open={contextOpen} onOpenChange={setContextOpen} />
     </>
   );
 }
@@ -155,6 +202,9 @@ export function QuotaRings({
 }
 
 export function UsageStatusBar() {
+  const contextUsage = useChatStore((state) => state.lastStatus?.context_usage ?? undefined);
+  const contextTokens = useChatStore((state) => state.lastStatus?.context_tokens ?? undefined);
+  const maxContextTokens = useChatStore((state) => state.lastStatus?.max_context_tokens ?? undefined);
   const currentModel = useSettingsStore((state) => state.currentModel);
   const models = useSettingsStore((state) => state.models);
   const isLoggedIn = useSettingsStore((state) => state.isLoggedIn);
@@ -201,35 +251,47 @@ export function UsageStatusBar() {
     return () => clearInterval(timer);
   }, []);
 
-  if (managedProvider === undefined) return null;
+  const contextRatio = contextUsage ?? (
+    contextTokens !== undefined && maxContextTokens !== undefined && maxContextTokens > 0
+      ? usageRatio(contextTokens, maxContextTokens)
+      : undefined
+  );
+  const contextDetail = contextTokens !== undefined && maxContextTokens !== undefined && maxContextTokens > 0
+    ? t("usage.tokenCount", { used: formatTokenCount(contextTokens), limit: formatTokenCount(maxContextTokens) })
+    : undefined;
 
   let quota: { fiveHour: QuotaWindowState; secondary: QuotaWindowState; secondaryLabel: string } | null = null;
-  if (usageError === null && usage === null) {
-    quota = { fiveHour: { ratio: null }, secondary: { ratio: null }, secondaryLabel: t("usage.weeklyLimit") };
-  } else {
-    const fiveHour = quotaWindowState(usage?.fiveHour, usageError);
-    const secondarySel = usage !== null ? secondaryQuotaWindow(usage) : undefined;
-    const secondary = quotaWindowState(secondarySel?.window, usageError);
-    const secondaryLabel = secondarySel?.kind === "monthly" ? t("usage.monthlyLimit") : t("usage.weeklyLimit");
-    if (fiveHour !== null || secondary !== null) {
-      quota = {
-        fiveHour: fiveHour ?? { ratio: null },
-        secondary: secondary ?? { ratio: null },
-        secondaryLabel,
-      };
+  if (managedProvider !== undefined) {
+    if (usageError === null && usage === null) {
+      quota = { fiveHour: { ratio: null }, secondary: { ratio: null }, secondaryLabel: t("usage.weeklyLimit") };
+    } else {
+      const fiveHour = quotaWindowState(usage?.fiveHour, usageError);
+      const secondarySel = usage !== null ? secondaryQuotaWindow(usage) : undefined;
+      const secondary = quotaWindowState(secondarySel?.window, usageError);
+      const secondaryLabel = secondarySel?.kind === "monthly" ? t("usage.monthlyLimit") : t("usage.weeklyLimit");
+      if (fiveHour !== null || secondary !== null) {
+        quota = {
+          fiveHour: fiveHour ?? { ratio: null },
+          secondary: secondary ?? { ratio: null },
+          secondaryLabel,
+        };
+      }
     }
   }
 
-  if (quota === null) return null;
+  if (contextRatio === undefined && quota === null) return null;
   return (
     <div className="flex h-6 items-center gap-1.5 select-none">
-      <QuotaRings
-        fiveHour={quota.fiveHour}
-        secondary={quota.secondary}
-        secondaryLabel={quota.secondaryLabel}
-        planName={usage?.planName}
-        now={now}
-      />
+      {contextRatio !== undefined && <ContextRing ratio={contextRatio} label={t("usage.contextWindow")} detail={contextDetail} />}
+      {quota !== null && (
+        <QuotaRings
+          fiveHour={quota.fiveHour}
+          secondary={quota.secondary}
+          secondaryLabel={quota.secondaryLabel}
+          planName={usage?.planName}
+          now={now}
+        />
+      )}
     </div>
   );
 }

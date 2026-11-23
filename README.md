@@ -1,6 +1,6 @@
 <a name="english"></a>
 
-<p align="center"><img src="apps/vscode/resources/kimi-icon-storefront.png" width="112" alt="KIMI KRINIK extension icon"></p>
+<p align="center"><img src="apps/vscode/resources/krinik-robot-logo.png" width="240" alt="KIMI KRINIK extension icon"></p>
 
 <h2 align="center">KIMI KRINIK</h2>
 
@@ -66,7 +66,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 
 <a name="russian"></a>
 
-<p align="center"><img src="apps/vscode/resources/kimi-icon-storefront.png" width="112" alt="Иконка расширения KIMI KRINIK"></p>
+<p align="center"><img src="apps/vscode/resources/krinik-robot-logo.png" width="240" alt="Иконка расширения KIMI KRINIK"></p>
 
 <h2 align="center">KIMI KRINIK</h2>
 
@@ -132,7 +132,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 
 <a name="chinese"></a>
 
-<p align="center"><img src="apps/vscode/resources/kimi-icon-storefront.png" width="112" alt="KIMI KRINIK 扩展图标"></p>
+<p align="center"><img src="apps/vscode/resources/krinik-robot-logo.png" width="240" alt="KIMI KRINIK 扩展图标"></p>
 
 <h2 align="center">KIMI KRINIK</h2>
 

@@ -238,6 +238,10 @@ class Bridge {
     return this.call<{ ok: boolean }>(Methods.ResetSession);
   }
 
+  getSessionContext() {
+    return this.call<{ ok: boolean; snapshot: import("shared/legacy-sdk").SessionContextSnapshot | null }>(Methods.GetSessionContext);
+  }
+
   getProjectFiles(params?: { query?: string; directory?: string }) {
     return this.call<import("shared/types").ProjectFile[]>(Methods.GetProjectFiles, params);
   }

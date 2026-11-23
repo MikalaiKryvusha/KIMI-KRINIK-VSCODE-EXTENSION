@@ -91,6 +91,18 @@ describe("automatic follow-up steer", () => {
     expect(useChatStore.getState().pendingInput).toEqual({ content: "hello", model: "plain" });
   });
 
+  it("passes every manual line break unchanged to idle prompts and running-turn steers", () => {
+    const prompt = "first thought\nsecond thought\n\nthird paragraph";
+    useChatStore.getState().sendMessage(prompt);
+    expect(boundary.streamChat.mock.calls[0]?.[0]).toBe(prompt);
+    expect(useChatStore.getState().pendingInput?.content).toBe(prompt);
+
+    beginTurn("first");
+    const followUp = "correction line one\ncorrection line two";
+    useChatStore.getState().sendMessage(followUp);
+    expect(boundary.steerChat).toHaveBeenCalledWith(followUp);
+  });
+
   it("uses a dedicated idle send exactly once when the turn ends during steer", async () => {
     let finishSteer: (value: { ok: boolean }) => void = () => undefined;
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { finishSteer = resolve; }));

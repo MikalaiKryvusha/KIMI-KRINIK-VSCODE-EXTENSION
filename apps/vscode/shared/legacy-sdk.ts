@@ -91,6 +91,18 @@ export interface StatusUpdate {
   } | null;
 }
 
+export interface SessionContextMessageView {
+  role: "system" | "user" | "assistant" | "tool";
+  text: string;
+  isError?: boolean;
+  kind?: "compaction_summary";
+}
+
+export interface SessionContextSnapshot {
+  tokenCount: number;
+  messages: SessionContextMessageView[];
+}
+
 export interface ApprovalRequestPayload {
   id: string;
   tool_call_id: string;

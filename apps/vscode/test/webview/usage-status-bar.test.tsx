@@ -2,11 +2,14 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const boundary = vi.hoisted(() => ({ getManagedUsage: vi.fn() }));
+const boundary = vi.hoisted(() => ({ getManagedUsage: vi.fn(), getSessionContext: vi.fn() }));
 
-vi.mock("@/services", () => ({ bridge: { getManagedUsage: boundary.getManagedUsage } }));
+vi.mock("@/services", () => ({
+  bridge: { getManagedUsage: boundary.getManagedUsage, getSessionContext: boundary.getSessionContext },
+}));
 
 import { QuotaRings, quotaWindowState, UsageStatusBar } from "../../webview-ui/src/components/UsageStatusBar";
+import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import { useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 
 beforeEach(() => {
@@ -16,6 +19,8 @@ beforeEach(() => {
     disconnect() {}
   });
   boundary.getManagedUsage.mockReset();
+  boundary.getSessionContext.mockReset();
+  useChatStore.setState({ lastStatus: null });
   useSettingsStore.getState().initModels([
     { id: "plain", name: "Plain", provider: "managed:kimi-code", capabilities: [] },
   ], "plain", false);
@@ -23,10 +28,12 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  useChatStore.setState({ lastStatus: null });
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
-describe("quota status", () => {
+describe("usage status", () => {
   it("shows percentages, plan, monthly window and reset countdown", async () => {
     const user = userEvent.setup();
     render(
@@ -60,5 +67,26 @@ describe("quota status", () => {
   it("rejects non-finite usage instead of inventing zero", () => {
     expect(quotaWindowState({ usedRatio: Number.NaN }, null))
       .toEqual({ ratio: null, error: "Invalid usage data" });
+  });
+
+  it("opens the live context from the ring without sending compact", async () => {
+    boundary.getManagedUsage.mockResolvedValue({ ok: true, usage: {} });
+    boundary.getSessionContext.mockResolvedValue({
+      ok: true,
+      snapshot: { tokenCount: 5, messages: [{ role: "user", text: "keep this context" }] },
+    });
+    useChatStore.setState({
+      lastStatus: { context_usage: 0.5, context_tokens: 1024, max_context_tokens: 2048 },
+    });
+    const sendMessage = vi.spyOn(useChatStore.getState(), "sendMessage").mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<UsageStatusBar />);
+
+    await user.click(await screen.findByTestId("context-ring"));
+
+    expect(await screen.findByText("Current Context")).not.toBeNull();
+    expect(await screen.findByText("keep this context")).not.toBeNull();
+    expect(boundary.getSessionContext).toHaveBeenCalledOnce();
+    expect(sendMessage).not.toHaveBeenCalled();
   });
 });

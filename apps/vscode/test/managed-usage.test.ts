@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatResetCountdown,
+  formatTokenCount,
   formatUsagePercent,
   secondaryQuotaWindow,
   toManagedUsageView,
+  usageRatio,
 } from "../shared/managed-usage";
 
 describe("managed usage mapping", () => {
@@ -43,6 +45,24 @@ describe("usage formatting", () => {
     expect(formatUsagePercent(0.8)).toBe(80);
     expect(formatUsagePercent(1.5)).toBe(100);
     expect(formatUsagePercent(Number.NaN)).toBe(0);
+  });
+
+  it("clamps context ratios and rejects invalid capacities", () => {
+    expect(usageRatio(25_600, 256_000)).toBe(0.1);
+    expect(usageRatio(-1, 100)).toBe(0);
+    expect(usageRatio(200, 100)).toBe(1);
+    expect(usageRatio(10, 0)).toBe(0);
+    expect(usageRatio(Number.NaN, 100)).toBe(0);
+  });
+
+  it("formats token counts with binary units and trimmed decimals", () => {
+    expect(formatTokenCount(999)).toBe("999");
+    expect(formatTokenCount(1024)).toBe("1k");
+    expect(formatTokenCount(1536)).toBe("1.5k");
+    expect(formatTokenCount(102_400)).toBe("100k");
+    expect(formatTokenCount(2.5 * 1024 * 1024)).toBe("2.5M");
+    expect(formatTokenCount(-1)).toBe("0");
+    expect(formatTokenCount(Number.NaN)).toBe("0");
   });
 
   it("formats reset countdowns", () => {

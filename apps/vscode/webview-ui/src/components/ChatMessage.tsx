@@ -1,5 +1,5 @@
 import { useState, Fragment, memo } from "react";
-import { IconLoader3, IconGitFork } from "@tabler/icons-react";
+import { IconGitFork } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Content } from "@/lib/content";
 import { Markdown } from "./Markdown";
@@ -17,6 +17,7 @@ import { toast } from "@/components/ui/sonner";
 import { useChatStore } from "@/stores";
 import { bridge } from "@/services";
 import { useT } from "@/i18n";
+import { WorkingIndicator } from "./WorkingIndicator";
 import type { ChatMessage as ChatMessageType, UIStep, UIStepItem } from "@/stores/chat.store";
 import type { ContentPart } from "shared/legacy-sdk";
 
@@ -24,16 +25,6 @@ interface ChatMessageProps {
   message: ChatMessageType;
   turnIndex?: number;
   isStreaming?: boolean;
-}
-
-function ThinkingIndicator() {
-  const t = useT();
-  return (
-    <div className="flex items-center gap-2 mt-1 text-blue-500/80 py-1">
-      <IconLoader3 className="size-3.5 animate-spin" />
-      <span className="text-[11px] font-medium tracking-wide">{t("chat.processing")}</span>
-    </div>
-  );
 }
 
 function SteerBubble({ content }: { content: string | ContentPart[] }) {
@@ -222,7 +213,7 @@ function UserMessage({ message }: { message: ChatMessageType }) {
       <div className={cn("max-w-[85%] px-3.5 py-1.5 rounded-2xl rounded-br-md", "bg-zinc-100 dark:bg-zinc-800", "text-foreground")}>
         {displayContent && (
           <div className="text-xs leading-relaxed wrap-break-word">
-            <Markdown content={displayContent} enableEnrichment enableLocalImageRender={false} />
+            <Markdown content={displayContent} className="[&_p]:whitespace-pre-wrap" enableEnrichment enableLocalImageRender={false} />
           </div>
         )}
         <MessageMedia images={images} videos={videos} onPreview={setPreviewMedia} />
@@ -233,6 +224,7 @@ function UserMessage({ message }: { message: ChatMessageType }) {
 }
 
 function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMessageType; turnIndex?: number; isStreaming?: boolean }) {
+  const t = useT();
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const isCompacting = useChatStore((s) => s.isCompacting);
 
@@ -305,7 +297,14 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
               </div>
             )}
             <div className="flex flex-row items-center space-between">
-              <div className="inline-flex flex-1">{isStreaming && !isShowingInlineError && !isCompacting && <ThinkingIndicator />}</div>
+              <div className="inline-flex flex-1">
+                {isStreaming && !isShowingInlineError && !isCompacting && (
+                  <WorkingIndicator
+                    className="mt-1 py-1"
+                    label={hasMessageContent(message) ? t("chat.working") : t("chat.requesting")}
+                  />
+                )}
+              </div>
               <div className="inline-flex flex-1" />
               {!isStreaming && contentToCopy.trim().length > 0 && (
                 <div className="flex justify-start pt-1 gap-1 opacity-0 group-hover/message:opacity-100 transition-opacity duration-100">
