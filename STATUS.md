@@ -36,9 +36,9 @@
 - Auto is turquoise, Stop is a filled square; Working uses the acid-pink `#FF1A8C` face with slight top chamfers and clipped ±1 px eye travel. `krinik-robot-logo.svg` + 1024 px PNG are used in all three README sections.
 - Independent Context Window Control: no `.kaif` marker or wire file required; settings + four thresholds, SDK status → self-contained `promptWithSkills(..., steerIfActive: true)`, exact boundary/once/re-arm tests. Built-in ownership and vanilla ON both make the KAIF context hook dormant; no dual delivery.
 
-### 2026-11-23 closing checkpoint — secondary model 🔧 implementation present, closing verification pending
+### 2026-11-24 01:04 +03:00 — secondary model ✅ component and persistence guards
 - Added `SubagentModelDialog`, robot visibility, `secondaryModel` in the config/store/bridge contracts, and `src/config/secondary-model.ts` atomic validated persistence. Existing-model selection and Follow main model remove the whole old recipe; main model/effort stay untouched (`effortChanged:false`). Custom providers are excluded.
-- `apps/vscode/test/secondary-model.test.ts` proves selection and clearing (2 tests green); extension typecheck was green before the final test-fixture edit. No robot-specific interaction test or live Extension Host run was added before the owner stopped the work for closure. Do not call this live-accepted.
+- `apps/vscode/test/secondary-model.test.ts` proves TOML selection and clearing; the robot interaction test now drives open → existing model → Follow main model and asserts both bridge payloads. A targeted `effortChanged` mutation reddened exactly the new scenario. Full verification: 506 passed, 1 skipped; typecheck, lint and both builds green. Live Extension Host acceptance remains pending; do not call this live-accepted. Report: `testcases/reports/2026-11-24_secondary_model_robot.md`.
 
 ### 2026-11-23 evening — K1–K4 features (Claude) ✅ hygiene, live run pending
 - `365af86cd` Auto Compact and AUTO STEER switches (K2.1/K2.2/K2.4/K2.5/K2.7); `08a22d393` brand KIMI KRINIK (K1.4);
@@ -98,12 +98,11 @@ Standing falsehood: прежнее «ни один проектный хук н�
 
 KNOWLEDGE: independent Context Window Control and the one-authority handoff are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; the false total-hook-failure diagnosis, exact forensics and live activation are in `bugs/KAIF/04_context_window_alive_dormant.md` and EXP-0004; the voice route is in `HOUSE_RULES.md` R1 and EXP-0003; secondary model's checkpoint and the owner's new UI/persistence requirements are in this file.
 
-1. Read `FAREWELL_MESSAGE_FROM_THE_PREVIOUS_CHAT.md` and run `/skill:resume`. In a new official Kimi session run `node .kaif/hooks/context-window.mjs --alive` and `node .kaif/hooks/context-window.mjs --measure`; expect a recorded session and a real wire measurement. Dormant Auto Compact ON / built-in ownership is exit 2, not a total hook failure.
-2. Verify the closing commit and tree. Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.
-3. Add the missing robot interaction test (open → existing model → `saveConfig` with `secondaryModel` and `effortChanged:false` → Follow main model), then run `pnpm exec vitest run --reporter=agent apps/vscode/test/secondary-model.test.ts apps/vscode/test/webview/control-panel-settings.test.tsx` and the full verification commands above.
-4. Implement and test the owner's persistence requirement: the last Auto / Manual / YOLO mode, main model and reasoning effort are the defaults for a new chat and after a VS Code restart. Model/effort already use `harness.setConfig`; permission mode still needs the canonical `defaultPermissionMode` path reconciled with legacy `kimi.yoloMode`.
-5. Continue K1: combined model + effort picker, then status pills and session header. The header must display `KIMI KRINIK` and use the robot from KIMI FORK. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
-6. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
+1. Implement and test the owner's persistence requirement: the last Auto / Manual / YOLO mode, main model and reasoning effort are the defaults for a new chat and after a VS Code restart. Model/effort already use `harness.setConfig`; permission mode still needs the canonical `defaultPermissionMode` path reconciled with legacy `kimi.yoloMode`.
+2. Continue K1: combined model + effort picker, then status pills and session header. The header must display `KIMI KRINIK` and use the robot from KIMI FORK. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
+3. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
+
+Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.
 
 ## Open bugs
 

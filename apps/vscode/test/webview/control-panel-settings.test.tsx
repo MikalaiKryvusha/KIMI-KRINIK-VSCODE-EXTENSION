@@ -30,6 +30,7 @@ import { ActionMenu } from "../../webview-ui/src/components/ActionMenu";
 import { ControlPanelSettingsDialog } from "../../webview-ui/src/components/ControlPanelSettingsDialog";
 import { ModeButtons } from "../../webview-ui/src/components/ModeButtons";
 import { PermissionModeButton } from "../../webview-ui/src/components/PermissionModeButton";
+import { SubagentModelDialog } from "../../webview-ui/src/components/SubagentModelDialog";
 import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 
@@ -125,5 +126,47 @@ describe("Control Panel settings", () => {
     await user.type(threshold, "72");
     expect(useSettingsStore.getState().extensionConfig.contextWindowThresholds.warnPct).toBe(72);
     expect(boundary.updateExtensionSetting).toHaveBeenLastCalledWith({ key: "kaif.warnPercent", value: 72 });
+  });
+
+  it("selects and clears the secondary model through the robot without changing effort", async () => {
+    const user = userEvent.setup();
+    boundary.saveConfig.mockResolvedValue({ ok: true });
+    useSettingsStore.setState({
+      models: [
+        { id: "main", name: "Main", provider: "managed:kimi-code", capabilities: ["thinking"], support_efforts: ["low", "high"] },
+        { id: "reasoning", name: "Reasoning", provider: "managed:kimi-code", capabilities: ["thinking"], support_efforts: ["low", "high"] },
+      ],
+      currentModel: "main",
+      thinkingEffort: "high",
+      secondaryModel: null,
+    });
+    render(<SubagentModelDialog />);
+
+    await user.click(screen.getByTestId("secondary-model"));
+    await user.click(await screen.findByRole("button", { name: "Reasoning" }));
+
+    expect(boundary.saveConfig).toHaveBeenLastCalledWith({
+      model: "main",
+      thinking: true,
+      effort: "high",
+      effortChanged: false,
+      secondaryModel: { model: "reasoning" },
+    });
+    expect(useSettingsStore.getState().secondaryModel).toEqual({ model: "reasoning" });
+    expect(useSettingsStore.getState().thinkingEffort).toBe("high");
+
+    await user.click(screen.getByTestId("secondary-model"));
+    await user.click(await screen.findByRole("button", { name: /Follow main model/ }));
+
+    expect(boundary.saveConfig).toHaveBeenLastCalledWith({
+      model: "main",
+      thinking: true,
+      effort: "high",
+      effortChanged: false,
+      secondaryModel: null,
+    });
+    expect(useSettingsStore.getState().secondaryModel).toBeNull();
+    expect(useSettingsStore.getState().currentModel).toBe("main");
+    expect(useSettingsStore.getState().thinkingEffort).toBe("high");
   });
 });
