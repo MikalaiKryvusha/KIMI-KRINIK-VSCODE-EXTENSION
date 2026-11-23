@@ -11,6 +11,7 @@ import type {
 } from "shared/legacy-sdk";
 import type {
   AutoCompactResult,
+  ExtensionSettingUpdate,
   FileChange,
   SessionConfig,
   ExtensionConfig,
@@ -152,8 +153,8 @@ class Bridge {
     return this.call<ExtensionConfig>(Methods.GetExtensionConfig);
   }
 
-  updateExtensionSetting(key: "autoSteer", value: boolean) {
-    return this.call<{ ok: boolean }>(Methods.UpdateExtensionSetting, { key, value });
+  updateExtensionSetting(update: ExtensionSettingUpdate) {
+    return this.call<{ ok: boolean }>(Methods.UpdateExtensionSetting, update);
   }
 
   getAutoCompact() {

@@ -29,8 +29,17 @@ export interface ExtensionConfig {
   showThinkingContent: boolean;
   showThinkingExpanded: boolean;
   autoSteer: boolean;
+  language: InterfaceLanguage;
   version: string;
 }
+
+export const INTERFACE_LANGUAGES = ["en", "zh", "ru"] as const;
+
+export type InterfaceLanguage = (typeof INTERFACE_LANGUAGES)[number];
+
+export type ExtensionSettingUpdate =
+  | { key: "autoSteer"; value: boolean }
+  | { key: "language"; value: InterfaceLanguage };
 
 export interface KaifThresholds {
   warnPct: number;

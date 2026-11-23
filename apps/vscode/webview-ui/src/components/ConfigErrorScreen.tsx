@@ -14,6 +14,7 @@ import {
 import { bridge } from "@/services";
 import { Button } from "@/components/ui/button";
 import { KimiMascot } from "./KimiMascot";
+import { useT } from "@/i18n";
 
 interface Props {
   type: "loading" | "runtime-error" | "no-models" | "no-workspace";
@@ -24,6 +25,7 @@ interface Props {
 
 function ErrorDetails({ message }: { message?: string | null }) {
   const [copied, setCopied] = useState(false);
+  const t = useT();
 
   if (!message) return null;
 
@@ -38,7 +40,7 @@ function ErrorDetails({ message }: { message?: string | null }) {
       <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
         <div className="flex items-center gap-2 min-w-0">
           <IconTerminal2 className="size-4" />
-          <span>Error details</span>
+          <span>{t("error.details")}</span>
         </div>
         <Button
           onClick={() => {
@@ -49,7 +51,7 @@ function ErrorDetails({ message }: { message?: string | null }) {
           className="h-6 px-1.5 gap-1 shrink-0"
         >
           {copied ? <IconCheck className="size-3" /> : <IconCopy className="size-3" />}
-          {copied ? "Copied" : "Copy"}
+          {copied ? t("common.copied") : t("common.copy")}
         </Button>
       </div>
       <pre className="max-h-36 overflow-auto whitespace-pre-wrap break-words text-xs bg-background rounded px-3 py-2 font-mono text-foreground">{message}</pre>
@@ -58,25 +60,26 @@ function ErrorDetails({ message }: { message?: string | null }) {
 }
 
 function NoModelsContent({ onRefresh, onBackToLogin }: Pick<Props, "onRefresh" | "onBackToLogin">) {
+  const t = useT();
   return (
     <>
       <div className="space-y-2">
         <div className="inline-flex items-center gap-2 text-amber-500">
           <IconAlertTriangle className="size-5" />
-          <span className="text-sm font-medium">Model setup required</span>
+          <span className="text-sm font-medium">{t("error.modelSetupRequired")}</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          Sign in with a Kimi account, or configure a provider and model in your shared Kimi Code <code className="bg-muted px-1 rounded">config.toml</code>.
+          {t("error.modelSetupDesc")} <code className="bg-muted px-1 rounded">config.toml</code>.
         </p>
       </div>
 
       <div className="bg-muted/50 rounded-lg p-4 text-left space-y-2">
         <div className="flex items-center gap-2 text-xs font-medium">
           <IconFileSettings className="size-4" />
-          Shared Kimi Code configuration
+          {t("error.sharedConfig")}
         </div>
         <p className="text-xs text-muted-foreground">
-          VS Code and the terminal UI use the same Kimi Code home, configuration, credentials, and sessions.
+          {t("error.sharedConfigDesc")}
         </p>
       </div>
 
@@ -84,13 +87,13 @@ function NoModelsContent({ onRefresh, onBackToLogin }: Pick<Props, "onRefresh" |
         {onBackToLogin && (
           <Button onClick={onBackToLogin} variant="ghost" size="sm" className="gap-1 text-muted-foreground">
             <IconArrowLeft className="size-3" />
-            Back to sign in
+            {t("error.backToSignIn")}
           </Button>
         )}
         {onRefresh && (
           <Button onClick={onRefresh} variant="ghost" size="sm" className="gap-1 text-muted-foreground">
             <IconRefresh className="size-3" />
-            Reload
+            {t("error.reload")}
           </Button>
         )}
       </div>
@@ -99,6 +102,7 @@ function NoModelsContent({ onRefresh, onBackToLogin }: Pick<Props, "onRefresh" |
 }
 
 export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin }: Props) {
+  const t = useT();
   if (type === "loading") {
     return (
       <div className="h-full flex items-center justify-center p-6">
@@ -106,7 +110,7 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
           <KimiMascot className="h-10 mx-auto opacity-50" />
           <div className="inline-flex items-center gap-2 text-muted-foreground">
             <IconLoader2 className="size-4 animate-spin" />
-            <span className="text-sm">Starting KIMI KRINIK…</span>
+            <span className="text-sm">{t("error.starting")}</span>
           </div>
         </div>
       </div>
@@ -121,9 +125,9 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-amber-500">
               <IconFolderOpen className="size-5" />
-              <span className="text-sm font-medium">No workspace open</span>
+              <span className="text-sm font-medium">{t("error.noWorkspace")}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Open a folder to start using KIMI KRINIK.</p>
+            <p className="text-xs text-muted-foreground">{t("error.noWorkspaceDesc")}</p>
           </div>
           <Button
             onClick={() => {
@@ -132,7 +136,7 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
             className="gap-2"
           >
             <IconFolderOpen className="size-4" />
-            Open Folder
+            {t("error.openFolder")}
           </Button>
         </div>
       </div>
@@ -157,9 +161,9 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 text-red-500">
             <IconAlertTriangle className="size-5" />
-            <span className="text-sm font-medium">KIMI KRINIK could not start</span>
+            <span className="text-sm font-medium">{t("error.couldNotStart")}</span>
           </div>
-          <p className="text-xs text-muted-foreground">Check the error below. Full diagnostics are available in the Kimi Code output channel.</p>
+          <p className="text-xs text-muted-foreground">{t("error.couldNotStartDesc")}</p>
         </div>
         <ErrorDetails message={errorMessage} />
         <div className="flex gap-2 justify-center">
@@ -170,12 +174,12 @@ export function ConfigErrorScreen({ type, errorMessage, onRefresh, onBackToLogin
             variant="outline"
             size="sm"
           >
-            Show Logs
+            {t("menu.showLogs")}
           </Button>
           {onRefresh && (
             <Button onClick={onRefresh} size="sm" className="gap-1">
               <IconRefresh className="size-3" />
-              Retry
+              {t("common.retry")}
             </Button>
           )}
         </div>

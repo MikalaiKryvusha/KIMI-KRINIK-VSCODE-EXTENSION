@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder } from "@tabler/icons-react";
+import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconCheck } from "@tabler/icons-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,6 +8,14 @@ import { useSettingsStore } from "@/stores";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
+import type { InterfaceLanguage } from "shared/types";
+
+const LANGUAGE_NAMES: ReadonlyArray<[InterfaceLanguage, string]> = [
+  ["en", "English"],
+  ["zh", "中文"],
+  ["ru", "Русский"],
+];
 
 interface ActionMenuProps {
   className?: string;
@@ -57,7 +65,8 @@ function SwitchItem({ label, hint, checked, disabled, onChange }: { label: strin
 export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, autoCompact, autoCompactPending, changeAutoCompact, changeAutoSteer } = useSettingsStore();
+  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, autoCompact, autoCompactPending, changeAutoCompact, changeAutoSteer, changeLanguage } = useSettingsStore();
+  const t = useT();
 
   const handleOpenSettings = () => {
     void bridge.openSettings();
@@ -95,7 +104,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
         if (result.success) {
           setIsLoggedIn(true);
         } else {
-          toast.error(result.error ?? "Sign-in failed. Check the logs for details.");
+          toast.error(result.error ?? t("menu.signInFailed"));
         }
       }
     } finally {
@@ -113,35 +122,35 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[calc(100vw-1rem)] max-w-72 p-1.5 gap-0!" align="end" side="top">
-        <MenuSection title="Settings">
+        <MenuSection title={t("menu.settings")}>
           <MenuItem onClick={handleChangeWorkDir}>
             <IconFolder className="size-4 text-muted-foreground" />
-            <span className="flex-1">Working Directory</span>
+            <span className="flex-1">{t("menu.workingDirectory")}</span>
           </MenuItem>
           <MenuItem onClick={handleOpenMCPServers}>
             <IconServer className="size-4 text-muted-foreground" />
-            <span className="flex-1">MCP Servers</span>
+            <span className="flex-1">{t("menu.mcpServers")}</span>
           </MenuItem>
           <MenuItem onClick={handleOpenSettings}>
             <IconSettings className="size-4 text-muted-foreground" />
-            <span className="flex-1">General Config</span>
+            <span className="flex-1">{t("menu.generalConfig")}</span>
             <span className="text-[10px] text-muted-foreground">↗</span>
           </MenuItem>
         </MenuSection>
 
         <Separator className="my-px" />
 
-        <MenuSection title="Behavior">
+        <MenuSection title={t("menu.behavior")}>
           <SwitchItem
-            label="Auto Compact"
-            hint={autoCompact === false ? "Off: the KAIF thresholds guard the context" : "On: Kimi compacts the context by itself"}
+            label={t("menu.autoCompact")}
+            hint={autoCompact === false ? t("menu.autoCompactOff") : t("menu.autoCompactOn")}
             checked={autoCompact !== false}
             disabled={autoCompact === null || autoCompactPending}
             onChange={(enabled) => void changeAutoCompact(enabled)}
           />
           <SwitchItem
-            label="AUTO STEER"
-            hint={extensionConfig.autoSteer ? "On: a message joins the running turn" : "Off: a message waits in the queue"}
+            label={t("menu.autoSteer")}
+            hint={extensionConfig.autoSteer ? t("menu.autoSteerOn") : t("menu.autoSteerOff")}
             checked={extensionConfig.autoSteer}
             onChange={(enabled) => void changeAutoSteer(enabled)}
           />
@@ -149,20 +158,31 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
 
         <Separator className="my-px" />
 
-        <MenuSection title="Support" subtitle={extensionConfig.version ? `v${extensionConfig.version}` : undefined}>
+        <MenuSection title={t("menu.language")}>
+          {LANGUAGE_NAMES.map(([language, name]) => (
+            <MenuItem key={language} onClick={() => void changeLanguage(language)}>
+              <span className="flex-1">{name}</span>
+              {extensionConfig.language === language && <IconCheck className="size-3.5 text-muted-foreground" />}
+            </MenuItem>
+          ))}
+        </MenuSection>
+
+        <Separator className="my-px" />
+
+        <MenuSection title={t("menu.support")} subtitle={extensionConfig.version ? `v${extensionConfig.version}` : undefined}>
           <MenuItem onClick={handleShowLogs}>
             <IconFileText className="size-4 text-muted-foreground" />
-            <span className="flex-1">Show Logs</span>
+            <span className="flex-1">{t("menu.showLogs")}</span>
           </MenuItem>
           <MenuItem onClick={handleReset}>
             <IconRefresh className="size-4 text-muted-foreground" />
-            <span className="flex-1">Reset Kimi</span>
+            <span className="flex-1">{t("menu.resetKimi")}</span>
           </MenuItem>
         </MenuSection>
 
         <Separator className="my-px" />
 
-        <MenuSection title="Account">
+        <MenuSection title={t("menu.account")}>
           <MenuItem
             onClick={() => {
               void handleAuthAction();
@@ -171,7 +191,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
             danger={isLoggedIn}
           >
             {loading ? <IconLoader2 className="size-4 animate-spin" /> : isLoggedIn ? <IconLogout className="size-4" /> : <IconLogin className="size-4 text-muted-foreground" />}
-            <span className="flex-1">{loading ? "Processing…" : isLoggedIn ? "Sign out" : "Sign in"}</span>
+            <span className="flex-1">{loading ? t("menu.processing") : isLoggedIn ? t("menu.signOut") : t("menu.signIn")}</span>
           </MenuItem>
         </MenuSection>
       </PopoverContent>

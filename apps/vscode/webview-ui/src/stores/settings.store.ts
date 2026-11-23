@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
-import type { ExtensionConfig } from "shared/types";
+import type { ExtensionConfig, InterfaceLanguage } from "shared/types";
 import type { ModelConfig, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
 
 let settingsSaveRevision = 0;
@@ -28,6 +28,7 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
   showThinkingContent: true,
   showThinkingExpanded: true,
   autoSteer: true,
+  language: "en",
   version: "",
 };
 
@@ -184,6 +185,7 @@ interface SettingsState {
   setAutoCompact: (enabled: boolean | null) => void;
   changeAutoCompact: (enabled: boolean) => Promise<void>;
   changeAutoSteer: (enabled: boolean) => Promise<void>;
+  changeLanguage: (language: InterfaceLanguage) => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -225,9 +227,20 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     }
   },
 
+  changeLanguage: async (language) => {
+    const previous = get().extensionConfig.language;
+    set({ extensionConfig: { ...get().extensionConfig, language } });
+    try {
+      await bridge.updateExtensionSetting({ key: "language", value: language });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, language: previous } });
+      toast.error(`Language was not changed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  },
+
   changeAutoSteer: async (enabled) => {
     try {
-      await bridge.updateExtensionSetting("autoSteer", enabled);
+      await bridge.updateExtensionSetting({ key: "autoSteer", value: enabled });
     } catch (error) {
       toast.error(`AUTO STEER was not changed: ${error instanceof Error ? error.message : String(error)}`);
     }

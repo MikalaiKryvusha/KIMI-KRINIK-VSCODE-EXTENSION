@@ -3,14 +3,9 @@ import { dirname, join } from "node:path";
 import * as vscode from "vscode";
 
 import { Events, Methods } from "../../shared/bridge";
-import type { AutoCompactResult, KaifProjection, KaifThresholds } from "../../shared/types";
+import type { AutoCompactResult, ExtensionSettingUpdate, KaifProjection, KaifThresholds } from "../../shared/types";
 import { VSCodeSettings } from "../config/vscode-settings";
 import type { Handler, HandlerContext } from "./types";
-
-interface ExtensionSettingUpdate {
-  key: "autoSteer";
-  value: boolean;
-}
 
 const updateExtensionSetting: Handler<ExtensionSettingUpdate, { ok: boolean }> = async (params) => {
   await vscode.workspace.getConfiguration("kimi").update(params.key, params.value, vscode.ConfigurationTarget.Global);

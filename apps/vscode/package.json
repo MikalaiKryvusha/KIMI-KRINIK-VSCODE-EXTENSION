@@ -71,6 +71,21 @@
           "default": false,
           "description": "Use Ctrl/Cmd+Enter to send prompts instead of Enter"
         },
+        "kimi.language": {
+          "type": "string",
+          "enum": [
+            "en",
+            "zh",
+            "ru"
+          ],
+          "enumDescriptions": [
+            "English",
+            "中文",
+            "Русский"
+          ],
+          "default": "en",
+          "description": "Interface language of KIMI KRINIK."
+        },
         "kimi.autoSteer": {
           "type": "boolean",
           "default": true,

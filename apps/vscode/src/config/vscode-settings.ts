@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import type { ExtensionConfig, KaifThresholds } from "../../shared/types";
+import { INTERFACE_LANGUAGES, type ExtensionConfig, type InterfaceLanguage, type KaifThresholds } from "../../shared/types";
 
 declare const __EXTENSION_VERSION__: string;
 const EXTENSION_VERSION = typeof __EXTENSION_VERSION__ !== "undefined" ? __EXTENSION_VERSION__ : "0.0.0";
@@ -37,6 +37,11 @@ export const VSCodeSettings = {
     return getConfig().get<boolean>("autoSteer", true);
   },
 
+  get language(): InterfaceLanguage {
+    const value = getConfig().get<string>("language", "en");
+    return INTERFACE_LANGUAGES.find((language) => language === value) ?? "en";
+  },
+
   get kaifThresholds(): KaifThresholds {
     const config = getConfig();
     return {
@@ -60,6 +65,7 @@ export const VSCodeSettings = {
       showThinkingContent: this.showThinkingContent,
       showThinkingExpanded: this.showThinkingExpanded,
       autoSteer: this.autoSteer,
+      language: this.language,
       version: EXTENSION_VERSION,
     };
   },
@@ -70,7 +76,7 @@ export function onSettingsChange(callback: (changedKeys: string[]) => void): vsc
     if (!e.affectsConfiguration("kimi")) {
       return;
     }
-    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer"];
+    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "language"];
     const changedKeys = keys.filter((key) => e.affectsConfiguration(`kimi.${key}`));
     if (changedKeys.length > 0) {
       callback(changedKeys);

@@ -38,6 +38,7 @@ import { useMediaUpload } from "./hooks/useMediaUpload";
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useInputHistory } from "./hooks/useInputHistory";
 import { computeMentionInsert } from "./utils";
+import { useT } from "@/i18n";
 
 interface InputAreaProps {
   onAuthAction?: () => void;
@@ -62,6 +63,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   const { isStreaming, sendMessage, abort, draftMedia, removeDraftMedia, hasProcessingMedia, getMediaInConversation, pendingInput, composerRestore, planMode, messages } = useChatStore();
   const { currentModel, thinkingEffort, updateModel, toggleThinking, selectThinkingEffort, models, extensionConfig, getCurrentThinkingMode } = useSettingsStore();
 
+  const t = useT();
   const isProcessing = hasProcessingMedia();
   const thinkingMode = getCurrentThinkingMode();
   const hasConversationHistory = messages.some((message) => message.role === "user");
@@ -94,7 +96,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   const modelGroups = useMemo(() => groupModelsByProvider(availableModels), [availableModels]);
   const showProviderGroups = modelGroups.length > 1;
   const currentModelLabel = currentModelConfig === undefined
-    ? "No models available"
+    ? t("input.noModels")
     : showProviderGroups
       ? `${currentModelConfig.name} · ${providerDisplayName(currentModelConfig.provider)}`
       : currentModelConfig.name;
@@ -382,7 +384,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
             onKeyDown={handleKeyDown}
             onSelect={handleSelect}
             onPaste={handlePaste}
-            placeholder={isStreaming ? "Add a follow-up…" : "Ask Kimi Code… (/ commands · @ files · Alt+K code)"}
+            placeholder={isStreaming ? t("input.placeholderStreaming") : t("input.placeholder")}
             className={cn(
               "w-full min-h-12 max-h-35 px-2.5 py-1.5 text-xs leading-relaxed",
               "bg-transparent resize-none outline-none border-none overflow-y-auto",
@@ -403,7 +405,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
                         disabled={isStreaming || !hasModels}
                       >
                         <span className="flex min-w-0 items-center text-xs">
-                          <span className="truncate">{currentModelConfig?.name ?? "No models available"}</span>
+                          <span className="truncate">{currentModelConfig?.name ?? t("input.noModels")}</span>
                           {currentModelConfig !== undefined && showProviderGroups && (
                             <span className="shrink-[3] truncate text-muted-foreground max-[520px]:hidden">
                               {" · "}{providerDisplayName(currentModelConfig.provider)}
@@ -463,7 +465,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
                     <IconPlus className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Add files or media</TooltipContent>
+                <TooltipContent>{t("input.addFilesOrMedia")}</TooltipContent>
               </Tooltip>
 
               <UsageStatusBar />
@@ -486,9 +488,9 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
       <StreamingConfirmDialog
         open={showPlanModeConfirm}
         onOpenChange={setShowPlanModeConfirm}
-        title="Exit Plan Mode"
-        description="The agent is still working. Exiting plan mode now will affect the current turn. Are you sure you want to exit plan mode immediately?"
-        confirmLabel="Exit Now"
+        title={t("input.exitPlanMode.title")}
+        description={t("input.exitPlanMode.description")}
+        confirmLabel={t("input.exitPlanMode.confirm")}
         onConfirm={handleConfirmExitPlanMode}
       />
     </div>

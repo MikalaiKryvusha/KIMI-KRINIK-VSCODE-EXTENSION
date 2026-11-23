@@ -1,3 +1,5 @@
+import { INTERFACE_LANGUAGES } from "./types";
+
 export const Methods = {
   CheckWorkspace: "checkWorkspace",
   GetInputHistory: "getInputHistory",
@@ -154,7 +156,10 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.NotifyAttention:
       return isPlainObject(params) && hasNonEmptyString(params, "message");
     case Methods.UpdateExtensionSetting:
-      return isPlainObject(params) && params["key"] === "autoSteer" && typeof params["value"] === "boolean";
+      return isPlainObject(params) && (
+        (params["key"] === "autoSteer" && typeof params["value"] === "boolean")
+        || (params["key"] === "language" && (INTERFACE_LANGUAGES as readonly unknown[]).includes(params["value"]))
+      );
     case Methods.SetAutoCompact:
       return isPlainObject(params) && hasBoolean(params, "enabled");
     case Methods.SaveConfig:
