@@ -1,3 +1,4 @@
+import type { GoalStateInfo, PermissionModeName } from "./modes";
 export type ApprovalResponse = 'approve' | 'approve_for_session' | 'reject';
 
 export type ContentPart =
@@ -72,6 +73,11 @@ export interface TokenUsage {
 
 export interface StatusUpdate {
   context_usage?: number | null;
+  context_tokens?: number | null;
+  max_context_tokens?: number | null;
+  swarm_mode?: boolean | null;
+  permission?: PermissionModeName | null;
+  goal?: GoalStateInfo | null;
   token_usage?: TokenUsage | null;
   message_id?: string | null;
   plan_mode?: boolean | null;

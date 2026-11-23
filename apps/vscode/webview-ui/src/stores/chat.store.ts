@@ -12,6 +12,7 @@ import { useSettingsStore } from "./settings.store";
 import { processEvent } from "./event-handlers";
 import type { ApprovalRequestPayload, RunResult, StatusUpdate, ContentPart, QuestionRequest, ToolResult } from "shared/legacy-sdk";
 import type { StreamError, UIStreamEvent } from "shared/types";
+import type { GoalStateInfo, PermissionModeName } from "shared/modes";
 
 const HANDSHAKE_TIMEOUT_MS = 30_000;
 
@@ -106,6 +107,10 @@ export interface ChatState {
   queue: QueuedItem[];
   pendingQuestion: QuestionRequest | null;
   planMode: boolean;
+  swarmMode: boolean;
+  permissionMode: PermissionModeName | null;
+  goal: GoalStateInfo | null;
+  goalArmed: boolean;
 
   sendMessage: (text: string) => void;
   steerNow: (text: string) => void;
@@ -176,7 +181,7 @@ function clearAllInlineErrors(draft: ChatState): void {
   }
 }
 
-function doSend(state: ChatState, content: string | ContentPart[], model: string) {
+function doSend(state: ChatState, content: string | ContentPart[], model: string, goalObjective?: string) {
   const { sessionId, planMode } = state;
   const { thinkingEffort } = useSettingsStore.getState();
 
@@ -195,7 +200,10 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
   }, HANDSHAKE_TIMEOUT_MS);
 
   void bridge
-    .streamChat(content, model, thinkingEffort, planMode, sessionId ?? undefined)
+    .streamChat(content, model, thinkingEffort, planMode, sessionId ?? undefined, {
+      ...(state.permissionMode === null ? {} : { permissionMode: state.permissionMode }),
+      ...(goalObjective === undefined ? {} : { goalObjective }),
+    })
     .catch((error: unknown) => {
       const detail = error instanceof Error ? error.message : String(error);
       useChatStore.getState().processEvent({
@@ -208,7 +216,7 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
     });
 }
 
-function sendIdle(content: string | ContentPart[], model: string, sentMediaIds?: ReadonlySet<string>) {
+function sendIdle(content: string | ContentPart[], model: string, sentMediaIds?: ReadonlySet<string>, goalObjective?: string) {
   useChatStore.setState(
     produce((draft: ChatState) => {
       clearAllInlineErrors(draft);
@@ -221,7 +229,7 @@ function sendIdle(content: string | ContentPart[], model: string, sentMediaIds?:
     }),
   );
   useApprovalStore.getState().clearRequests();
-  doSend(useChatStore.getState(), content, model);
+  doSend(useChatStore.getState(), content, model, goalObjective);
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -239,6 +247,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
   queue: [],
   pendingQuestion: null,
   planMode: false,
+  swarmMode: false,
+  permissionMode: null,
+  goal: null,
+  goalArmed: false,
 
   sendMessage: (text) => {
     if (get().isStreaming) {
@@ -257,7 +269,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const { currentModel } = useSettingsStore.getState();
     const content = buildDraftContent(text, sendableDraftMedia(get().draftMedia));
     if (Content.isEmpty(content)) return;
-    sendIdle(content, currentModel);
+    const goalObjective = get().goalArmed && text.trim() ? text.trim() : undefined;
+    if (goalObjective !== undefined) set({ goalArmed: false });
+    sendIdle(content, currentModel, undefined, goalObjective);
   },
 
   steerNow: (text) => {
@@ -372,6 +386,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       queue: [],
       pendingQuestion: null,
       planMode: false,
+      swarmMode: false,
+      goal: null,
+      goalArmed: false,
     });
     useApprovalStore.getState().clearRequests();
 
@@ -430,6 +447,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       queue: [],
       pendingQuestion: null,
       planMode: false,
+      swarmMode: false,
+      goal: null,
+      goalArmed: false,
     });
     useApprovalStore.getState().clearRequests();
   },

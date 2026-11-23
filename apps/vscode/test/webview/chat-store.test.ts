@@ -60,6 +60,10 @@ beforeEach(() => {
     queue: [],
     pendingQuestion: null,
     planMode: false,
+    swarmMode: false,
+    permissionMode: null,
+    goal: null,
+    goalArmed: false,
   });
 });
 
@@ -320,5 +324,41 @@ describe("automatic follow-up steer", () => {
       ["Which one?", sounds.question],
       ["Done", sounds.turnComplete],
     ]);
+  });
+
+  it("sends an armed goal objective with the next idle message and disarms the goal", () => {
+    useChatStore.setState({ goalArmed: true });
+    useChatStore.getState().sendMessage("Ship the release");
+
+    expect(boundary.streamChat.mock.calls[0]?.[5]).toEqual({ goalObjective: "Ship the release" });
+    expect(useChatStore.getState().goalArmed).toBe(false);
+  });
+
+  it("sends the permission mode only after the user chose one", () => {
+    useChatStore.getState().sendMessage("first");
+    expect(boundary.streamChat.mock.calls[0]?.[5]).toEqual({});
+
+    useChatStore.setState({ isStreaming: false, permissionMode: "auto" });
+    useChatStore.getState().sendMessage("second");
+    expect(boundary.streamChat.mock.calls[1]?.[5]).toEqual({ permissionMode: "auto" });
+  });
+
+  it("follows swarm, goal and permission from status updates", () => {
+    useChatStore.setState({ goalArmed: true });
+    useChatStore.getState().processEvent({
+      type: "StatusUpdate",
+      payload: {
+        swarm_mode: true,
+        permission: "yolo",
+        goal: { objective: "Ship", status: "active", turnsUsed: 1, tokensUsed: 10, wallClockMs: 5 },
+      },
+    });
+
+    expect(useChatStore.getState()).toMatchObject({
+      swarmMode: true,
+      permissionMode: "yolo",
+      goal: { objective: "Ship", status: "active" },
+      goalArmed: false,
+    });
   });
 });

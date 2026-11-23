@@ -19,7 +19,6 @@ import { MediaPreviewModal } from "../MediaPreviewModal";
 import { BottomToolbar } from "../BottomToolbar";
 import { StreamingConfirmDialog } from "../StreamingConfirmDialog";
 import { ThinkingButton } from "../ThinkingButton";
-import { PlanModeButton } from "../PlanModeButton";
 import {
   getModelById,
   getMediaFallbackModel,
@@ -39,6 +38,8 @@ import { useClickOutside } from "./hooks/useClickOutside";
 import { useInputHistory } from "./hooks/useInputHistory";
 import { computeMentionInsert } from "./utils";
 import { useT } from "@/i18n";
+import { ModeButtons } from "../ModeButtons";
+import { PermissionModeButton } from "../PermissionModeButton";
 
 interface InputAreaProps {
   onAuthAction?: () => void;
@@ -392,7 +393,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
             )}
           />
 
-          <div className="flex items-center justify-between px-1.5 pb-1.5">
+          <div className="@container/composer flex items-center justify-between gap-1 px-1.5 pb-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <DropdownMenu>
                 <Tooltip>
@@ -455,7 +456,8 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
                 onToggle={toggleThinking}
                 onSelectEffort={selectThinkingEffort}
               />
-              <PlanModeButton active={planMode} onToggle={handleTogglePlanMode} />
+              <PermissionModeButton />
+              <ModeButtons planMode={planMode} onTogglePlanMode={handleTogglePlanMode} />
             </div>
 
             <div className="flex items-center gap-2 shrink-0">

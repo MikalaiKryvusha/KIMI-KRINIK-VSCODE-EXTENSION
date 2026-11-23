@@ -11,6 +11,7 @@ import type { ContentPart as LegacyContentPart, ApprovalResponse } from "../../s
 import { Events } from "../../shared/bridge";
 import { getUserMessage } from "../../shared/errors";
 import type { ErrorPhase, UIStreamEvent } from "../../shared/types";
+import { toGoalStateInfo, type PermissionModeName } from "../../shared/modes";
 import {
   adaptSdkEvent,
   createEventAdapterState,
@@ -118,6 +119,15 @@ export class SessionRuntime {
     return this.legacyApproval;
   }
 
+  get permissionMode(): PermissionModeName {
+    return corePermissionForLegacyApproval(this.legacyApproval);
+  }
+
+  async setPermissionMode(mode: PermissionModeName): Promise<void> {
+    if (this.permissionMode === mode) return;
+    await this.applyLegacyApproval({ yolo: mode === "yolo", afk: mode === "auto" });
+  }
+
   async toggleLegacyApproval(kind: keyof LegacyApprovalFlags): Promise<LegacyApprovalFlags> {
     const next = { ...this.legacyApproval, [kind]: !this.legacyApproval[kind] };
     await this.applyLegacyApproval(next);
@@ -138,6 +148,8 @@ export class SessionRuntime {
     this.ensureOpen();
     const status = await this.session.getStatus();
     if (this.closed || !this.webviewIds.has(webviewId)) return;
+    const goalResult = await Promise.resolve().then(() => this.session.getGoal()).catch(() => null);
+    if (this.closed || !this.webviewIds.has(webviewId)) return;
     this.broadcast(
       Events.StreamEvent,
       {
@@ -146,7 +158,12 @@ export class SessionRuntime {
           model: status.model,
           thinking_effort: status.thinkingEffort,
           plan_mode: status.planMode,
+          swarm_mode: status.swarmMode ?? false,
+          permission: this.permissionMode,
           context_usage: status.contextUsage,
+          context_tokens: status.contextTokens,
+          max_context_tokens: status.maxContextTokens,
+          goal: toGoalStateInfo(goalResult?.goal ?? null),
         },
         _sessionId: this.id,
       },
@@ -403,6 +420,15 @@ export class SessionRuntime {
 
   private onSdkEvent(event: Event): void {
     if (this.closed) return;
+    if (event.type === "goal.updated") {
+      for (const webviewId of this.webviewIds) {
+        this.broadcast(
+          Events.StreamEvent,
+          { type: "StatusUpdate", payload: { goal: toGoalStateInfo(event.snapshot) }, _sessionId: this.id },
+          webviewId,
+        );
+      }
+    }
 
     if (event.type === "compaction.completed" || event.type === "compaction.cancelled") {
       const pending = this.pendingHostCompaction;

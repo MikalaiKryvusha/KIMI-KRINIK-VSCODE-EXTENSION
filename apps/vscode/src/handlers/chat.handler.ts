@@ -11,6 +11,7 @@ import type { SessionRuntime } from "../runtime/session-runtime";
 import { isWorkspacePathContained, relativeWorkspacePath } from "../utils/workspace-path";
 import { parseHostSlashCommand, runHostSlashCommand } from "./slash-command";
 import type { Handler } from "./types";
+import type { PermissionModeName } from "../../shared/modes";
 
 interface StreamChatParams {
   content: string | ContentPart[];
@@ -19,6 +20,8 @@ interface StreamChatParams {
   thinking?: boolean;
   planMode?: boolean;
   sessionId?: string;
+  permissionMode?: PermissionModeName;
+  goalObjective?: string;
 }
 
 interface RespondApprovalParams {
@@ -114,6 +117,12 @@ const streamChat: Handler<StreamChatParams, { done: boolean }> = async (params, 
     }
     if (params.planMode !== undefined && status.planMode !== params.planMode) {
       await runtime.session.setPlanMode(params.planMode);
+    }
+    if (params.permissionMode !== undefined) {
+      await runtime.setPermissionMode(params.permissionMode);
+    }
+    if (params.goalObjective !== undefined) {
+      await runtime.session.createGoal({ objective: params.goalObjective });
     }
     runtime.announceSessionStart(model);
   } catch (error) {

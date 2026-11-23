@@ -4,7 +4,7 @@ import { useApprovalStore } from "./approval.store";
 import { useSettingsStore } from "./settings.store";
 import { isPreflightError, isUserInterrupt } from "shared/errors";
 import type { ChatMessage, UIStep, UIStepItem, ChatState, TokenUsage } from "./chat.store";
-import type { ContentPart, ToolCall, ToolResult, TurnBegin, SubagentEvent, ApprovalRequestPayload, DiffBlock, RunResult, QuestionRequest } from "shared/legacy-sdk";
+import type { ContentPart, ToolCall, ToolResult, TurnBegin, SubagentEvent, ApprovalRequestPayload, DiffBlock, RunResult, QuestionRequest, StatusUpdate } from "shared/legacy-sdk";
 import type { UIStreamEvent, StreamError } from "shared/types";
 
 type EventHandler = (draft: ChatState, payload: any) => void;
@@ -508,8 +508,8 @@ const eventHandlers: Record<string, EventHandler> = {
     draft.pendingQuestion = payload;
   },
 
-  StatusUpdate: (draft, payload) => {
-    const { context_usage, token_usage, plan_mode, model, thinking_effort, retrying } = payload;
+  StatusUpdate: (draft, payload: StatusUpdate) => {
+    const { context_usage, context_tokens, max_context_tokens, token_usage, plan_mode, swarm_mode, permission, goal, model, thinking_effort, retrying } = payload;
 
     if (typeof model === "string" && model.length > 0) {
       useSettingsStore.getState().setCurrentModel(model);
@@ -520,6 +520,16 @@ const eventHandlers: Record<string, EventHandler> = {
 
     if (plan_mode !== undefined && plan_mode !== null) {
       draft.planMode = plan_mode;
+    }
+    if (swarm_mode !== undefined && swarm_mode !== null) {
+      draft.swarmMode = swarm_mode;
+    }
+    if (permission !== undefined && permission !== null) {
+      draft.permissionMode = permission;
+    }
+    if (goal !== undefined) {
+      draft.goal = goal;
+      if (goal !== null) draft.goalArmed = false;
     }
 
     if (token_usage) {
@@ -533,6 +543,8 @@ const eventHandlers: Record<string, EventHandler> = {
 
     draft.lastStatus = {
       context_usage: context_usage ?? draft.lastStatus?.context_usage,
+      context_tokens: context_tokens ?? draft.lastStatus?.context_tokens,
+      max_context_tokens: max_context_tokens ?? draft.lastStatus?.max_context_tokens,
       token_usage,
       retrying: retrying ?? draft.lastStatus?.retrying,
     };

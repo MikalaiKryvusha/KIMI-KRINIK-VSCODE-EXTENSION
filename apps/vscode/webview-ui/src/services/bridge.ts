@@ -20,6 +20,7 @@ import type {
   UIStreamEvent,
 } from "shared/types";
 import type { ManagedUsageResult } from "shared/managed-usage";
+import type { GoalAction, PermissionModeName } from "shared/modes";
 
 interface PendingRequest {
   resolve: (value: unknown) => void;
@@ -206,8 +207,27 @@ class Bridge {
     return this.call<MCPTestResult>(Methods.TestMCP, { name });
   }
 
-  streamChat(content: string | ContentPart[], model: string, effort: string, planMode: boolean, sessionId?: string) {
-    return this.call<{ done: boolean }>(Methods.StreamChat, { content, model, effort, planMode, sessionId });
+  streamChat(
+    content: string | ContentPart[],
+    model: string,
+    effort: string,
+    planMode: boolean,
+    sessionId?: string,
+    extras: { permissionMode?: PermissionModeName; goalObjective?: string } = {},
+  ) {
+    return this.call<{ done: boolean }>(Methods.StreamChat, { content, model, effort, planMode, sessionId, ...extras });
+  }
+
+  setPermissionMode(mode: PermissionModeName) {
+    return this.call<{ ok: boolean; mode: PermissionModeName | null }>(Methods.SetPermissionMode, { mode });
+  }
+
+  setSwarmMode(enabled: boolean) {
+    return this.call<{ ok: boolean; swarmMode: boolean }>(Methods.SetSwarmMode, { enabled });
+  }
+
+  controlGoal(action: GoalAction) {
+    return this.call<{ ok: boolean }>(Methods.ControlGoal, { action });
   }
 
   abortChat() {

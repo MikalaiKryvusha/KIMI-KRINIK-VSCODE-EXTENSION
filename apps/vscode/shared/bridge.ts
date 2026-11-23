@@ -1,5 +1,6 @@
 import { INTERFACE_LANGUAGES } from "./types";
 import { isSoundSettings } from "./sounds";
+import { GOAL_ACTIONS, isPermissionModeName } from "./modes";
 
 export const Methods = {
   CheckWorkspace: "checkWorkspace",
@@ -15,6 +16,9 @@ export const Methods = {
   UpdateExtensionSetting: "updateExtensionSetting",
   GetAutoCompact: "getAutoCompact",
   SetAutoCompact: "setAutoCompact",
+  SetPermissionMode: "setPermissionMode",
+  SetSwarmMode: "setSwarmMode",
+  ControlGoal: "controlGoal",
   SaveConfig: "saveConfig",
   GetExtensionConfig: "getExtensionConfig",
   OpenSettings: "openSettings",
@@ -163,7 +167,12 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
         || (params["key"] === "sounds" && isSoundSettings(params["value"]))
       );
     case Methods.SetAutoCompact:
+    case Methods.SetSwarmMode:
       return isPlainObject(params) && hasBoolean(params, "enabled");
+    case Methods.SetPermissionMode:
+      return isPlainObject(params) && isPermissionModeName(params["mode"]);
+    case Methods.ControlGoal:
+      return isPlainObject(params) && (GOAL_ACTIONS as readonly unknown[]).includes(params["action"]);
     case Methods.SaveConfig:
       return isPlainObject(params)
         && typeof params["model"] === "string"
@@ -239,7 +248,9 @@ function isStreamChatParams(value: unknown): boolean {
     && isOptionalType(value["effort"], "string")
     && isOptionalType(value["thinking"], "boolean")
     && isOptionalType(value["planMode"], "boolean")
-    && isOptionalType(value["sessionId"], "string");
+    && isOptionalType(value["sessionId"], "string")
+    && (value["permissionMode"] === undefined || isPermissionModeName(value["permissionMode"]))
+    && (value["goalObjective"] === undefined || isNonEmptyString(value["goalObjective"]));
 }
 
 function isContent(value: unknown): boolean {

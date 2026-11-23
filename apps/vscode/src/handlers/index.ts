@@ -7,6 +7,7 @@ import { workspaceHandlers } from "./workspace.handler";
 import { authHandlers } from "./auth.handler";
 import { attentionHandlers } from "./attention.handler";
 import { behaviorHandlers } from "./behavior.handler";
+import { modesHandlers } from "./modes.handler";
 import type { Handler } from "./types";
 
 export type { Handler, HandlerContext, BroadcastFn, ReloadWebviewFn, ShowLogsFn } from "./types";
@@ -21,4 +22,5 @@ export const handlers: Record<string, Handler<any, any>> = {
   ...authHandlers,
   ...attentionHandlers,
   ...behaviorHandlers,
+  ...modesHandlers,
 };

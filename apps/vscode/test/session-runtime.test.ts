@@ -226,7 +226,12 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
       payload: {
         thinking_effort: "off",
         plan_mode: false,
+        swarm_mode: false,
+        permission: "manual",
         context_usage: 0,
+        context_tokens: 0,
+        max_context_tokens: 128000,
+        goal: null,
       },
       _sessionId: "session-1",
     });
