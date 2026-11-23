@@ -13,6 +13,7 @@ import { bridge, Events } from "./services";
 import { useAppInit, resolveAppView } from "./hooks/useAppInit";
 import { isPreflightError } from "shared/errors";
 import type { UIStreamEvent, StreamError, ExtensionConfig } from "shared/types";
+import { SoundSettingsModal } from "./components/SoundSettingsModal";
 import "./styles/index.css";
 
 function MainContent({ onAuthAction }: { onAuthAction: () => void }) {
@@ -79,6 +80,7 @@ function MainContent({ onAuthAction }: { onAuthAction: () => void }) {
       </div>
       <MCPServersModal />
       <WorkDirModal />
+      <SoundSettingsModal />
     </>
   );
 }

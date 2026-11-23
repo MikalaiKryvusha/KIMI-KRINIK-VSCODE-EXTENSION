@@ -26,6 +26,7 @@ vi.mock("../../webview-ui/src/lib/attention", () => ({
 }));
 
 import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
+import { DEFAULT_SOUND_SETTINGS } from "../../shared/sounds";
 import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 
 const MODELS = [{ id: "plain", name: "Plain", provider: "managed:kimi-code", capabilities: [] }];
@@ -179,7 +180,7 @@ describe("automatic follow-up steer", () => {
   it("speaks the actual error message of a stream error", () => {
     useChatStore.getState().processEvent({ type: "error", code: "quota", message: "Quota exceeded", phase: "runtime" });
 
-    expect(boundary.notifyAttention).toHaveBeenCalledWith("Quota exceeded");
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("Quota exceeded", DEFAULT_SOUND_SETTINGS.error);
   });
 
   it("stays silent for non-terminal retry warnings", () => {
@@ -201,7 +202,7 @@ describe("automatic follow-up steer", () => {
       payload: { id: "a1", tool_call_id: "t1", sender: "agent", action: "", description: "" },
     });
 
-    expect(boundary.notifyAttention).toHaveBeenCalledWith("Approval required");
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("Approval required", DEFAULT_SOUND_SETTINGS.approval);
   });
 
   it("keeps the running prompt for retry after a rejected steer", async () => {
@@ -290,5 +291,34 @@ describe("automatic follow-up steer", () => {
       { content: [{ type: "text", text: "second" }, { type: "image_url", image_url: { url: IMAGE } }], model: "plain" },
     ]);
     expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-uploading" }]);
+  });
+
+  it("routes each attention event to its own sound setting", () => {
+    const sounds = {
+      approval: { sound: "chime", volume: 20 },
+      question: { sound: "bell", volume: 30 },
+      error: { sound: "alert", volume: 40 },
+      turnComplete: { sound: "pop", volume: 50 },
+    } as const;
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, sounds } });
+
+    useChatStore.getState().processEvent({ type: "error", code: "quota", message: "Quota exceeded", phase: "runtime" });
+    useChatStore.getState().processEvent({
+      type: "ApprovalRequest",
+      payload: { id: "a1", tool_call_id: "t1", sender: "agent", action: "run", description: "Run tests" },
+    });
+    useChatStore.getState().processEvent({
+      type: "QuestionRequest",
+      payload: { id: "q1", tool_call_id: "t2", questions: [{ question: "Which one?", options: [] }] },
+    });
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" } });
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "cancelled" } });
+
+    expect(boundary.notifyAttention.mock.calls).toEqual([
+      ["Quota exceeded", sounds.error],
+      ["Approval required: Run tests", sounds.approval],
+      ["Which one?", sounds.question],
+      ["Done", sounds.turnComplete],
+    ]);
   });
 });

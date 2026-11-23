@@ -86,6 +86,28 @@
           "default": "en",
           "description": "Interface language of KIMI KRINIK."
         },
+        "kimi.sounds": {
+          "type": "object",
+          "default": {
+            "approval": {
+              "sound": "voice",
+              "volume": 80
+            },
+            "question": {
+              "sound": "voice",
+              "volume": 80
+            },
+            "error": {
+              "sound": "voice",
+              "volume": 80
+            },
+            "turnComplete": {
+              "sound": "off",
+              "volume": 60
+            }
+          },
+          "description": "Sound and volume (0-100) for each attention event: approval, question, error and turnComplete. A sound is voice, chime, bell, pop, alert or off. Change it in the Sound Settings window of the settings menu."
+        },
         "kimi.autoSteer": {
           "type": "boolean",
           "default": true,

@@ -1,3 +1,4 @@
+import type { SoundSettings } from "./sounds";
 import type { RunResult, StreamEvent } from "./legacy-sdk";
 
 export interface SessionConfig {
@@ -30,6 +31,7 @@ export interface ExtensionConfig {
   showThinkingExpanded: boolean;
   autoSteer: boolean;
   language: InterfaceLanguage;
+  sounds: SoundSettings;
   version: string;
 }
 
@@ -39,7 +41,8 @@ export type InterfaceLanguage = (typeof INTERFACE_LANGUAGES)[number];
 
 export type ExtensionSettingUpdate =
   | { key: "autoSteer"; value: boolean }
-  | { key: "language"; value: InterfaceLanguage };
+  | { key: "language"; value: InterfaceLanguage }
+  | { key: "sounds"; value: SoundSettings };
 
 export interface KaifThresholds {
   warnPct: number;

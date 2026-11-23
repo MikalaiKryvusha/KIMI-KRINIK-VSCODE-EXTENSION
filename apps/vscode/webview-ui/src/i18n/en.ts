@@ -240,6 +240,28 @@ export const en = {
   "toast.pickMediaFailed": "Failed to pick media",
   "media.maxCount": "Maximum {max} media files allowed",
   "init.failed": "Failed to initialize",
+
+  "menu.soundSettings": "Sound Settings",
+  "sound.title": "Sound Settings",
+  "sound.description": "Choose a sound and a volume for each moment the agent needs you or finishes.",
+  "sound.event.approval": "Approval request",
+  "sound.event.approvalWhen": "The agent asks to run a tool action",
+  "sound.event.question": "Question",
+  "sound.event.questionWhen": "The agent asks you a question",
+  "sound.event.error": "Error",
+  "sound.event.errorWhen": "A turn stops on an error",
+  "sound.event.turnComplete": "Turn complete",
+  "sound.event.turnCompleteWhen": "The agent finishes its answer",
+  "sound.choice.voice": "Voice",
+  "sound.choice.chime": "Chime",
+  "sound.choice.bell": "Bell",
+  "sound.choice.pop": "Pop",
+  "sound.choice.alert": "Alert",
+  "sound.choice.off": "Off",
+  "sound.volume": "Volume {volume}%",
+  "sound.preview": "Preview",
+  "attention.turnComplete": "Done",
+  "toast.soundsNotChanged": "Sound settings were not saved: {error}",
 };
 
 export type TranslationKey = keyof typeof en;

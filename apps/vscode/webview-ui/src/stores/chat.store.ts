@@ -10,7 +10,7 @@ import { t } from "@/i18n";
 
 import { useSettingsStore } from "./settings.store";
 import { processEvent } from "./event-handlers";
-import type { ApprovalRequestPayload, StatusUpdate, ContentPart, QuestionRequest, ToolResult } from "shared/legacy-sdk";
+import type { ApprovalRequestPayload, RunResult, StatusUpdate, ContentPart, QuestionRequest, ToolResult } from "shared/legacy-sdk";
 import type { StreamError, UIStreamEvent } from "shared/types";
 
 const HANDSHAKE_TIMEOUT_MS = 30_000;
@@ -135,17 +135,20 @@ let attentionSuppressed = false;
 
 function notifyEventAttention(event: UIStreamEvent): void {
   if (attentionSuppressed) return;
+  const { sounds } = useSettingsStore.getState().extensionConfig;
   if (event.type === "error") {
     const error = event as StreamError;
     if (error.terminal === false) return;
-    notifyAttention(error.message || t("attention.actionFailed"));
+    notifyAttention(error.message || t("attention.actionFailed"), sounds.error);
   } else if (event.type === "ApprovalRequest") {
     const { description, action } = (event as { payload: ApprovalRequestPayload }).payload;
     const reason = description || action;
-    notifyAttention(reason ? t("attention.approvalRequiredFor", { reason }) : t("attention.approvalRequired"));
+    notifyAttention(reason ? t("attention.approvalRequiredFor", { reason }) : t("attention.approvalRequired"), sounds.approval);
   } else if (event.type === "QuestionRequest") {
     const { questions } = (event as { payload: QuestionRequest }).payload;
-    notifyAttention(questions[0]?.question || t("attention.answerNeeded"));
+    notifyAttention(questions[0]?.question || t("attention.answerNeeded"), sounds.question);
+  } else if (event.type === "stream_complete" && (event as { result: RunResult }).result.status === "finished") {
+    notifyAttention(t("attention.turnComplete"), sounds.turnComplete);
   }
 }
 

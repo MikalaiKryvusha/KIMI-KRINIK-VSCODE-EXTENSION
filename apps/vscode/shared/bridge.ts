@@ -1,4 +1,5 @@
 import { INTERFACE_LANGUAGES } from "./types";
+import { isSoundSettings } from "./sounds";
 
 export const Methods = {
   CheckWorkspace: "checkWorkspace",
@@ -159,6 +160,7 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
       return isPlainObject(params) && (
         (params["key"] === "autoSteer" && typeof params["value"] === "boolean")
         || (params["key"] === "language" && (INTERFACE_LANGUAGES as readonly unknown[]).includes(params["value"]))
+        || (params["key"] === "sounds" && isSoundSettings(params["value"]))
       );
     case Methods.SetAutoCompact:
       return isPlainObject(params) && hasBoolean(params, "enabled");

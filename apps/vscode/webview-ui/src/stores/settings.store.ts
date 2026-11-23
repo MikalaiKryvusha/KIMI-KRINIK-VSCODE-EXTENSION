@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
 import type { ExtensionConfig, InterfaceLanguage } from "shared/types";
+import { DEFAULT_SOUND_SETTINGS, type SoundSettings } from "shared/sounds";
 import type { ModelConfig, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
 import { translate, type TranslateParams, type TranslationKey } from "@/i18n/translate";
 
@@ -34,6 +35,7 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
   showThinkingExpanded: true,
   autoSteer: true,
   language: "en",
+  sounds: DEFAULT_SOUND_SETTINGS,
   version: "",
 };
 
@@ -158,6 +160,7 @@ interface SettingsState {
   thinkingEffort: string;
   extensionConfig: ExtensionConfig;
   mcpModalOpen: boolean;
+  soundModalOpen: boolean;
   workDirModalOpen: boolean;
   currentWorkDir: string | null;
   workspaceRoot: string | null;
@@ -180,6 +183,8 @@ interface SettingsState {
   selectThinkingEffort: (effort: string) => void;
   setExtensionConfig: (config: ExtensionConfig) => void;
   setMCPModalOpen: (open: boolean) => void;
+  setSoundModalOpen: (open: boolean) => void;
+  changeSounds: (sounds: SoundSettings) => Promise<void>;
   setWorkDirModalOpen: (open: boolean) => void;
   setCurrentWorkDir: (workDir: string | null) => void;
   setWorkspaceRoot: (root: string | null) => void;
@@ -198,6 +203,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   thinkingEffort: "off",
   extensionConfig: DEFAULT_EXTENSION_CONFIG,
   mcpModalOpen: false,
+  soundModalOpen: false,
   workDirModalOpen: false,
   currentWorkDir: null,
   workspaceRoot: null,
@@ -341,6 +347,19 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setExtensionConfig: (extensionConfig) => set({ extensionConfig }),
 
   setMCPModalOpen: (mcpModalOpen) => set({ mcpModalOpen }),
+
+  setSoundModalOpen: (soundModalOpen) => set({ soundModalOpen }),
+
+  changeSounds: async (sounds) => {
+    const previous = get().extensionConfig.sounds;
+    set({ extensionConfig: { ...get().extensionConfig, sounds } });
+    try {
+      await bridge.updateExtensionSetting({ key: "sounds", value: sounds });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, sounds: previous } });
+      toast.error(t("toast.soundsNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
 
   setWorkDirModalOpen: (workDirModalOpen) => set({ workDirModalOpen }),
 

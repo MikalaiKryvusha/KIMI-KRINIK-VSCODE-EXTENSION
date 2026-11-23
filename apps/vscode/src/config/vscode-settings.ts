@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { INTERFACE_LANGUAGES, type ExtensionConfig, type InterfaceLanguage, type KaifThresholds } from "../../shared/types";
+import { normalizeSoundSettings, type SoundSettings } from "../../shared/sounds";
 
 declare const __EXTENSION_VERSION__: string;
 const EXTENSION_VERSION = typeof __EXTENSION_VERSION__ !== "undefined" ? __EXTENSION_VERSION__ : "0.0.0";
@@ -42,6 +43,10 @@ export const VSCodeSettings = {
     return INTERFACE_LANGUAGES.find((language) => language === value) ?? "en";
   },
 
+  get sounds(): SoundSettings {
+    return normalizeSoundSettings(getConfig().get<unknown>("sounds"));
+  },
+
   get kaifThresholds(): KaifThresholds {
     const config = getConfig();
     return {
@@ -66,6 +71,7 @@ export const VSCodeSettings = {
       showThinkingExpanded: this.showThinkingExpanded,
       autoSteer: this.autoSteer,
       language: this.language,
+      sounds: this.sounds,
       version: EXTENSION_VERSION,
     };
   },
@@ -76,7 +82,7 @@ export function onSettingsChange(callback: (changedKeys: string[]) => void): vsc
     if (!e.affectsConfiguration("kimi")) {
       return;
     }
-    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "language"];
+    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "language", "sounds"];
     const changedKeys = keys.filter((key) => e.affectsConfiguration(`kimi.${key}`));
     if (changedKeys.length > 0) {
       callback(changedKeys);
