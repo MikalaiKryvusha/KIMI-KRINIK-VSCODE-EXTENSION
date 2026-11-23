@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores";
 import { bridge } from "@/services";
 import { Content } from "@/lib/content";
+import { useT } from "@/i18n";
 
 import type { ContentPart } from "shared/legacy-sdk";
 
 function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: string | ContentPart[]; isStreaming: boolean; onEdit: (id: string) => void }) {
   const { removeFromQueue, moveQueueItemUp, queue } = useChatStore();
+  const t = useT();
   const text = Content.getText(content);
   const hasMedia = Content.hasMedia(content);
   const isFirst = queue[0]?.id === id;
@@ -23,8 +25,8 @@ function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: 
   return (
     <div className="group flex items-start px-2.5 py-0.5 hover:bg-muted/50 transition-colors">
       <div className="flex-1 min-w-0">
-        <p className="text-xs line-clamp-2 text-foreground">{text || (hasMedia ? "(media)" : "")}</p>
-        {hasMedia && text && <span className="text-[10px] text-muted-foreground">+ media</span>}
+        <p className="text-xs line-clamp-2 text-foreground">{text || (hasMedia ? t("queue.mediaOnly") : "")}</p>
+        {hasMedia && text && <span className="text-[10px] text-muted-foreground">{t("queue.withMedia")}</span>}
       </div>
       <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
         {isStreaming && (
@@ -35,7 +37,7 @@ function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: 
             onClick={() => {
               void handleSteer();
             }}
-            title="Insert now (steer)"
+            title={t("queue.insertNow")}
           >
             <IconBolt className="size-3" />
           </Button>

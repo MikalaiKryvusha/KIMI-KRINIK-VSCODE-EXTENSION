@@ -48,6 +48,28 @@ export function formatUsagePercent(ratio: number): number {
   return Math.round(Math.min(ratio, 1) * 1000) / 10;
 }
 
+export type ResetCountdown =
+  | { readonly kind: "refreshing" }
+  | { readonly kind: "soon" }
+  | { readonly kind: "days"; readonly days: number; readonly hours: number }
+  | { readonly kind: "hours"; readonly hours: number; readonly minutes: number }
+  | { readonly kind: "minutes"; readonly minutes: number };
+
+export function resetCountdown(resetAt: string | undefined, now: number = Date.now()): ResetCountdown | undefined {
+  if (resetAt === undefined) return undefined;
+  const parsed = Date.parse(resetAt);
+  if (!Number.isFinite(parsed)) return undefined;
+  const totalMinutes = Math.floor(Math.floor((parsed - now) / 1000) / 60);
+  if (parsed - now <= 0) return { kind: "refreshing" };
+  if (totalMinutes < 1) return { kind: "soon" };
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  if (days > 0) return { kind: "days", days, hours };
+  if (hours > 0) return { kind: "hours", hours, minutes };
+  return { kind: "minutes", minutes };
+}
+
 export function formatResetCountdown(resetAt: string | undefined, now: number = Date.now()): string | undefined {
   if (resetAt === undefined) return undefined;
   const parsed = Date.parse(resetAt);

@@ -1,3 +1,4 @@
+import { useT } from "@/i18n";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,31 +27,33 @@ export function StreamingConfirmDialog({
   open,
   onOpenChange,
   title,
-  description = "The current conversation is still generating a response. This action will truncate the output. Are you sure you want to continue?",
-  confirmLabel = "Continue",
-  cancelLabel = "Cancel",
+  description,
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   confirmDisabled = false,
   cancelDisabled = false,
   confirmLoading = false,
 }: StreamingConfirmDialogProps) {
+  const t = useT();
+  const confirmText = confirmLabel ?? t("common.continue");
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogDescription>{description ?? t("dialog.streamingDescription")}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => onOpenChange(false)} disabled={cancelDisabled}>
-            {cancelLabel}
+            {cancelLabel ?? t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={confirmDisabled}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {confirmLoading ? `${confirmLabel}…` : confirmLabel}
+            {confirmLoading ? `${confirmText}…` : confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

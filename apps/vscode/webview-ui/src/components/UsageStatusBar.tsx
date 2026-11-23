@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { bridge } from "@/services";
 import { getModelById, useSettingsStore } from "@/stores";
 import {
-  formatResetCountdown,
+  resetCountdown,
   formatUsagePercent,
   secondaryQuotaWindow,
   type ManagedUsageView,
   type ManagedUsageWindowView,
 } from "shared/managed-usage";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { t as translateNow, useT } from "@/i18n";
 
 const USAGE_POLL_INTERVAL_MS = 60_000;
 const COUNTDOWN_TICK_MS = 60_000;
@@ -65,7 +66,7 @@ export function quotaWindowState(
 ): QuotaWindowState | null {
   if (usageError !== null) return { ratio: null, error: usageError };
   if (window === undefined) return null;
-  if (!Number.isFinite(window.usedRatio)) return { ratio: null, error: "Invalid usage data" };
+  if (!Number.isFinite(window.usedRatio)) return { ratio: null, error: translateNow("usage.invalidData") };
   return {
     ratio: Math.max(0, Math.min(window.usedRatio, 1)),
     resetAt: window.resetAt,
@@ -73,15 +74,27 @@ export function quotaWindowState(
 }
 
 function QuotaTooltipSection({ label, state, now }: { label: string; state: QuotaWindowState; now: number }) {
-  const resetText = formatResetCountdown(state.resetAt, now);
+  const t = useT();
+  const countdown = resetCountdown(state.resetAt, now);
+  const resetText = countdown === undefined
+    ? undefined
+    : countdown.kind === "refreshing"
+      ? t("usage.resetRefreshing")
+      : countdown.kind === "soon"
+        ? t("usage.resetsSoon")
+        : countdown.kind === "days"
+          ? t("usage.resetsInDays", { days: countdown.days, hours: countdown.hours })
+          : countdown.kind === "hours"
+            ? t("usage.resetsInHours", { hours: countdown.hours, minutes: countdown.minutes })
+            : t("usage.resetsInMinutes", { minutes: countdown.minutes });
   return (
     <div className="flex flex-col gap-0.5">
       <span>{label}</span>
       {state.ratio === null ? (
-        <span>{state.error !== undefined ? `Usage unavailable: ${state.error}` : "Loading usage..."}</span>
+        <span>{state.error !== undefined ? t("usage.unavailable", { error: state.error }) : t("usage.loading")}</span>
       ) : (
         <>
-          <span>{formatUsagePercent(state.ratio)}% used</span>
+          <span>{t("usage.percentUsed", { percent: formatUsagePercent(state.ratio) })}</span>
           {resetText !== undefined && <span>{resetText}</span>}
         </>
       )}
@@ -106,6 +119,7 @@ export function QuotaRings({
   const strokeWidth = 2;
   const outerRadius = (size - strokeWidth) / 2;
   const innerRadius = outerRadius - strokeWidth - 1;
+  const t = useT();
   const outerColor = fiveHour.ratio !== null ? quotaRingColor(fiveHour.ratio) : undefined;
   const innerColor = secondary.ratio !== null ? longWindowRingColor(secondary.ratio) : undefined;
 
@@ -131,8 +145,8 @@ export function QuotaRings({
       </TooltipTrigger>
       <TooltipContent>
         <div className="flex flex-col gap-1.5">
-          {planName !== undefined && <span className="font-medium">Plan: {planName}</span>}
-          <QuotaTooltipSection label="5h quota" state={fiveHour} now={now} />
+          {planName !== undefined && <span className="font-medium">{t("usage.plan", { name: planName })}</span>}
+          <QuotaTooltipSection label={t("usage.fiveHourLimit")} state={fiveHour} now={now} />
           <QuotaTooltipSection label={secondaryLabel} state={secondary} now={now} />
         </div>
       </TooltipContent>
@@ -151,6 +165,7 @@ export function UsageStatusBar() {
   const [usage, setUsage] = useState<ManagedUsageView | null>(null);
   const [usageError, setUsageError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const t = useT();
 
   useEffect(() => {
     setUsage(null);
@@ -190,12 +205,12 @@ export function UsageStatusBar() {
 
   let quota: { fiveHour: QuotaWindowState; secondary: QuotaWindowState; secondaryLabel: string } | null = null;
   if (usageError === null && usage === null) {
-    quota = { fiveHour: { ratio: null }, secondary: { ratio: null }, secondaryLabel: "7-day quota" };
+    quota = { fiveHour: { ratio: null }, secondary: { ratio: null }, secondaryLabel: t("usage.weeklyLimit") };
   } else {
     const fiveHour = quotaWindowState(usage?.fiveHour, usageError);
     const secondarySel = usage !== null ? secondaryQuotaWindow(usage) : undefined;
     const secondary = quotaWindowState(secondarySel?.window, usageError);
-    const secondaryLabel = secondarySel?.kind === "monthly" ? "Monthly quota" : "7-day quota";
+    const secondaryLabel = secondarySel?.kind === "monthly" ? t("usage.monthlyLimit") : t("usage.weeklyLimit");
     if (fiveHour !== null || secondary !== null) {
       quota = {
         fiveHour: fiveHour ?? { ratio: null },

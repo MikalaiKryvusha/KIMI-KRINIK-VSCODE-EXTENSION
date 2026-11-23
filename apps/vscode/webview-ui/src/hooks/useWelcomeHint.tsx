@@ -1,11 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
 import { bridge } from "@/services";
+import { useT, type TranslationKey } from "@/i18n";
 
 export interface WelcomeHint {
   title: string;
   description: string;
   slashCommand?: string;
   component?: React.ReactNode;
+}
+
+interface HintSource {
+  title: TranslationKey;
+  description?: TranslationKey;
+  slashCommand?: string;
+  guide?: true;
 }
 
 function ShortcutRow({ kbd, children }: { kbd: string; children: React.ReactNode }) {
@@ -18,80 +26,55 @@ function ShortcutRow({ kbd, children }: { kbd: string; children: React.ReactNode
 }
 
 function ShortcutGuide() {
+  const t = useT();
   return (
     <div className="text-left text-xs mt-2 space-y-5 w-full max-w-96">
       <div>
-        <div className="font-medium text-foreground mb-1.5">⚡ Commands</div>
+        <div className="font-medium text-foreground mb-1.5">{t("welcome.commands")}</div>
         <div className="text-muted-foreground space-y-1">
-          <ShortcutRow kbd="/">View all commands</ShortcutRow>
-          <ShortcutRow kbd="/init">Scan project and generate AGENTS.md file</ShortcutRow>
-          <ShortcutRow kbd="/compact">Trim context so that I focus on the essentials</ShortcutRow>
+          <ShortcutRow kbd="/">{t("welcome.viewAllCommands")}</ShortcutRow>
+          <ShortcutRow kbd="/init">{t("welcome.initDesc")}</ShortcutRow>
+          <ShortcutRow kbd="/compact">{t("welcome.compactDesc")}</ShortcutRow>
         </div>
       </div>
       <div>
-        <div className="font-medium text-foreground mb-1.5">💡 Tips</div>
+        <div className="font-medium text-foreground mb-1.5">{t("welcome.tips")}</div>
         <div className="text-muted-foreground space-y-1">
-          <ShortcutRow kbd="↑">Browse input history</ShortcutRow>
-          <ShortcutRow kbd="@">Add/Search files to reference</ShortcutRow>
-          <ShortcutRow kbd="Alt+K">Add selected code directly from editor</ShortcutRow>
+          <ShortcutRow kbd="↑">{t("welcome.browseHistory")}</ShortcutRow>
+          <ShortcutRow kbd="@">{t("welcome.addFiles")}</ShortcutRow>
+          <ShortcutRow kbd="Alt+K">{t("welcome.altK")}</ShortcutRow>
         </div>
       </div>
       <div>
-        <div className="font-medium text-foreground mb-1.5">🚀 Pro Tips</div>
+        <div className="font-medium text-foreground mb-1.5">{t("welcome.proTips")}</div>
         <div className="text-muted-foreground space-y-1">
-          <div>• Use YOLO mode to auto-approve tool calls</div>
-          <div>• AGENTS.md helps me understand your codebase</div>
-          <div>• Enable Thinking for complex tasks</div>
+          <div>{t("welcome.proYolo")}</div>
+          <div>{t("welcome.proAgentsMd")}</div>
+          <div>{t("welcome.proThinking")}</div>
         </div>
       </div>
     </div>
   );
 }
 
-const HINT_FIRST_TIME: WelcomeHint = {
-  title: "Quick Start Guide",
-  description: "",
-  component: <ShortcutGuide />,
-};
+const HINT_FIRST_TIME: HintSource = { title: "welcome.quickStart", guide: true };
 
-const HINT_AGENT_MD: WelcomeHint = {
-  title: "Let me map your codebase",
-  description: "Run /init to scan the project and generate docs",
+const HINT_AGENT_MD: HintSource = {
+  title: "welcome.mapCodebase.title",
+  description: "welcome.mapCodebase.desc",
   slashCommand: "/init",
 };
 
-const HINTS_POOL: WelcomeHint[] = [
+const HINTS_POOL: HintSource[] = [
   HINT_FIRST_TIME,
   HINT_AGENT_MD,
-  {
-    title: "Reference specific code",
-    description: "Type @ to select files, or press Alt+K with code highlighted",
-  },
-  {
-    title: "See what I can do",
-    description: "Type / for all commands—like /compact to trim context",
-  },
-  {
-    title: "Need deeper analysis?",
-    description: "Enable thinking mode for complex architecture or debugging",
-  },
-  {
-    title: "More than code",
-    description: "Paste a screenshot or design and I'll help implement it",
-  },
-  {
-    title: "Add more tools",
-    description: "Connect external services via MCP servers in settings",
-  },
-  {
-    title: "Prefer fewer interruptions?",
-    description: "Enable YOLO mode to auto-approve",
-  },
-  {
-    title: "Context getting long?",
-    description: "Type /compact to keep only the essentials",
-    slashCommand: "/compact",
-  },
+  { title: "welcome.refCode.title", description: "welcome.refCode.desc" },
+  { title: "welcome.seeWhatICanDo.title", description: "welcome.seeWhatICanDo.desc" },
+  { title: "welcome.deeperAnalysis.title", description: "welcome.deeperAnalysis.desc" },
+  { title: "welcome.moreThanCode.title", description: "welcome.moreThanCode.desc" },
+  { title: "welcome.addMoreTools.title", description: "welcome.addMoreTools.desc" },
+  { title: "welcome.fewerInterruptions.title", description: "welcome.fewerInterruptions.desc" },
+  { title: "welcome.longContext.title", description: "welcome.longContext.desc", slashCommand: "/compact" },
 ];
 
 function pickRandom<T>(arr: T[]): T {
@@ -105,6 +88,7 @@ function withProbability(p: number): boolean {
 export function useWelcomeHint(): WelcomeHint {
   const [hasAgentMd, setHasAgentMd] = useState<boolean | null>(null);
   const [hasHistory, setHasHistory] = useState<boolean | null>(null);
+  const t = useT();
 
   useEffect(() => {
     bridge
@@ -117,7 +101,7 @@ export function useWelcomeHint(): WelcomeHint {
       .catch(() => setHasHistory(false));
   }, []);
 
-  return useMemo(() => {
+  const source = useMemo(() => {
     if (hasHistory === false) {
       return HINT_FIRST_TIME;
     }
@@ -126,4 +110,11 @@ export function useWelcomeHint(): WelcomeHint {
     }
     return pickRandom(HINTS_POOL);
   }, [hasAgentMd, hasHistory]);
+
+  return useMemo(() => ({
+    title: t(source.title),
+    description: source.description === undefined ? "" : t(source.description),
+    ...(source.slashCommand === undefined ? {} : { slashCommand: source.slashCommand }),
+    ...(source.guide ? { component: <ShortcutGuide /> } : {}),
+  }), [source, t]);
 }

@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useChatStore } from "@/stores";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 export function QuestionDialog() {
   const { pendingQuestion, respondQuestion } = useChatStore();
+  const t = useT();
   const [customDrafts, setCustomDrafts] = useState<Record<number, string>>({});
   const [showCustom, setShowCustom] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(1);
@@ -112,7 +114,7 @@ export function QuestionDialog() {
         )}
         {question.header && <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{question.header}</div>}
         <div className="text-xs font-semibold text-foreground">{question.question}</div>
-        {isMultiSelect && <div className="text-[10px] text-muted-foreground">Select all that apply</div>}
+        {isMultiSelect && <div className="text-[10px] text-muted-foreground">{t("question.selectAll")}</div>}
         <div className="space-y-1.5">
           {options.map((option, idx) => {
             const isChecked = selectedValues.includes(option.label);
@@ -175,7 +177,7 @@ export function QuestionDialog() {
                   if (e.key === "Escape") setShowCustom(false);
                 }}
                 disabled={isSubmitting}
-                placeholder="Enter your response…"
+                placeholder={t("question.enterResponse")}
                 className="flex-1 px-2 py-1 rounded-md text-xs border border-border bg-background outline-none focus:border-blue-500 disabled:opacity-50"
               />
               <button
@@ -200,7 +202,7 @@ export function QuestionDialog() {
               )}
             >
               <span className={cn("mr-2", selectedIndex === customIndex ? "text-blue-200" : "text-muted-foreground")}>{customIndex}</span>
-              <span className="font-medium">Custom response…</span>
+              <span className="font-medium">{t("question.customResponse")}</span>
             </button>
           )}
           {!isMultiSelect && !isLastQuestion && currentAnswer !== undefined && (
@@ -222,7 +224,7 @@ export function QuestionDialog() {
               disabled={isSubmitting || selectedValues.length === 0}
               className="w-full px-2 py-1 rounded-md text-xs bg-blue-500 text-white disabled:opacity-50 cursor-pointer"
             >
-              {isLastQuestion ? "Submit" : "Next"}
+              {isLastQuestion ? t("question.submit") : t("question.next")}
             </button>
           )}
         </div>
