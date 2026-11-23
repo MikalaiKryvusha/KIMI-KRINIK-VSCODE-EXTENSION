@@ -56,7 +56,7 @@
 > <!-- classes: question-already-answered, guard-not-proven-against-threat, shown-as-link,
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
->      field-dropped-in-rebuild -->
+>      field-dropped-in-rebuild, red-accepted-unread -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -71,6 +71,7 @@
 > | `escaping-layer` | one escaping level lost between the tool and the file |
 > | `twins-missed` | one of two layers/copies moved and the twin stayed behind |
 > | `field-dropped-in-rebuild` | a field or section silently lost when an artifact was regenerated |
+> | `red-accepted-unread` | a failing test labelled "baseline" or "flaky" before its assertion diff was read |
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -79,6 +80,19 @@
 > Skill: `/experience` (capture a lesson · recall relevant lessons).
 
 ## Entries
+
+### EXP-0002 · 2026-11-23 · ❌→✅ · #testing #windows #flaky #vscode
+class: red-accepted-unread
+**Context:** `apps/vscode/test` carried three "Windows baseline" failures and one "flaky" test across several sessions.
+**Tried / did:** read each assertion diff instead of re-running: two expected native `\` paths where the engine reports `/`
+(pathe), one called real `statSync` on a made-up UNC share, and the "flaky" one caught a real committed out-of-range selection.
+**Result:** ✅ — fixed in `aaf2e75b7` and `02a18c159`; the suite is 0 failed on Windows, so a red test is a signal again.
+**Lesson:** a "baseline" or "flaky" label is a hypothesis about the failure; the assertion diff decides it, and a standing red
+list hides every new regression behind it.   → link: (none)
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test` — expect `0 failed`; on any red, read its `- Expected / + Received` block before labelling it.
+**Trigger:** about to write "baseline", "known failure" or "flaky" about a test → open its failure diff first.
+**Not for:** failures that need hardware or services this machine does not have — those are recorded with the missing piece named.
+none-cheap: the label lives in chat and status prose, and a grep for "baseline" would also hit the ratchet baseline files; the zero-failure suite is what makes a new red visible.
 
 ### EXP-0001 · 2026-01-01 · ✅ · #example #meta
 **Context:** first task after KAIF was deployed into this project (example entry — replace with real ones).
