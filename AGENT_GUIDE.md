@@ -533,10 +533,11 @@ Grow this tooling over time; each command, stand and device gets its row in the 
 
 ## Git workflow
 
-`<State your branching policy. A simple, effective default — used by this framework's own project —
-is: work ONLY in `main`, no feature branches; commit incrementally and often; to undo, use git history
-(git revert / git checkout <hash> -- file), not branches. Pick what fits your project and state it here
-so the agent doesn't improvise.>`
+1. Work in the branch `kaif/no-auto-compaction`; `main` mirrors upstream and takes only fast-forward README commits.
+2. Commit each finished, verified piece of work yourself and push it to `origin` yourself — never ask the owner for either.
+3. A release, a repository rename and any external publication wait for the owner's `AUTH:` line.
+
+`[OWNER] «комиты и пуши агенты делают сами», «это не ответственность заказчика» · 2026-11-23 19:41 +03:00 (chat)`
 
 > Reconciliation with the fable-method **authorization gate**: this deployed guide IS the owner's standing authorization
 > for routine commits/pushes per the policy above. Everything beyond it — releases, deploys, external sends/publishes,

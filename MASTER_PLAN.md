@@ -20,7 +20,8 @@ context-window closure, an English / 中文 / Русский interface and per-e
 2. Every visible control runs a real host or SDK path; a decorative button is a defect.
 3. One persisted authority per setting: the engine config owns `auto_compact`.
 4. A port from KIMI FORK is surgical, with an inventory of the old and the new path; no wholesale copy of `InputArea` or stores.
-5. Release, push and external publication happen only on the owner's separate word.
+5. Agents commit and push their own work themselves; a release, a repository rename and any external publication happen only on
+   the owner's separate word.
 
 ## From here to there — the phased path
 

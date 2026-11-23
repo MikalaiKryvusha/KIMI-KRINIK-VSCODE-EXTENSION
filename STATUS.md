@@ -46,7 +46,8 @@
 
 The extension builds, `pnpm lint` is green and `apps/vscode/test` is fully green on Windows. The 1.0.0 scope, phases and
 acceptance live in the KAIF origin repository: `D:/work/ai_sandbox/KAIF/plans/147_EPIC_kimi_krinik_1_0_0.md` and `plans/148`–`154`.
-Pushed to GitHub up to `b93d6813c`; `d699642de`…`02a18c159` are local commits waiting for the owner's word to push.
+Routine pushes of this branch go under the standing authorization of `AGENT_GUIDE.md` → Git workflow; a release, a rename and any
+external publication wait for the owner's `AUTH:`.
 
 | Phase | State | Note |
 |---|---|---|
@@ -72,8 +73,6 @@ A red test here is a signal again — there is no accepted baseline of failures.
 - ❓ `GOAL.md` was assembled from the owner's recorded words (`researches/52` §1); the owner confirms it.
 - ❓ B9: one changelog mechanism (changesets or the hand-written `CHANGELOG.md`) and the `major` level.
 - ❓ B10: the settings namespace `kimi.*` shared with the official extension.
-- ❓ The word to push `d699642de`…`02a18c159` (`GOAL.md`: push only on the owner's separate word).
-- ❓ The changeset texts for the composer modes and the Sound Settings window (`gen-changesets` step 4: shown before commit).
 
 ## Where to continue next session
 
@@ -81,7 +80,8 @@ A red test here is a signal again — there is no accepted baseline of failures.
 2. `/skill:resume`, then the adaptation item `study` of `KAIF_ADAPTATION_TASK.md` and `node .kaif/kaif-core.mjs verify-final`.
 3. K1: a live Extension Host run of the composer modes, then status pills, Working, the context ring, the combined picker.
 4. Claude sessions here get no KAIF skills or hooks: `.kaif/kaif.json` → `agents` lists only `kimi-code`, and the checked-out
-   `CLAUDE.md` is a git symlink that Windows writes as the text `AGENTS.md`. Adding `claude-code` waits for the owner's word.
+   `CLAUDE.md` is a git symlink that Windows writes as the text `AGENTS.md`. `[OWNER] "пока не нужно" · 2026-11-23` (chat) —
+not adding `claude-code` for now.
 
 ## Open bugs
 
