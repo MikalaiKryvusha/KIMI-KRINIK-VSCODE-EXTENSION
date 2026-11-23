@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconCheck, IconVolume } from "@tabler/icons-react";
+import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconCheck, IconVolume, IconAdjustmentsHorizontal } from "@tabler/icons-react";
+import { ControlPanelSettingsDialog } from "./ControlPanelSettingsDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -64,6 +65,7 @@ function SwitchItem({ label, hint, checked, disabled, onChange }: { label: strin
 
 export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
+  const [controlPanelOpen, setControlPanelOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, autoCompact, autoCompactPending, changeAutoCompact, changeAutoSteer, changeLanguage, setSoundModalOpen } = useSettingsStore();
   const t = useT();
@@ -115,7 +117,8 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon-xs" className={cn("text-muted-foreground", className)}>
           <IconSettings className="size-3.5" />
@@ -134,6 +137,10 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
           <MenuItem onClick={() => { setSoundModalOpen(true); setOpen(false); }}>
             <IconVolume className="size-4 text-muted-foreground" />
             <span className="flex-1">{t("menu.soundSettings")}</span>
+          </MenuItem>
+          <MenuItem onClick={() => { setControlPanelOpen(true); setOpen(false); }}>
+            <IconAdjustmentsHorizontal className="size-4 text-muted-foreground" />
+            <span className="flex-1">{t("controlPanel.title")}</span>
           </MenuItem>
           <MenuItem onClick={handleOpenSettings}>
             <IconSettings className="size-4 text-muted-foreground" />
@@ -199,6 +206,8 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
           </MenuItem>
         </MenuSection>
       </PopoverContent>
-    </Popover>
+      </Popover>
+      <ControlPanelSettingsDialog open={controlPanelOpen} onOpenChange={setControlPanelOpen} />
+    </>
   );
 }

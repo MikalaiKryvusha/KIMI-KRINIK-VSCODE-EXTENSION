@@ -10,6 +10,8 @@ import { setTelemetryContext, track, withTelemetryContext } from "@moonshot-ai/k
 import { Events } from "../../shared/bridge";
 import { startModelCatalogRefresh } from "./model-catalog-refresh";
 import type { RuntimeBroadcast } from "./session-runtime";
+import type { ContextWindowConfigProvider } from "./context-window-control";
+import type { KaifThresholds } from "../../shared/types";
 import {
   corePermissionForLegacyApproval,
   legacyApprovalMetadata,
@@ -30,6 +32,7 @@ export interface KimiRuntimeOptions {
     webviewIds: readonly string[],
   ) => void;
   readonly log: (message: string, error?: unknown) => void;
+  readonly contextWindowSettings?: () => { enabled: boolean; thresholds: KaifThresholds };
   readonly homeDir?: string;
   readonly harness?: KimiHarness;
 }
@@ -49,6 +52,7 @@ export class KimiRuntime {
   private readonly broadcast: RuntimeBroadcast;
   private readonly captureBaseline: KimiRuntimeOptions["captureBaseline"];
   private readonly log: KimiRuntimeOptions["log"];
+  private readonly contextWindowConfig?: ContextWindowConfigProvider;
   private readonly disposeModelCatalogRefresh: () => void;
   private readonly sessions = new Map<string, SessionRuntime>();
   private readonly sessionByView = new Map<string, string>();
@@ -75,6 +79,13 @@ export class KimiRuntime {
           setContext: setTelemetryContext,
         },
       });
+    const contextWindowSettings = options.contextWindowSettings;
+    if (contextWindowSettings !== undefined) {
+      this.contextWindowConfig = async () => {
+        const config = await this.harness.getConfig();
+        return { ...contextWindowSettings(), ...config.loopControl };
+      };
+    }
     this.disposeModelCatalogRefresh = startModelCatalogRefresh({
       harness: this.harness,
       onChanged: () => {
@@ -278,6 +289,7 @@ export class KimiRuntime {
       broadcast: this.broadcast,
       captureBaseline: this.captureBaseline,
       log: this.log,
+      contextWindowControl: this.contextWindowConfig,
     });
     this.sessions.set(session.id, runtime);
     return runtime;

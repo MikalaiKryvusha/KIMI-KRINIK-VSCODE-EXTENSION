@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { INTERFACE_LANGUAGES, type ExtensionConfig, type InterfaceLanguage, type KaifThresholds } from "../../shared/types";
+import { CONTROL_PANEL_BUTTONS, INTERFACE_LANGUAGES, type ControlPanelVisibility, type ExtensionConfig, type InterfaceLanguage, type KaifThresholds } from "../../shared/types";
 import { normalizeSoundSettings, type SoundSettings } from "../../shared/sounds";
 
 declare const __EXTENSION_VERSION__: string;
@@ -38,6 +38,17 @@ export const VSCodeSettings = {
     return getConfig().get<boolean>("autoSteer", true);
   },
 
+  get contextWindowControl(): boolean {
+    return getConfig().get<boolean>("contextWindowControl", false);
+  },
+
+  get controlPanel(): ControlPanelVisibility {
+    const config = getConfig();
+    return Object.fromEntries(
+      CONTROL_PANEL_BUTTONS.map((button) => [button, config.get<boolean>(`controlPanel.${button}`, true)]),
+    ) as ControlPanelVisibility;
+  },
+
   get language(): InterfaceLanguage {
     const value = getConfig().get<string>("language", "en");
     return INTERFACE_LANGUAGES.find((language) => language === value) ?? "en";
@@ -70,6 +81,9 @@ export const VSCodeSettings = {
       showThinkingContent: this.showThinkingContent,
       showThinkingExpanded: this.showThinkingExpanded,
       autoSteer: this.autoSteer,
+      contextWindowControl: this.contextWindowControl,
+      contextWindowThresholds: this.kaifThresholds,
+      controlPanel: this.controlPanel,
       language: this.language,
       sounds: this.sounds,
       version: EXTENSION_VERSION,
@@ -82,7 +96,7 @@ export function onSettingsChange(callback: (changedKeys: string[]) => void): vsc
     if (!e.affectsConfiguration("kimi")) {
       return;
     }
-    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "language", "sounds"];
+    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "contextWindowControl", "kaif", "controlPanel", "language", "sounds"];
     const changedKeys = keys.filter((key) => e.affectsConfiguration(`kimi.${key}`));
     if (changedKeys.length > 0) {
       callback(changedKeys);

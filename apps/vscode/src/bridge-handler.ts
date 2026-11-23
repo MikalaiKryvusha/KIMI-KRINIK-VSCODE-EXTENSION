@@ -7,6 +7,7 @@ import {
   type RpcResult,
 } from "../shared/bridge";
 import { VSCodeSettings } from "./config/vscode-settings";
+import { syncContextWindowOwnership as syncKaifContextWindowOwnership } from "./handlers/behavior.handler";
 import { handlers, type BroadcastFn, type HandlerContext, type ReloadWebviewFn, type ShowLogsFn } from "./handlers";
 import { BaselineManager, type BaselineSession } from "./managers/baseline.manager";
 import { FileManager } from "./managers/file.manager";
@@ -45,6 +46,10 @@ export class BridgeHandler {
           this.captureFileBaseline(session, filePath, webviewIds);
         },
         log: (message, error) => this.logRuntimeError(message, error),
+        contextWindowSettings: () => ({
+          enabled: VSCodeSettings.contextWindowControl,
+          thresholds: VSCodeSettings.kaifThresholds,
+        }),
       });
     } catch (error) {
       throw new Error(
@@ -278,6 +283,10 @@ export class BridgeHandler {
   async dispose(): Promise<void> {
     this.fileManager.dispose();
     await this.runtime.dispose();
+  }
+
+  async syncContextWindowOwnership(): Promise<void> {
+    await syncKaifContextWindowOwnership(this.workspaceRoot, VSCodeSettings.contextWindowControl);
   }
 
   async getBaselineContent(sessionId: string, filePath: string): Promise<string> {

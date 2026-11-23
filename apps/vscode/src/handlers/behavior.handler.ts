@@ -19,7 +19,10 @@ const getAutoCompact: Handler<void, AutoCompactResult> = async (_, ctx) => {
 const setAutoCompact: Handler<{ enabled: boolean }, AutoCompactResult> = async (params, ctx) => {
   let kaif: KaifProjection | undefined;
   try {
-    if (!params.enabled) kaif = await projectKaifThresholds(ctx.workDir, VSCodeSettings.kaifThresholds);
+    if (!params.enabled) {
+      if (VSCodeSettings.contextWindowControl) await syncContextWindowOwnership(ctx.workDir, true);
+      else kaif = await projectKaifThresholds(ctx.workDir, VSCodeSettings.kaifThresholds);
+    }
     await ctx.harness.setConfig({ loopControl: { autoCompact: params.enabled } });
   } catch (error) {
     ctx.logError("Unable to change Auto Compact", error);
@@ -39,21 +42,46 @@ async function engineAutoCompact(ctx: HandlerContext): Promise<boolean> {
 }
 
 async function projectKaifThresholds(workDir: string | null, thresholds: KaifThresholds): Promise<KaifProjection> {
-  for (const [name, value] of Object.entries(thresholds)) {
-    if (!Number.isFinite(value) || value < 0 || value > 100) {
-      throw new Error(`The KAIF threshold ${name} must be a number from 0 to 100; it is ${String(value)}.`);
-    }
-  }
+  assertValidThresholds(thresholds);
   const marker = workDir === null ? undefined : await findKaifMarker(workDir);
   if (marker === undefined) return "absent";
   const data: unknown = JSON.parse((await readFile(marker, "utf8")).replace(/^﻿/, ""));
   if (!isRecord(data)) throw new Error(`${marker} does not hold a JSON object.`);
-  const contextWindow = isRecord(data["contextWindow"]) ? data["contextWindow"] : {};
+  const contextWindow = isRecord(data["contextWindow"]) ? { ...data["contextWindow"] } : {};
+  if (contextWindow["owner"] === "kimi-krinik") delete contextWindow["owner"];
   const projected = { ...data, contextWindow: { ...contextWindow, ...thresholds } };
   const staging = `${marker}.${process.pid}.tmp`;
   await writeFile(staging, `${JSON.stringify(projected, null, 2)}\n`, "utf8");
   await rename(staging, marker);
   return "projected";
+}
+
+export async function syncContextWindowOwnership(workDir: string | null, enabled: boolean): Promise<KaifProjection> {
+  const thresholds = VSCodeSettings.kaifThresholds;
+  if (enabled) assertValidThresholds(thresholds);
+  const marker = workDir === null ? undefined : await findKaifMarker(workDir);
+  if (marker === undefined) return "absent";
+  const data: unknown = JSON.parse((await readFile(marker, "utf8")).replace(/^﻿/, ""));
+  if (!isRecord(data)) throw new Error(`${marker} does not hold a JSON object.`);
+  const current = isRecord(data["contextWindow"]) ? { ...data["contextWindow"] } : {};
+  if (!enabled && current["owner"] !== "kimi-krinik") return "projected";
+  const contextWindow = enabled
+    ? { ...current, ...thresholds, owner: "kimi-krinik" }
+    : { ...current };
+  if (!enabled) delete contextWindow["owner"];
+  const projected = { ...data, contextWindow };
+  const staging = `${marker}.${process.pid}.tmp`;
+  await writeFile(staging, `${JSON.stringify(projected, null, 2)}\n`, "utf8");
+  await rename(staging, marker);
+  return "projected";
+}
+
+function assertValidThresholds(thresholds: KaifThresholds): void {
+  for (const [name, value] of Object.entries(thresholds)) {
+    if (!Number.isFinite(value) || value < 0 || value > 100) {
+      throw new Error(`The Context Window Control threshold ${name} must be a number from 0 to 100; it is ${String(value)}.`);
+    }
+  }
 }
 
 async function findKaifMarker(start: string): Promise<string | undefined> {

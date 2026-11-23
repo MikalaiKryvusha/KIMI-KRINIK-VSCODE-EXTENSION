@@ -1,4 +1,4 @@
-import { INTERFACE_LANGUAGES } from "./types";
+import { CONTEXT_WINDOW_THRESHOLD_SETTINGS, CONTROL_PANEL_BUTTONS, INTERFACE_LANGUAGES } from "./types";
 import { isSoundSettings } from "./sounds";
 import { GOAL_ACTIONS, isPermissionModeName } from "./modes";
 
@@ -36,6 +36,7 @@ export const Methods = {
   StreamChat: "streamChat",
   AbortChat: "abortChat",
   ResetSession: "resetSession",
+  GetSessionContext: "getSessionContext",
   SetPlanMode: "setPlanMode",
   SteerChat: "steerChat",
   RespondApproval: "respondApproval",
@@ -143,6 +144,7 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.GetMCPServers:
     case Methods.AbortChat:
     case Methods.ResetSession:
+    case Methods.GetSessionContext:
     case Methods.GetKimiSessions:
     case Methods.GetAllKimiSessions:
     case Methods.GetRegisteredWorkDirs:
@@ -163,6 +165,10 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.UpdateExtensionSetting:
       return isPlainObject(params) && (
         (params["key"] === "autoSteer" && typeof params["value"] === "boolean")
+        || (params["key"] === "contextWindowControl" && typeof params["value"] === "boolean")
+        || ((Object.values(CONTEXT_WINDOW_THRESHOLD_SETTINGS) as readonly unknown[]).includes(params["key"])
+          && typeof params["value"] === "number" && Number.isFinite(params["value"]) && params["value"] >= 0 && params["value"] <= 100)
+        || (typeof params["value"] === "boolean" && CONTROL_PANEL_BUTTONS.some((button) => params["key"] === `controlPanel.${button}`))
         || (params["key"] === "language" && (INTERFACE_LANGUAGES as readonly unknown[]).includes(params["value"]))
         || (params["key"] === "sounds" && isSoundSettings(params["value"]))
       );

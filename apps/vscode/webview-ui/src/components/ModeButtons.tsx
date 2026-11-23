@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/sonner";
 import { bridge } from "@/services";
-import { useChatStore } from "@/stores";
+import { useChatStore, useSettingsStore } from "@/stores";
 import { useT, type TranslationKey } from "@/i18n";
 import { cn } from "@/lib/utils";
 import type { GoalAction, GoalStateInfo, GoalStatusName } from "shared/modes";
@@ -42,6 +42,7 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
   const swarmMode = useChatStore((state) => state.swarmMode);
   const goal = useChatStore((state) => state.goal);
   const goalArmed = useChatStore((state) => state.goalArmed);
+  const controlPanel = useSettingsStore((state) => state.extensionConfig.controlPanel);
   const [goalMenuOpen, setGoalMenuOpen] = useState(false);
 
   const toggleSwarm = () => {
@@ -68,17 +69,19 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button type="button" onClick={onTogglePlanMode} className={modeButtonClass(planMode)} data-testid="mode-plan">
-            <IconClipboardList className="size-3.5" />
-            <span className="leading-none @max-[480px]/composer:hidden">{t("modes.plan")}</span>
-          </button>
-        </TooltipTrigger>
-        <TooltipContent>{planMode ? t("planMode.active") : t("modes.planDesc")}</TooltipContent>
-      </Tooltip>
+      {controlPanel.plan && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button type="button" onClick={onTogglePlanMode} className={modeButtonClass(planMode)} data-testid="mode-plan">
+              <IconClipboardList className="size-3.5" />
+              <span className="leading-none @max-[480px]/composer:hidden">{t("modes.plan")}</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{planMode ? t("planMode.active") : t("modes.planDesc")}</TooltipContent>
+        </Tooltip>
+      )}
 
-      {isGoalOpen(goal) ? (
+      {controlPanel.goal && (isGoalOpen(goal) ? (
         <DropdownMenu open={goalMenuOpen} onOpenChange={setGoalMenuOpen}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -136,17 +139,19 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
           </TooltipTrigger>
           <TooltipContent>{goalArmed ? t("modes.goalArmed") : t("modes.goalDesc")}</TooltipContent>
         </Tooltip>
-      )}
+      ))}
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button type="button" onClick={toggleSwarm} className={modeButtonClass(swarmMode)} data-testid="mode-swarm">
-            <IconSparkles className="size-3.5" />
-            <span className="leading-none @max-[480px]/composer:hidden">{t("modes.swarm")}</span>
-          </button>
-        </TooltipTrigger>
-        <TooltipContent>{t("modes.swarmDesc")}</TooltipContent>
-      </Tooltip>
+      {controlPanel.swarm && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button type="button" onClick={toggleSwarm} className={modeButtonClass(swarmMode)} data-testid="mode-swarm">
+              <IconSparkles className="size-3.5" />
+              <span className="leading-none @max-[480px]/composer:hidden">{t("modes.swarm")}</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{t("modes.swarmDesc")}</TooltipContent>
+        </Tooltip>
+      )}
     </>
   );
 }

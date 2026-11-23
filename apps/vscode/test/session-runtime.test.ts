@@ -817,3 +817,39 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     expect(activateSkill).toHaveBeenCalledWith("review", undefined, { path: "/work/B/review/SKILL.md" });
   });
 });
+
+describe("Context Window Control runtime delivery", () => {
+  it("turns an SDK status into one self-contained steer-capable prompt", async () => {
+    const sdk = createFakeSession();
+    const promptWithSkills = vi.fn(async (_line: string, _skills: readonly unknown[], _options: { steerIfActive?: boolean }) => ({}));
+    Object.assign(sdk.session, { promptWithSkills });
+    const runtime = new SessionRuntime({
+      session: sdk.session,
+      legacyApproval: DEFAULT_LEGACY_APPROVAL,
+      broadcast: vi.fn(),
+      captureBaseline: vi.fn(),
+      log: vi.fn(),
+      contextWindowControl: async () => ({
+        enabled: true,
+        autoCompact: false,
+        thresholds: { warnPct: 70, cutPct: 75, closePct: 80, forcePct: 90 },
+      }),
+    });
+
+    sdk.emit({
+      type: "agent.status.updated",
+      sessionId: "session-1",
+      agentId: "main",
+      contextTokens: 623_903,
+      maxContextTokens: 1_048_576,
+    });
+
+    await vi.waitFor(() => expect(promptWithSkills).toHaveBeenCalledTimes(1));
+    const [line, skills, options] = promptWithSkills.mock.calls[0]!;
+    expect(line).toContain("<system>KIMI KRINIK context:");
+    expect(line).not.toContain("KAIF");
+    expect(skills).toEqual([]);
+    expect(options).toEqual({ steerIfActive: true });
+    await runtime.close();
+  });
+});

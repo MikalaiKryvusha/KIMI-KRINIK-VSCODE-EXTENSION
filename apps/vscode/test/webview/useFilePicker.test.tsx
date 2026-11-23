@@ -73,6 +73,26 @@ describe('search', () => {
     await waitFor(() => { expect(getProjectFiles).toHaveBeenCalledTimes(1); });
     expect(getProjectFiles).toHaveBeenCalledWith({ query: 'app' });
   });
+
+  it('does not replay the previous search when reopened with an empty query', async () => {
+    getProjectFiles.mockImplementation(async (params?: { query?: string }) => [{
+      name: params?.query ?? 'root.ts',
+      path: params?.query ?? 'root.ts',
+      isDirectory: false,
+    }]);
+    const { result, rerender } = renderHook(({ token }) => useFilePicker(token, noop, noop, noop), {
+      initialProps: { token: at('old') as Token },
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => { expect(result.current.fileItems[0]?.name).toBe('old'); });
+
+    rerender({ token: null });
+    rerender({ token: at('') });
+
+    expect(result.current.fileItems).toHaveLength(0);
+    await waitFor(() => { expect(getProjectFiles).toHaveBeenLastCalledWith({ query: undefined }); });
+    await waitFor(() => { expect(result.current.fileItems[0]?.name).toBe('root.ts'); });
+  });
 });
 
 describe('media option', () => {

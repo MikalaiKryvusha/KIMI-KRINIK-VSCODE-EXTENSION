@@ -18,8 +18,9 @@ vi.mock("vscode", () => ({
   },
 }));
 
-import { behaviorHandlers } from "../src/handlers/behavior.handler";
-import { Events, Methods } from "../shared/bridge";
+import { behaviorHandlers, syncContextWindowOwnership } from "../src/handlers/behavior.handler";
+import { Events, Methods, validateRpcMessage } from "../shared/bridge";
+import { CONTROL_PANEL_BUTTONS } from "../shared/types";
 
 const setAutoCompact = behaviorHandlers[Methods.SetAutoCompact];
 const getAutoCompact = behaviorHandlers[Methods.GetAutoCompact];
@@ -123,6 +124,39 @@ describe("Auto Compact switch", () => {
     expect(engineAutoCompact).toBe(false);
   });
 
+  it("uses the independent controller without requiring a KAIF marker", async () => {
+    boundary.settings.set("contextWindowControl", true);
+    const ctx = context();
+
+    await expect(setAutoCompact({ enabled: false }, ctx as never)).resolves.toEqual({ ok: true, enabled: false });
+    expect(engineAutoCompact).toBe(false);
+  });
+
+  it("hands a valid KAIF marker to KIMI KRINIK and back without losing fields", async () => {
+    mkdirSync(join(root, ".kaif"), { recursive: true });
+    writeFileSync(marker(), JSON.stringify({ agents: ["kimi-code"], custom: true, contextWindow: { tokens: 123456, custom: "keep" } }));
+    boundary.settings.set("kaif.warnPercent", 72);
+
+    await expect(syncContextWindowOwnership(workDir, true)).resolves.toBe("projected");
+    const owned = JSON.parse(readFileSync(marker(), "utf8"));
+    expect(owned).toMatchObject({ agents: ["kimi-code"], custom: true });
+    expect(owned.contextWindow).toEqual({
+      tokens: 123456,
+      custom: "keep",
+      warnPct: 72,
+      cutPct: 75,
+      closePct: 80,
+      forcePct: 90,
+      owner: "kimi-krinik",
+    });
+
+    await expect(syncContextWindowOwnership(workDir, false)).resolves.toBe("projected");
+    const returned = JSON.parse(readFileSync(marker(), "utf8"));
+    expect(returned.contextWindow.owner).toBeUndefined();
+    expect(returned.contextWindow).toMatchObject({ tokens: 123456, custom: "keep", warnPct: 72 });
+    expect(returned.custom).toBe(true);
+  });
+
   it("turns automatic compaction back on without touching the marker", async () => {
     mkdirSync(join(root, ".kaif"), { recursive: true });
     writeFileSync(marker(), JSON.stringify({ agents: ["kimi-code"] }));
@@ -150,5 +184,39 @@ describe("AUTO STEER setting", () => {
   it("writes the user-level kimi.autoSteer setting", async () => {
     await expect(updateExtensionSetting({ key: "autoSteer", value: false }, context() as never)).resolves.toEqual({ ok: true });
     expect(boundary.update).toHaveBeenCalledWith("autoSteer", false, 1);
+  });
+});
+
+describe("Control Panel and Context Window settings", () => {
+  it("writes one nested user-level boolean without changing the feature value", async () => {
+    await expect(updateExtensionSetting({ key: "controlPanel.plan", value: false }, context() as never)).resolves.toEqual({ ok: true });
+    expect(boundary.update).toHaveBeenCalledWith("controlPanel.plan", false, 1);
+  });
+
+  it("accepts only declared Control Panel booleans", () => {
+    const message = (params: unknown) => validateRpcMessage({ id: "1", method: Methods.UpdateExtensionSetting, params });
+    expect(message({ key: "controlPanel.swarm", value: false }).ok).toBe(true);
+    expect(message({ key: "controlPanel.swarm", value: "false" }).ok).toBe(false);
+    expect(message({ key: "controlPanel.attachments", value: false }).ok).toBe(false);
+  });
+
+  it("validates the independent toggle and numeric thresholds", () => {
+    const message = (params: unknown) => validateRpcMessage({ id: "1", method: Methods.UpdateExtensionSetting, params });
+    expect(message({ key: "contextWindowControl", value: true }).ok).toBe(true);
+    expect(message({ key: "kaif.warnPercent", value: 72 }).ok).toBe(true);
+    expect(message({ key: "kaif.warnPercent", value: 101 }).ok).toBe(false);
+    expect(message({ key: "kaif.warnPercent", value: "72" }).ok).toBe(false);
+  });
+
+  it("exposes every configurable button as a default-on General setting", () => {
+    const manifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as {
+      contributes: { configuration: { properties: Record<string, { type: string; default: unknown }> } };
+    };
+    const properties = manifest.contributes.configuration.properties;
+    for (const button of CONTROL_PANEL_BUTTONS) {
+      expect(properties[`kimi.controlPanel.${button}`], button).toMatchObject({ type: "boolean", default: true });
+    }
+    expect(properties["kimi.controlPanel.attachments"]).toBeUndefined();
+    expect(properties["kimi.controlPanel.model"]).toBeUndefined();
   });
 });

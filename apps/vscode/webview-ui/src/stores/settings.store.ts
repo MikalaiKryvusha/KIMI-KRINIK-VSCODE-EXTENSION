@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
-import type { ExtensionConfig, InterfaceLanguage } from "shared/types";
+import type { ContextWindowThresholds, ControlPanelButton, ExtensionConfig, InterfaceLanguage } from "shared/types";
+import { CONTEXT_WINDOW_THRESHOLD_SETTINGS } from "shared/types";
 import { DEFAULT_SOUND_SETTINGS, type SoundSettings } from "shared/sounds";
 import type { ModelConfig, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
 import { translate, type TranslateParams, type TranslationKey } from "@/i18n/translate";
@@ -34,6 +35,17 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
   showThinkingContent: true,
   showThinkingExpanded: true,
   autoSteer: true,
+  contextWindowControl: false,
+  contextWindowThresholds: { warnPct: 70, cutPct: 75, closePct: 80, forcePct: 90 },
+  controlPanel: {
+    permission: true,
+    compact: true,
+    steer: true,
+    control: true,
+    plan: true,
+    goal: true,
+    swarm: true,
+  },
   language: "en",
   sounds: DEFAULT_SOUND_SETTINGS,
   version: "",
@@ -195,6 +207,9 @@ interface SettingsState {
   setAutoCompact: (enabled: boolean | null) => void;
   changeAutoCompact: (enabled: boolean) => Promise<void>;
   changeAutoSteer: (enabled: boolean) => Promise<void>;
+  changeContextWindowControl: (enabled: boolean) => Promise<void>;
+  changeContextWindowThreshold: (name: keyof ContextWindowThresholds, value: number) => Promise<void>;
+  changeControlPanelVisibility: (button: ControlPanelButton, visible: boolean) => Promise<void>;
   changeLanguage: (language: InterfaceLanguage) => Promise<void>;
 }
 
@@ -254,6 +269,59 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       await bridge.updateExtensionSetting({ key: "autoSteer", value: enabled });
     } catch (error) {
       toast.error(t("toast.autoSteerNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeContextWindowControl: async (enabled) => {
+    const previous = get().extensionConfig.contextWindowControl;
+    set({ extensionConfig: { ...get().extensionConfig, contextWindowControl: enabled } });
+    try {
+      await bridge.updateExtensionSetting({ key: "contextWindowControl", value: enabled });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, contextWindowControl: previous } });
+      toast.error(t("toast.contextWindowNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeContextWindowThreshold: async (name, value) => {
+    const previous = get().extensionConfig.contextWindowThresholds[name];
+    set({
+      extensionConfig: {
+        ...get().extensionConfig,
+        contextWindowThresholds: { ...get().extensionConfig.contextWindowThresholds, [name]: value },
+      },
+    });
+    try {
+      await bridge.updateExtensionSetting({ key: CONTEXT_WINDOW_THRESHOLD_SETTINGS[name], value });
+    } catch (error) {
+      set({
+        extensionConfig: {
+          ...get().extensionConfig,
+          contextWindowThresholds: { ...get().extensionConfig.contextWindowThresholds, [name]: previous },
+        },
+      });
+      toast.error(t("toast.contextWindowNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeControlPanelVisibility: async (button, visible) => {
+    const previous = get().extensionConfig.controlPanel[button];
+    set({
+      extensionConfig: {
+        ...get().extensionConfig,
+        controlPanel: { ...get().extensionConfig.controlPanel, [button]: visible },
+      },
+    });
+    try {
+      await bridge.updateExtensionSetting({ key: `controlPanel.${button}`, value: visible });
+    } catch (error) {
+      set({
+        extensionConfig: {
+          ...get().extensionConfig,
+          controlPanel: { ...get().extensionConfig.controlPanel, [button]: previous },
+        },
+      });
+      toast.error(t("toast.controlPanelNotChanged", { error: error instanceof Error ? error.message : String(error) }));
     }
   },
 

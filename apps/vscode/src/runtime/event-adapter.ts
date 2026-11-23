@@ -324,6 +324,8 @@ function mapStatusUpdate(
   const payload: StatusUpdate = {};
   const contextUsage = contextUsageRatio(sdkEvent);
   if (contextUsage !== undefined) payload.context_usage = contextUsage;
+  if (sdkEvent.contextTokens !== undefined) payload.context_tokens = sdkEvent.contextTokens;
+  if (sdkEvent.maxContextTokens !== undefined) payload.max_context_tokens = sdkEvent.maxContextTokens;
   if (sdkEvent.planMode !== undefined) payload.plan_mode = sdkEvent.planMode;
   if (sdkEvent.model !== undefined) payload.model = sdkEvent.model;
   if (sdkEvent.thinkingEffort !== undefined) payload.thinking_effort = sdkEvent.thinkingEffort;

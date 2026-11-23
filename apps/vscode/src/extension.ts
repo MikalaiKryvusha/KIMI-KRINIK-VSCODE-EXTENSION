@@ -66,11 +66,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           ?.setYoloModeForActiveSessions(VSCodeSettings.yoloMode)
           .catch((error) => logError("Unable to update session permission", error));
       }
+      if (changedKeys.includes("contextWindowControl") || changedKeys.includes("kaif")) {
+        void provider
+          ?.syncContextWindowOwnership()
+          .catch((error: unknown) => logError("Unable to synchronize Context Window Control ownership", error));
+      }
     }),
     vscode.window.registerWebviewViewProvider("kimiKaif.webview", provider, {
       webviewOptions: { retainContextWhenHidden: true },
     }),
   );
+  void provider.syncContextWindowOwnership()
+    .catch((error: unknown) => logError("Unable to synchronize Context Window Control ownership", error));
 
   const migrationManager = new LegacyMigrationManager({
     targetHome: provider.harness.homeDir,

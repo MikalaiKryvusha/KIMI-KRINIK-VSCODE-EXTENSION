@@ -111,35 +111,75 @@
         "kimi.autoSteer": {
           "type": "boolean",
           "default": true,
-          "description": "AUTO STEER: a message sent during a running turn joins that turn at once. Off: the message waits in the queue until the turn ends."
+          "description": "Steer: a message sent during a running turn joins that turn at once. Off: the message waits in the queue until the turn ends."
+        },
+        "kimi.contextWindowControl": {
+          "type": "boolean",
+          "default": false,
+          "description": "Send KIMI KRINIK context-window prompts at the configured thresholds, with or without automatic compaction. Turn Compact off for fully manual context management. No KAIF installation is required."
+        },
+        "kimi.controlPanel.permission": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the permission-mode button in Control Panel. Hiding the button does not change the permission mode."
+        },
+        "kimi.controlPanel.compact": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Compact button in Control Panel. Hiding the button does not change Auto Compact."
+        },
+        "kimi.controlPanel.steer": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Steer button in Control Panel. Hiding the button does not change Steer."
+        },
+        "kimi.controlPanel.control": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Control button in Control Panel. Hiding the button does not change Context Window Control."
+        },
+        "kimi.controlPanel.plan": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Plan button in Control Panel. Hiding the button does not change Plan mode."
+        },
+        "kimi.controlPanel.goal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Goal button in Control Panel. Hiding the button does not change the current goal."
+        },
+        "kimi.controlPanel.swarm": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Swarm button in Control Panel. Hiding the button does not change Swarm mode."
         },
         "kimi.kaif.warnPercent": {
           "type": "number",
           "default": 70,
           "minimum": 0,
           "maximum": 100,
-          "description": "KAIF context-window warning threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+          "description": "Context Window Control warning threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
         },
         "kimi.kaif.cutPercent": {
           "type": "number",
           "default": 75,
           "minimum": 0,
           "maximum": 100,
-          "description": "KAIF context-window trim threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+          "description": "Context Window Control logical-cut threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
         },
         "kimi.kaif.closePercent": {
           "type": "number",
           "default": 80,
           "minimum": 0,
           "maximum": 100,
-          "description": "KAIF context-window soft closure threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+          "description": "Context Window Control soft-closure threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
         },
         "kimi.kaif.forcePercent": {
           "type": "number",
           "default": 90,
           "minimum": 0,
           "maximum": 100,
-          "description": "KAIF context-window forced closure threshold, in percent of Kimi's compaction point. Written to the project's .kaif/kaif.json when Auto Compact is turned off; only the defaults 70 / 75 / 80 / 90 are guaranteed."
+          "description": "Context Window Control forced-closure threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
         },
         "kimi.attentionVoiceCommand": {
           "type": "array",

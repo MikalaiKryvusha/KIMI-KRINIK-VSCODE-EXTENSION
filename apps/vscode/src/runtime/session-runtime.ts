@@ -24,6 +24,7 @@ import {
   type LegacyApprovalFlags,
 } from "./legacy-approval";
 import { ReverseRpcController } from "./reverse-rpc";
+import { ContextWindowController, type ContextWindowConfigProvider } from "./context-window-control";
 
 export type RuntimeBroadcast = (event: string, data: unknown, webviewId?: string) => void;
 
@@ -37,6 +38,7 @@ export interface SessionRuntimeOptions {
     webviewIds: readonly string[],
   ) => void;
   readonly log: (message: string, error?: unknown) => void;
+  readonly contextWindowControl?: ContextWindowConfigProvider;
 }
 
 interface ActivePrompt {
@@ -71,6 +73,7 @@ export class SessionRuntime {
   private readonly log: SessionRuntimeOptions["log"];
   private readonly webviewIds = new Set<string>();
   private readonly reverseRpc: ReverseRpcController;
+  private readonly contextWindowController?: ContextWindowController;
   private readonly unsubscribe: () => void;
   private adapterState: EventAdapterState = createEventAdapterState();
   private activePrompt: ActivePrompt | undefined;
@@ -93,6 +96,15 @@ export class SessionRuntime {
     this.log = options.log;
     this.legacyApproval = options.legacyApproval;
     this.reverseRpc = new ReverseRpcController((event) => this.emitStreamEvent(event));
+    if (options.contextWindowControl !== undefined) {
+      this.contextWindowController = new ContextWindowController(
+        options.contextWindowControl,
+        async (line) => {
+          if (!this.closed) await this.session.promptWithSkills(line, [], { steerIfActive: true });
+        },
+        (message, error) => this.log(message, error),
+      );
+    }
 
     this.session.setApprovalHandler((request) => this.reverseRpc.requestApproval(request));
     this.session.setQuestionHandler((request) => this.reverseRpc.requestQuestion(request));
@@ -420,6 +432,11 @@ export class SessionRuntime {
 
   private onSdkEvent(event: Event): void {
     if (this.closed) return;
+    if (event.type === "compaction.completed") this.contextWindowController?.reset();
+    if (event.type === "agent.status.updated" && event.agentId === "main"
+      && event.contextTokens !== undefined && event.maxContextTokens !== undefined) {
+      void this.contextWindowController?.observe(event.contextTokens, event.maxContextTokens);
+    }
     if (event.type === "goal.updated") {
       for (const webviewId of this.webviewIds) {
         this.broadcast(

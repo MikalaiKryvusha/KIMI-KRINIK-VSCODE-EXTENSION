@@ -22,6 +22,30 @@ export interface FileChange {
   deletions: number;
 }
 
+export const CONTROL_PANEL_BUTTONS = ["permission", "compact", "steer", "control", "plan", "goal", "swarm"] as const;
+
+export type ControlPanelButton = (typeof CONTROL_PANEL_BUTTONS)[number];
+export type ControlPanelVisibility = Record<ControlPanelButton, boolean>;
+export type ControlPanelSettingKey = `controlPanel.${ControlPanelButton}`;
+
+export interface ContextWindowThresholds {
+  warnPct: number;
+  cutPct: number;
+  closePct: number;
+  forcePct: number;
+}
+
+export type KaifThresholds = ContextWindowThresholds;
+
+export const CONTEXT_WINDOW_THRESHOLD_SETTINGS = {
+  warnPct: "kaif.warnPercent",
+  cutPct: "kaif.cutPercent",
+  closePct: "kaif.closePercent",
+  forcePct: "kaif.forcePercent",
+} as const;
+
+export type ContextWindowThresholdSettingKey = (typeof CONTEXT_WINDOW_THRESHOLD_SETTINGS)[keyof ContextWindowThresholds];
+
 export interface ExtensionConfig {
   yoloMode: boolean;
   autosave: boolean;
@@ -30,6 +54,9 @@ export interface ExtensionConfig {
   showThinkingContent: boolean;
   showThinkingExpanded: boolean;
   autoSteer: boolean;
+  contextWindowControl: boolean;
+  contextWindowThresholds: ContextWindowThresholds;
+  controlPanel: ControlPanelVisibility;
   language: InterfaceLanguage;
   sounds: SoundSettings;
   version: string;
@@ -41,15 +68,11 @@ export type InterfaceLanguage = (typeof INTERFACE_LANGUAGES)[number];
 
 export type ExtensionSettingUpdate =
   | { key: "autoSteer"; value: boolean }
+  | { key: "contextWindowControl"; value: boolean }
+  | { key: ContextWindowThresholdSettingKey; value: number }
+  | { key: ControlPanelSettingKey; value: boolean }
   | { key: "language"; value: InterfaceLanguage }
   | { key: "sounds"; value: SoundSettings };
-
-export interface KaifThresholds {
-  warnPct: number;
-  cutPct: number;
-  closePct: number;
-  forcePct: number;
-}
 
 export type KaifProjection = "projected" | "absent";
 

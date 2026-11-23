@@ -306,7 +306,11 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
 
     expect(result.event).toEqual({
       type: 'StatusUpdate',
-      payload: { context_usage: 0.1 },
+      payload: {
+        context_usage: 0.1,
+        context_tokens: 25_600,
+        max_context_tokens: 256_000,
+      },
       _sessionId: 'session-1',
     });
   });
@@ -336,7 +340,11 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
       maxContextTokens: 0,
     });
 
-    expect(result.event).toBeUndefined();
+    expect(result.event).toEqual({
+      type: 'StatusUpdate',
+      payload: { context_tokens: 25_600, max_context_tokens: 0 },
+      _sessionId: 'session-1',
+    });
   });
 
   it('emits only new token usage when SDK status carries cumulative turn usage', () => {

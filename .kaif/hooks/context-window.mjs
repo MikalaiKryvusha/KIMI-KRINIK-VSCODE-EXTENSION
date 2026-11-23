@@ -129,6 +129,11 @@ export function kimiCompactionPoint(win, configText = '') {
   if (reserved > 0 && reserved < win) point = Math.min(point, win - reserved);
   return point;
 }
+export function kimiAutoCompactEnabled(configText = '') {
+  const lc = String(configText).split(/(?=^\[)/m).find((s) => /^\[loop_control\]\s*$/m.test(s.split('\n')[0])) || '';
+  const match = /^\s*auto_compact\s*=\s*(true|false)\s*(?:#.*)?$/m.exec(lc);
+  return match ? match[1] === 'true' : true;
+}
 
 // [NOT-TESTED: 2026-11-21 15:22 +03:00 the script was proven by events fed to it directly (s14); Kimi itself never ran its PostToolUse entry —
 //  the fragment's matcher was «*» (bugs/145); the live run is plans/143 KA9] Kimi's display count is a record of its own.
@@ -469,6 +474,9 @@ if (process.argv[2] === '--selftest') {
       && kimiCompactionPoint(1048576, '[loop_control]\nreserved_context_size = 0\n') === 891289
       && kimiCompactionPoint(1048576, '[models."x"]\nreserved_context_size = 900000\n') === 891289,
       'Kimi compaction point: min(0.85 · W, W − 50 000); compaction_trigger_ratio and reserved_context_size are read from [loop_control] only');
+    ok(kimiAutoCompactEnabled('') && kimiAutoCompactEnabled('[loop_control]\nauto_compact = true\n')
+      && !kimiAutoCompactEnabled('[loop_control]\nauto_compact = false\n'),
+      'Kimi Auto Compact defaults ON; the explicit false value is the only dormant-KAIF handoff');
     { const cfgK = 'default_model = "kimi-code/k3.1-pro"\n\n[models."kimi-code/k3.1-pro"]\nmax_context_size = 1048576\n';
       ok(kimiDefaultModel(cfgK) === 'kimi-code/k3.1-pro' && kimiConfiguredWindow(kimiDefaultModel(cfgK), cfgK) === 1048576
         && kimiDefaultModel('[models."x"]\ndefault_model = "y"\n') === '',
@@ -487,6 +495,8 @@ if (process.argv[2] === '--selftest') {
       const home = join(dir, 'home'), root = join(dir, 'project');
       mkdirSync(join(root, '.kaif'), { recursive: true });
       writeFileSync(join(root, DEPLOYMENT), JSON.stringify({ contextWindow: { tokens: 1048576 } }));
+      mkdirSync(home, { recursive: true });
+      writeFileSync(join(home, 'config.toml'), '[loop_control]\nauto_compact = false\n');
       const tp = join(home, 'sessions', 'wd_test', 'session_live', 'agents', 'main', 'wire.jsonl');
       const at = (n) => JSON.stringify({ type: 'token_counting.measured', agentId: 'main', tokens: n });
       mkdirSync(dirname(tp), { recursive: true }); writeFileSync(tp, usage + '\n' + at(760000) + '\n');
@@ -551,6 +561,15 @@ if (process.argv[2] === '--selftest') {
       ok(statusRead.status === 0 && gitStatus.status === 0 && ordinaryRead.status === 2 && build.status === 2
         && /only STATUS\.md/.test(ordinaryRead.stderr) && /Ordinary work is refused/.test(build.stderr),
         'Kimi post-force contour: STATUS and git handover pass; README and build are refused');
+      writeFileSync(join(root, DEPLOYMENT), JSON.stringify({ contextWindow: { tokens: 1048576, owner: 'kimi-krinik' } }));
+      const owned = run('PreToolUse', { tool_name: 'Read', usage: forceUsage, session_id: 'session_owned' });
+      ok(owned.status === 0 && owned.stdout === '' && owned.stderr === '',
+        'KIMI KRINIK ownership: the KAIF context hook is fully dormant while the built-in controller owns the window');
+      writeFileSync(join(root, DEPLOYMENT), JSON.stringify({ contextWindow: { tokens: 1048576 } }));
+      writeFileSync(join(home, 'config.toml'), '[loop_control]\nauto_compact = true\n');
+      const vanilla = run('PreToolUse', { tool_name: 'Read', usage: forceUsage, session_id: 'session_vanilla' });
+      ok(vanilla.status === 0 && vanilla.stdout === '' && vanilla.stderr === '',
+        'Vanilla Auto Compact ON: KAIF context demands are dormant without changing any other hook');
     } finally { rmSync(dir, { recursive: true, force: true }); }
   }
   console.log(bad ? `selftest: ${bad} FAIL` : 'selftest: all ok');
@@ -648,6 +667,7 @@ if (process.argv[2] === '--kimi') {
     if (!existsSync(join(root, DEPLOYMENT))) process.exit(0);
     const marker = readJson(join(root, DEPLOYMENT)) || {};
     const cw = (marker.contextWindow && typeof marker.contextWindow === 'object') ? marker.contextWindow : {};
+    if (cw.owner === 'kimi-krinik') process.exit(0);
     const cfg = kimiThresholds(cw);
     const id = ev.session_id, all = readJson(join(root, STATE)) || {};
     const st = all[id] || { said: [], seen: 0 };
@@ -666,6 +686,7 @@ if (process.argv[2] === '--kimi') {
       configText = readFileSync(join(configHome, 'config.toml'), 'utf8');
       configured = kimiConfiguredWindow(st.model || kimiDefaultModel(configText), configText);
     } catch { /* no readable Kimi config — the generic floor and Kimi's default trigger apply */ }
+    if (kimiAutoCompactEnabled(configText)) process.exit(0);
     const full = windowOf({ tokens: cw.tokens || configured, seen: Math.max(st.seen || 0, used) });
     const win = kimiCompactionPoint(full, configText);   // the steps count up to Kimi's own compaction (№164, D1)
     const gate = closeGate(ev, used, win, cfg);

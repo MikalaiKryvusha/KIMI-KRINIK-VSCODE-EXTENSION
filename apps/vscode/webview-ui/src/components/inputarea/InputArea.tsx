@@ -1,5 +1,5 @@
 import { Fragment, useRef, useMemo, useState, useEffect } from "react";
-import { IconSend, IconPlayerStop, IconChevronDown, IconPlus } from "@tabler/icons-react";
+import { IconSend, IconChevronDown, IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -40,6 +40,7 @@ import { computeMentionInsert } from "./utils";
 import { useT } from "@/i18n";
 import { ModeButtons } from "../ModeButtons";
 import { PermissionModeButton } from "../PermissionModeButton";
+import { BehaviorButtons } from "../BehaviorButtons";
 
 interface InputAreaProps {
   onAuthAction?: () => void;
@@ -57,6 +58,7 @@ function adjustHeight(textarea: HTMLTextAreaElement | null) {
 export function InputArea({ onAuthAction }: InputAreaProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
   const [text, setText] = useState("");
   const [cursorPos, setCursorPos] = useState(0);
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
@@ -250,7 +252,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
     }
   };
 
-  useClickOutside([textareaRef, menuRef], showSlashMenu || showFileMenu, closeMenus);
+  useClickOutside([textareaRef, menuRef, addButtonRef], showSlashMenu || showFileMenu, closeMenus);
 
   useEffect(() => {
     resetSlashMenu();
@@ -317,6 +319,10 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   };
 
   function handleAddButtonClick() {
+    if (showFileMenu) {
+      removeActiveToken();
+      return;
+    }
     const newText = text + "@";
     setText(newText);
     setCursorPos(newText.length);
@@ -456,14 +462,23 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
                 onToggle={toggleThinking}
                 onSelectEffort={selectThinkingEffort}
               />
-              <PermissionModeButton />
+              {extensionConfig.controlPanel.permission && <PermissionModeButton />}
+              <BehaviorButtons />
               <ModeButtons planMode={planMode} onTogglePlanMode={handleTogglePlanMode} />
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon-xs" onClick={handleAddButtonClick} className="text-muted-foreground">
+                  <Button
+                    ref={addButtonRef}
+                    data-testid="attachment-picker-toggle"
+                    aria-label={t("input.addFilesOrMedia")}
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={handleAddButtonClick}
+                    className="text-muted-foreground"
+                  >
                     <IconPlus className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
@@ -475,7 +490,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
 
               {isStreaming ? (
                 <Button variant="destructive" size="icon-xs" onClick={abort}>
-                  <IconPlayerStop className="size-3.5" />
+                  <span aria-hidden="true" data-testid="stop-indicator" className="block size-2.5 bg-current" />
                 </Button>
               ) : (
                 <Button variant="default" size="icon-xs" onClick={handleSend} disabled={!canSend}>

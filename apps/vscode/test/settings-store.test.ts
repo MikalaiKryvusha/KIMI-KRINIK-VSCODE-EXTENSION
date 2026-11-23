@@ -12,6 +12,7 @@ const boundary = vi.hoisted(() => ({
   toastWarning: vi.fn(),
   notifyAttention: vi.fn(),
   setAutoCompact: vi.fn(),
+  updateExtensionSetting: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
@@ -23,6 +24,7 @@ vi.mock("@/services", () => ({
     trackFiles: boundary.trackFiles,
     notifyAttention: boundary.notifyAttention,
     setAutoCompact: boundary.setAutoCompact,
+    updateExtensionSetting: boundary.updateExtensionSetting,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -30,6 +32,7 @@ vi.mock("@/components/ui/sonner", () => ({
 }));
 
 import {
+  DEFAULT_EXTENSION_CONFIG,
   getMediaFallbackModel,
   getModelThinkingMode,
   groupModelsByProvider,
@@ -64,6 +67,11 @@ beforeEach(() => {
   boundary.toastWarning.mockReset();
   boundary.notifyAttention.mockReset();
   boundary.notifyAttention.mockResolvedValue({ ok: true });
+  boundary.updateExtensionSetting.mockReset();
+  boundary.updateExtensionSetting.mockResolvedValue({ ok: true });
+  useSettingsStore.setState({
+    extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, controlPanel: { ...DEFAULT_EXTENSION_CONFIG.controlPanel } },
+  });
   useSettingsStore.getState().initModels(MODELS, "plain", false);
   useChatStore.setState({
     sessionId: null,
@@ -626,5 +634,28 @@ describe("Webview Auto Compact switch", () => {
     await useSettingsStore.getState().changeAutoCompact(false);
 
     expect(boundary.toastWarning).toHaveBeenCalledWith(expect.stringContaining("no KAIF marker"));
+  });
+});
+
+describe("Control Panel visibility", () => {
+  it("updates visibility immediately and persists it without changing feature values", async () => {
+    const previousConfig = useSettingsStore.getState().extensionConfig;
+    const change = useSettingsStore.getState().changeControlPanelVisibility("plan", false);
+
+    expect(useSettingsStore.getState().extensionConfig.controlPanel.plan).toBe(false);
+    expect(useSettingsStore.getState().extensionConfig.autoSteer).toBe(previousConfig.autoSteer);
+    expect(useSettingsStore.getState().extensionConfig.yoloMode).toBe(previousConfig.yoloMode);
+    await change;
+    expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "controlPanel.plan", value: false });
+  });
+
+  it("restores visibility and reports the error when persistence fails", async () => {
+    boundary.updateExtensionSetting.mockRejectedValueOnce(new Error("settings are read-only"));
+
+    await useSettingsStore.getState().changeControlPanelVisibility("goal", false);
+
+    expect(useSettingsStore.getState().extensionConfig.controlPanel.goal).toBe(true);
+    expect(useSettingsStore.getState().extensionConfig.autoSteer).toBe(DEFAULT_EXTENSION_CONFIG.autoSteer);
+    expect(boundary.toastError).toHaveBeenCalledWith("Control Panel visibility was not changed: settings are read-only");
   });
 });

@@ -146,6 +146,10 @@ export class KimiWebviewProvider implements vscode.WebviewViewProvider {
     await this.bridgeHandler.runtime.setYoloModeForActiveSessions(enabled);
   }
 
+  async syncContextWindowOwnership(): Promise<void> {
+    await this.bridgeHandler.syncContextWindowOwnership();
+  }
+
   private getHtml(webviewId: string, webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "dist", "webview.js"));
     const baseUri = webview.asWebviewUri(this.extensionUri).toString();

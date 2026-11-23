@@ -48,6 +48,18 @@ describe("interface dictionaries", () => {
     useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG } });
     expect(t("menu.settings")).toBe("Settings");
   });
+
+  it("keeps the Control Panel action names localized", () => {
+    expect(translate("en", "menu.autoCompact")).toBe("Compact");
+    expect(translate("ru", "menu.autoCompact")).toBe("Сжатие");
+    expect(translate("zh", "menu.autoCompact")).toBe("压缩");
+    expect(translate("en", "menu.autoSteer")).toBe("Steer");
+    expect(translate("ru", "menu.autoSteer")).toBe("Стиринг");
+    expect(translate("zh", "menu.autoSteer")).toBe("插话");
+    expect(translate("ru", "modes.plan")).toBe("План");
+    expect(translate("ru", "modes.goal")).toBe("Цель");
+    expect(translate("ru", "modes.swarm")).toBe("Рой");
+  });
 });
 
 describe("language switch", () => {
