@@ -43,7 +43,7 @@ and voice when it waits for you. The table shows what works now and what comes i
 | Sound and voice when an approval, a question or an error waits for you | — | — | ✅ · 🚧 a sound and a volume for each event |
 | Context Window Control with configurable thresholds | — | — | ✅ the extension sends threshold prompts without KAIF and supports KAIF handoff · 🚧 live acceptance |
 | Interface languages | English | English, 中文 | ✅ English, 中文, Русский, chosen in the settings menu |
-| Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ automated checks cover Control Panel visibility and secondary-model selection · 🚧 combined model + effort picker and live acceptance |
+| Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection · 🚧 live acceptance |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
 ### 2. Install
@@ -109,7 +109,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Звук и голос, когда вас ждут одобрение, вопрос или ошибка | — | — | ✅ · 🚧 свой звук и громкость для каждого события |
 | Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ расширение само отправляет пороговые промпты без KAIF и поддерживает передачу контура при его наличии · 🚧 живая приёмка |
 | Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, выбор в меню настроек |
-| Панель композера: режим разрешений, Plan, Goal, Swarm, вторичная модель, кольцо контекста и его просмотр | — | ✅ | ✅ автоматические проверки покрывают видимость Control Panel и выбор вторичной модели · 🚧 объединённый выбор модели с усилием и живая приёмка |
+| Панель композера: режим разрешений, Plan, Goal, Swarm, вторичная модель, кольцо контекста и его просмотр | — | ✅ | ✅ объединённый выбор модели с усилием, поиск, избранное и выбор вторичной модели · 🚧 живая приёмка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
 ### 2. Установка
@@ -174,7 +174,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 等待审批、问题或出现错误时的提示音与语音 | — | — | ✅ · 🚧 为每个事件设置声音与音量 |
 | 上下文窗口控制与可配置阈值 | — | — | ✅ 内置于扩展，无需 KAIF；可与 KAIF 交接 · 🚧 实际使用验收 |
 | 界面语言 | English | English、中文 | ✅ English、中文、Русский，在设置菜单中选择 |
-| 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ Control Panel 可见性设置已通过自动检查 · 🚧 模型与推理强度合并选择器及实际使用验收 |
+| 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ 模型与推理强度合并选择器、搜索、收藏及次级模型选择 · 🚧 实际使用验收 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 
 ### 2. 安装

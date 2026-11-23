@@ -179,6 +179,7 @@ function toWebviewModel(id: string, model: ModelAlias, providerType?: ProviderTy
     support_efforts:
       effective.supportEfforts === undefined ? undefined : [...effective.supportEfforts],
     default_effort: effective.defaultEffort,
+    max_context_tokens: effective.maxContextSize,
   };
 }
 

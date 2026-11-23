@@ -25,6 +25,10 @@
 
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
+### 2026-11-24 01:48 +03:00 — combined model + effort picker ✅ full hygiene
+- `ModelPicker` combines model and effort in one readable button; quick current-provider list, thinking tiers/on/off, cache note, full search, provider filters, keyboard navigation and shared persisted favorites. `InputArea` keeps attachment, permission, behavior/mode buttons, robot, quota, settings and stop/send in place; the old `ThinkingButton` is removed.
+- Five component scenarios plus the bridge context-size assertion are green; full suite 519 passed, 1 skipped; typecheck, lint and both builds green. EN/RU/ZH strings, README and third-party attribution updated. Live Second Side Bar layout and interaction remain K5. Report: `testcases/reports/2026-11-24_model_picker.md`.
+
 ### 2026-11-24 01:26 +03:00 — permission defaults ✅ real SDK and full hygiene
 - Control Panel Auto / Manual / YOLO now persists canonical `defaultPermissionMode`; new chats clear the old session override and use that default, with legacy `kimi.yoloMode` only as fallback. Main model and reasoning effort remain the defaults for new chats and restart; restored sessions keep their own approval metadata.
 - Real SDK proof: a second harness reloaded Auto from disk and a fresh session reported `permission: "auto"` despite legacy YOLO true. Red-to-green: 8 new expectations failed before implementation, 114 targeted tests passed after. Full: 514 passed, 1 skipped; typecheck, lint and both builds green. Live VS Code restart remains K5. Report: `testcases/reports/2026-11-24_permission_defaults.md`.
@@ -71,7 +75,7 @@ external publication wait for the owner's `AUTH:`.
 | Phase | State | Note |
 |---|---|---|
 | K0 baseline and contracts | 🔧 in progress | KAIF deployed; inventory and red tests for K1–K4 left |
-| K1 UI convergence | 🔧 in progress | context ring/viewer, Control Panel and Working are committed; secondary model + robot is a closing checkpoint with persistence tests only. Left: robot interaction/live test, combined model + effort picker, status pills, session header |
+| K1 UI convergence | 🔧 in progress | context ring/viewer, Control Panel, Working, secondary-model robot interaction and combined model + effort picker are committed and hygiene-green. Left: status pills, session-header polish and live Extension Host acceptance |
 | K2 behavior controls | 🔧 in progress | independent Context Window Control and KAIF handoff are committed and hygiene-green; left: K2.6 an in-flight compaction |
 | K3 localization and theme | ✅ hygiene | three languages and the theme tokens; live acceptance in K5 |
 | K4 sound settings | 🔧 in progress | the window is done; B5/B6/B8 not re-checked against it |
@@ -102,7 +106,7 @@ Standing falsehood: прежнее «ни один проектный хук н�
 
 KNOWLEDGE: independent Context Window Control and the one-authority handoff are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; the false total-hook-failure diagnosis, exact forensics and live activation are in `bugs/KAIF/04_context_window_alive_dormant.md` and EXP-0004; the voice route is in `HOUSE_RULES.md` R1 and EXP-0003; secondary model's checkpoint and the owner's new UI/persistence requirements are in this file.
 
-1. Continue K1: combined model + effort picker, then status pills and session header. The header must display `KIMI KRINIK` and use the robot from KIMI FORK. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
+1. Continue K1: status pills and session-header polish. The header must display `KIMI KRINIK` and use the robot from KIMI FORK. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
 2. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.

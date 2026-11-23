@@ -1,14 +1,6 @@
-import { Fragment, useRef, useMemo, useState, useEffect } from "react";
-import { IconSend, IconChevronDown, IconPlus } from "@tabler/icons-react";
+import { useRef, useMemo, useState, useEffect } from "react";
+import { IconSend, IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ActionMenu } from "../ActionMenu";
 import { UsageStatusBar } from "../UsageStatusBar";
@@ -18,13 +10,10 @@ import { MediaThumbnail } from "../MediaThumbnail";
 import { MediaPreviewModal } from "../MediaPreviewModal";
 import { BottomToolbar } from "../BottomToolbar";
 import { StreamingConfirmDialog } from "../StreamingConfirmDialog";
-import { ThinkingButton } from "../ThinkingButton";
 import {
   getModelById,
   getMediaFallbackModel,
   getModelsForMedia,
-  groupModelsByProvider,
-  providerDisplayName,
   useChatStore,
   useSettingsStore,
 } from "@/stores";
@@ -42,13 +31,11 @@ import { ModeButtons } from "../ModeButtons";
 import { PermissionModeButton } from "../PermissionModeButton";
 import { BehaviorButtons } from "../BehaviorButtons";
 import { SubagentModelDialog } from "../SubagentModelDialog";
+import { ModelPicker } from "../ModelPicker";
 
 interface InputAreaProps {
   onAuthAction?: () => void;
 }
-
-const SWITCH_CACHE_NOTE =
-  "Note: Switching models or thinking effort invalidates the existing prompt cache. Start a new conversation to avoid extra token costs.";
 
 function adjustHeight(textarea: HTMLTextAreaElement | null) {
   if (!textarea) return;
@@ -65,11 +52,10 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
 
   const { isStreaming, sendMessage, abort, draftMedia, removeDraftMedia, hasProcessingMedia, getMediaInConversation, pendingInput, composerRestore, planMode, messages } = useChatStore();
-  const { currentModel, thinkingEffort, updateModel, toggleThinking, selectThinkingEffort, models, extensionConfig, getCurrentThinkingMode } = useSettingsStore();
+  const { currentModel, updateModel, models, extensionConfig } = useSettingsStore();
 
   const t = useT();
   const isProcessing = hasProcessingMedia();
-  const thinkingMode = getCurrentThinkingMode();
   const hasConversationHistory = messages.some((message) => message.role === "user");
 
   const [showPlanModeConfirm, setShowPlanModeConfirm] = useState(false);
@@ -97,13 +83,6 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
 
   const availableModels = useMemo(() => getModelsForMedia(models, mediaReq), [models, mediaReq]);
   const currentModelConfig = getModelById(models, currentModel);
-  const modelGroups = useMemo(() => groupModelsByProvider(availableModels), [availableModels]);
-  const showProviderGroups = modelGroups.length > 1;
-  const currentModelLabel = currentModelConfig === undefined
-    ? t("input.noModels")
-    : showProviderGroups
-      ? `${currentModelConfig.name} · ${providerDisplayName(currentModelConfig.provider)}`
-      : currentModelConfig.name;
 
   useEffect(() => {
     if (!mediaReq.image && !mediaReq.video) {
@@ -402,66 +381,10 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
 
           <div className="@container/composer flex items-center justify-between gap-1 px-1.5 pb-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
-              <DropdownMenu>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        className="gap-0.5 text-accent-foreground border-0! h-6 px-1.5 min-w-0 max-w-[calc(100%-4rem)]"
-                        disabled={isStreaming || !hasModels}
-                      >
-                        <span className="flex min-w-0 items-center text-xs">
-                          <span className="truncate">{currentModelConfig?.name ?? t("input.noModels")}</span>
-                          {currentModelConfig !== undefined && showProviderGroups && (
-                            <span className="shrink-[3] truncate text-muted-foreground max-[520px]:hidden">
-                              {" · "}{providerDisplayName(currentModelConfig.provider)}
-                            </span>
-                          )}
-                        </span>
-                        {hasModels && <IconChevronDown className="size-3.5 shrink-0" />}
-                      </Button>
-                    </DropdownMenuTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>{currentModelLabel}</TooltipContent>
-                </Tooltip>
-                <DropdownMenuContent className="w-52!" align="start">
-                  {modelGroups.map((group, groupIndex) => (
-                    <Fragment key={group.provider}>
-                      {showProviderGroups && <DropdownMenuLabel>{group.label}</DropdownMenuLabel>}
-                      {group.models.map((model) => (
-                        <DropdownMenuItem
-                          key={model.id}
-                          onClick={() => updateModel(model.id)}
-                          className={cn("text-xs px-3 py-1.5 cursor-pointer", currentModel === model.id && "bg-accent")}
-                        >
-                          {model.name}
-                        </DropdownMenuItem>
-                      ))}
-                      {showProviderGroups && groupIndex < modelGroups.length - 1 && <DropdownMenuSeparator />}
-                    </Fragment>
-                  ))}
-                  {hasConversationHistory && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <div className="px-3 py-1.5 text-[10px] leading-snug whitespace-normal text-muted-foreground">
-                        {SWITCH_CACHE_NOTE}
-                      </div>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <ThinkingButton
-                mode={thinkingMode}
-                effort={thinkingEffort}
-                efforts={currentModelConfig?.support_efforts}
-                alwaysOn={currentModelConfig?.capabilities.includes("always_thinking")}
-                disabled={isStreaming}
-                cacheNote={hasConversationHistory ? SWITCH_CACHE_NOTE : undefined}
-                onToggle={toggleThinking}
-                onSelectEffort={selectThinkingEffort}
+              <ModelPicker
+                availableModels={availableModels}
+                hasConversationHistory={hasConversationHistory}
+                disabled={isStreaming || !hasModels}
               />
               {extensionConfig.controlPanel.permission && <PermissionModeButton />}
               <BehaviorButtons />

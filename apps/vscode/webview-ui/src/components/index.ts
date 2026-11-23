@@ -13,7 +13,7 @@ export { ApprovalDialog } from "./ApprovalDialog";
 export { MCPServersModal } from "./MCPServersModal";
 export { WorkDirModal } from "./WorkDirModal";
 export { ThinkingBlock } from "./ThinkingBlock";
-export { ThinkingButton } from "./ThinkingButton";
+export { ModelPicker } from "./ModelPicker";
 export { CompactionCard } from "./CompactionCard";
 export { ConfigErrorScreen } from "./ConfigErrorScreen";
 export { LoginScreen } from "./LoginScreen";

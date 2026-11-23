@@ -181,6 +181,7 @@ export interface ModelConfig {
   adaptive_thinking?: boolean;
   support_efforts?: string[];
   default_effort?: string;
+  max_context_tokens?: number;
 }
 
 export interface SecondaryModelSelection {

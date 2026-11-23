@@ -314,6 +314,7 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
           name: "claude-sonnet",
           provider: "anthropic",
           adaptive_thinking: true,
+          max_context_tokens: 200_000,
         }],
       },
     });
