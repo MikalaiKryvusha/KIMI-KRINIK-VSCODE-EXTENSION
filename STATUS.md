@@ -91,7 +91,7 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-PARKED: 2026-11-24 00:44 +03:00 — the owner ordered an immediate force closure after KAIF context control was activated and observed in a fresh official Kimi session. Start the next chat in official `moonshot-ai.kimi-code` (not KIMI FORK or KIMI KRINIK for the autonomous context-controlled path). The user-level engine config now has `[loop_control] auto_compact = false`. The local `--alive` diagnostic fix and delivered issue #204 are included in this handover; UI work resumes from the checklist below.
+[AI] PARKED: 2026-11-24 00:44 +03:00 — the previous chat was urgently force-closed after KAIF context control was activated and observed in a fresh official Kimi session. Start the next chat in official `moonshot-ai.kimi-code` (not KIMI FORK or KIMI KRINIK for the autonomous context-controlled path). The user-level engine config now has `[loop_control] auto_compact = false`. The local `--alive` diagnostic fix and delivered issue #204 are included in this handover; UI work resumes from the checklist below.
 
 ⚠️ Force-closed 2026-11-24 00:44 +03:00: мягкое закрытие прервано словом владельца; повторное судейство остановлено, bonsai trim и README/showcase ceremonies не выполнялись — первый `/skill:end-chat-soft` оплачивает этот долг.
 Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; отдельная коррекция дана в чате.
@@ -111,3 +111,7 @@ KNOWLEDGE: independent Context Window Control and the one-authority handoff are 
 - 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.
 - 🔴 `bugs/152` (KAIF origin) — the extension can stay on «Starting Kimi Code…»; not reproduced; check B10 when it recurs.
 - 🟠 `bugs/151` (KAIF origin) — follow-up steer race; store-level fixes in place, live acceptance left.
+
+Автономный дневной цикл разрешён с 2026-11-24 00:52 +03:00 по заказанному скоупу KIMI KRINIK 1.0.0. Для этого запуска сигнал хука переполнения контекста — явное условие остановки: довести текущий микрошаг до рабочего состояния и запустить `/skill:end-chat-soft`. Релиз в этом цикле не выполняется; его делают позже в новом чате. `[OWNER] «я бы хотел тебя оставить работать автономно над KIMI KRINIK 1.0.0 по скоупу тех фичей, что я заказал», «завершить работы сам, когда сработает хук переполнения контекста», «релиз сделаем потов, в новом чате» · 2026-11-24 00:52 +03:00 (чат)`
+
+Вопросы и запросы владельцу в этом запуске не отправляются: он не сможет ответить. На работу над KIMI KRINIK 1.0.0 получено полное разрешение; пункты, действительно требующие владельца, фиксируются в документах, а цикл продолжается другой задачей. `[OWNER] «вообще никаких запросов не делай, я не смогу ответить. На всё даю разрешение, ДА, разрешаю работать тебе над KIMI KRINIK 1.0.0» · 2026-11-24 00:54 +03:00 (чат)`
