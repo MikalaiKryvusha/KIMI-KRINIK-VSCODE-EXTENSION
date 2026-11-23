@@ -17,14 +17,14 @@ import { en } from "../../webview-ui/src/i18n/en";
 import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 
 function placeholders(text: string): string[] {
-  return [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]!).sort();
+  return [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]!).toSorted();
 }
 
 describe("interface dictionaries", () => {
   it("give every language the same key set as English", () => {
-    const keys = Object.keys(en).sort();
+    const keys = Object.keys(en).toSorted();
     for (const [language, dictionary] of Object.entries(dictionaries)) {
-      expect(Object.keys(dictionary).sort(), language).toEqual(keys);
+      expect(Object.keys(dictionary).toSorted(), language).toEqual(keys);
     }
   });
 
