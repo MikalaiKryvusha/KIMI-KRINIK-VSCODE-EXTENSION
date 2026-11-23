@@ -35,7 +35,8 @@
 4. **Managed quota.** `UsageStatusBar` polls `bridge.getManagedUsage` every 60 s for the `managed:kimi-code` provider →
    `auth.handler` → `harness.auth.getManagedUsage` → `shared/managed-usage.ts` view.
 5. **Compaction.** The engine checks before and after each step and on context overflow; with `auto_compact = false` none of the
-   three starts, manual `/compact` stays.
+   three starts, manual `/compact` stays. A live flip to OFF also aborts the active automatic operation through the
+   `loopControl` section subscription before its provider response, without cancelling an active manual compaction.
 6. **Context Window Control.** `agent.status.updated` → `ContextWindowController` reads the current VS Code thresholds and engine
    loop config → one highest newly reached stage → `session.promptWithSkills(..., steerIfActive: true)`. A compaction re-arms the
    stages. With a valid KAIF marker, `contextWindow.owner = "kimi-krinik"` makes the KAIF context hook dormant; removing the owner

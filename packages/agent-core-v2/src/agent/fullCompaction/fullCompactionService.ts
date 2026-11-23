@@ -13,6 +13,8 @@ import type { LLMRequestTrace } from '#/llm-adapter/contract/request-trace';
 import { llmErrorName, llmErrorRequestId, type LlmOutcome } from '@moonshot-ai/core/llm/response';
 import { retryBackoffDelay, sleepForRetry } from '#/_base/utils/retry';
 import { IAgentLoopService, type LoopErrorContext } from '#/agent/loop/loop';
+import { IConfigService } from '#/app/config/config';
+import { LOOP_CONTROL_SECTION } from '#/agent/loop/configSection';
 import { TurnStarted } from '#/agent/loop/turnEvents';
 import { TurnEnded } from '#/agent/loop/turnOps';
 import { isAbortError } from '#/_base/utils/abort';
@@ -151,6 +153,7 @@ export class AgentFullCompactionService extends Service implements IAgentFullCom
     @IAgentStateService private readonly states: IAgentStateService,
     @IWireService private readonly wire: IWireService,
     @ISessionRunGate private readonly runGate: ISessionRunGate,
+    @IConfigService private readonly configService: IConfigService,
   ) {
     super();
     this.states.contributeState(fullCompactionKey);
@@ -195,6 +198,13 @@ export class AgentFullCompactionService extends Service implements IAgentFullCom
         id: 'full-compaction',
         match: (context) => this.shouldRecoverFromContextOverflow(context.error),
         handle: (context) => this.recoverFromContextOverflow(context),
+      }),
+    );
+    this._register(
+      this.configService.onDidSectionChange(({ domain }) => {
+        if (domain !== LOOP_CONTROL_SECTION) return;
+        const active = this._compacting;
+        if (active?.trigger === 'auto' && this.autoCompactionDisabled()) active.abortController.abort();
       }),
     );
   }

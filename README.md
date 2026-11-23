@@ -37,7 +37,7 @@ and voice when it waits for you. The table shows what works now and what comes i
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | Engine | official 2.7.2 | older 2.2.0 | ✅ official 2.7.2, follows upstream |
-| Automatic compaction can be turned off, overflow recovery included; manual `/compact` stays | — | — | ✅ `[loop_control] auto_compact = false` and a switch in the settings menu |
+| Automatic compaction can be turned off, including overflow recovery and an automatic compaction already in progress; manual `/compact` stays and is not cancelled | — | — | ✅ `[loop_control] auto_compact = false` and a switch in the settings menu |
 | A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ joins the turn at once with its attachments; on a failure the text returns to the input · ✅ AUTO STEER on/off in the settings menu |
 | Managed quota: 5-hour and 7-day / monthly rings with a reset countdown | — | ✅ | ✅ |
 | Sound and voice when an approval, a question or an error waits for you | — | — | ✅ · 🚧 a sound and a volume for each event |
@@ -104,7 +104,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | Движок | официальный 2.7.2 | старый 2.2.0 | ✅ официальный 2.7.2, идёт за upstream |
-| Автоматический compaction выключается вместе с восстановлением при переполнении; ручной `/compact` работает | — | — | ✅ `[loop_control] auto_compact = false` и переключатель в меню настроек |
+| Автоматический compaction выключается вместе с восстановлением при переполнении и уже идущим автоматическим сжатием; ручной `/compact` работает и не отменяется | — | — | ✅ `[loop_control] auto_compact = false` и переключатель в меню настроек |
 | Сообщение, отправленное во время хода | ждёт в очереди | вливается в ход, может потерять вложения | ✅ сразу вливается в ход вместе с вложениями; при ошибке текст возвращается в поле ввода · ✅ AUTO STEER вкл/выкл в меню настроек |
 | Квоты: кольца 5 часов и 7 дней / месяц с отсчётом до сброса | — | ✅ | ✅ |
 | Звук и голос, когда вас ждут одобрение, вопрос или ошибка | — | — | ✅ · 🚧 свой звук и громкость для каждого события |
@@ -170,7 +170,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | 引擎 | 官方 2.7.2 | 较旧的 2.2.0 | ✅ 官方 2.7.2，跟随上游 |
-| 自动压缩可以关闭，包括上下文溢出恢复；手动 `/compact` 照常可用 | — | — | ✅ `[loop_control] auto_compact = false` 及设置菜单中的开关 |
+| 自动压缩可以关闭，包括上下文溢出恢复和已在进行的自动压缩；手动 `/compact` 照常可用且不会被取消 | — | — | ✅ `[loop_control] auto_compact = false` 及设置菜单中的开关 |
 | 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即连同附件并入当前轮次；失败时文本回到输入框 · ✅ 设置菜单中的 AUTO STEER 开关 |
 | 托管配额：5 小时与 7 天 / 月度圆环及重置倒计时 | — | ✅ | ✅ |
 | 等待审批、问题或出现错误时的提示音与语音 | — | — | ✅ · 🚧 为每个事件设置声音与音量 |

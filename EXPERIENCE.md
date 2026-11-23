@@ -56,7 +56,8 @@
 > <!-- classes: question-already-answered, guard-not-proven-against-threat, shown-as-link,
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
->      field-dropped-in-rebuild, red-accepted-unread, defaults-overwrite-session-state -->
+>      field-dropped-in-rebuild, red-accepted-unread, defaults-overwrite-session-state,
+      late-cancellation-masquerades-as-live-flip -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -73,6 +74,7 @@
 > | `field-dropped-in-rebuild` | a field or section silently lost when an artifact was regenerated |
 > | `red-accepted-unread` | a failing test labelled "baseline" or "flaky" before its assertion diff was read |
 > | `defaults-overwrite-session-state` | a global default is applied over a restored session's own persisted state |
+> | `late-cancellation-masquerades-as-live-flip` | cleanup after the provider response is mistaken for immediate cancellation on a live config change |
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -81,6 +83,17 @@
 > Skill: `/experience` (capture a lesson · recall relevant lessons).
 
 ## Entries
+
+### EXP-0006 · 2026-11-24 · ✅ · #compaction #config #testing
+class: late-cancellation-masquerades-as-live-flip
+mechanized: pnpm exec vitest run --reporter=agent packages/agent-core-v2/test/agent/fullCompaction/fullCompaction.test.ts -t "autoCompact becomes false"
+**Context:** Auto Compact OFF needed to cancel an active automatic operation immediately without touching manual compaction.
+**Tried / did:** the first test asserted cancellation only after releasing the provider response; history-change cleanup made it pass without a live subscription. Strengthened it to require `full_compaction.cancel` before release.
+**Result:** ✅ — the strengthened assertion was red before the `loopControl` subscription and green after it; the manual task still completed.   → link: testcases/reports/2026-11-24_inflight_auto_compact_off.md
+**Lesson:** a mid-flight flip test must observe cancellation before the deferred response, or later history cleanup can masquerade as the intended live behavior.
+**Repro:** `pnpm exec vitest run --reporter=agent packages/agent-core-v2/test/agent/fullCompaction/fullCompaction.test.ts -t "autoCompact becomes false"` — cancellation precedes release and manual completion follows the same flip.
+**Trigger:** testing cancellation on a config change, cancellation, or other in-flight event → assert the event before releasing the deferred operation, not only after it.
+**Not for:** verifying only that a late response is discarded; that is a separate guarantee and does not prove immediate cancellation.
 
 ### EXP-0005 · 2026-11-24 · ✅ · #vscode #config #sessions
 class: defaults-overwrite-session-state
