@@ -8,7 +8,7 @@ import { SlashCommandMenu } from "../SlashCommandMenu";
 import { FilePickerMenu } from "../FilePickerMenu";
 import { MediaThumbnail } from "../MediaThumbnail";
 import { MediaPreviewModal } from "../MediaPreviewModal";
-import { BottomToolbar } from "../BottomToolbar";
+import { StatusPills } from "../StatusPills";
 import { StreamingConfirmDialog } from "../StreamingConfirmDialog";
 import {
   getModelById,
@@ -318,7 +318,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
 
   return (
     <div className="p-2 pt-0! flex flex-col min-h-0">
-      <BottomToolbar />
+      <StatusPills />
       <div className="relative shrink-0">
         {showSlashMenu && filteredCommands.length > 0 && (
           <div ref={menuRef} className="absolute bottom-full left-0 right-0 mb-2 z-10">

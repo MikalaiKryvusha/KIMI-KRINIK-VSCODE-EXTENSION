@@ -359,13 +359,14 @@ describe("automatic follow-up steer", () => {
     expect(boundary.streamChat.mock.calls[1]?.[5]).toEqual({ permissionMode: "auto" });
   });
 
-  it("follows swarm, goal and permission from status updates", () => {
+  it("follows swarm, goal, permission and title from status updates", () => {
     useChatStore.setState({ goalArmed: true });
     useChatStore.getState().processEvent({
       type: "StatusUpdate",
       payload: {
         swarm_mode: true,
         permission: "yolo",
+        session_title: "Fix login",
         goal: { objective: "Ship", status: "active", turnsUsed: 1, tokensUsed: 10, wallClockMs: 5 },
       },
     });
@@ -373,19 +374,20 @@ describe("automatic follow-up steer", () => {
     expect(useChatStore.getState()).toMatchObject({
       swarmMode: true,
       permissionMode: "yolo",
+      sessionTitle: "Fix login",
       goal: { objective: "Ship", status: "active" },
       goalArmed: false,
     });
   });
 
-  it("keeps model and effort but clears the old session mode for a new conversation", async () => {
+  it("keeps model and effort but clears the old session mode and title for a new conversation", async () => {
     useSettingsStore.setState({ currentModel: "reasoning", thinkingEffort: "high" });
-    useChatStore.setState({ permissionMode: "manual" });
+    useChatStore.setState({ permissionMode: "manual", sessionTitle: "Old chat" });
 
     await useChatStore.getState().startNewConversation();
     useChatStore.getState().sendMessage("new conversation");
 
-    expect(useChatStore.getState().permissionMode).toBeNull();
+    expect(useChatStore.getState()).toMatchObject({ permissionMode: null, sessionTitle: null });
     expect(boundary.streamChat).toHaveBeenCalledWith("new conversation", "reasoning", "high", false, undefined, {});
   });
 });

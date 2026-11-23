@@ -19,7 +19,7 @@ export { ConfigErrorScreen } from "./ConfigErrorScreen";
 export { LoginScreen } from "./LoginScreen";
 export { MediaPreviewModal } from "./MediaPreviewModal";
 export { MediaThumbnail } from "./MediaThumbnail";
-export { BottomToolbar } from "./BottomToolbar";
+export { StatusPills } from "./StatusPills";
 export { InlineError } from "./InlineError";
 export { QuestionDialog } from "./QuestionDialog";
 export { PlanCard } from "./PlanCard";

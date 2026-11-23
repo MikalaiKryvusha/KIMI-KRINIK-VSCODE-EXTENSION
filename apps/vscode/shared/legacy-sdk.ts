@@ -82,6 +82,7 @@ export interface StatusUpdate {
   message_id?: string | null;
   plan_mode?: boolean | null;
   model?: string | null;
+  session_title?: string | null;
   thinking_effort?: string | null;
   retrying?: {
     next_attempt: number;
@@ -89,6 +90,15 @@ export interface StatusUpdate {
     delay_ms: number;
     message: string;
   } | null;
+}
+
+export interface BackgroundTaskItem {
+  taskId: string;
+  kind: string;
+  description: string;
+  status: string;
+  startedAt: number;
+  endedAt: number | null;
 }
 
 export interface SessionContextMessageView {

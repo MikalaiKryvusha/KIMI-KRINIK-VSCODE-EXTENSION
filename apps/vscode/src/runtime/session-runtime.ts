@@ -171,6 +171,7 @@ export class SessionRuntime {
           thinking_effort: status.thinkingEffort,
           plan_mode: status.planMode,
           swarm_mode: status.swarmMode ?? false,
+          ...(this.summary?.title === undefined ? {} : { session_title: this.summary.title }),
           permission: this.permissionMode,
           context_usage: status.contextUsage,
           context_tokens: status.contextTokens,
@@ -436,6 +437,16 @@ export class SessionRuntime {
     if (event.type === "agent.status.updated" && event.agentId === "main"
       && event.contextTokens !== undefined && event.maxContextTokens !== undefined) {
       void this.contextWindowController?.observe(event.contextTokens, event.maxContextTokens);
+    }
+    if (event.type === "session.meta.updated" && typeof event.title === "string") {
+      if (this.session.summary !== undefined) this.session.summary = { ...this.session.summary, title: event.title };
+      for (const webviewId of this.webviewIds) {
+        this.broadcast(
+          Events.StreamEvent,
+          { type: "StatusUpdate", payload: { session_title: event.title }, _sessionId: this.id },
+          webviewId,
+        );
+      }
     }
     if (event.type === "goal.updated") {
       for (const webviewId of this.webviewIds) {

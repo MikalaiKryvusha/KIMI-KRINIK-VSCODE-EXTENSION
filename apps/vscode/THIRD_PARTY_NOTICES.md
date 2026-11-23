@@ -11,3 +11,5 @@ The managed-quota mapping and concentric-ring presentation were adapted from thi
 The automatic follow-up route uses the official `SteerChat` bridge. Its acknowledgement, turn-ended fallback, media preservation, composer rollback, ordering and recursion tests were written for this fork instead of copying the reference `steerNow` fallback, which drops attachments on one path and does not restore the composer on rejection.
 
 The combined model/effort picker, full model search, provider filters, keyboard navigation and starred-model presentation were adapted from the same reference. The implementation keeps the target store and media filtering, and uses one shared Zustand favorites state so the quick list updates as soon as a star changes.
+
+The queued/changed/background/todo/compaction status panels were adapted from the reference `StatusPills`. Background tasks use the target SDK's `listBackgroundTasks()` without reference-only options, native polling with session-change cleanup, and a visible error state instead of silent task disappearance.

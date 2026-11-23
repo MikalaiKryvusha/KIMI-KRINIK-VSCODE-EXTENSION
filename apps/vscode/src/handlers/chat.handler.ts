@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { isKimiError } from "@moonshot-ai/kimi-code-sdk";
 
 import { Events, Methods } from "../../shared/bridge";
-import type { ApprovalResponse, ContentPart } from "../../shared/legacy-sdk";
+import type { ApprovalResponse, BackgroundTaskItem, ContentPart } from "../../shared/legacy-sdk";
 import { getUserMessage } from "../../shared/errors";
 import type { ErrorPhase } from "../../shared/types";
 import { VSCodeSettings } from "../config/vscode-settings";
@@ -180,6 +180,22 @@ const steerChat: Handler<{ content: string | ContentPart[] }, { ok: boolean }> =
   return { ok: true };
 };
 
+const getBackgroundTasks: Handler<void, { tasks: BackgroundTaskItem[] }> = async (_, ctx) => {
+  const runtime = ctx.getSession();
+  if (runtime === undefined) return { tasks: [] };
+  const tasks = await runtime.session.listBackgroundTasks();
+  return {
+    tasks: tasks.map((task) => ({
+      taskId: task.taskId,
+      kind: task.kind,
+      description: task.description,
+      status: task.status,
+      startedAt: task.startedAt,
+      endedAt: task.endedAt,
+    })),
+  };
+};
+
 const resetSession: Handler<void, { ok: boolean }> = async (_, ctx) => {
   const runtime = ctx.getSession();
   if (runtime !== undefined) injectedEditorContextSessions.delete(runtime.id);
@@ -194,6 +210,7 @@ export const chatHandlers: Record<string, Handler<any, any>> = {
   [Methods.RespondApproval]: respondApproval,
   [Methods.RespondQuestion]: respondQuestion,
   [Methods.SetPlanMode]: setPlanMode,
+  [Methods.GetBackgroundTasks]: getBackgroundTasks,
   [Methods.SteerChat]: steerChat,
   [Methods.ResetSession]: resetSession,
 };

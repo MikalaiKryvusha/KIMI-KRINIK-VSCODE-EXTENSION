@@ -47,7 +47,7 @@ function formatOutput(output: string | object | object[]): string {
   return cleanSystemTags(raw);
 }
 
-function getTodoBlock(display?: DisplayBlock[]): TodoBlock | null {
+export function getTodoBlock(display?: DisplayBlock[]): TodoBlock | null {
   if (!display) {
     return null;
   }
@@ -128,7 +128,7 @@ function IORow({ label, children }: { label: "IN" | "OUT"; children: React.React
   );
 }
 
-function TodoStatusIcon({ status }: { status: string }) {
+export function TodoStatusIcon({ status }: { status: string }) {
   if (status === "done") {
     return (
       <div className="size-4 rounded flex items-center justify-center">

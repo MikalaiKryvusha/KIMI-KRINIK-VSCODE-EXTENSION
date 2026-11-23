@@ -18,6 +18,7 @@
 | **Chat store** | webview state of one conversation: messages, streaming flag, draft media, `pendingInput` (retry), `composerRestore`, queue | `apps/vscode/webview-ui/src/stores/chat.store.ts`, `event-handlers.ts` |
 | **Settings store** | models, current model and effort, login, extension config | `webview-ui/src/stores/settings.store.ts` |
 | **Model picker** | combined model/effort quick selection, full search/provider filters, keyboard navigation and shared persisted favorites | `webview-ui/src/components/ModelPicker.tsx`, `ModelPickerDialog.tsx`, `inputarea/hooks/useFavoriteModels.ts` |
+| **Status pills** | live queued/changes panels, background process/agent tasks, last Todo display and compaction viewer | `webview-ui/src/components/StatusPills.tsx` |
 | **Engine** | the agent loop and compaction; `loopControl.autoCompact === false` refuses every automatic compaction | `packages/agent-core-v2/src/agent/fullCompaction/fullCompactionService.ts` |
 | **Context Window Control** | independent per-session threshold decisions and serialized self-contained prompt delivery from SDK status; no KAIF marker or wire file required | `apps/vscode/src/runtime/context-window-control.ts`, wired by `kimi-runtime.ts` and `session-runtime.ts` |
 | **KAIF contour** | optional hooks run by Kimi on its events: context-window closure, STATUS/test-debt Stop guards, voice before a permission wait | `.kaif/hooks/`, wired through `~/.kimi-code/config.toml` |
@@ -44,6 +45,9 @@
    with legacy `kimi.yoloMode` as fallback. Starting a new conversation clears the old session override; `bridge-handler` reads the
    current engine default and `KimiRuntime.openSession` applies it only to a new session. Resume keeps the existing approval metadata
    and legacy-YOLO compatibility path.
+8. **Status and title.** `StatusPills` polls `runtime.session.listBackgroundTasks()` for process/agent rows, reads queue/file-change
+   events, the last `SetTodoList` display and compaction state. `summary.title` and `session.meta.updated` flow through
+   `StatusUpdate.session_title` into the chat store and header; starting/loading another conversation clears the old title first.
 
 ## Invariants
 

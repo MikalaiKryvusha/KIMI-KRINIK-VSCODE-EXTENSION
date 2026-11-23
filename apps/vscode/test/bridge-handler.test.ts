@@ -228,6 +228,26 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     expect(host.harness.listWorkspaceSkills).toHaveBeenCalledOnce();
   });
 
+  it("returns the current session background tasks", async () => {
+    const listBackgroundTasks = vi.fn(async () => [{
+      taskId: "task-1",
+      kind: "process",
+      description: "pnpm build",
+      status: "running",
+      startedAt: 10,
+      endedAt: null,
+    }]);
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ session: { listBackgroundTasks } } as never);
+
+    const result = await bridge.handle({ id: "rpc-tasks", method: Methods.GetBackgroundTasks }, "view-1");
+
+    expect(listBackgroundTasks).toHaveBeenCalledWith();
+    expect(result).toMatchObject({
+      id: "rpc-tasks",
+      result: { tasks: [{ taskId: "task-1", kind: "process", description: "pnpm build", status: "running" }] },
+    });
+  });
+
   it("returns the persisted default permission mode with the model config", async () => {
     host.harness.getConfig.mockResolvedValueOnce({ defaultPermissionMode: "auto", models: {} });
 

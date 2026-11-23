@@ -14,7 +14,7 @@ export function Header() {
   const [showSessionList, setShowSessionList] = useState(false);
   const [showSessionInfo, setShowSessionInfo] = useState(false);
   const [showConfirmNew, setShowConfirmNew] = useState(false);
-  const { startNewConversation, sessionId, messages, isStreaming } = useChatStore();
+  const { startNewConversation, sessionId, sessionTitle, messages, isStreaming } = useChatStore();
   const t = useT();
 
   const handleNewSession = async () => {
@@ -34,9 +34,14 @@ export function Header() {
 
   return (
     <header className="flex items-center justify-between px-3 py-2 border-b border-border shrink-0 @container">
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-2 min-w-0">
         <KimiLogo className="size-5 shrink-0" />
-        <span className="text-sm font-semibold whitespace-nowrap">KIMI KRINIK</span>
+        <span className="text-sm font-semibold whitespace-nowrap shrink-0">KIMI KRINIK</span>
+        {sessionTitle && (
+          <span className="text-xs text-muted-foreground truncate min-w-0 @max-[430px]:hidden" title={sessionTitle}>
+            · {sessionTitle}
+          </span>
+        )}
       </div>
       <div className="flex items-center gap-1">
         {sessionId && (

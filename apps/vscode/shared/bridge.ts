@@ -37,6 +37,7 @@ export const Methods = {
   AbortChat: "abortChat",
   ResetSession: "resetSession",
   GetSessionContext: "getSessionContext",
+  GetBackgroundTasks: "getBackgroundTasks",
   SetPlanMode: "setPlanMode",
   SteerChat: "steerChat",
   RespondApproval: "respondApproval",
@@ -145,6 +146,7 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.AbortChat:
     case Methods.ResetSession:
     case Methods.GetSessionContext:
+    case Methods.GetBackgroundTasks:
     case Methods.GetKimiSessions:
     case Methods.GetAllKimiSessions:
     case Methods.GetRegisteredWorkDirs:

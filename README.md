@@ -44,6 +44,7 @@ and voice when it waits for you. The table shows what works now and what comes i
 | Context Window Control with configurable thresholds | — | — | ✅ the extension sends threshold prompts without KAIF and supports KAIF handoff · 🚧 live acceptance |
 | Interface languages | English | English, 中文 | ✅ English, 中文, Русский, chosen in the settings menu |
 | Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection · 🚧 live acceptance |
+| Live status and session header | — | ✅ | ✅ queued/changed panels, background tasks, todos, compaction viewer, session title and KIMI KRINIK robot · 🚧 live acceptance |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
 ### 2. Install
@@ -110,6 +111,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ расширение само отправляет пороговые промпты без KAIF и поддерживает передачу контура при его наличии · 🚧 живая приёмка |
 | Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, выбор в меню настроек |
 | Панель композера: режим разрешений, Plan, Goal, Swarm, вторичная модель, кольцо контекста и его просмотр | — | ✅ | ✅ объединённый выбор модели с усилием, поиск, избранное и выбор вторичной модели · 🚧 живая приёмка |
+| Живой статус и панель сессии | — | ✅ | ✅ очередь и изменения, фоновые задачи, список задач, просмотр контекста, название сессии и робот KIMI KRINIK · 🚧 живая приёмка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
 ### 2. Установка
@@ -175,6 +177,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 上下文窗口控制与可配置阈值 | — | — | ✅ 内置于扩展，无需 KAIF；可与 KAIF 交接 · 🚧 实际使用验收 |
 | 界面语言 | English | English、中文 | ✅ English、中文、Русский，在设置菜单中选择 |
 | 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ 模型与推理强度合并选择器、搜索、收藏及次级模型选择 · 🚧 实际使用验收 |
+| 实时状态与会话标题栏 | — | ✅ | ✅ 排队与更改、后台任务、待办、上下文查看器、会话标题及 KIMI KRINIK 机器人 · 🚧 实际使用验收 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 
 ### 2. 安装

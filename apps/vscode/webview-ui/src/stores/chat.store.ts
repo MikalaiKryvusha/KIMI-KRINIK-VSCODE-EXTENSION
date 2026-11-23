@@ -94,6 +94,7 @@ export interface QueuedItem {
 
 export interface ChatState {
   sessionId: string | null;
+  sessionTitle: string | null;
   messages: ChatMessage[];
   isStreaming: boolean;
   isCompacting: boolean;
@@ -234,6 +235,7 @@ function sendIdle(content: string | ContentPart[], model: string, sentMediaIds?:
 
 export const useChatStore = create<ChatState>((set, get) => ({
   sessionId: null,
+  sessionTitle: null,
   messages: [],
   isStreaming: false,
   isCompacting: false,
@@ -373,6 +375,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     set({
       sessionId,
+      sessionTitle: null,
       messages: [],
       isStreaming: false,
       isCompacting: false,
@@ -434,6 +437,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     await bridge.clearTrackedFiles();
     set({
       sessionId: null,
+  sessionTitle: null,
       messages: [],
       isStreaming: false,
       isCompacting: false,

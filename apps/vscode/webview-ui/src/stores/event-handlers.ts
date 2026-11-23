@@ -509,8 +509,11 @@ const eventHandlers: Record<string, EventHandler> = {
   },
 
   StatusUpdate: (draft, payload: StatusUpdate) => {
-    const { context_usage, context_tokens, max_context_tokens, token_usage, plan_mode, swarm_mode, permission, goal, model, thinking_effort, retrying } = payload;
+    const { context_usage, context_tokens, max_context_tokens, token_usage, plan_mode, swarm_mode, permission, goal, model, session_title, thinking_effort, retrying } = payload;
 
+    if (session_title !== undefined) {
+      draft.sessionTitle = session_title;
+    }
     if (typeof model === "string" && model.length > 0) {
       useSettingsStore.getState().setCurrentModel(model);
     }

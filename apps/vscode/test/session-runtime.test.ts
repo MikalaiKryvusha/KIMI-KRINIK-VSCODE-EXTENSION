@@ -216,6 +216,19 @@ function turnEnded(
 }
 
 describe("session runtime (adapts one SDK session for subscribed Webviews)", () => {
+  it("broadcasts session title updates and refreshes the summary", () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+
+    sdk.emit({ type: "session.meta.updated", sessionId: "session-1", agentId: "main", title: "Fix login" });
+
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "StatusUpdate",
+      payload: { session_title: "Fix login" },
+      _sessionId: "session-1",
+    });
+    expect(runtime.summary?.title).toBe("Fix login");
+  });
+
   it("announces the current context usage to a subscribed Webview", async () => {
     const { runtime, broadcasts } = createRuntime();
 
