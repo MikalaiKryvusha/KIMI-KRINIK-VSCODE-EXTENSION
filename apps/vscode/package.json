@@ -9,7 +9,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MikalaiKryvusha/kimi-code.git",
+    "url": "git+https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION.git",
     "directory": "apps/vscode"
   },
   "engines": {
