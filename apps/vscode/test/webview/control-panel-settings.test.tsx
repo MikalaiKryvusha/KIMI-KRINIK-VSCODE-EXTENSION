@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const boundary = vi.hoisted(() => ({
   updateExtensionSetting: vi.fn(),
+  saveConfig: vi.fn(),
   setAutoCompact: vi.fn(),
   setPermissionMode: vi.fn(),
   setSwarmMode: vi.fn(),
@@ -13,6 +14,7 @@ const boundary = vi.hoisted(() => ({
 vi.mock("@/services", () => ({
   bridge: {
     updateExtensionSetting: boundary.updateExtensionSetting,
+    saveConfig: boundary.saveConfig,
     setAutoCompact: boundary.setAutoCompact,
     setPermissionMode: boundary.setPermissionMode,
     setSwarmMode: boundary.setSwarmMode,
@@ -70,7 +72,7 @@ describe("Control Panel settings", () => {
     useSettingsStore.setState({
       extensionConfig: {
         ...DEFAULT_EXTENSION_CONFIG,
-        controlPanel: { permission: true, compact: false, steer: false, control: false, plan: false, goal: false, swarm: false },
+        controlPanel: { permission: true, compact: false, steer: false, control: false, plan: false, goal: false, swarm: false, secondaryModel: false },
       },
     });
     render(
@@ -106,7 +108,7 @@ describe("Control Panel settings", () => {
     await user.click(await screen.findByText("Control Panel"));
 
     expect(await screen.findByText("Choose which buttons are visible. Hidden features keep working and remain available in General settings.")).not.toBeNull();
-    expect(screen.getAllByRole("checkbox")).toHaveLength(7);
+    expect(screen.getAllByRole("checkbox")).toHaveLength(8);
   });
 
   it("disables thresholds while Control is off and edits them while Control is on", async () => {

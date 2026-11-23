@@ -83,6 +83,7 @@
 
 ### EXP-0003 · 2026-11-23 · ❌→✅ · #voice #windows #kaif
 class: text-in-agents-world
+mechanized: node .kaif/hooks/kimi-permission-call.mjs --selftest
 **Context:** a voice request used an English phrase, omitted the owner/project names and fell back to the generic KAIF beep path.
 **Tried / did:** inspected the actual machine engine and KUMM's accepted voice rules, then wrote a Cyrillic-only phrase file with the owner and project names.
 **Result:** ✅ — the local Silero + Glass route and `soft voice:` output were observed; the permanent route now lives in `HOUSE_RULES.md` R1.

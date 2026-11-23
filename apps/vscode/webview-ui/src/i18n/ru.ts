@@ -288,6 +288,13 @@ export const ru: Record<TranslationKey, string> = {
   "attention.turnComplete": "Готово",
   "toast.soundsNotChanged": "Настройки звука не сохранены: {error}",
 
+  "subagent.title": "Вторичная модель",
+  "subagent.description": "Выберите существующую модель для сабагентов вместо основной.",
+  "subagent.tooltip": "Модель сабагентов: {label}",
+  "subagent.followsMain": "Следует основной",
+  "subagent.followMain": "Следовать основной",
+  "subagent.defaultSuffix": "По умолчанию",
+
   "permMode.manual": "Вручную",
   "permMode.yolo": "YOLO",
   "permMode.auto": "Авто",

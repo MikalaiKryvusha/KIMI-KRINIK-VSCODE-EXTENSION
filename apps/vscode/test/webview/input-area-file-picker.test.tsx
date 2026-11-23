@@ -93,7 +93,7 @@ describe("Control Panel composition", () => {
     useSettingsStore.setState({
       extensionConfig: {
         ...DEFAULT_EXTENSION_CONFIG,
-        controlPanel: { permission: false, compact: false, steer: false, control: false, plan: false, goal: false, swarm: false },
+        controlPanel: { permission: false, compact: false, steer: false, control: false, plan: false, goal: false, swarm: false, secondaryModel: false },
       },
     });
     renderInputArea();
@@ -105,6 +105,7 @@ describe("Control Panel composition", () => {
     expect(screen.queryByTestId("mode-plan")).toBeNull();
     expect(screen.queryByTestId("mode-goal")).toBeNull();
     expect(screen.queryByTestId("mode-swarm")).toBeNull();
+    expect(screen.queryByTestId("secondary-model")).toBeNull();
     expect(screen.getByTestId("attachment-picker-toggle")).not.toBeNull();
   });
 

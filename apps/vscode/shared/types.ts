@@ -1,11 +1,12 @@
 import type { SoundSettings } from "./sounds";
-import type { RunResult, StreamEvent } from "./legacy-sdk";
+import type { RunResult, SecondaryModelSelection, StreamEvent } from "./legacy-sdk";
 
 export interface SessionConfig {
   model: string;
   thinking?: boolean;
   effort?: string;
   effortChanged?: boolean;
+  secondaryModel?: SecondaryModelSelection | null;
 }
 
 export interface ProjectFile {
@@ -22,7 +23,7 @@ export interface FileChange {
   deletions: number;
 }
 
-export const CONTROL_PANEL_BUTTONS = ["permission", "compact", "steer", "control", "plan", "goal", "swarm"] as const;
+export const CONTROL_PANEL_BUTTONS = ["permission", "compact", "steer", "control", "plan", "goal", "swarm", "secondaryModel"] as const;
 
 export type ControlPanelButton = (typeof CONTROL_PANEL_BUTTONS)[number];
 export type ControlPanelVisibility = Record<ControlPanelButton, boolean>;

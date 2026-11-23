@@ -4,7 +4,7 @@ import { toast } from "@/components/ui/sonner";
 import type { ContextWindowThresholds, ControlPanelButton, ExtensionConfig, InterfaceLanguage } from "shared/types";
 import { CONTEXT_WINDOW_THRESHOLD_SETTINGS } from "shared/types";
 import { DEFAULT_SOUND_SETTINGS, type SoundSettings } from "shared/sounds";
-import type { ModelConfig, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
+import type { ModelConfig, SecondaryModelSelection, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
 import { translate, type TranslateParams, type TranslationKey } from "@/i18n/translate";
 
 let settingsSaveRevision = 0;
@@ -45,6 +45,7 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
     plan: true,
     goal: true,
     swarm: true,
+    secondaryModel: true,
   },
   language: "en",
   sounds: DEFAULT_SOUND_SETTINGS,
@@ -180,6 +181,7 @@ interface SettingsState {
   defaultModel: string | null;
   defaultThinking: boolean;
   defaultThinkingEffort?: string;
+  secondaryModel: SecondaryModelSelection | null;
   modelsLoaded: boolean;
   wireSlashCommands: SlashCommandInfo[];
   slashCommands: SlashCommandInfo[];
@@ -191,6 +193,7 @@ interface SettingsState {
   setModels: (models: ModelConfig[]) => void;
   setThinkingEffort: (effort: string) => void;
   updateModel: (modelId: string) => void;
+  updateSecondaryModel: (selection: SecondaryModelSelection | null) => void;
   toggleThinking: () => void;
   selectThinkingEffort: (effort: string) => void;
   setExtensionConfig: (config: ExtensionConfig) => void;
@@ -200,7 +203,7 @@ interface SettingsState {
   setWorkDirModalOpen: (open: boolean) => void;
   setCurrentWorkDir: (workDir: string | null) => void;
   setWorkspaceRoot: (root: string | null) => void;
-  initModels: (models: ModelConfig[], defaultModel: string | null, defaultThinking: boolean, defaultThinkingEffort?: string) => void;
+  initModels: (models: ModelConfig[], defaultModel: string | null, defaultThinking: boolean, defaultThinkingEffort?: string, secondaryModel?: SecondaryModelSelection | null) => void;
   setWireSlashCommands: (commands: SlashCommandInfo[]) => void;
   setIsLoggedIn: (loggedIn: boolean) => void;
   getCurrentThinkingMode: () => ThinkingMode;
@@ -225,6 +228,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   models: [],
   defaultModel: null,
   defaultThinking: false,
+  secondaryModel: null,
   modelsLoaded: false,
   wireSlashCommands: [],
   slashCommands: [],
@@ -361,6 +365,24 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     );
   },
 
+  updateSecondaryModel: (selection) => {
+    const { models, secondaryModel: previous, currentModel, thinkingEffort } = get();
+    if (selection !== null && getModelById(models, selection.model) === undefined) return;
+    if (selection?.model === previous?.model && selection?.defaultEffort === previous?.defaultEffort) return;
+    set({ secondaryModel: selection });
+    saveConfigWithRollback(
+      {
+        model: currentModel,
+        thinking: thinkingEffort !== "off",
+        effort: thinkingEffort,
+        effortChanged: false,
+        secondaryModel: selection,
+      },
+      { secondaryModel: previous },
+      set,
+    );
+  },
+
   toggleThinking: () => {
     const { models, currentModel, thinkingEffort, defaultThinking } = get();
     const model = getModelById(models, currentModel);
@@ -435,7 +457,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   setWorkspaceRoot: (workspaceRoot) => set({ workspaceRoot }),
 
-  initModels: (models, defaultModel, defaultThinking, defaultThinkingEffort) => {
+  initModels: (models, defaultModel, defaultThinking, defaultThinkingEffort, secondaryModel) => {
     settingsSaveRevision += 1;
     const initialModel = defaultModel || models[0]?.id || "";
     const model = getModelById(models, initialModel);
@@ -447,6 +469,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       defaultModel,
       defaultThinking,
       defaultThinkingEffort,
+      secondaryModel: secondaryModel ?? null,
       modelsLoaded: true,
       currentModel: initialModel,
       thinkingEffort,

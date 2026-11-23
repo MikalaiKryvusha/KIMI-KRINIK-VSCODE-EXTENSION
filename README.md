@@ -41,9 +41,9 @@ and voice when it waits for you. The table shows what works now and what comes i
 | A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ joins the turn at once with its attachments; on a failure the text returns to the input · ✅ AUTO STEER on/off in the settings menu |
 | Managed quota: 5-hour and 7-day / monthly rings with a reset countdown | — | ✅ | ✅ |
 | Sound and voice when an approval, a question or an error waits for you | — | — | ✅ · 🚧 a sound and a volume for each event |
-| The session closes by the KAIF context-window thresholds | — | — | ✅ with the KAIF hooks, thresholds 70 / 75 / 80 / 90 % in the settings |
+| Context Window Control with configurable thresholds | — | — | ✅ the extension sends threshold prompts without KAIF and supports KAIF handoff · 🚧 live acceptance |
 | Interface languages | English | English, 中文 | ✅ English, 中文, Русский, chosen in the settings menu |
-| Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring, model with effort | — | ✅ | 🚧 on the official engine |
+| Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ automated checks cover Control Panel visibility and secondary-model selection · 🚧 combined model + effort picker and live acceptance |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
 ### 2. Install
@@ -107,9 +107,9 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Сообщение, отправленное во время хода | ждёт в очереди | вливается в ход, может потерять вложения | ✅ сразу вливается в ход вместе с вложениями; при ошибке текст возвращается в поле ввода · ✅ AUTO STEER вкл/выкл в меню настроек |
 | Квоты: кольца 5 часов и 7 дней / месяц с отсчётом до сброса | — | ✅ | ✅ |
 | Звук и голос, когда вас ждут одобрение, вопрос или ошибка | — | — | ✅ · 🚧 свой звук и громкость для каждого события |
-| Сессия закрывается по порогам контекстного окна KAIF | — | — | ✅ с хуками KAIF, пороги 70 / 75 / 80 / 90 % в настройках |
+| Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ расширение само отправляет пороговые промпты без KAIF и поддерживает передачу контура при его наличии · 🚧 живая приёмка |
 | Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, выбор в меню настроек |
-| Панель композера: режим разрешений, Plan, Goal, Swarm, вторичная модель, кольцо контекста, модель с усилием | — | ✅ | 🚧 на официальном движке |
+| Панель композера: режим разрешений, Plan, Goal, Swarm, вторичная модель, кольцо контекста и его просмотр | — | ✅ | ✅ автоматические проверки покрывают видимость Control Panel и выбор вторичной модели · 🚧 объединённый выбор модели с усилием и живая приёмка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
 ### 2. Установка
@@ -172,9 +172,9 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即连同附件并入当前轮次；失败时文本回到输入框 · ✅ 设置菜单中的 AUTO STEER 开关 |
 | 托管配额：5 小时与 7 天 / 月度圆环及重置倒计时 | — | ✅ | ✅ |
 | 等待审批、问题或出现错误时的提示音与语音 | — | — | ✅ · 🚧 为每个事件设置声音与音量 |
-| 会话按 KAIF 上下文窗口阈值收尾 | — | — | ✅ 配合 KAIF 钩子，设置中的 70 / 75 / 80 / 90 % 阈值 |
+| 上下文窗口控制与可配置阈值 | — | — | ✅ 内置于扩展，无需 KAIF；可与 KAIF 交接 · 🚧 实际使用验收 |
 | 界面语言 | English | English、中文 | ✅ English、中文、Русский，在设置菜单中选择 |
-| 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环、模型与推理强度 | — | ✅ | 🚧 基于官方引擎 |
+| 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ Control Panel 可见性设置已通过自动检查 · 🚧 模型与推理强度合并选择器及实际使用验收 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 
 ### 2. 安装

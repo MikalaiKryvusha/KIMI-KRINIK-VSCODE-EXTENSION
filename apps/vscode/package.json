@@ -153,6 +153,11 @@
           "default": true,
           "description": "Show the Swarm button in Control Panel. Hiding the button does not change Swarm mode."
         },
+        "kimi.controlPanel.secondaryModel": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the secondary-model robot in Control Panel. Hiding the button does not change the selected secondary model."
+        },
         "kimi.kaif.warnPercent": {
           "type": "number",
           "default": 70,

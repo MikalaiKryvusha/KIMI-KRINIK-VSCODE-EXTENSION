@@ -15,6 +15,7 @@ const BUTTON_LABEL: Record<ControlPanelButton, TranslationKey> = {
   plan: "modes.plan",
   goal: "modes.goal",
   swarm: "modes.swarm",
+  secondaryModel: "subagent.title",
 };
 
 const THRESHOLD_LABEL: Record<keyof ContextWindowThresholds, TranslationKey> = {

@@ -11,10 +11,12 @@ import { Methods } from "../../shared/bridge";
 import type {
   KimiConfig as WebviewKimiConfig,
   ModelConfig,
+  SecondaryModelSelection,
   SlashCommandInfo,
 } from "../../shared/legacy-sdk";
 import type { ExtensionConfig, SessionConfig } from "../../shared/types";
 import { VSCodeSettings } from "../config/vscode-settings";
+import { persistSecondaryModelSelection } from "../config/secondary-model";
 import type { Handler } from "./types";
 
 const SLASH_COMMANDS: SlashCommandInfo[] = [
@@ -65,6 +67,14 @@ const saveConfig: Handler<SessionConfig, { ok: boolean }> = async (params, ctx) 
     const status = await runtime.session.getStatus();
     if (status.model !== params.model) await runtime.session.setModel(params.model);
     if (status.thinkingEffort !== effort) await runtime.session.setThinking(effort);
+  }
+  if (params.secondaryModel !== undefined) {
+    const selection = params.secondaryModel;
+    if (selection !== null && config.models?.[selection.model] === undefined) {
+      throw new Error(`Unknown secondary model: ${selection.model}`);
+    }
+    await persistSecondaryModelSelection(ctx.harness.configPath, selection);
+    await ctx.harness.getConfig({ reload: true });
   }
   return { ok: true };
 };
@@ -141,7 +151,19 @@ export function toWebviewConfig(config: SdkKimiConfig): WebviewKimiConfig {
     defaultModel: config.defaultModel ?? models[0]?.id ?? null,
     defaultThinking: config.thinking?.enabled !== false,
     defaultThinkingEffort: config.thinking?.effort,
+    secondaryModel: toWebviewSecondaryModel(config.secondaryModel),
     models,
+  };
+}
+
+function toWebviewSecondaryModel(
+  secondary: SdkKimiConfig["secondaryModel"],
+): SecondaryModelSelection | null {
+  const model = secondary?.model ?? secondary?.defaultModel;
+  if (model === undefined) return null;
+  return {
+    model,
+    ...(secondary?.defaultEffort === undefined ? {} : { defaultEffort: secondary.defaultEffort }),
   };
 }
 

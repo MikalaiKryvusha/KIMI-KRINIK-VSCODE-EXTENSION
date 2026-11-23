@@ -31,6 +31,10 @@
 - Auto is turquoise, Stop is a filled square; Working uses the acid-pink `#FF1A8C` face with slight top chamfers and clipped ±1 px eye travel. `krinik-robot-logo.svg` + 1024 px PNG are used in all three README sections.
 - Independent Context Window Control: no `.kaif` marker or wire file required; settings + four thresholds, SDK status → self-contained `promptWithSkills(..., steerIfActive: true)`, exact boundary/once/re-arm tests. Built-in ownership and vanilla ON both make the KAIF context hook dormant; no dual delivery.
 
+### 2026-11-23 closing checkpoint — secondary model 🔧 implementation present, closing verification pending
+- Added `SubagentModelDialog`, robot visibility, `secondaryModel` in the config/store/bridge contracts, and `src/config/secondary-model.ts` atomic validated persistence. Existing-model selection and Follow main model remove the whole old recipe; main model/effort stay untouched (`effortChanged:false`). Custom providers are excluded.
+- `apps/vscode/test/secondary-model.test.ts` proves selection and clearing (2 tests green); extension typecheck was green before the final test-fixture edit. No robot-specific interaction test or live Extension Host run was added before the owner stopped the work for closure. Do not call this live-accepted.
+
 ### 2026-11-23 evening — K1–K4 features (Claude) ✅ hygiene, live run pending
 - `365af86cd` Auto Compact and AUTO STEER switches (K2.1/K2.2/K2.4/K2.5/K2.7); `08a22d393` brand KIMI KRINIK (K1.4);
   `bd0f2e569`…`53bda319b` EN / 中文 / RU (K3.1–K3.6); `61fcdd449` dark tooltips and menus (K3.7/K3.8, the owner saw it live);
@@ -58,7 +62,7 @@ external publication wait for the owner's `AUTH:`.
 | Phase | State | Note |
 |---|---|---|
 | K0 baseline and contracts | 🔧 in progress | KAIF deployed; inventory and red tests for K1–K4 left |
-| K1 UI convergence | 🔧 in progress | context ring/viewer, Control Panel and Working are committed and hygiene-green; left: status pills, the combined model + effort picker, the secondary model + robot visibility setting, the session header |
+| K1 UI convergence | 🔧 in progress | context ring/viewer, Control Panel and Working are committed; secondary model + robot is a closing checkpoint with persistence tests only. Left: robot interaction/live test, combined model + effort picker, status pills, session header |
 | K2 behavior controls | 🔧 in progress | independent Context Window Control and KAIF handoff are committed and hygiene-green; left: K2.6 an in-flight compaction |
 | K3 localization and theme | ✅ hygiene | three languages and the theme tokens; live acceptance in K5 |
 | K4 sound settings | 🔧 in progress | the window is done; B5/B6/B8 not re-checked against it |
@@ -82,17 +86,18 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-PARKED: 2026-11-23 23:05 +03:00 — product commits `80f882851` and `a27da7a8c` are in place; the remaining documentation/voice-rules commit is next, then resume K1. All seven changesets are written and the owner confirmed the requested feature content. Full hygiene: 503 passed, 1 skipped; typecheck, lint, KAIF selftest and judge green. Live Extension Host acceptance has not run.
+PARKED: 2026-11-24 00:04 +03:00 — the owner stopped secondary-model completion for a soft closure and explicitly waived the judge pass. Closing hygiene is green: 505 passed, 1 skipped; typecheck, lint, extension + webview builds and README voice-check. The secondary-model checkpoint and this handover are ready for the immediate closing commit. Start the new chat with `/skill:resume`, then prove the newly wired hooks with `node .kaif/hooks/context-window.mjs --alive`. `wire-hooks --kimi` rewired 22 entries and `kimi doctor config` passed, but the old session had no hook record; a new/reloaded session is required. Live Extension Host acceptance and the robot interaction test remain open.
 
-1. In a Kimi session in this root: `node .kaif/hooks/context-window.mjs --alive` — proves the KAIF hooks run here.
-2. K1: secondary model + robot visibility, combined model + effort picker, status pills and session header; keep Control Panel's fixed paperclip/model/rings/settings/stop-send boundaries.
-3. K5 preparation: drive the new controls and multiline/picker fixes in a real Extension Host before marking `bugs/01`–`03` DONE.
-4. Claude sessions here get no KAIF skills or hooks: `.kaif/kaif.json` → `agents` lists only `kimi-code`, and the checked-out
-   `CLAUDE.md` is a git symlink that Windows writes as the text `AGENTS.md`. `[OWNER] "пока не нужно" · 2026-11-23` (chat) —
-not adding `claude-code` for now.
+KNOWLEDGE: independent Context Window Control and the one-authority handoff are written in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; the exact Cyrillic Silero + Glass voice route and owner/project naming are in `HOUSE_RULES.md` R1 and EXP-0003; secondary model's exact checkpoint and missing live evidence are in this file.
+
+1. Read `FAREWELL_MESSAGE_FROM_THE_PREVIOUS_CHAT.md`, run `/skill:resume`, then `node .kaif/hooks/context-window.mjs --alive`. Do not assume hooks run because the config is wired.
+2. Verify the closing commit exists and the tree is clean except pre-existing `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`. If the checkpoint is still uncommitted, inspect exactly the secondary-model files named in `git status` before doing anything else.
+3. Add the missing robot interaction test (open → existing model → `saveConfig` with `secondaryModel` and `effortChanged:false` → Follow main model), then run `pnpm exec vitest run --reporter=agent apps/vscode/test/secondary-model.test.ts apps/vscode/test/webview/control-panel-settings.test.tsx` and the full verification commands above.
+4. Next K1 feature: combined model + effort picker, then status pills and session header. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
+5. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
 
 ## Open bugs
 
-- 🟠 `bugs/01`–`03` — fixes and red-to-green guards are in the working tree; live Extension Host acceptance remains before DONE.
+- 🟠 `bugs/01`–`03` — fixes and red-to-green guards are committed; live Extension Host acceptance remains before DONE.
 - 🔴 `bugs/152` (KAIF origin) — the extension can stay on «Starting Kimi Code…»; not reproduced; check B10 when it recurs.
 - 🟠 `bugs/151` (KAIF origin) — follow-up steer race; store-level fixes in place, live acceptance left.

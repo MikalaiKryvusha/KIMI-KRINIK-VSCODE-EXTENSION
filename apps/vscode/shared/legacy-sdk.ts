@@ -183,10 +183,16 @@ export interface ModelConfig {
   default_effort?: string;
 }
 
+export interface SecondaryModelSelection {
+  model: string;
+  defaultEffort?: string;
+}
+
 export interface KimiConfig {
   defaultModel: string | null;
   defaultThinking: boolean;
   defaultThinkingEffort?: string;
+  secondaryModel?: SecondaryModelSelection | null;
   models: ModelConfig[];
 }
 

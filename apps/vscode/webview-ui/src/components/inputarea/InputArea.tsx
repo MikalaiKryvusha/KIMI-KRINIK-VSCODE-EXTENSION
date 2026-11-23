@@ -41,6 +41,7 @@ import { useT } from "@/i18n";
 import { ModeButtons } from "../ModeButtons";
 import { PermissionModeButton } from "../PermissionModeButton";
 import { BehaviorButtons } from "../BehaviorButtons";
+import { SubagentModelDialog } from "../SubagentModelDialog";
 
 interface InputAreaProps {
   onAuthAction?: () => void;
@@ -465,6 +466,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
               {extensionConfig.controlPanel.permission && <PermissionModeButton />}
               <BehaviorButtons />
               <ModeButtons planMode={planMode} onTogglePlanMode={handleTogglePlanMode} />
+              {extensionConfig.controlPanel.secondaryModel && <SubagentModelDialog disabled={isStreaming} />}
             </div>
 
             <div className="flex items-center gap-2 shrink-0">

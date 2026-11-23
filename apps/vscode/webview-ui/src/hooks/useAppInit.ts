@@ -126,6 +126,7 @@ export function useAppInit(): AppInitState {
           kimiConfig.defaultModel,
           kimiConfig.defaultThinking,
           kimiConfig.defaultThinkingEffort,
+          kimiConfig.secondaryModel,
         );
 
         const modelsCount = useSettingsStore.getState().models.length;
