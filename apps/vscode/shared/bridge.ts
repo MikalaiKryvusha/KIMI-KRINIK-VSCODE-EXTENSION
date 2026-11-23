@@ -7,6 +7,8 @@ export const Methods = {
   CheckLoginStatus: "checkLoginStatus",
   Login: "login",
   Logout: "logout",
+  GetManagedUsage: "getManagedUsage",
+  NotifyAttention: "notifyAttention",
   SaveConfig: "saveConfig",
   GetExtensionConfig: "getExtensionConfig",
   OpenSettings: "openSettings",
@@ -141,6 +143,11 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
 
     case Methods.AddInputHistory:
       return hasString(params, "text");
+    case Methods.GetManagedUsage:
+      return params === undefined
+        || (isPlainObject(params) && isOptionalType(params["provider"], "string"));
+    case Methods.NotifyAttention:
+      return isPlainObject(params) && hasNonEmptyString(params, "message");
     case Methods.SaveConfig:
       return isPlainObject(params)
         && typeof params["model"] === "string"

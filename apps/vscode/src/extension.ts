@@ -67,7 +67,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           .catch((error) => logError("Unable to update session permission", error));
       }
     }),
-    vscode.window.registerWebviewViewProvider("kimi.webview", provider, {
+    vscode.window.registerWebviewViewProvider("kimiKaif.webview", provider, {
       webviewOptions: { retainContextWhenHidden: true },
     }),
   );
@@ -89,44 +89,44 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   };
 
   const commands: Record<string, () => void | Promise<void>> = {
-    "kimi.clearAllState": async () => {
+    "kimiKaif.clearAllState": async () => {
       await context.globalState.update("kimi.config", undefined);
       await context.globalState.update("kimi.mcpServers", undefined);
       await context.workspaceState.update("kimi.mcpEnabled", undefined);
       await vscode.window.showInformationMessage("Kimi: Extension UI state cleared.");
     },
-    "kimi.openInTab": () => {
+    "kimiKaif.openInTab": () => {
       provider?.createPanel();
     },
-    "kimi.openInSideBar": async () => {
-      await vscode.commands.executeCommand("kimi.webview.focus");
+    "kimiKaif.openInSideBar": async () => {
+      await vscode.commands.executeCommand("kimiKaif.webview.focus");
     },
-    "kimi.focusInput": async () => {
-      await vscode.commands.executeCommand("kimi.webview.focus");
+    "kimiKaif.focusInput": async () => {
+      await vscode.commands.executeCommand("kimiKaif.webview.focus");
       provider?.broadcast(Events.FocusInput, {});
     },
-    "kimi.insertMention": async () => {
+    "kimiKaif.insertMention": async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         await vscode.window.showWarningMessage("No active editor");
         return;
       }
-      await vscode.commands.executeCommand("kimi.webview.focus");
+      await vscode.commands.executeCommand("kimiKaif.webview.focus");
       if (!(await provider?.insertEditorMention(editor.document.uri, editor.selection))) {
         await vscode.window.showWarningMessage("The active file is outside the selected working directory.");
       }
     },
-    "kimi.newConversation": async () => {
-      await vscode.commands.executeCommand("kimi.webview.focus");
+    "kimiKaif.newConversation": async () => {
+      await vscode.commands.executeCommand("kimiKaif.webview.focus");
       provider?.broadcast(Events.NewConversation, {});
     },
-    "kimi.showLogs": () => outputChannel?.show(),
-    "kimi.resetKimi": () => provider?.resetAllWebviews(),
-    "kimi.logout": async () => {
-      await vscode.commands.executeCommand("kimi.webview.focus");
+    "kimiKaif.showLogs": () => outputChannel?.show(),
+    "kimiKaif.resetKimi": () => provider?.resetAllWebviews(),
+    "kimiKaif.logout": async () => {
+      await vscode.commands.executeCommand("kimiKaif.webview.focus");
       await vscode.window.showInformationMessage("Use the logout button in Kimi settings.");
     },
-    "kimi.migrateLegacyData": () => runMigration(true),
+    "kimiKaif.migrateLegacyData": () => runMigration(true),
   };
 
   for (const [id, handler] of Object.entries(commands)) {

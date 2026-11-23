@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.0
+
+### Minor Changes
+
+- Play a sound and speak a message when an approval, question, or error needs attention.
+
+## 0.9.1
+
+### Minor Changes
+
+- Show 5-hour and 7-day or monthly managed quota rings with reset countdowns in the composer.
+- Send follow-ups into running turns immediately, preserving attachments and restoring input if steering fails.
+
+### Patch Changes
+
+- Match the webview background to the VS Code sidebar theme.
+- Bundle runtime dependencies and give the KAIF extension a separate VS Code identity.
+
 ## 0.9.0
 
 ### Minor Changes

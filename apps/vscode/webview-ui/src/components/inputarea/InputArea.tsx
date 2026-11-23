@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ActionMenu } from "../ActionMenu";
+import { UsageStatusBar } from "../UsageStatusBar";
 import { SlashCommandMenu } from "../SlashCommandMenu";
 import { FilePickerMenu } from "../FilePickerMenu";
 import { MediaThumbnail } from "../MediaThumbnail";
@@ -113,7 +114,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   }, [mediaReq.image, mediaReq.video, currentModel, currentModelConfig, availableModels, updateModel]);
 
   useEffect(() => {
-    if (!pendingInput || isStreaming) {
+    if (!pendingInput || (isStreaming && pendingInput.restore !== true)) {
       return;
     }
 
@@ -124,6 +125,9 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
     const textContent = Content.getText(pendingInput.content);
     if (textContent) {
       setText(textContent);
+      if (pendingInput.restore === true) {
+        useChatStore.setState({ pendingInput: null });
+      }
       setTimeout(() => {
         textareaRef.current?.focus();
         adjustHeight(textareaRef.current);
@@ -450,6 +454,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
                 <TooltipContent>Add files or media</TooltipContent>
               </Tooltip>
 
+              <UsageStatusBar />
               <ActionMenu onAuthAction={onAuthAction} />
 
               {isStreaming ? (

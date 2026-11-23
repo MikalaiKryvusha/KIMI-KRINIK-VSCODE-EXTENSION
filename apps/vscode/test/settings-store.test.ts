@@ -5,18 +5,22 @@ import { MCP_SECRET_MASK } from "../shared/legacy-sdk";
 const boundary = vi.hoisted(() => ({
   saveConfig: vi.fn(),
   streamChat: vi.fn(),
+  steerChat: vi.fn(),
   abortChat: vi.fn(),
   trackFiles: vi.fn(),
   toastError: vi.fn(),
   toastWarning: vi.fn(),
+  notifyAttention: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
   bridge: {
     saveConfig: boundary.saveConfig,
     streamChat: boundary.streamChat,
+    steerChat: boundary.steerChat,
     abortChat: boundary.abortChat,
     trackFiles: boundary.trackFiles,
+    notifyAttention: boundary.notifyAttention,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -49,11 +53,15 @@ beforeEach(() => {
   boundary.saveConfig.mockReset();
   boundary.streamChat.mockReset();
   boundary.streamChat.mockResolvedValue({ done: false });
+  boundary.steerChat.mockReset();
+  boundary.steerChat.mockResolvedValue({ ok: true });
   boundary.abortChat.mockReset();
   boundary.abortChat.mockResolvedValue({ aborted: true });
   boundary.trackFiles.mockReset();
   boundary.toastError.mockReset();
   boundary.toastWarning.mockReset();
+  boundary.notifyAttention.mockReset();
+  boundary.notifyAttention.mockResolvedValue({ ok: true });
   useSettingsStore.getState().initModels(MODELS, "plain", false);
   useChatStore.setState({
     sessionId: null,
@@ -556,9 +564,10 @@ describe("Webview thinking effort parity with the TUI", () => {
 describe("Webview mid-turn warnings", () => {
   it("shows a non-terminal error as a toast without unlocking the composer", async () => {
     useChatStore.getState().sendMessage("first message");
-    useChatStore.getState().sendMessage("queued follow-up");
+    useChatStore.getState().sendMessage("steered follow-up");
     expect(useChatStore.getState().isStreaming).toBe(true);
-    expect(useChatStore.getState().queue).toHaveLength(1);
+    expect(boundary.steerChat).toHaveBeenCalledWith("steered follow-up");
+    expect(useChatStore.getState().queue).toHaveLength(0);
 
     useChatStore.getState().processEvent({
       type: "error",
@@ -572,14 +581,12 @@ describe("Webview mid-turn warnings", () => {
     expect(boundary.toastWarning).toHaveBeenCalledWith("Internal error occurred.");
     const state = useChatStore.getState();
     expect(state.isStreaming).toBe(true);
-    expect(state.queue).toHaveLength(1);
+    expect(state.queue).toHaveLength(0);
     expect(state.pendingInput).not.toBeNull();
     expect(state.messages.at(-1)?.inlineError).toBeUndefined();
 
     useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" } });
     expect(useChatStore.getState().isStreaming).toBe(false);
-    await vi.waitFor(() => {
-      expect(boundary.streamChat).toHaveBeenCalledTimes(2);
-    });
+    expect(boundary.streamChat).toHaveBeenCalledTimes(1);
   });
 });

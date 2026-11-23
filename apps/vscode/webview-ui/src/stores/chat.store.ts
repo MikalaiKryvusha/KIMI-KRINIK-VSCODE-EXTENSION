@@ -5,6 +5,7 @@ import { bridge } from "@/services";
 import { Content } from "@/lib/content";
 import { useApprovalStore } from "./approval.store";
 import { toast } from "@/components/ui/sonner";
+import { notifyAttention } from "@/lib/attention";
 
 import { useSettingsStore } from "./settings.store";
 import { processEvent } from "./event-handlers";
@@ -80,6 +81,7 @@ export interface DraftMediaItem {
 export interface PendingInput {
   content: string | ContentPart[];
   model: string;
+  restore?: boolean;
 }
 
 export interface QueuedItem {
@@ -104,6 +106,7 @@ export interface ChatState {
   planMode: boolean;
 
   sendMessage: (text: string) => void;
+  steerNow: (text: string) => void;
   retryLastMessage: () => void;
   processEvent: (event: UIStreamEvent) => void;
   loadSession: (sessionId: string, events: UIStreamEvent[]) => Promise<void>;
@@ -126,6 +129,26 @@ export interface ChatState {
 }
 
 let handshakeTimer: ReturnType<typeof setTimeout> | null = null;
+let attentionSuppressed = false;
+
+function notifyEventAttention(event: UIStreamEvent): void {
+  if (attentionSuppressed) return;
+  const payload = (event as {
+    payload?: {
+      message?: string;
+      description?: string;
+      action?: string;
+      questions?: Array<{ question?: string }>;
+    };
+  }).payload ?? {};
+  if (event.type === "error") {
+    notifyAttention(payload.message ?? "Action failed");
+  } else if (event.type === "ApprovalRequest") {
+    notifyAttention(`Approval required: ${payload.description || payload.action}`);
+  } else if (event.type === "QuestionRequest") {
+    notifyAttention(payload.questions?.[0]?.question ?? "Your answer is needed.");
+  }
+}
 
 function clearHandshakeTimer() {
   if (handshakeTimer) {
@@ -174,6 +197,20 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
     });
 }
 
+function sendIdle(content: string | ContentPart[], model: string) {
+  useChatStore.setState(
+    produce((draft: ChatState) => {
+      clearAllInlineErrors(draft);
+      draft.draftMedia = [];
+      draft.isStreaming = true;
+      draft.handshakeReceived = false;
+      draft.pendingInput = { content, model };
+    }),
+  );
+  useApprovalStore.getState().clearRequests();
+  doSend(useChatStore.getState(), content, model);
+}
+
 export const useChatStore = create<ChatState>((set, get) => ({
   sessionId: null,
   messages: [],
@@ -190,34 +227,44 @@ export const useChatStore = create<ChatState>((set, get) => ({
   planMode: false,
 
   sendMessage: (text) => {
-    const { draftMedia, isStreaming } = get();
+    if (get().isStreaming) {
+      get().steerNow(text);
+      return;
+    }
+    const { draftMedia } = get();
     const { currentModel } = useSettingsStore.getState();
-
     const readyMedia = draftMedia.filter((m) => m.dataUri).map((m) => m.dataUri!);
     const content = readyMedia.length > 0 ? Content.build(text, readyMedia) : text;
+    if (Content.isEmpty(content)) return;
+    sendIdle(content, currentModel);
+  },
 
-    if (Content.isEmpty(content)) {
+  steerNow: (text) => {
+    if (!get().isStreaming) {
+      get().sendMessage(text);
       return;
     }
+    const { draftMedia } = get();
+    const { currentModel } = useSettingsStore.getState();
+    const readyMedia = draftMedia.filter((m) => m.dataUri).map((m) => m.dataUri!);
+    const content = readyMedia.length > 0 ? Content.build(text, readyMedia) : text;
+    if (Content.isEmpty(content)) return;
+    const sentMediaIds = new Set(draftMedia.filter((item) => item.dataUri).map((item) => item.id));
 
-    if (isStreaming) {
-      get().enqueue(content, currentModel);
-      set({ draftMedia: [] });
-      return;
-    }
-
-    set(
-      produce((draft: ChatState) => {
-        clearAllInlineErrors(draft);
-        draft.draftMedia = [];
-        draft.isStreaming = true;
-        draft.handshakeReceived = false;
-        draft.pendingInput = { content, model: currentModel };
-      }),
-    );
-    useApprovalStore.getState().clearRequests();
-
-    doSend(get(), content, currentModel);
+    void bridge.steerChat(content)
+      .then(({ ok }) => {
+        if (!ok) {
+          sendIdle(content, currentModel);
+          return;
+        }
+        set((state) => ({
+          draftMedia: state.draftMedia.filter((item) => !sentMediaIds.has(item.id)),
+        }));
+      })
+      .catch((error: unknown) => {
+        get().rollbackInput(content);
+        toast.error(error instanceof Error ? error.message : String(error));
+      });
   },
 
   retryLastMessage: () => {
@@ -247,6 +294,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   processEvent: (event) => {
+    notifyEventAttention(event);
     if (event.type === "error" && "terminal" in event && event.terminal === false) {
       clearHandshakeTimer();
       toast.warning(event.message);
@@ -298,8 +346,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
     });
     useApprovalStore.getState().clearRequests();
 
-    for (const event of events) {
-      get().processEvent(event);
+    attentionSuppressed = true;
+    try {
+      for (const event of events) {
+        get().processEvent(event);
+      }
+    } finally {
+      attentionSuppressed = false;
     }
 
     set(
@@ -414,7 +467,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   rollbackInput: (content) => {
     const { currentModel } = useSettingsStore.getState();
-    set({ pendingInput: { content, model: currentModel } });
+    set({ pendingInput: { content, model: currentModel, restore: true } });
   },
 
   respondQuestion: async (answers) => {

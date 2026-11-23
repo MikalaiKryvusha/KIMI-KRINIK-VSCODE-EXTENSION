@@ -1,15 +1,15 @@
 {
-  "name": "kimi-code",
-  "publisher": "moonshot-ai",
-  "displayName": "Kimi Code",
-  "description": "Official Kimi Code plugin for VS Code",
-  "version": "0.9.0",
+  "name": "kimi-code-kaif",
+  "publisher": "mikalai-kryvusha",
+  "displayName": "Kimi Code (KAIF fork)",
+  "description": "KAIF fork of the Kimi Code plugin for VS Code",
+  "version": "1.0.0",
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MoonshotAI/kimi-code.git",
+    "url": "git+https://github.com/MikalaiKryvusha/kimi-code.git",
     "directory": "apps/vscode"
   },
   "engines": {
@@ -71,6 +71,11 @@
           "default": false,
           "description": "Use Ctrl/Cmd+Enter to send prompts instead of Enter"
         },
+        "kimi.attentionVoiceCommand": {
+          "type": "array",
+          "default": [],
+          "description": "Command used to play attention messages; {file} is replaced with the phrase file"
+        },
         "kimi.showThinkingContent": {
           "type": "boolean",
           "default": true,
@@ -100,62 +105,62 @@
     },
     "commands": [
       {
-        "command": "kimi.clearAllState",
+        "command": "kimiKaif.clearAllState",
         "title": "Kimi Code: [DEBUG] Clear All State"
       },
       {
-        "command": "kimi.openInTab",
+        "command": "kimiKaif.openInTab",
         "title": "Kimi Code: Open in New Tab",
         "icon": "$(link-external)"
       },
       {
-        "command": "kimi.openInSideBar",
+        "command": "kimiKaif.openInSideBar",
         "title": "Kimi Code: Open in Side Panel",
         "icon": "$(layout-sidebar-left)"
       },
       {
-        "command": "kimi.focusInput",
+        "command": "kimiKaif.focusInput",
         "title": "Kimi Code: Focus Input",
         "icon": "$(edit)"
       },
       {
-        "command": "kimi.insertMention",
+        "command": "kimiKaif.insertMention",
         "title": "Kimi Code: Insert Current File",
         "icon": "$(mention)"
       },
       {
-        "command": "kimi.newConversation",
+        "command": "kimiKaif.newConversation",
         "title": "Kimi Code: New Conversation",
         "icon": "$(add)"
       },
       {
-        "command": "kimi.showLogs",
+        "command": "kimiKaif.showLogs",
         "title": "Kimi Code: Show Logs",
         "icon": "$(output)"
       },
       {
-        "command": "kimi.resetKimi",
+        "command": "kimiKaif.resetKimi",
         "title": "Kimi Code: Reset Kimi (in case of any issues/no response)",
         "icon": "$(refresh)"
       },
       {
-        "command": "kimi.logout",
+        "command": "kimiKaif.logout",
         "title": "Kimi Code: Logout",
         "icon": "$(sign-out)"
       },
       {
-        "command": "kimi.migrateLegacyData",
+        "command": "kimiKaif.migrateLegacyData",
         "title": "Kimi Code: Migrate Legacy Data"
       }
     ],
     "keybindings": [
       {
-        "command": "kimi.focusInput",
+        "command": "kimiKaif.focusInput",
         "key": "ctrl+shift+k",
         "mac": "cmd+shift+k"
       },
       {
-        "command": "kimi.insertMention",
+        "command": "kimiKaif.insertMention",
         "key": "alt+k",
         "mac": "alt+k",
         "when": "editorTextFocus"
@@ -164,17 +169,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "kimi-sidebar",
-          "title": "Kimi Code",
+          "id": "kimi-kaif-sidebar",
+          "title": "Kimi Code (KAIF fork)",
           "icon": "resources/kimi-icon.svg"
         }
       ]
     },
     "views": {
-      "kimi-sidebar": [
+      "kimi-kaif-sidebar": [
         {
           "type": "webview",
-          "id": "kimi.webview",
+          "id": "kimiKaif.webview",
           "name": "Kimi Code"
         }
       ]
@@ -182,61 +187,61 @@
     "menus": {
       "view/title": [
         {
-          "command": "kimi.openInTab",
-          "when": "view == kimi.webview",
+          "command": "kimiKaif.openInTab",
+          "when": "view == kimiKaif.webview",
           "group": "navigation"
         },
         {
-          "command": "kimi.newConversation",
-          "when": "view == kimi.webview",
+          "command": "kimiKaif.newConversation",
+          "when": "view == kimiKaif.webview",
           "group": "navigation"
         }
       ],
       "commandPalette": [
         {
-          "command": "kimi.clearAllState",
+          "command": "kimiKaif.clearAllState",
           "when": "isDevelopment"
         },
         {
-          "command": "kimi.openInTab",
+          "command": "kimiKaif.openInTab",
           "when": "true"
         },
         {
-          "command": "kimi.openInSideBar",
+          "command": "kimiKaif.openInSideBar",
           "when": "true"
         },
         {
-          "command": "kimi.focusInput",
+          "command": "kimiKaif.focusInput",
           "when": "true"
         },
         {
-          "command": "kimi.insertMention",
+          "command": "kimiKaif.insertMention",
           "when": "true"
         },
         {
-          "command": "kimi.newConversation",
+          "command": "kimiKaif.newConversation",
           "when": "true"
         },
         {
-          "command": "kimi.showLogs",
+          "command": "kimiKaif.showLogs",
           "when": "true"
         },
         {
-          "command": "kimi.resetKimi",
+          "command": "kimiKaif.resetKimi",
           "when": "true"
         },
         {
-          "command": "kimi.logout",
+          "command": "kimiKaif.logout",
           "when": "kimi.isLoggedIn"
         },
         {
-          "command": "kimi.migrateLegacyData",
+          "command": "kimiKaif.migrateLegacyData",
           "when": "true"
         }
       ],
       "editor/context": [
         {
-          "command": "kimi.insertMention",
+          "command": "kimiKaif.insertMention",
           "group": "moonshot-ai",
           "when": "editorTextFocus"
         }

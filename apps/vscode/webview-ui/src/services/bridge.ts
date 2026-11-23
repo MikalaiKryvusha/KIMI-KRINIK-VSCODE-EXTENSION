@@ -17,6 +17,7 @@ import type {
   LoginStatus,
   UIStreamEvent,
 } from "shared/types";
+import type { ManagedUsageResult } from "shared/managed-usage";
 
 interface PendingRequest {
   resolve: (value: unknown) => void;
@@ -132,6 +133,14 @@ class Bridge {
 
   logout() {
     return this.call<LoginResult>(Methods.Logout);
+  }
+
+  getManagedUsage(provider?: string) {
+    return this.call<ManagedUsageResult>(Methods.GetManagedUsage, provider === undefined ? undefined : { provider });
+  }
+
+  notifyAttention(message: string) {
+    return this.call<{ ok: boolean }>(Methods.NotifyAttention, { message });
   }
 
   saveConfig(sessionConfig: SessionConfig) {

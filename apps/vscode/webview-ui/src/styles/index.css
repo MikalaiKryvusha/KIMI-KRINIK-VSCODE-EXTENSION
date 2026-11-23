@@ -8,7 +8,7 @@
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(1 0 0);
+  --background: var(--vscode-sideBar-background, var(--vscode-editor-background));
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
@@ -29,7 +29,7 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
+  --background: var(--vscode-sideBar-background, var(--vscode-editor-background));
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.18 0.005 285.823);
   --card-foreground: oklch(0.985 0 0);
@@ -73,6 +73,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: var(--background);
 }
 
 @theme inline {
