@@ -71,9 +71,8 @@ export function useFilePicker(activeToken: ActiveToken | null, onInsertFile: (pa
   const showMediaOption = canAddMedia && query === "";
   const fileMenuHeaderCount = showMediaOption ? 1 : 0;
 
-  useEffect(() => {
-    setSelectedIndex((i) => Math.min(i, Math.max(0, fileMenuHeaderCount + fileItems.length - 1)));
-  }, [fileMenuHeaderCount, fileItems.length]);
+  const lastRowIndex = Math.max(0, fileMenuHeaderCount + fileItems.length - 1);
+  if (selectedIndex > lastRowIndex) setSelectedIndex(lastRowIndex);
 
   const resetFilePicker = useCallback(() => {
     setSelectedIndex(0);
