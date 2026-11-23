@@ -37,11 +37,11 @@ and voice when it waits for you. The table shows what works now and what comes i
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | Engine | official 2.7.2 | older 2.2.0 | ✅ official 2.7.2, follows upstream |
-| Automatic compaction can be turned off, overflow recovery included; manual `/compact` stays | — | — | ✅ `[loop_control] auto_compact = false` · 🚧 switch in the composer |
-| A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ joins the turn at once with its attachments; on a failure the text returns to the input · 🚧 AUTO STEER on/off |
+| Automatic compaction can be turned off, overflow recovery included; manual `/compact` stays | — | — | ✅ `[loop_control] auto_compact = false` and a switch in the settings menu |
+| A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ joins the turn at once with its attachments; on a failure the text returns to the input · ✅ AUTO STEER on/off in the settings menu |
 | Managed quota: 5-hour and 7-day / monthly rings with a reset countdown | — | ✅ | ✅ |
 | Sound and voice when an approval, a question or an error waits for you | — | — | ✅ · 🚧 a sound and a volume for each event |
-| The session closes by the KAIF context-window thresholds | — | — | ✅ with the KAIF hooks · 🚧 thresholds 70 / 75 / 80 / 90 % in the settings |
+| The session closes by the KAIF context-window thresholds | — | — | ✅ with the KAIF hooks, thresholds 70 / 75 / 80 / 90 % in the settings |
 | Interface languages | English | English, 中文 | 🚧 English, 中文, Русский |
 | Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring, model with effort | — | ✅ | 🚧 on the official engine |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ background · 🚧 tooltips and menus |
@@ -66,9 +66,27 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 
 <a name="russian"></a>
 
+<p align="center"><img src="apps/vscode/resources/kimi-icon-storefront.png" width="112" alt="Иконка расширения KIMI KRINIK"></p>
+
 <h2 align="center">KIMI KRINIK</h2>
 
 <p align="center"><b>Kimi Krinik — улучшенное и продвинутое расширение Kimi Code для VS Code на основе <a href="https://github.com/MoonshotAI/kimi-code">ванильного Kimi Code</a> и <a href="https://github.com/gxgleo67/kimi-code-vscode-fork">Kimi Fork</a></b></p>
+
+<p align="center">
+  <a href="#english"><img src="https://img.shields.io/badge/English-2C7BE5?style=for-the-badge" alt="English"></a>
+  &nbsp;
+  <a href="#russian"><img src="https://img.shields.io/badge/Русский-C0392B?style=for-the-badge" alt="Русский"></a>
+  &nbsp;
+  <a href="#chinese"><img src="https://img.shields.io/badge/中文-E67E22?style=for-the-badge" alt="中文"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/версия-1.0.0_в_работе-1E1E1E.svg" alt="Версия: 1.0.0 в работе">
+  <a href="https://github.com/MoonshotAI/kimi-code"><img src="https://img.shields.io/badge/движок-Kimi_Code_2.7.2-2C7BE5.svg" alt="Движок: Kimi Code 2.7.2"></a>
+  <a href="https://github.com/gxgleo67/kimi-code-vscode-fork"><img src="https://img.shields.io/badge/интерфейс-KIMI_FORK-8E44AD.svg" alt="Интерфейс: KIMI FORK"></a>
+  <a href="https://github.com/MikalaiKryvusha/KAIF"><img src="https://img.shields.io/badge/фреймворк-KAIF-7F52FF.svg" alt="Фреймворк: KAIF"></a>
+  <a href="apps/vscode/LICENSE"><img src="https://img.shields.io/badge/лицензия-Apache--2.0-yellow.svg" alt="Лицензия: Apache-2.0"></a>
+</p>
 
 [Read in English →](#english) · [中文 →](#chinese)
 
@@ -85,11 +103,11 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | Движок | официальный 2.7.2 | старый 2.2.0 | ✅ официальный 2.7.2, идёт за upstream |
-| Автоматический compaction выключается вместе с восстановлением при переполнении; ручной `/compact` работает | — | — | ✅ `[loop_control] auto_compact = false` · 🚧 переключатель в композере |
-| Сообщение, отправленное во время хода | ждёт в очереди | вливается в ход, может потерять вложения | ✅ сразу вливается в ход вместе с вложениями; при ошибке текст возвращается в поле ввода · 🚧 AUTO STEER вкл/выкл |
+| Автоматический compaction выключается вместе с восстановлением при переполнении; ручной `/compact` работает | — | — | ✅ `[loop_control] auto_compact = false` и переключатель в меню настроек |
+| Сообщение, отправленное во время хода | ждёт в очереди | вливается в ход, может потерять вложения | ✅ сразу вливается в ход вместе с вложениями; при ошибке текст возвращается в поле ввода · ✅ AUTO STEER вкл/выкл в меню настроек |
 | Квоты: кольца 5 часов и 7 дней / месяц с отсчётом до сброса | — | ✅ | ✅ |
 | Звук и голос, когда вас ждут одобрение, вопрос или ошибка | — | — | ✅ · 🚧 свой звук и громкость для каждого события |
-| Сессия закрывается по порогам контекстного окна KAIF | — | — | ✅ с хуками KAIF · 🚧 пороги 70 / 75 / 80 / 90 % в настройках |
+| Сессия закрывается по порогам контекстного окна KAIF | — | — | ✅ с хуками KAIF, пороги 70 / 75 / 80 / 90 % в настройках |
 | Языки интерфейса | English | English, 中文 | 🚧 English, 中文, Русский |
 | Панель композера: режим разрешений, Plan, Goal, Swarm, вторичная модель, кольцо контекста, модель с усилием | — | ✅ | 🚧 на официальном движке |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ фон · 🚧 подсказки и меню |
@@ -114,9 +132,27 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 
 <a name="chinese"></a>
 
+<p align="center"><img src="apps/vscode/resources/kimi-icon-storefront.png" width="112" alt="KIMI KRINIK 扩展图标"></p>
+
 <h2 align="center">KIMI KRINIK</h2>
 
 <p align="center"><b>Kimi Krinik —— 改进增强版 Kimi Code VS Code 扩展，基于 <a href="https://github.com/MoonshotAI/kimi-code">原版 Kimi Code</a> 与 <a href="https://github.com/gxgleo67/kimi-code-vscode-fork">Kimi Fork</a></b></p>
+
+<p align="center">
+  <a href="#english"><img src="https://img.shields.io/badge/English-2C7BE5?style=for-the-badge" alt="English"></a>
+  &nbsp;
+  <a href="#russian"><img src="https://img.shields.io/badge/Русский-C0392B?style=for-the-badge" alt="Русский"></a>
+  &nbsp;
+  <a href="#chinese"><img src="https://img.shields.io/badge/中文-E67E22?style=for-the-badge" alt="中文"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/版本-1.0.0_开发中-1E1E1E.svg" alt="版本：1.0.0 开发中">
+  <a href="https://github.com/MoonshotAI/kimi-code"><img src="https://img.shields.io/badge/引擎-Kimi_Code_2.7.2-2C7BE5.svg" alt="引擎：Kimi Code 2.7.2"></a>
+  <a href="https://github.com/gxgleo67/kimi-code-vscode-fork"><img src="https://img.shields.io/badge/界面-KIMI_FORK-8E44AD.svg" alt="界面：KIMI FORK"></a>
+  <a href="https://github.com/MikalaiKryvusha/KAIF"><img src="https://img.shields.io/badge/框架-KAIF-7F52FF.svg" alt="框架：KAIF"></a>
+  <a href="apps/vscode/LICENSE"><img src="https://img.shields.io/badge/许可证-Apache--2.0-yellow.svg" alt="许可证：Apache-2.0"></a>
+</p>
 
 [Read in English →](#english) · [Читать по-русски →](#russian)
 
@@ -132,11 +168,11 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | 引擎 | 官方 2.7.2 | 较旧的 2.2.0 | ✅ 官方 2.7.2，跟随上游 |
-| 自动压缩可以关闭，包括上下文溢出恢复；手动 `/compact` 照常可用 | — | — | ✅ `[loop_control] auto_compact = false` · 🚧 输入框中的开关 |
-| 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即连同附件并入当前轮次；失败时文本回到输入框 · 🚧 AUTO STEER 开关 |
+| 自动压缩可以关闭，包括上下文溢出恢复；手动 `/compact` 照常可用 | — | — | ✅ `[loop_control] auto_compact = false` 及设置菜单中的开关 |
+| 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即连同附件并入当前轮次；失败时文本回到输入框 · ✅ 设置菜单中的 AUTO STEER 开关 |
 | 托管配额：5 小时与 7 天 / 月度圆环及重置倒计时 | — | ✅ | ✅ |
 | 等待审批、问题或出现错误时的提示音与语音 | — | — | ✅ · 🚧 为每个事件设置声音与音量 |
-| 会话按 KAIF 上下文窗口阈值收尾 | — | — | ✅ 配合 KAIF 钩子 · 🚧 设置中的 70 / 75 / 80 / 90 % 阈值 |
+| 会话按 KAIF 上下文窗口阈值收尾 | — | — | ✅ 配合 KAIF 钩子，设置中的 70 / 75 / 80 / 90 % 阈值 |
 | 界面语言 | English | English、中文 | 🚧 English、中文、Русский |
 | 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环、模型与推理强度 | — | ✅ | 🚧 基于官方引擎 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ 背景 · 🚧 提示框与菜单 |
