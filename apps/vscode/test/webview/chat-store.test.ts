@@ -30,6 +30,7 @@ import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 
 const MODELS = [{ id: "plain", name: "Plain", provider: "managed:kimi-code", capabilities: [] }];
 const IMAGE = "data:image/png;base64,AAAA";
+const IMAGE_2 = "data:image/png;base64,BBBB";
 
 beforeEach(() => {
   boundary.streamChat.mockReset();
@@ -110,7 +111,8 @@ describe("automatic follow-up steer", () => {
 
     await vi.waitFor(() => expect(boundary.toastError).toHaveBeenCalled());
     const state = useChatStore.getState();
-    expect(state.pendingInput).toMatchObject({ restore: true, model: "plain" });
+    expect(state.composerRestore).toBe("look");
+    expect(state.pendingInput).toEqual({ content: "first", model: "plain" });
     expect(state.draftMedia).toEqual([{ id: "image-1", dataUri: IMAGE }]);
     expect(boundary.streamChat).toHaveBeenCalledTimes(1);
     expect(boundary.toastError.mock.calls[0]?.[0]).toBe("steer failed");
@@ -171,5 +173,107 @@ describe("automatic follow-up steer", () => {
     ]);
 
     expect(boundary.notifyAttention).not.toHaveBeenCalled();
+  });
+
+  it("speaks the actual error message of a stream error", () => {
+    useChatStore.getState().processEvent({ type: "error", code: "quota", message: "Quota exceeded", phase: "runtime" });
+
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("Quota exceeded");
+  });
+
+  it("stays silent for non-terminal retry warnings", () => {
+    useChatStore.getState().processEvent({
+      type: "error",
+      code: "retrying",
+      message: "Retrying request",
+      phase: "runtime",
+      terminal: false,
+    });
+
+    expect(boundary.notifyAttention).not.toHaveBeenCalled();
+    expect(boundary.toastWarning).toHaveBeenCalledWith("Retrying request");
+  });
+
+  it("never speaks an empty approval reason", () => {
+    useChatStore.getState().processEvent({
+      type: "ApprovalRequest",
+      payload: { id: "a1", tool_call_id: "t1", sender: "agent", action: "", description: "" },
+    });
+
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("Approval required");
+  });
+
+  it("keeps the running prompt for retry after a rejected steer", async () => {
+    boundary.steerChat.mockRejectedValue(new Error("steer failed"));
+    useChatStore.getState().sendMessage("original prompt");
+    beginTurn("original prompt");
+    useChatStore.getState().sendMessage("follow-up");
+    await vi.waitFor(() => expect(boundary.toastError).toHaveBeenCalled());
+
+    expect(useChatStore.getState().composerRestore).toBe("follow-up");
+    expect(useChatStore.getState().pendingInput).toEqual({ content: "original prompt", model: "plain" });
+
+    useChatStore.getState().processEvent({ type: "error", code: "internal", message: "Turn failed", phase: "runtime" });
+    useChatStore.getState().retryLastMessage();
+
+    expect(boundary.streamChat).toHaveBeenCalledTimes(2);
+    expect(boundary.streamChat.mock.calls[1]?.[0]).toBe("original prompt");
+  });
+
+  it("keeps media attached during an in-flight steer when the turn has already ended", async () => {
+    let finishSteer: (value: { ok: boolean }) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((resolve) => { finishSteer = resolve; }));
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.setState({ draftMedia: [{ id: "image-sent", dataUri: IMAGE }] });
+    useChatStore.getState().sendMessage("look");
+    useChatStore.setState((state) => ({ draftMedia: [...state.draftMedia, { id: "image-late", dataUri: IMAGE_2 }] }));
+
+    useChatStore.setState({ isStreaming: false });
+    finishSteer({ ok: false });
+
+    await vi.waitFor(() => expect(boundary.streamChat).toHaveBeenCalledTimes(2));
+    expect(boundary.streamChat.mock.calls[1]?.[0]).toMatchObject([
+      { type: "text", text: "look" },
+      { type: "image_url", image_url: { url: IMAGE } },
+    ]);
+    expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-late", dataUri: IMAGE_2 }]);
+  });
+
+  it("does not resend media that is still waiting for a steer acknowledgement", async () => {
+    const pending: Array<(value: { ok: boolean }) => void> = [];
+    boundary.steerChat.mockImplementation(() => new Promise((resolve) => { pending.push(resolve); }));
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.setState({ draftMedia: [{ id: "image-once", dataUri: IMAGE }] });
+    useChatStore.getState().sendMessage("look");
+    useChatStore.getState().sendMessage("and this");
+
+    expect(boundary.steerChat.mock.calls[0]?.[0]).toMatchObject([
+      { type: "text", text: "look" },
+      { type: "image_url", image_url: { url: IMAGE } },
+    ]);
+    expect(boundary.steerChat.mock.calls[1]?.[0]).toBe("and this");
+
+    for (const resolve of pending) resolve({ ok: true });
+    await vi.waitFor(() => expect(useChatStore.getState().draftMedia).toEqual([]));
+  });
+
+  it("returns in-flight media to the draft when the steer is rejected", async () => {
+    let rejectSteer: (error: Error) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((_resolve, reject) => { rejectSteer = reject; }));
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.setState({ draftMedia: [{ id: "image-retry", dataUri: IMAGE }] });
+    useChatStore.getState().sendMessage("look");
+
+    rejectSteer(new Error("steer failed"));
+    await vi.waitFor(() => expect(boundary.toastError).toHaveBeenCalled());
+    useChatStore.getState().sendMessage("look again");
+
+    expect(boundary.steerChat.mock.calls[1]?.[0]).toMatchObject([
+      { type: "text", text: "look again" },
+      { type: "image_url", image_url: { url: IMAGE } },
+    ]);
   });
 });

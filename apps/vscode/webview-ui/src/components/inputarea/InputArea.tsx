@@ -59,7 +59,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   const [cursorPos, setCursorPos] = useState(0);
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
 
-  const { isStreaming, sendMessage, abort, draftMedia, removeDraftMedia, hasProcessingMedia, getMediaInConversation, pendingInput, planMode, messages } = useChatStore();
+  const { isStreaming, sendMessage, abort, draftMedia, removeDraftMedia, hasProcessingMedia, getMediaInConversation, pendingInput, composerRestore, planMode, messages } = useChatStore();
   const { currentModel, thinkingEffort, updateModel, toggleThinking, selectThinkingEffort, models, extensionConfig, getCurrentThinkingMode } = useSettingsStore();
 
   const isProcessing = hasProcessingMedia();
@@ -114,7 +114,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   }, [mediaReq.image, mediaReq.video, currentModel, currentModelConfig, availableModels, updateModel]);
 
   useEffect(() => {
-    if (!pendingInput || (isStreaming && pendingInput.restore !== true)) {
+    if (!pendingInput || isStreaming) {
       return;
     }
 
@@ -125,15 +125,27 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
     const textContent = Content.getText(pendingInput.content);
     if (textContent) {
       setText(textContent);
-      if (pendingInput.restore === true) {
-        useChatStore.setState({ pendingInput: null });
-      }
       setTimeout(() => {
         textareaRef.current?.focus();
         adjustHeight(textareaRef.current);
       }, 0);
     }
   }, [pendingInput, isStreaming]);
+
+  useEffect(() => {
+    if (composerRestore === null) {
+      return;
+    }
+    useChatStore.setState({ composerRestore: null });
+    if (!composerRestore) {
+      return;
+    }
+    setText((current) => (current.trim() ? `${composerRestore}\n${current}` : composerRestore));
+    setTimeout(() => {
+      textareaRef.current?.focus();
+      adjustHeight(textareaRef.current);
+    }, 0);
+  }, [composerRestore]);
 
   const activeToken = useMemo(() => findActiveToken(text, cursorPos), [text, cursorPos]);
 

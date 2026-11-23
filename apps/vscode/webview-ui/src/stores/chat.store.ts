@@ -9,8 +9,8 @@ import { notifyAttention } from "@/lib/attention";
 
 import { useSettingsStore } from "./settings.store";
 import { processEvent } from "./event-handlers";
-import type { StatusUpdate, ContentPart, QuestionRequest, ToolResult } from "shared/legacy-sdk";
-import type { UIStreamEvent } from "shared/types";
+import type { ApprovalRequestPayload, StatusUpdate, ContentPart, QuestionRequest, ToolResult } from "shared/legacy-sdk";
+import type { StreamError, UIStreamEvent } from "shared/types";
 
 const HANDSHAKE_TIMEOUT_MS = 30_000;
 
@@ -76,12 +76,12 @@ export interface MediaInConversation {
 export interface DraftMediaItem {
   id: string;
   dataUri?: string;
+  steering?: boolean;
 }
 
 export interface PendingInput {
   content: string | ContentPart[];
   model: string;
-  restore?: boolean;
 }
 
 export interface QueuedItem {
@@ -101,6 +101,7 @@ export interface ChatState {
   tokenUsage: TokenUsage;
   activeTokenUsage: TokenUsage;
   pendingInput: PendingInput | null;
+  composerRestore: string | null;
   queue: QueuedItem[];
   pendingQuestion: QuestionRequest | null;
   planMode: boolean;
@@ -133,21 +134,27 @@ let attentionSuppressed = false;
 
 function notifyEventAttention(event: UIStreamEvent): void {
   if (attentionSuppressed) return;
-  const payload = (event as {
-    payload?: {
-      message?: string;
-      description?: string;
-      action?: string;
-      questions?: Array<{ question?: string }>;
-    };
-  }).payload ?? {};
   if (event.type === "error") {
-    notifyAttention(payload.message ?? "Action failed");
+    const error = event as StreamError;
+    if (error.terminal === false) return;
+    notifyAttention(error.message || "Action failed");
   } else if (event.type === "ApprovalRequest") {
-    notifyAttention(`Approval required: ${payload.description || payload.action}`);
+    const { description, action } = (event as { payload: ApprovalRequestPayload }).payload;
+    const reason = description || action;
+    notifyAttention(reason ? `Approval required: ${reason}` : "Approval required");
   } else if (event.type === "QuestionRequest") {
-    notifyAttention(payload.questions?.[0]?.question ?? "Your answer is needed.");
+    const { questions } = (event as { payload: QuestionRequest }).payload;
+    notifyAttention(questions[0]?.question || "Your answer is needed.");
   }
+}
+
+function sendableDraftMedia(draftMedia: readonly DraftMediaItem[]): DraftMediaItem[] {
+  return draftMedia.filter((item) => item.dataUri && item.steering !== true);
+}
+
+function buildDraftContent(text: string, media: readonly DraftMediaItem[]): string | ContentPart[] {
+  const dataUris = media.map((item) => item.dataUri!);
+  return dataUris.length > 0 ? Content.build(text, dataUris) : text;
 }
 
 function clearHandshakeTimer() {
@@ -197,11 +204,13 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
     });
 }
 
-function sendIdle(content: string | ContentPart[], model: string) {
+function sendIdle(content: string | ContentPart[], model: string, sentMediaIds?: ReadonlySet<string>) {
   useChatStore.setState(
     produce((draft: ChatState) => {
       clearAllInlineErrors(draft);
-      draft.draftMedia = [];
+      draft.draftMedia = sentMediaIds === undefined
+        ? []
+        : draft.draftMedia.filter((item) => !sentMediaIds.has(item.id));
       draft.isStreaming = true;
       draft.handshakeReceived = false;
       draft.pendingInput = { content, model };
@@ -222,6 +231,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   tokenUsage: createEmptyTokenUsage(),
   activeTokenUsage: createEmptyTokenUsage(),
   pendingInput: null,
+  composerRestore: null,
   queue: [],
   pendingQuestion: null,
   planMode: false,
@@ -231,10 +241,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
       get().steerNow(text);
       return;
     }
-    const { draftMedia } = get();
     const { currentModel } = useSettingsStore.getState();
-    const readyMedia = draftMedia.filter((m) => m.dataUri).map((m) => m.dataUri!);
-    const content = readyMedia.length > 0 ? Content.build(text, readyMedia) : text;
+    const content = buildDraftContent(text, sendableDraftMedia(get().draftMedia));
     if (Content.isEmpty(content)) return;
     sendIdle(content, currentModel);
   },
@@ -244,17 +252,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
       get().sendMessage(text);
       return;
     }
-    const { draftMedia } = get();
     const { currentModel } = useSettingsStore.getState();
-    const readyMedia = draftMedia.filter((m) => m.dataUri).map((m) => m.dataUri!);
-    const content = readyMedia.length > 0 ? Content.build(text, readyMedia) : text;
+    const media = sendableDraftMedia(get().draftMedia);
+    const content = buildDraftContent(text, media);
     if (Content.isEmpty(content)) return;
-    const sentMediaIds = new Set(draftMedia.filter((item) => item.dataUri).map((item) => item.id));
+    const sentMediaIds = new Set(media.map((item) => item.id));
+    set((state) => ({
+      draftMedia: state.draftMedia.map((item) => (sentMediaIds.has(item.id) ? { ...item, steering: true } : item)),
+    }));
 
     void bridge.steerChat(content)
       .then(({ ok }) => {
         if (!ok) {
-          sendIdle(content, currentModel);
+          sendIdle(content, currentModel, sentMediaIds);
           return;
         }
         set((state) => ({
@@ -262,6 +272,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }));
       })
       .catch((error: unknown) => {
+        set((state) => ({
+          draftMedia: state.draftMedia.map((item) => (
+            sentMediaIds.has(item.id) ? { id: item.id, dataUri: item.dataUri } : item
+          )),
+        }));
         get().rollbackInput(content);
         toast.error(error instanceof Error ? error.message : String(error));
       });
@@ -340,6 +355,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       tokenUsage: createEmptyTokenUsage(),
       activeTokenUsage: createEmptyTokenUsage(),
       pendingInput: null,
+      composerRestore: null,
       queue: [],
       pendingQuestion: null,
       planMode: false,
@@ -397,6 +413,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       tokenUsage: createEmptyTokenUsage(),
       activeTokenUsage: createEmptyTokenUsage(),
       pendingInput: null,
+      composerRestore: null,
       queue: [],
       pendingQuestion: null,
       planMode: false,
@@ -466,8 +483,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   rollbackInput: (content) => {
-    const { currentModel } = useSettingsStore.getState();
-    set({ pendingInput: { content, model: currentModel, restore: true } });
+    set({ composerRestore: Content.getText(content) });
   },
 
   respondQuestion: async (answers) => {
