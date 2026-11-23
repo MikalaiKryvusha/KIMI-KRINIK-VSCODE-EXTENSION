@@ -504,7 +504,7 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
         transport: "http",
         url: "https://example.test/mcp",
         source: "global",
-        origin: join(rig.homeDir, "mcp.json"),
+        origin: join(rig.homeDir, "mcp.json").replaceAll("\\", "/"),
         mutable: true,
       },
     ]);
