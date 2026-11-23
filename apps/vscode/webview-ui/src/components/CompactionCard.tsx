@@ -1,8 +1,10 @@
 import { IconLoader2 } from "@tabler/icons-react";
 import { useChatStore } from "@/stores";
+import { useT } from "@/i18n";
 
 export function CompactionCard() {
   const isCompacting = useChatStore((s) => s.isCompacting);
+  const t = useT();
 
   return (
     <div className="rounded-lg border border-border bg-muted/20 overflow-hidden">
@@ -15,7 +17,7 @@ export function CompactionCard() {
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-medium text-foreground">{isCompacting ? "Compacting context…" : "Context compacted"}</div>
+          <div className="text-xs font-medium text-foreground">{isCompacting ? t("compaction.compacting") : t("compaction.compacted")}</div>
         </div>
       </div>
     </div>

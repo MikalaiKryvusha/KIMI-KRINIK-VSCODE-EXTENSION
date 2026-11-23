@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 interface CopyButtonProps {
   content: string;
@@ -9,6 +10,7 @@ interface CopyButtonProps {
 }
 
 export function CopyButton({ content, className }: CopyButtonProps) {
+  const t = useT();
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -37,7 +39,7 @@ export function CopyButton({ content, className }: CopyButtonProps) {
       onClick={() => {
         void handleCopy();
       }}
-      title="Copy message"
+      title={t("copy.message")}
     >
       {isCopied ? <IconCheck className="size-3.5" /> : <IconCopy className="size-3.5" />}
     </Button>

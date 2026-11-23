@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 import type { SlashCommandInfo } from "shared/legacy-sdk";
 
 interface SlashCommandMenuProps {
@@ -43,6 +44,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
 }
 
 export function SlashCommandMenu({ commands, query, selectedIndex, onSelect, onHover }: SlashCommandMenuProps) {
+  const t = useT();
   const selectedRef = useRef<HTMLButtonElement>(null);
   const hoverSelectionRef = useRef<number | null>(null);
 
@@ -61,7 +63,7 @@ export function SlashCommandMenu({ commands, query, selectedIndex, onSelect, onH
   };
 
   if (commands.length === 0) {
-    return <div className="rounded-md border bg-popover shadow-md p-3 text-xs text-muted-foreground text-center">No commands found</div>;
+    return <div className="rounded-md border bg-popover shadow-md p-3 text-xs text-muted-foreground text-center">{t("slash.noCommands")}</div>;
   }
 
   return (

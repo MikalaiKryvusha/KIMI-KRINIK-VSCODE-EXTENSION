@@ -3,6 +3,7 @@ import { IconBulb, IconCheck } from "@tabler/icons-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 import type { ThinkingMode } from "shared/legacy-sdk";
 
 interface ThinkingButtonProps {
@@ -21,6 +22,7 @@ function label(effort: string): string {
 }
 
 export function ThinkingButton({ mode, effort, efforts = [], alwaysOn = false, disabled, cacheNote, onToggle, onSelectEffort }: ThinkingButtonProps) {
+  const t = useT();
   if (mode === "none") return null;
 
   const active = effort !== "off" || alwaysOn;
@@ -68,7 +70,7 @@ export function ThinkingButton({ mode, effort, efforts = [], alwaysOn = false, d
     );
   }
 
-  const tooltip = mode === "always" ? "Thinking is always enabled for this model" : active ? "Thinking enabled" : "Enable thinking";
+  const tooltip = mode === "always" ? t("thinking.alwaysOn") : active ? t("thinking.enabled") : t("thinking.enable");
   return (
     <Tooltip>
       <TooltipTrigger asChild>{button}</TooltipTrigger>

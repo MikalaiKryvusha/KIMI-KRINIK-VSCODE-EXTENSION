@@ -6,6 +6,17 @@ import { useChatStore } from "@/stores";
 import { bridge } from "@/services";
 import { cn } from "@/lib/utils";
 import { FileChange } from "shared/types";
+import { useT, type TranslationKey } from "@/i18n";
+import { useSettingsStore } from "@/stores/settings.store";
+
+const FILE_COUNT_KEYS: Record<Intl.LDMLPluralRule, TranslationKey> = {
+  zero: "files.count.other",
+  one: "files.count.one",
+  two: "files.count.other",
+  few: "files.count.few",
+  many: "files.count.many",
+  other: "files.count.other",
+};
 import { toast } from "./ui/sonner";
 
 const STATUS_CONFIG = {
@@ -35,6 +46,7 @@ interface FileItemProps {
 
 function FileItem({ file, onRevert, onKeep, onViewDiff, disabled, isStreaming }: FileItemProps) {
   const { icon: Icon, color } = STATUS_CONFIG[file.status];
+  const t = useT();
   const name = file.path.split("/").pop() || file.path;
   const dir = file.path.includes("/") ? file.path.slice(0, file.path.lastIndexOf("/")) : "";
 
@@ -52,7 +64,7 @@ function FileItem({ file, onRevert, onKeep, onViewDiff, disabled, isStreaming }:
               <IconGitCompare className="size-3" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>View Changes</TooltipContent>
+          <TooltipContent>{t("files.viewChanges")}</TooltipContent>
         </Tooltip>
         {!isStreaming && (
           <>
@@ -62,7 +74,7 @@ function FileItem({ file, onRevert, onKeep, onViewDiff, disabled, isStreaming }:
                   <IconArrowBackUp className="size-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Undo Changes</TooltipContent>
+              <TooltipContent>{t("files.undoChanges")}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -70,7 +82,7 @@ function FileItem({ file, onRevert, onKeep, onViewDiff, disabled, isStreaming }:
                   <IconCheck className="size-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Keep Changes</TooltipContent>
+              <TooltipContent>{t("files.keepChanges")}</TooltipContent>
             </Tooltip>
           </>
         )}
@@ -90,13 +102,15 @@ interface FileChangesPanelProps {
 export function FileChangesPanel({ changes }: FileChangesPanelProps) {
   const { isStreaming } = useChatStore();
   const [loading, setLoading] = useState(false);
+  const t = useT();
+  const language = useSettingsStore((state) => state.extensionConfig.language);
 
   const handleRevert = async (filePath?: string) => {
     setLoading(true);
     try {
       await bridge.revertFiles(filePath);
     } catch (error) {
-      toast.error(`Unable to undo changes: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(t("files.unableToUndo", { error: error instanceof Error ? error.message : String(error) }));
     } finally {
       setLoading(false);
     }
@@ -107,7 +121,7 @@ export function FileChangesPanel({ changes }: FileChangesPanelProps) {
     try {
       await bridge.keepChanges(filePath);
     } catch (error) {
-      toast.error(`Unable to keep changes: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(t("files.unableToKeep", { error: error instanceof Error ? error.message : String(error) }));
     } finally {
       setLoading(false);
     }
@@ -124,7 +138,7 @@ export function FileChangesPanel({ changes }: FileChangesPanelProps) {
       <div className="flex items-center justify-between px-2.5 py-1.5 text-xs bg-muted/30">
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">
-            {changes.length} file{changes.length !== 1 ? "s" : ""}
+            {t(FILE_COUNT_KEYS[new Intl.PluralRules(language).select(changes.length)], { count: changes.length })}
           </span>
           <div className="flex items-center gap-1 text-[10px] tabular-nums">
             <span className="text-green-600 dark:text-green-400">+{stats.additions}</span>
@@ -142,7 +156,7 @@ export function FileChangesPanel({ changes }: FileChangesPanelProps) {
               }}
               disabled={loading}
             >
-              Keep All
+              {t("files.keepAll")}
             </Button>
             <Button
               variant="secondary"
@@ -153,7 +167,7 @@ export function FileChangesPanel({ changes }: FileChangesPanelProps) {
               }}
               disabled={loading}
             >
-              Undo All
+              {t("files.undoAll")}
             </Button>
           </div>
         )}

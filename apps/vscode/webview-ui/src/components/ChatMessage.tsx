@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { useChatStore } from "@/stores";
 import { bridge } from "@/services";
+import { useT } from "@/i18n";
 import type { ChatMessage as ChatMessageType, UIStep, UIStepItem } from "@/stores/chat.store";
 import type { ContentPart } from "shared/legacy-sdk";
 
@@ -26,10 +27,11 @@ interface ChatMessageProps {
 }
 
 function ThinkingIndicator() {
+  const t = useT();
   return (
     <div className="flex items-center gap-2 mt-1 text-blue-500/80 py-1">
       <IconLoader3 className="size-3.5 animate-spin" />
-      <span className="text-[11px] font-medium tracking-wide">Processing…</span>
+      <span className="text-[11px] font-medium tracking-wide">{t("chat.processing")}</span>
     </div>
   );
 }
@@ -143,6 +145,7 @@ interface ForkButtonProps {
 }
 
 function ForkButton({ turnIndex, className }: ForkButtonProps) {
+  const t = useT();
   const [showConfirm, setShowConfirm] = useState(false);
   const [isForking, setIsForking] = useState(false);
   const sessionId = useChatStore((s) => s.sessionId);
@@ -165,7 +168,7 @@ function ForkButton({ turnIndex, className }: ForkButtonProps) {
         await loadSession(result.sessionId, events);
       }
     } catch (error) {
-      toast.error(`Failed to fork conversation: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(t("chat.forkFailed", { error: error instanceof Error ? error.message : String(error) }));
     } finally {
       setIsForking(false);
       setShowConfirm(false);
@@ -184,7 +187,7 @@ function ForkButton({ turnIndex, className }: ForkButtonProps) {
         )}
         onClick={handleFork}
         disabled={isForking || !sessionId}
-        title="Fork conversation from this point"
+        title={t("chat.forkTooltip")}
       >
         <IconGitFork className="size-3.5" />
       </Button>
@@ -192,13 +195,13 @@ function ForkButton({ turnIndex, className }: ForkButtonProps) {
       <StreamingConfirmDialog
         open={showConfirm}
         onOpenChange={setShowConfirm}
-        title="Fork Conversation"
+        title={t("chat.forkTitle")}
         description={
           isStreaming
-            ? "The current conversation is still generating a response. Forking will stop the generation and create a new conversation from this point. Continue?"
-            : "This will create a new conversation branching from this point. All messages after this turn will be removed in the forked conversation. Continue?"
+            ? t("chat.forkDescStreaming")
+            : t("chat.forkDesc")
         }
-        confirmLabel="Fork"
+        confirmLabel={t("chat.fork")}
         onConfirm={() => { void doFork(); }}
         confirmLoading={isForking}
         confirmDisabled={isForking}
