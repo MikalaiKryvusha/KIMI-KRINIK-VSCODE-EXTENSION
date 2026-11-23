@@ -12,8 +12,11 @@
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
+  --popover: var(--vscode-menu-background, var(--vscode-editorWidget-background, oklch(1 0 0)));
+  --popover-foreground: var(--vscode-menu-foreground, var(--vscode-editorWidget-foreground, oklch(0.141 0.005 285.823)));
+  --tooltip: var(--vscode-editorHoverWidget-background, oklch(1 0 0));
+  --tooltip-foreground: var(--vscode-editorHoverWidget-foreground, oklch(0.141 0.005 285.823));
+  --tooltip-border: var(--vscode-editorHoverWidget-border, oklch(0.92 0.004 286.32));
   --primary: oklch(0.21 0.006 285.885);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.967 0.001 286.375);
@@ -33,8 +36,11 @@
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.18 0.005 285.823);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.18 0.005 285.823);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: var(--vscode-menu-background, var(--vscode-editorWidget-background, oklch(0.18 0.005 285.823)));
+  --popover-foreground: var(--vscode-menu-foreground, var(--vscode-editorWidget-foreground, oklch(0.985 0 0)));
+  --tooltip: var(--vscode-editorHoverWidget-background, oklch(0.18 0.005 285.823));
+  --tooltip-foreground: var(--vscode-editorHoverWidget-foreground, oklch(0.985 0 0));
+  --tooltip-border: var(--vscode-editorHoverWidget-border, oklch(0.274 0.006 286.033));
   --primary: oklch(0.21 0.006 285.885);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.274 0.006 286.033);
@@ -84,6 +90,9 @@ body {
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-tooltip: var(--tooltip);
+  --color-tooltip-foreground: var(--tooltip-foreground);
+  --color-tooltip-border: var(--tooltip-border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
