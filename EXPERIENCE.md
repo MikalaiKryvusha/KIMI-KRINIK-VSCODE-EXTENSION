@@ -81,6 +81,17 @@
 
 ## Entries
 
+### EXP-0004 · 2026-11-24 · ❌→✅ · #hooks #kaif #testing
+class: claim-before-evidence
+mechanized: node .kaif/hooks/context-window.mjs --selftest
+**Context:** Kimi `--alive` had no context-window state, and I generalized that to "no project hook ran" across two chats.
+**Tried / did:** compared the session-start time with the independent `.kaif/kimi-refresh.json` marker and read the intentional dormant exits; added CLI-level Auto Compact ON and built-in-ownership cases.
+**Result:** ✅ — SessionStart had run; the false total-failure diagnosis is fixed, and a fresh official Kimi session has green `--alive` plus a real wire measurement.   → link: bugs/KAIF/04 · upstream #204
+**Lesson:** one subsystem's missing state never proves a whole pipeline failed; check an independent hook marker and every intentional early exit before naming a global outage or prescribing a reload.
+**Repro:** `node .kaif/hooks/context-window.mjs --selftest` — both dormant cases must reject `NOT running`; on a live session also read `.kaif/kimi-refresh.json` before interpreting `--alive`.
+**Trigger:** about to claim that hooks, hooks-of-one-event, or a whole agent integration did not run → check independent evidence and early exits first.
+**Not for:** a direct process spawn failure with its own error output; that is already primary evidence about the failed process.
+
 ### EXP-0003 · 2026-11-23 · ❌→✅ · #voice #windows #kaif
 class: text-in-agents-world
 mechanized: node .kaif/hooks/kimi-permission-call.mjs --selftest

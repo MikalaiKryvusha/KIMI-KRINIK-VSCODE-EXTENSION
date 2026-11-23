@@ -566,10 +566,21 @@ if (process.argv[2] === '--selftest') {
       ok(owned.status === 0 && owned.stdout === '' && owned.stderr === '',
         'KIMI KRINIK ownership: the KAIF context hook is fully dormant while the built-in controller owns the window');
       writeFileSync(join(root, DEPLOYMENT), JSON.stringify({ contextWindow: { tokens: 1048576 } }));
-      writeFileSync(join(home, 'config.toml'), '[loop_control]\nauto_compact = true\n');
+      writeFileSync(join(home, 'config.toml'), '[loop_control]\nauto_compact = true\n\n[[hooks]]\nevent = "PostToolUse"\ncommand = "node kimi-hook.mjs context-window.mjs --kimi"\n');
       const vanilla = run('PreToolUse', { tool_name: 'Read', usage: forceUsage, session_id: 'session_vanilla' });
       ok(vanilla.status === 0 && vanilla.stdout === '' && vanilla.stderr === '',
         'Vanilla Auto Compact ON: KAIF context demands are dormant without changing any other hook');
+      const alive = (id) => spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--alive'], {
+        env: { ...process.env, KIMI_CODE_HOME: home, KIMI_CODE_SESSION_ID: id, CLAUDE_PROJECT_DIR: root }, encoding: 'utf8', timeout: 20000 });
+      const vanillaAlive = alive('session_vanilla');
+      ok(vanillaAlive.status === 2 && /dormant/.test(vanillaAlive.stdout) && /Auto Compact ON/.test(vanillaAlive.stdout)
+        && !/NOT running/.test(vanillaAlive.stdout),
+      'Kimi --alive under Auto Compact ON: explicit dormant state, never a total hook-failure diagnosis');
+      writeFileSync(join(root, DEPLOYMENT), JSON.stringify({ contextWindow: { tokens: 1048576, owner: 'kimi-krinik' } }));
+      const ownedAlive = alive('session_owned');
+      ok(ownedAlive.status === 2 && /dormant/.test(ownedAlive.stdout) && /KIMI KRINIK/.test(ownedAlive.stdout)
+        && !/NOT running/.test(ownedAlive.stdout),
+      'Kimi --alive under built-in ownership: explicit dormant state, never a total hook-failure diagnosis');
     } finally { rmSync(dir, { recursive: true, force: true }); }
   }
   console.log(bad ? `selftest: ${bad} FAIL` : 'selftest: all ok');
@@ -612,6 +623,14 @@ if (handKimiId && (process.argv[2] === '--alive' || process.argv[2] === '--measu
     const w = kimiWiring(configText);
     if (!w.wired) { console.log(`KAIF hooks: the context-window hook is not wired in ${join(home, 'config.toml')} (Kimi) — nothing to judge.`); process.exit(2); }
     if (w.star) console.log(`KAIF hooks: ${w.star} KAIF hook entr${w.star === 1 ? 'y' : 'ies'} in Kimi's config carr${w.star === 1 ? 'ies' : 'y'} matcher "*" — Kimi never fires ${w.star === 1 ? 'it' : 'them'} (bugs/145); remove the matcher line.`);
+    if (cw.owner === 'kimi-krinik') {
+      console.log('KAIF context-window: dormant by design — built-in KIMI KRINIK Context Window Control owns the window. Other project hooks may still run; this says nothing about them.');
+      process.exit(2);
+    }
+    if (kimiAutoCompactEnabled(configText)) {
+      console.log('KAIF context-window: dormant by design — Auto Compact ON. Other project hooks may still run. To arm KAIF context control, set [loop_control] auto_compact = false and verify a session whose --alive is running.');
+      process.exit(2);
+    }
     const st = readJson(join(root, STATE)) || {}, id = kimiIds(sid).find((k) => st[k]);
     if (id) { console.log(`KAIF hooks: running in this Kimi session (${id}) — the context-window hook recorded it at ${st[id].at} (session by ${handKimiBy}).`); process.exit(0); }
     console.log(`KAIF hooks: NOT running in this Kimi session (${sid}) — wired in ${join(home, 'config.toml')}, yet no hook recorded the session (session by ${handKimiBy}). ` +

@@ -25,6 +25,11 @@
 
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
+### 2026-11-24 00:33 +03:00 — KAIF Kimi context control ✅ live activation, local diagnostic fix
+- Official Kimi Code CLI 2.7.2 created `session_1e622498-786b-45e0-b5f4-af8e0532ec2e`; its real output showed UserPromptSubmit hooks. `--alive` exited 0, `--measure` read the session's real `wire.jsonl` (30,750 of 891,289 = 3%), and `.kaif/context-window.json` recorded the session.
+- Added `[loop_control] auto_compact = false` to `C:/Users/krinik/.kimi-code/config.toml`; `kimi doctor config` is green. For autonomous context-controlled work use a NEW chat in official `moonshot-ai.kimi-code`; KIMI KRINIK live acceptance is still pending, and built-in ownership makes the KAIF hook dormant.
+- `bugs/KAIF/04` / upstream issue #204: Kimi `--alive` now reports Auto Compact ON and built-in ownership as explicit dormant states instead of falsely claiming that no hooks ran. Selftest covers both and is green. Correction: the previous session's claim that the dispatcher ran no hooks was false; SessionStart had written `.kaif/kimi-refresh.json` at this session's start.
+
 ### 2026-11-23 late evening — K1/K2 functionality and brand assets ✅ hygiene, committed
 - `80f882851` Control Panel visibility settings, Compact / Steer / Control, independent Context Window Control, KAIF ownership handoff and picker fixes; `a27da7a8c` context ring + live viewer, multiline messages and Working/logo.
 - `bugs/01`–`03`: multiline rendering, attachment-toggle outside-click race and stale picker results have red-to-green component/store guards; live Extension Host acceptance is still pending.
@@ -70,7 +75,7 @@ external publication wait for the owner's `AUTH:`.
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-23 22:40 +03:00, Windows): 503 passed, 1 skipped, 0 failed; typecheck and lint green. Judge re-ran the same claims at 22:40 and found no weakened checks.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 00:39 +03:00, Windows): 505 passed, 1 skipped, 0 failed; typecheck, lint and extension + webview builds green. The context-window red-to-green selftest and fresh official Kimi run are recorded in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -86,18 +91,23 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-PARKED: 2026-11-24 00:04 +03:00 — the owner stopped secondary-model completion for a soft closure and explicitly waived the judge pass. Closing hygiene is green: 505 passed, 1 skipped; typecheck, lint, extension + webview builds and README voice-check. The secondary-model checkpoint and this handover are ready for the immediate closing commit. Start the new chat with `/skill:resume`, then prove the newly wired hooks with `node .kaif/hooks/context-window.mjs --alive`. `wire-hooks --kimi` rewired 22 entries and `kimi doctor config` passed, but the old session had no hook record; a new/reloaded session is required. Live Extension Host acceptance and the robot interaction test remain open.
+PARKED: 2026-11-24 00:44 +03:00 — the owner ordered an immediate force closure after KAIF context control was activated and observed in a fresh official Kimi session. Start the next chat in official `moonshot-ai.kimi-code` (not KIMI FORK or KIMI KRINIK for the autonomous context-controlled path). The user-level engine config now has `[loop_control] auto_compact = false`. The local `--alive` diagnostic fix and delivered issue #204 are included in this handover; UI work resumes from the checklist below.
 
-KNOWLEDGE: independent Context Window Control and the one-authority handoff are written in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; the exact Cyrillic Silero + Glass voice route and owner/project naming are in `HOUSE_RULES.md` R1 and EXP-0003; secondary model's exact checkpoint and missing live evidence are in this file.
+⚠️ Force-closed 2026-11-24 00:44 +03:00: мягкое закрытие прервано словом владельца; повторное судейство остановлено, bonsai trim и README/showcase ceremonies не выполнялись — первый `/skill:end-chat-soft` оплачивает этот долг.
+Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; отдельная коррекция дана в чате.
 
-1. Read `FAREWELL_MESSAGE_FROM_THE_PREVIOUS_CHAT.md`, run `/skill:resume`, then `node .kaif/hooks/context-window.mjs --alive`. Do not assume hooks run because the config is wired.
-2. Verify the closing commit exists and the tree is clean except pre-existing `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`. If the checkpoint is still uncommitted, inspect exactly the secondary-model files named in `git status` before doing anything else.
+KNOWLEDGE: independent Context Window Control and the one-authority handoff are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; the false total-hook-failure diagnosis, exact forensics and live activation are in `bugs/KAIF/04_context_window_alive_dormant.md` and EXP-0004; the voice route is in `HOUSE_RULES.md` R1 and EXP-0003; secondary model's checkpoint and the owner's new UI/persistence requirements are in this file.
+
+1. Read `FAREWELL_MESSAGE_FROM_THE_PREVIOUS_CHAT.md` and run `/skill:resume`. In a new official Kimi session run `node .kaif/hooks/context-window.mjs --alive` and `node .kaif/hooks/context-window.mjs --measure`; expect a recorded session and a real wire measurement. Dormant Auto Compact ON / built-in ownership is exit 2, not a total hook failure.
+2. Verify the closing commit and tree. Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.
 3. Add the missing robot interaction test (open → existing model → `saveConfig` with `secondaryModel` and `effortChanged:false` → Follow main model), then run `pnpm exec vitest run --reporter=agent apps/vscode/test/secondary-model.test.ts apps/vscode/test/webview/control-panel-settings.test.tsx` and the full verification commands above.
-4. Next K1 feature: combined model + effort picker, then status pills and session header. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
-5. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
+4. Implement and test the owner's persistence requirement: the last Auto / Manual / YOLO mode, main model and reasoning effort are the defaults for a new chat and after a VS Code restart. Model/effort already use `harness.setConfig`; permission mode still needs the canonical `defaultPermissionMode` path reconciled with legacy `kimi.yoloMode`.
+5. Continue K1: combined model + effort picker, then status pills and session header. The header must display `KIMI KRINIK` and use the robot from KIMI FORK. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
+6. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
 
 ## Open bugs
 
 - 🟠 `bugs/01`–`03` — fixes and red-to-green guards are committed; live Extension Host acceptance remains before DONE.
+- 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.
 - 🔴 `bugs/152` (KAIF origin) — the extension can stay on «Starting Kimi Code…»; not reproduced; check B10 when it recurs.
 - 🟠 `bugs/151` (KAIF origin) — follow-up steer race; store-level fixes in place, live acceptance left.
