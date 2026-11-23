@@ -5,6 +5,7 @@ import type { ContextWindowThresholds, ControlPanelButton, ExtensionConfig, Inte
 import { CONTEXT_WINDOW_THRESHOLD_SETTINGS } from "shared/types";
 import { DEFAULT_SOUND_SETTINGS, type SoundSettings } from "shared/sounds";
 import type { ModelConfig, SecondaryModelSelection, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
+import type { PermissionModeName } from "shared/modes";
 import { translate, type TranslateParams, type TranslationKey } from "@/i18n/translate";
 
 let settingsSaveRevision = 0;
@@ -181,6 +182,7 @@ interface SettingsState {
   defaultModel: string | null;
   defaultThinking: boolean;
   defaultThinkingEffort?: string;
+  defaultPermissionMode: PermissionModeName;
   secondaryModel: SecondaryModelSelection | null;
   modelsLoaded: boolean;
   wireSlashCommands: SlashCommandInfo[];
@@ -203,7 +205,7 @@ interface SettingsState {
   setWorkDirModalOpen: (open: boolean) => void;
   setCurrentWorkDir: (workDir: string | null) => void;
   setWorkspaceRoot: (root: string | null) => void;
-  initModels: (models: ModelConfig[], defaultModel: string | null, defaultThinking: boolean, defaultThinkingEffort?: string, secondaryModel?: SecondaryModelSelection | null) => void;
+  initModels: (models: ModelConfig[], defaultModel: string | null, defaultThinking: boolean, defaultThinkingEffort?: string, secondaryModel?: SecondaryModelSelection | null, defaultPermissionMode?: PermissionModeName | null) => void;
   setWireSlashCommands: (commands: SlashCommandInfo[]) => void;
   setIsLoggedIn: (loggedIn: boolean) => void;
   getCurrentThinkingMode: () => ThinkingMode;
@@ -228,6 +230,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   models: [],
   defaultModel: null,
   defaultThinking: false,
+  defaultPermissionMode: "manual",
   secondaryModel: null,
   modelsLoaded: false,
   wireSlashCommands: [],
@@ -457,7 +460,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   setWorkspaceRoot: (workspaceRoot) => set({ workspaceRoot }),
 
-  initModels: (models, defaultModel, defaultThinking, defaultThinkingEffort, secondaryModel) => {
+  initModels: (models, defaultModel, defaultThinking, defaultThinkingEffort, secondaryModel, defaultPermissionMode) => {
     settingsSaveRevision += 1;
     const initialModel = defaultModel || models[0]?.id || "";
     const model = getModelById(models, initialModel);
@@ -469,6 +472,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       defaultModel,
       defaultThinking,
       defaultThinkingEffort,
+      defaultPermissionMode: defaultPermissionMode ?? "manual",
       secondaryModel: secondaryModel ?? null,
       modelsLoaded: true,
       currentModel: initialModel,

@@ -448,6 +448,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       pendingQuestion: null,
       planMode: false,
       swarmMode: false,
+      permissionMode: null,
       goal: null,
       goalArmed: false,
     });

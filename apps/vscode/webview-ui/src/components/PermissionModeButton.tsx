@@ -42,8 +42,8 @@ const MODE_TEXT: Record<PermissionModeName, string> = {
 export function PermissionModeButton() {
   const t = useT();
   const chosen = useChatStore((state) => state.permissionMode);
-  const yoloByDefault = useSettingsStore((state) => state.extensionConfig.yoloMode);
-  const mode: PermissionModeName = chosen ?? (yoloByDefault ? "yolo" : "manual");
+  const defaultPermissionMode = useSettingsStore((state) => state.defaultPermissionMode);
+  const mode = chosen ?? defaultPermissionMode;
   const ModeIcon = MODE_ICON[mode];
 
   const select = (next: PermissionModeName) => {
@@ -51,7 +51,10 @@ export function PermissionModeButton() {
     useChatStore.setState({ permissionMode: next });
     void bridge.setPermissionMode(next).then(
       (result) => {
-        if (result.mode !== null) useChatStore.setState({ permissionMode: result.mode });
+        if (result.mode !== null) {
+          useSettingsStore.setState({ defaultPermissionMode: result.mode });
+          useChatStore.setState({ permissionMode: result.mode });
+        }
       },
       (error: unknown) => {
         useChatStore.setState({ permissionMode: previous });

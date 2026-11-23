@@ -8,6 +8,8 @@ const boundary = vi.hoisted(() => ({
   toastError: vi.fn(),
   toastWarning: vi.fn(),
   notifyAttention: vi.fn(),
+  resetSession: vi.fn(),
+  clearTrackedFiles: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
@@ -16,6 +18,8 @@ vi.mock("@/services", () => ({
     steerChat: boundary.steerChat,
     abortChat: boundary.abortChat,
     trackFiles: boundary.trackFiles,
+    resetSession: boundary.resetSession,
+    clearTrackedFiles: boundary.clearTrackedFiles,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -372,5 +376,16 @@ describe("automatic follow-up steer", () => {
       goal: { objective: "Ship", status: "active" },
       goalArmed: false,
     });
+  });
+
+  it("keeps model and effort but clears the old session mode for a new conversation", async () => {
+    useSettingsStore.setState({ currentModel: "reasoning", thinkingEffort: "high" });
+    useChatStore.setState({ permissionMode: "manual" });
+
+    await useChatStore.getState().startNewConversation();
+    useChatStore.getState().sendMessage("new conversation");
+
+    expect(useChatStore.getState().permissionMode).toBeNull();
+    expect(boundary.streamChat).toHaveBeenCalledWith("new conversation", "reasoning", "high", false, undefined, {});
   });
 });

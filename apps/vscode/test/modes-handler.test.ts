@@ -29,20 +29,40 @@ function runtime(mode: "manual" | "yolo" | "auto" = "manual") {
 }
 
 function context(session: ReturnType<typeof runtime> | undefined) {
-  return { webviewId: "view-1", getSession: () => session } as never;
+  return {
+    webviewId: "view-1",
+    getSession: () => session,
+    harness: { setConfig: vi.fn(async () => undefined) },
+  } as unknown as import("../src/handlers/types").HandlerContext;
 }
 
 describe("composer mode handlers", () => {
-  it("applies the permission mode to the live session and announces the status", async () => {
+  it("persists the default and applies the permission mode to the live session", async () => {
     const live = runtime("manual");
+    const ctx = context(live);
 
-    await expect(setPermissionMode({ mode: "auto" }, context(live))).resolves.toEqual({ ok: true, mode: "auto" });
+    await expect(setPermissionMode({ mode: "auto" }, ctx)).resolves.toEqual({ ok: true, mode: "auto" });
     expect(live.setPermissionMode).toHaveBeenCalledWith("auto");
+    expect(ctx.harness.setConfig).toHaveBeenCalledWith({ defaultPermissionMode: "auto" });
     expect(live.announceStatus).toHaveBeenCalledWith("view-1");
   });
 
-  it("keeps the chosen permission mode for the first message when no session exists yet", async () => {
-    await expect(setPermissionMode({ mode: "yolo" }, context(undefined))).resolves.toEqual({ ok: true, mode: "yolo" });
+  it("persists the chosen permission mode before the first session exists", async () => {
+    const ctx = context(undefined);
+
+    await expect(setPermissionMode({ mode: "yolo" }, ctx)).resolves.toEqual({ ok: true, mode: "yolo" });
+    expect(ctx.harness.setConfig).toHaveBeenCalledWith({ defaultPermissionMode: "yolo" });
+  });
+
+  it("restores the live mode when persisting the default fails", async () => {
+    const live = runtime("manual");
+    const ctx = context(live);
+    vi.mocked(ctx.harness.setConfig).mockRejectedValueOnce(new Error("config.toml is read-only"));
+
+    await expect(setPermissionMode({ mode: "auto" }, ctx)).rejects.toThrow("config.toml is read-only");
+    expect(live.setPermissionMode).toHaveBeenNthCalledWith(1, "auto");
+    expect(live.setPermissionMode).toHaveBeenNthCalledWith(2, "manual");
+    expect(live.announceStatus).not.toHaveBeenCalled();
   });
 
   it("refuses swarm mode without a session and toggles it on a live one", async () => {

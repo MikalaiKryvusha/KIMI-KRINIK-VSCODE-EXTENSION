@@ -32,6 +32,7 @@ import {
 } from "../shared/legacy-sdk";
 import { configHandlers } from "../src/handlers/config.handler";
 import { chatHandlers } from "../src/handlers/chat.handler";
+import { modesHandlers } from "../src/handlers/modes.handler";
 import { mcpHandlers } from "../src/handlers/mcp.handler";
 import { parseHostSlashCommand, runHostSlashCommand } from "../src/handlers/slash-command";
 import type { HandlerContext } from "../src/handlers/types";
@@ -436,6 +437,31 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
 
     await rig.runtime.harness.setConfig({ yolo: true });
     await expect(plain.getConfig({ reload: true })).resolves.toMatchObject({ yolo: true });
+  });
+
+  it("persists the permission default and applies it to a fresh real session", async () => {
+    const rig = await createRuntimeRig();
+
+    await modesHandlers[Methods.SetPermissionMode]!({ mode: "auto" }, {
+      webviewId: "view-1",
+      getSession: () => undefined,
+      harness: rig.runtime.harness,
+    } as unknown as HandlerContext);
+
+    const plain = await createPlainHarness(rig.homeDir);
+    await expect(plain.getConfig({ reload: true })).resolves.toMatchObject({ defaultPermissionMode: "auto" });
+    const config = await rig.runtime.harness.getConfig({ reload: true });
+    const session = await rig.runtime.openSession({
+      webviewId: "view-1",
+      workDir: rig.workDir,
+      model: MODEL_ALIAS,
+      effort: "off",
+      yoloMode: true,
+      defaultPermissionMode: config.defaultPermissionMode,
+    });
+
+    await expect(session.session.getStatus()).resolves.toMatchObject({ permission: "auto" });
+    expect(session.legacyApprovalFlags).toEqual({ yolo: false, afk: true });
   });
 
   it("masks credential-valued MCP fields at the Webview list boundary while leaving ordinary values visible", async () => {

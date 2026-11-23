@@ -56,7 +56,7 @@
 > <!-- classes: question-already-answered, guard-not-proven-against-threat, shown-as-link,
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
->      field-dropped-in-rebuild, red-accepted-unread -->
+>      field-dropped-in-rebuild, red-accepted-unread, defaults-overwrite-session-state -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -72,6 +72,7 @@
 > | `twins-missed` | one of two layers/copies moved and the twin stayed behind |
 > | `field-dropped-in-rebuild` | a field or section silently lost when an artifact was regenerated |
 > | `red-accepted-unread` | a failing test labelled "baseline" or "flaky" before its assertion diff was read |
+> | `defaults-overwrite-session-state` | a global default is applied over a restored session's own persisted state |
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -80,6 +81,17 @@
 > Skill: `/experience` (capture a lesson · recall relevant lessons).
 
 ## Entries
+
+### EXP-0005 · 2026-11-24 · ✅ · #vscode #config #sessions
+class: defaults-overwrite-session-state
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/kimi-runtime.test.ts apps/vscode/test/webview/chat-store.test.ts
+**Context:** the last Auto / Manual / YOLO choice had to become the default for new chats and VS Code restarts without changing restored sessions.
+**Tried / did:** kept the engine default out of per-session resume state; new conversations clear the old override, while runtime applies the canonical default only when creating a session.
+**Result:** ✅ — red-to-green UI/runtime guards and a real SDK second-harness reload plus fresh Auto session passed.   → link: testcases/reports/2026-11-24_permission_defaults.md
+**Lesson:** a global default belongs at new-session creation and initial display; never seed every request from it, because that silently overwrites a restored session's own state.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/kimi-harness.integration.test.ts apps/vscode/test/webview/chat-store.test.ts` — real default persistence and the new-conversation override boundary pass.
+**Trigger:** adding or changing a persisted default for model, permission, effort, plan, or another session-scoped setting → separate new-session defaults from resume metadata before editing stores.
+**Not for:** an explicit user command to change the current session; that command should update its live state and, when required, the future default through the canonical handler.
 
 ### EXP-0004 · 2026-11-24 · ❌→✅ · #hooks #kaif #testing
 class: claim-before-evidence

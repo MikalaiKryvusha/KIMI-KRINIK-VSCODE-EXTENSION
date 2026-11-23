@@ -228,6 +228,37 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     expect(host.harness.listWorkspaceSkills).toHaveBeenCalledOnce();
   });
 
+  it("returns the persisted default permission mode with the model config", async () => {
+    host.harness.getConfig.mockResolvedValueOnce({ defaultPermissionMode: "auto", models: {} });
+
+    const result = await bridge.handle({ id: "rpc-models", method: Methods.GetModels }, "view-1");
+
+    expect(result).toMatchObject({ id: "rpc-models", result: { defaultPermissionMode: "auto" } });
+  });
+
+  it("passes the engine default permission through streamChat to session creation", async () => {
+    host.harness.getConfig.mockResolvedValueOnce({ defaultPermissionMode: "auto", models: {} });
+    const openSession = vi.spyOn(bridge.runtime, "openSession").mockResolvedValue({
+      id: "session-1",
+      summary: undefined,
+      session: {
+        workDir: root,
+        getStatus: async () => ({ model: "kimi-test", thinkingEffort: "off", planMode: false }),
+      },
+      announceSessionStart: vi.fn(),
+      prompt: vi.fn(async () => ({ status: "finished" })),
+    } as never);
+
+    const result = await bridge.handle({
+      id: "rpc-chat",
+      method: Methods.StreamChat,
+      params: { content: "hello", model: "kimi-test", effort: "off" },
+    }, "view-1");
+
+    expect(result).toEqual({ id: "rpc-chat", result: { done: true } });
+    expect(openSession).toHaveBeenCalledWith(expect.objectContaining({ defaultPermissionMode: "auto" }));
+  });
+
   it("keeps provider identity when configured models share a display name", async () => {
     host.harness.getConfig.mockResolvedValueOnce({
       defaultModel: "openai/shared",

@@ -169,4 +169,13 @@ describe("Control Panel settings", () => {
     expect(useSettingsStore.getState().currentModel).toBe("main");
     expect(useSettingsStore.getState().thinkingEffort).toBe("high");
   });
+
+  it("shows the persisted default permission before a session starts", () => {
+    useSettingsStore.setState({ defaultPermissionMode: "auto" });
+    useChatStore.setState({ permissionMode: null });
+
+    render(<PermissionModeButton />);
+
+    expect(screen.getByTestId("permission-mode").textContent).toBe("Auto");
+  });
 });

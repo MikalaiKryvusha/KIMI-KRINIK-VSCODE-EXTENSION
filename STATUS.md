@@ -25,6 +25,10 @@
 
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
+### 2026-11-24 01:26 +03:00 — permission defaults ✅ real SDK and full hygiene
+- Control Panel Auto / Manual / YOLO now persists canonical `defaultPermissionMode`; new chats clear the old session override and use that default, with legacy `kimi.yoloMode` only as fallback. Main model and reasoning effort remain the defaults for new chats and restart; restored sessions keep their own approval metadata.
+- Real SDK proof: a second harness reloaded Auto from disk and a fresh session reported `permission: "auto"` despite legacy YOLO true. Red-to-green: 8 new expectations failed before implementation, 114 targeted tests passed after. Full: 514 passed, 1 skipped; typecheck, lint and both builds green. Live VS Code restart remains K5. Report: `testcases/reports/2026-11-24_permission_defaults.md`.
+
 ### 2026-11-24 00:33 +03:00 — KAIF Kimi context control ✅ live activation, local diagnostic fix
 - Official Kimi Code CLI 2.7.2 created `session_1e622498-786b-45e0-b5f4-af8e0532ec2e`; its real output showed UserPromptSubmit hooks. `--alive` exited 0, `--measure` read the session's real `wire.jsonl` (30,750 of 891,289 = 3%), and `.kaif/context-window.json` recorded the session.
 - Added `[loop_control] auto_compact = false` to `C:/Users/krinik/.kimi-code/config.toml`; `kimi doctor config` is green. For autonomous context-controlled work use a NEW chat in official `moonshot-ai.kimi-code`; KIMI KRINIK live acceptance is still pending, and built-in ownership makes the KAIF hook dormant.
@@ -98,9 +102,8 @@ Standing falsehood: прежнее «ни один проектный хук н�
 
 KNOWLEDGE: independent Context Window Control and the one-authority handoff are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; the false total-hook-failure diagnosis, exact forensics and live activation are in `bugs/KAIF/04_context_window_alive_dormant.md` and EXP-0004; the voice route is in `HOUSE_RULES.md` R1 and EXP-0003; secondary model's checkpoint and the owner's new UI/persistence requirements are in this file.
 
-1. Implement and test the owner's persistence requirement: the last Auto / Manual / YOLO mode, main model and reasoning effort are the defaults for a new chat and after a VS Code restart. Model/effort already use `harness.setConfig`; permission mode still needs the canonical `defaultPermissionMode` path reconciled with legacy `kimi.yoloMode`.
-2. Continue K1: combined model + effort picker, then status pills and session header. The header must display `KIMI KRINIK` and use the robot from KIMI FORK. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
-3. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
+1. Continue K1: combined model + effort picker, then status pills and session header. The header must display `KIMI KRINIK` and use the robot from KIMI FORK. Keep paperclip/model/rings/settings/stop-send fixed; secondary-model robot visibility is `kimi.controlPanel.secondaryModel`.
+2. K5 preparation: drive all new controls and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.
 

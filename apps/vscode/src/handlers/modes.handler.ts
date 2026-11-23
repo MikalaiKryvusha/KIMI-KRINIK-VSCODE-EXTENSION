@@ -4,8 +4,15 @@ import type { Handler } from "./types";
 
 const setPermissionMode: Handler<{ mode: PermissionModeName }, { ok: boolean; mode: PermissionModeName | null }> = async (params, ctx) => {
   const runtime = ctx.getSession();
+  const previous = runtime?.permissionMode;
+  if (runtime !== undefined) await runtime.setPermissionMode(params.mode);
+  try {
+    await ctx.harness.setConfig({ defaultPermissionMode: params.mode });
+  } catch (error) {
+    if (runtime !== undefined && previous !== undefined && previous !== params.mode) await runtime.setPermissionMode(previous);
+    throw error;
+  }
   if (runtime === undefined) return { ok: true, mode: params.mode };
-  await runtime.setPermissionMode(params.mode);
   await runtime.announceStatus(ctx.webviewId);
   return { ok: true, mode: runtime.permissionMode };
 };

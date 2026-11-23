@@ -192,6 +192,7 @@ export interface KimiConfig {
   defaultModel: string | null;
   defaultThinking: boolean;
   defaultThinkingEffort?: string;
+  defaultPermissionMode?: import("./modes").PermissionModeName | null;
   secondaryModel?: SecondaryModelSelection | null;
   models: ModelConfig[];
 }

@@ -38,6 +38,11 @@
    loop config → one highest newly reached stage → `session.promptWithSkills(..., steerIfActive: true)`. A compaction re-arms the
    stages. With a valid KAIF marker, `contextWindow.owner = "kimi-krinik"` makes the KAIF context hook dormant; removing the owner
    hands the contour back. The KAIF hook is also dormant while stock Auto Compact is ON.
+7. **Permission defaults.** `PermissionModeButton` → `modes.handler` changes the live session and persists `defaultPermissionMode`
+   through `harness.setConfig`; a failed default write restores the previous live mode. App initialization reads the engine default
+   with legacy `kimi.yoloMode` as fallback. Starting a new conversation clears the old session override; `bridge-handler` reads the
+   current engine default and `KimiRuntime.openSession` applies it only to a new session. Resume keeps the existing approval metadata
+   and legacy-YOLO compatibility path.
 
 ## Invariants
 

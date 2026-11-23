@@ -127,6 +127,7 @@ export function useAppInit(): AppInitState {
           kimiConfig.defaultThinking,
           kimiConfig.defaultThinkingEffort,
           kimiConfig.secondaryModel,
+          kimiConfig.defaultPermissionMode ?? (extensionConfig.yoloMode ? "yolo" : "manual"),
         );
 
         const modelsCount = useSettingsStore.getState().models.length;

@@ -164,12 +164,14 @@ export class BridgeHandler {
       getSession: () => this.runtime.getSessionForView(webviewId),
       getSessionId: () => this.fileManager.getSessionId(webviewId),
       getOrCreateSession: async (model, effort, sessionId) => {
+        const config = await this.runtime.harness.getConfig();
         const runtime = await this.runtime.openSession({
           webviewId,
           workDir: this.requireWorkDir(webviewId),
           model,
           effort,
           yoloMode: VSCodeSettings.yoloMode,
+          defaultPermissionMode: config.defaultPermissionMode,
           ...(sessionId === undefined ? {} : { sessionId }),
         });
         this.fileManager.setSession(webviewId, baselineSession(runtime));

@@ -151,6 +151,7 @@ export function toWebviewConfig(config: SdkKimiConfig): WebviewKimiConfig {
     defaultModel: config.defaultModel ?? models[0]?.id ?? null,
     defaultThinking: config.thinking?.enabled !== false,
     defaultThinkingEffort: config.thinking?.effort,
+    defaultPermissionMode: config.defaultPermissionMode ?? null,
     secondaryModel: toWebviewSecondaryModel(config.secondaryModel),
     models,
   };
