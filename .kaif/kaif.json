@@ -1,0 +1,15 @@
+{
+  "framework": "KAIF",
+  "version": "2.10",
+  "released": "2026-11-22",
+  "origin": "https://github.com/MikalaiKryvusha/KAIF",
+  "tracking": "origin",
+  "sphere": "programming",
+  "agents": [
+    "kimi-code"
+  ],
+  "language": "ru",
+  "canonArtifacts": [],
+  "build": "a8297ab35775",
+  "projectName": "KIMI KRINIK"
+}

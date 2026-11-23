@@ -36,7 +36,11 @@
     "version": "changeset version",
     "version:release": "changeset version",
     "publish": "pnpm run typecheck && pnpm run lint && pnpm run sherif && pnpm run test && pnpm run build && pnpm run lint:pkg && changeset publish",
-    "prepare": "node .husky/install.mjs"
+    "prepare": "node .husky/install.mjs",
+    "kaif:version": "node .kaif/kaif-core.mjs version",
+    "kaif:check": "node .kaif/kaif-core.mjs check",
+    "kaif:update": "node .kaif/kaif-core.mjs update",
+    "kaif:voice": "node .kaif/tools/kaif-voice-lint.mjs check --genre document README.md"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.2",
@@ -69,7 +73,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}": [
       "node scripts/check-comments.mjs",
-      "oxlint --type-aware --deny-warnings"
+      "oxlint --type-aware --deny-warnings --no-error-on-unmatched-pattern"
     ],
     ".commentignore": "node scripts/check-comments.mjs"
   },
