@@ -6,6 +6,7 @@ import { Content } from "@/lib/content";
 import { useApprovalStore } from "./approval.store";
 import { toast } from "@/components/ui/sonner";
 import { notifyAttention } from "@/lib/attention";
+import { t } from "@/i18n";
 
 import { useSettingsStore } from "./settings.store";
 import { processEvent } from "./event-handlers";
@@ -137,14 +138,14 @@ function notifyEventAttention(event: UIStreamEvent): void {
   if (event.type === "error") {
     const error = event as StreamError;
     if (error.terminal === false) return;
-    notifyAttention(error.message || "Action failed");
+    notifyAttention(error.message || t("attention.actionFailed"));
   } else if (event.type === "ApprovalRequest") {
     const { description, action } = (event as { payload: ApprovalRequestPayload }).payload;
     const reason = description || action;
-    notifyAttention(reason ? `Approval required: ${reason}` : "Approval required");
+    notifyAttention(reason ? t("attention.approvalRequiredFor", { reason }) : t("attention.approvalRequired"));
   } else if (event.type === "QuestionRequest") {
     const { questions } = (event as { payload: QuestionRequest }).payload;
-    notifyAttention(questions[0]?.question || "Your answer is needed.");
+    notifyAttention(questions[0]?.question || t("attention.answerNeeded"));
   }
 }
 
@@ -184,7 +185,7 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
       s.processEvent({
         type: "error",
         code: "HANDSHAKE_TIMEOUT",
-        message: "Connection timed out.",
+        message: t("chat.connectionTimedOut"),
         phase: "runtime",
       });
     }
@@ -197,7 +198,7 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
       useChatStore.getState().processEvent({
         type: "error",
         code: "internal",
-        message: "Unable to send the message.",
+        message: t("chat.unableToSend"),
         detail,
         phase: "preflight",
       });

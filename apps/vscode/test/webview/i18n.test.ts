@@ -72,6 +72,6 @@ describe("language switch", () => {
     await useSettingsStore.getState().changeLanguage("ru");
 
     expect(useSettingsStore.getState().extensionConfig.language).toBe("zh");
-    expect(boundary.toastError).toHaveBeenCalledWith("Language was not changed: settings are read-only");
+    expect(boundary.toastError).toHaveBeenCalledWith(translate("zh", "toast.languageNotChanged", { error: "settings are read-only" }));
   });
 });

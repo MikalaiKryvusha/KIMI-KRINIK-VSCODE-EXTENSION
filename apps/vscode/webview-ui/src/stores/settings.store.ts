@@ -3,8 +3,13 @@ import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
 import type { ExtensionConfig, InterfaceLanguage } from "shared/types";
 import type { ModelConfig, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
+import { translate, type TranslateParams, type TranslationKey } from "@/i18n/translate";
 
 let settingsSaveRevision = 0;
+
+function t(key: TranslationKey, params?: TranslateParams): string {
+  return translate(useSettingsStore.getState().extensionConfig.language, key, params);
+}
 const MANAGED_KIMI_CODE_PROVIDER = "managed:kimi-code";
 
 function saveConfigWithRollback(
@@ -16,7 +21,7 @@ function saveConfigWithRollback(
   void bridge.saveConfig(config).catch((error: unknown) => {
     if (revision !== settingsSaveRevision) return;
     set(rollback);
-    toast.error(`Failed to save model settings: ${error instanceof Error ? error.message : String(error)}`);
+    toast.error(t("toast.saveModelSettingsFailed", { error: error instanceof Error ? error.message : String(error) }));
   });
 }
 
@@ -216,12 +221,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       const result = await bridge.setAutoCompact(enabled);
       set({ autoCompact: result.enabled });
       if (!result.ok) {
-        toast.error(`Auto Compact stayed ${result.enabled ? "on" : "off"}: ${result.error}`);
+        toast.error(t(result.enabled ? "toast.autoCompactStayedOn" : "toast.autoCompactStayedOff", { error: result.error }));
       } else if (!result.enabled && result.kaif === "absent") {
-        toast.warning("Auto Compact is off. This project has no KAIF marker, so no KAIF closure guards the context window.");
+        toast.warning(t("toast.autoCompactNoKaif"));
       }
     } catch (error) {
-      toast.error(`Auto Compact was not changed: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(t("toast.autoCompactNotChanged", { error: error instanceof Error ? error.message : String(error) }));
     } finally {
       set({ autoCompactPending: false });
     }
@@ -234,7 +239,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       await bridge.updateExtensionSetting({ key: "language", value: language });
     } catch (error) {
       set({ extensionConfig: { ...get().extensionConfig, language: previous } });
-      toast.error(`Language was not changed: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(t("toast.languageNotChanged", { error: error instanceof Error ? error.message : String(error) }));
     }
   },
 
@@ -242,7 +247,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       await bridge.updateExtensionSetting({ key: "autoSteer", value: enabled });
     } catch (error) {
-      toast.error(`AUTO STEER was not changed: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(t("toast.autoSteerNotChanged", { error: error instanceof Error ? error.message : String(error) }));
     }
   },
 

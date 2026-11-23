@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { bridge, Events } from "@/services";
 import { requiresManagedProviderLogin, useSettingsStore } from "@/stores";
 import type { ExtensionConfig } from "shared/types";
+import { t } from "@/i18n";
 
 export type AppStatus = "loading" | "no-workspace" | "runtime-error" | "not-logged-in" | "no-models" | "ready";
 
@@ -149,7 +150,7 @@ export function useAppInit(): AppInitState {
         if (!cancelled) {
           setState({
             status: "runtime-error",
-            errorMessage: error instanceof Error ? error.message : "Failed to initialize",
+            errorMessage: error instanceof Error ? error.message : t("init.failed"),
             modelsCount: 0,
           });
         }
