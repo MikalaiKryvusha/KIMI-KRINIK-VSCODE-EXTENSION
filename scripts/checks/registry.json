@@ -63,6 +63,7 @@
     {
       "run": "oxlint --type-aware --deny-warnings",
       "in": "package.json#lint-staged",
+      "contains": true,
       "why": "The pre-commit hook lints staged files with the same rules CI enforces."
     },
     {
