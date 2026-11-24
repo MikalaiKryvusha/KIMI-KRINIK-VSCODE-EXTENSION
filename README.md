@@ -24,11 +24,10 @@
 
 [Читать по-русски →](#russian) · [中文 →](#chinese)
 
-**KIMI KRINIK** is an improved and advanced Kimi Code extension for VS Code. The engine and the harness are the
+**KIMI KRINIK** is an improved and advanced Kimi Code extension for VS Code. The engine and the agent runtime (harness) are the
 [official Kimi Code](https://github.com/MoonshotAI/kimi-code) at its current version; the interface comes from
-[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork). The build adds what neither of them has: automatic
-compaction can be switched off, a follow-up joins the running turn with its attachments, and the agent calls you by sound
-and voice when it waits for you. The table shows what works now and what comes in 1.0.0.
+[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork). The build adds what neither project has: automatic
+context compaction (compaction) can be switched off, a follow-up joins the running turn with its attachments, and the agent alerts you with a sound and spoken message when it waits for you.
 
 ### 1. What it brings
 
@@ -37,11 +36,13 @@ and voice when it waits for you. The table shows what works now and what comes i
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | Engine | official 2.7.2 | older 2.2.0 | ✅ official 2.7.2, follows upstream |
-| Automatic compaction can be turned off, including overflow recovery and an automatic compaction already in progress; manual `/compact` stays and is not cancelled | — | — | ✅ `[loop_control] auto_compact = false` and a switch in the settings menu |
+| Automatic compaction and overflow recovery can be turned off, including an automatic compaction already in progress; manual `/compact` stays and is not cancelled | — | — | ✅ `[loop_control] auto_compact = false` and a switch in the settings menu |
 | A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ joins the turn at once with its attachments; on a failure the text returns to the input · ✅ AUTO STEER on/off in the settings menu |
-| Managed quota: 5-hour and 7-day / monthly rings with a reset countdown | — | ✅ | ✅ |
+| Managed quota: 5-hour ring with a reset countdown | — | ✅ | ✅ |
+| Managed quota: 7-day ring with a reset countdown | — | ✅ | ✅ |
+| Managed quota: monthly ring with a reset countdown | — | ✅ | ✅ |
 | Sound and voice when an approval, a question or an error waits for you | — | — | ✅ · 🚧 a sound and a volume for each event |
-| Context Window Control with configurable thresholds | — | — | ✅ the extension sends threshold prompts without KAIF and supports KAIF handoff · 🚧 live acceptance |
+| Context Window Control with configurable thresholds | — | — | ✅ the extension sends threshold prompts without KAIF and supports handing context-window control back to KAIF when it is installed · 🚧 live acceptance |
 | Interface languages | English | English, 中文 | ✅ English, 中文, Русский, chosen in the settings menu |
 | Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection · 🚧 live acceptance |
 | Live status and session header | — | ✅ | ✅ queued/changed panels, background tasks, todos, compaction viewer, session title and KIMI KRINIK robot · 🚧 live acceptance |
@@ -61,7 +62,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
   keep our changes on top.
 - **[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork)** by gxgleo67: the interface and the quota rings, ported by hand
   (Apache-2.0, reference commit `4298cb7f`, details in [THIRD_PARTY_NOTICES](apps/vscode/THIRD_PARTY_NOTICES.md)).
-- **[KAIF](https://github.com/MikalaiKryvusha/KAIF)**: the framework the extension is built in and built for.
+- **[KAIF](https://github.com/MikalaiKryvusha/KAIF)**: the framework used to develop KIMI KRINIK; the extension also supports KAIF integration.
 
 ---
 
@@ -91,11 +92,11 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 
 [Read in English →](#english) · [中文 →](#chinese)
 
-**KIMI KRINIK** — улучшенное и продвинутое расширение Kimi Code для VS Code. Движок и harness — это
+**KIMI KRINIK** — улучшенное и продвинутое расширение Kimi Code для VS Code. Движок и среда выполнения агента (harness) — это
 [официальный Kimi Code](https://github.com/MoonshotAI/kimi-code) текущей версии, интерфейс перенесён из
 [KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork). Сборка добавляет то, чего нет ни в одном из них:
-автоматический compaction выключается, сообщение во время хода вливается в ход вместе с вложениями, агент зовёт вас звуком
-и голосом, когда ждёт ответа. Таблица показывает, что уже работает и что появится в 1.0.0.
+автоматическое сжатие контекста (compaction) выключается, сообщение, отправленное во время работы агента, сразу обрабатывается в текущем ходе вместе с вложениями, агент предупреждает вас звуком
+и голосом, когда ждёт ответа.
 
 ### 1. Что нового
 
@@ -105,13 +106,15 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 |---|---|---|---|
 | Движок | официальный 2.7.2 | старый 2.2.0 | ✅ официальный 2.7.2, идёт за upstream |
 | Автоматический compaction выключается вместе с восстановлением при переполнении и уже идущим автоматическим сжатием; ручной `/compact` работает и не отменяется | — | — | ✅ `[loop_control] auto_compact = false` и переключатель в меню настроек |
-| Сообщение, отправленное во время хода | ждёт в очереди | вливается в ход, может потерять вложения | ✅ сразу вливается в ход вместе с вложениями; при ошибке текст возвращается в поле ввода · ✅ AUTO STEER вкл/выкл в меню настроек |
-| Квоты: кольца 5 часов и 7 дней / месяц с отсчётом до сброса | — | ✅ | ✅ |
+| Сообщение, отправленное во время работы агента | ждёт в очереди | обрабатывается в текущем ходе, вложения могут теряться | ✅ сразу обрабатывается в текущем ходе вместе с вложениями; при ошибке текст возвращается в поле ввода · ✅ AUTO STEER вкл/выкл в меню настроек |
+| Квота на 5 часов: кольцо с отсчётом до сброса | — | ✅ | ✅ |
+| Квота на 7 дней: кольцо с отсчётом до сброса | — | ✅ | ✅ |
+| Месячная квота: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Звук и голос, когда вас ждут одобрение, вопрос или ошибка | — | — | ✅ · 🚧 свой звук и громкость для каждого события |
-| Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ расширение само отправляет пороговые промпты без KAIF и поддерживает передачу контура при его наличии · 🚧 живая приёмка |
+| Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ расширение само отправляет пороговые промпты без KAIF; при наличии KAIF расширение позволяет передать KAIF контроль контекстного окна · 🚧 живая приёмка |
 | Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, выбор в меню настроек |
-| Панель композера: режим разрешений, Plan, Goal, Swarm, вторичная модель, кольцо контекста и его просмотр | — | ✅ | ✅ объединённый выбор модели с усилием, поиск, избранное и выбор вторичной модели · 🚧 живая приёмка |
-| Живой статус и панель сессии | — | ✅ | ✅ очередь и изменения, фоновые задачи, список задач, просмотр контекста, название сессии и робот KIMI KRINIK · 🚧 живая приёмка |
+| Панель ввода: режим разрешений, Plan, Goal, Swarm, дополнительная модель, кольцо контекста и просмотр контекста | — | ✅ | ✅ общий выбор модели и уровня рассуждений, поиск, избранное и выбор дополнительной модели · 🚧 живая приёмка |
+| Текущий статус и заголовок сессии | — | ✅ | ✅ очередь и изменения, фоновые задачи, список задач, просмотр контекста, название сессии и робот KIMI KRINIK · 🚧 живая приёмка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
 ### 2. Установка
@@ -128,7 +131,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
   держим свои изменения сверху.
 - **[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork)** от gxgleo67: интерфейс и кольца квот, перенесённые вручную
   (Apache-2.0, опорный коммит `4298cb7f`, подробности в [THIRD_PARTY_NOTICES](apps/vscode/THIRD_PARTY_NOTICES.md)).
-- **[KAIF](https://github.com/MikalaiKryvusha/KAIF)**: фреймворк, в котором расширение создаётся и для которого работает.
+- **[KAIF](https://github.com/MikalaiKryvusha/KAIF)**: фреймворк, в котором создаётся KIMI KRINIK; расширение также поддерживает интеграцию с KAIF.
 
 ---
 
@@ -158,10 +161,10 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 
 [Read in English →](#english) · [Читать по-русски →](#russian)
 
-**KIMI KRINIK** 是改进增强版 Kimi Code VS Code 扩展。引擎与 harness 来自当前版本的
+**KIMI KRINIK** 是改进增强版 Kimi Code VS Code 扩展。引擎与 agent 运行环境（harness）来自当前版本的
 [官方 Kimi Code](https://github.com/MoonshotAI/kimi-code)，界面移植自
-[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork)。在此之上，它加入了两者都没有的功能：可以关闭自动压缩；
-轮次运行中发送的消息连同附件立即并入当前轮次；智能体等待你时用提示音和语音提醒。下表列出已有功能和 1.0.0 将提供的功能。
+[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork)。在此之上，它加入了两者都没有的功能：可以关闭自动上下文压缩（compaction）；
+轮次运行中发送的消息连同附件立即并入当前轮次；智能体等待你时用提示音和语音提醒。
 
 ### 1. 新增内容
 
@@ -170,11 +173,13 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | | Kimi Code | KIMI FORK | **KIMI KRINIK** |
 |---|---|---|---|
 | 引擎 | 官方 2.7.2 | 较旧的 2.2.0 | ✅ 官方 2.7.2，跟随上游 |
-| 自动压缩可以关闭，包括上下文溢出恢复和已在进行的自动压缩；手动 `/compact` 照常可用且不会被取消 | — | — | ✅ `[loop_control] auto_compact = false` 及设置菜单中的开关 |
+| 自动上下文压缩（compaction）可以关闭，包括上下文溢出恢复和已在进行的自动压缩；手动 `/compact` 照常可用且不会被取消 | — | — | ✅ `[loop_control] auto_compact = false` 及设置菜单中的开关 |
 | 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即连同附件并入当前轮次；失败时文本回到输入框 · ✅ 设置菜单中的 AUTO STEER 开关 |
-| 托管配额：5 小时与 7 天 / 月度圆环及重置倒计时 | — | ✅ | ✅ |
-| 等待审批、问题或出现错误时的提示音与语音 | — | — | ✅ · 🚧 为每个事件设置声音与音量 |
-| 上下文窗口控制与可配置阈值 | — | — | ✅ 内置于扩展，无需 KAIF；可与 KAIF 交接 · 🚧 实际使用验收 |
+| 5 小时配额：带重置倒计时的圆环 | — | ✅ | ✅ |
+| 7 天配额：带重置倒计时的圆环 | — | ✅ | ✅ |
+| 月度配额：带重置倒计时的圆环 | — | ✅ | ✅ |
+| 需要审批、收到问题或发生错误时，用提示音和语音提醒 | — | — | ✅ · 🚧 为每个事件设置声音与音量 |
+| 上下文窗口控制与可配置阈值 | — | — | ✅ 内置扩展无需 KAIF 即可发送阈值提示；安装 KAIF 后可交还上下文窗口控制 · 🚧 实际使用验收 |
 | 界面语言 | English | English、中文 | ✅ English、中文、Русский，在设置菜单中选择 |
 | 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ 模型与推理强度合并选择器、搜索、收藏及次级模型选择 · 🚧 实际使用验收 |
 | 实时状态与会话标题栏 | — | ✅ | ✅ 排队与更改、后台任务、待办、上下文查看器、会话标题及 KIMI KRINIK 机器人 · 🚧 实际使用验收 |
@@ -190,7 +195,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 ### 3. 基础与致谢
 
 - **[Kimi Code](https://github.com/MoonshotAI/kimi-code)**（Moonshot AI）：引擎、harness 与本 monorepo（MIT；`apps/vscode`
-  中的扩展为 Apache-2.0）。我们的基线是上游 `56145f849`。每当官方发布新版本，我们执行 rebase，并将自己的改动保持在其之上。
+  中的扩展为 Apache-2.0）。我们的基线是上游 `56145f849`。每当官方发布新版本，我们都会 rebase，并把自己的改动保留在新版本之上。
 - **[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork)**（gxgleo67）：手工移植的界面与配额圆环
   （Apache-2.0，参考提交 `4298cb7f`，详见 [THIRD_PARTY_NOTICES](apps/vscode/THIRD_PARTY_NOTICES.md)）。
-- **[KAIF](https://github.com/MikalaiKryvusha/KAIF)**：本扩展的开发框架，也是它所服务的框架。
+- **[KAIF](https://github.com/MikalaiKryvusha/KAIF)**：KIMI KRINIK 的开发框架；本扩展也支持与 KAIF 集成。
