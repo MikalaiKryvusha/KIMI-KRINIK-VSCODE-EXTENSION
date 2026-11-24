@@ -23,6 +23,11 @@
 
 ---
 
+### 2026-11-25 02:14 +03:00 — replay flicker reproduced and fixed on isolated build 19
+- `bugs/25`: build-18 session replay showed one zero-assistant/response-absent frame (~21 ms). Reset, history events and completion marking now use one state transaction; live attention/queue wrappers do not run for replay.
+- Regression was red before the fix; 65 affected checks, typecheck and VSIX audit pass. Build-19 real history navigation stayed at one assistant container on every frame and ended with the restored response. Original main-profile first-prompt route remains open; isolated instant first prompt did not reproduce it.
+- Report: `testcases/reports/2026-11-25_atomic_replay_build_19.md`. NEXT: non-KAIF reference cleanup/root lint, then the known usage selector; main-profile acceptance of builds 17–19 remains pending.
+
 ### 2026-11-25 01:43 +03:00 — owner UI findings verified on isolated build 18
 - Context ring interpolates blue→yellow at 60–70% and yellow→red-orange at 70–80%, retaining endpoints outside the range. Exact 60/65/70/75/80% checks pass; the live low-usage ring is blue.
 - `bugs/26`: sound selector stays editable with per-event Off and global Sound OFF. Live RU cycle Off → Glass re-enabled volume; main-profile acceptance pending.
@@ -151,7 +156,7 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 
 - 🔧 `bugs/27_effort_persistence_and_localization.md` — isolated build-18 restart/wire/labels pass; main-profile acceptance pending.
 - 🔧 `bugs/26_sound_off_disables_dropdown.md` — isolated build-18 Off → Glass pass; main-profile acceptance pending.
-- 🔴 `bugs/25_first_prompt_assistant_message_flicker.md` — owner saw a transient Kimi entry and whole-feed flash on the first prompt; reproduction/forensics pending.
+- 🔧 `bugs/25_first_prompt_assistant_message_flicker.md` — replay flash reproduced/fixed on isolated build 19; original main-profile first-prompt variant remains unverified.
 - 🔬 `bugs/23_queued_multiline_steer_newlines.md` — owner screenshot shows the intentionally line-clamped queue preview; exact ON/OFF payload preservation still needs current-build verification, no payload loss is claimed yet.
 - 🔧 `bugs/22_first_send_stuck_in_steering_queue.md` — exactly-once/result contracts implemented; main-profile build-12 acceptance pending.
 - 🔧 `bugs/24_glass_preview_silent.md` — real packaged MP3 playback passed in isolation; main-profile build-12 acceptance pending.

@@ -62,7 +62,7 @@
 
 1. One authority per setting: the engine config owns `auto_compact`; the extension never keeps a second copy.
 2. `pendingInput` belongs to the running turn (retry); composer restoration goes through `composerRestore` only.
-3. Replayed history never triggers attention.
+3. Replayed history is applied in one state transaction and never triggers attention or live queue delivery.
 4. Only one contour delivers context-window stage prompts: built-in KIMI KRINIK ownership excludes the KAIF context hook.
 5. An optimistic `clientId` identifies one user action through bridge, runtime and live events; durable `TurnBegin`/`SteerInput`
    reconcile that record instead of creating a second bubble, while legacy events without IDs remain supported.

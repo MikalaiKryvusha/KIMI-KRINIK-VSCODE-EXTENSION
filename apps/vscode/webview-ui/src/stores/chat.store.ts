@@ -144,11 +144,9 @@ export interface ChatState {
 }
 
 let handshakeTimer: ReturnType<typeof setTimeout> | null = null;
-let attentionSuppressed = false;
 let latestOutboundClientId: string | undefined;
 
 function notifyEventAttention(event: UIStreamEvent): void {
-  if (attentionSuppressed) return;
   const { sounds } = useSettingsStore.getState().extensionConfig;
   if (event.type === "error") {
     const error = event as StreamError;
@@ -441,40 +439,31 @@ export const useChatStore = create<ChatState>((set, get) => ({
       await bridge.abortChat();
     }
 
-    set({
-      sessionId,
-      sessionTitle: null,
-      messages: [],
-      isStreaming: false,
-      isCompacting: false,
-      handshakeReceived: false,
-      draftMedia: [],
-      lastStatus: null,
-      tokenUsage: createEmptyTokenUsage(),
-      activeTokenUsage: createEmptyTokenUsage(),
-      pendingInput: null,
-      composerRestore: null,
-      queue: [],
-      queueSteerInFlight: null,
-      pendingQuestion: null,
-      planMode: false,
-      swarmMode: false,
-      goal: null,
-      goalArmed: false,
-    });
     useApprovalStore.getState().clearRequests();
-
-    attentionSuppressed = true;
-    try {
-      for (const event of events) {
-        get().processEvent(event);
-      }
-    } finally {
-      attentionSuppressed = false;
-    }
-
     set(
       produce((draft: ChatState) => {
+        draft.sessionId = sessionId;
+        draft.sessionTitle = null;
+        draft.messages = [];
+        draft.isStreaming = false;
+        draft.isCompacting = false;
+        draft.handshakeReceived = false;
+        draft.draftMedia = [];
+        draft.lastStatus = null;
+        draft.tokenUsage = createEmptyTokenUsage();
+        draft.activeTokenUsage = createEmptyTokenUsage();
+        draft.pendingInput = null;
+        draft.composerRestore = null;
+        draft.queue = [];
+        draft.queueSteerInFlight = null;
+        draft.pendingQuestion = null;
+        draft.planMode = false;
+        draft.swarmMode = false;
+        draft.goal = null;
+        draft.goalArmed = false;
+
+        for (const event of events) processEvent(draft, event);
+
         for (const msg of draft.messages) {
           if (msg.steps) {
             for (const step of msg.steps) {

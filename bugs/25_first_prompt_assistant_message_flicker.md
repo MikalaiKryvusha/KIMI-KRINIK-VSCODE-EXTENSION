@@ -1,6 +1,6 @@
 # Bug 25 — Chat feed briefly shows and then removes a Kimi message on the first prompt
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 replay flicker reproduced and fixed on isolated build 19; original main-profile first-prompt variant remains unverified
 **Version/build:** KIMI KRINIK 1.0.0 build 12 · `6fea8307b` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 23:50 +03:00, first message of a new session
 **Severity:** S2
 **Fixing:** after the owner-requested context-ring color change; before further backlog work
@@ -23,17 +23,29 @@ The symptom is owner-observed once; deterministic reproduction and frame-level e
 
 ## Forensics
 
-No screenshot, recording, DOM sequence or fresh log excerpt was captured for the transient entry. Build 12 was active on the owner's main profile. The current prompt path creates an optimistic user/assistant pair and later reconciles it by `clientId`; that path is an investigation lead, not a confirmed cause.
+2026-11-25 02:14 +03:00 — isolated build 18 instant first prompt did not reproduce assistant loss: MutationObserver/requestAnimationFrame kept one assistant container through optimistic, durable and completed states. Markdown text nodes were replaced internally without losing the container. Trace: `.tmp/k25-instant-trace.json`; final WebP `.tmp/k5-vscode/49-k25-instant-settled.webp`.
+
+Session replay on build 18 did reproduce the visual class: one frame had `assistants=0` and no `K25 response`, followed by `assistants=1` about 21 ms later. `loadSession` published `messages: []` and then issued a separate store update for every replay event. This confirms a replay/loading blank frame, not the original first-prompt route.
 
 ## Root cause / Hypotheses
 
-1. Unverified: optimistic assistant entry replacement or removal during durable-event reconciliation.
-2. Unverified: replay/loading state briefly replaces the live message list.
-3. Unverified: viewport layout movement makes a persistent entry appear to vanish.
+1. Not reproduced on isolated instant first prompt: optimistic assistant entry remained stable through durable reconciliation.
+2. Confirmed on build-18 replay: reset plus per-event store updates published an empty message list and intermediate history states.
+3. Unverified on the owner's original path: viewport movement or a different accumulated-profile event sequence.
 
-## Fix plan
+## Fix
 
-Capture the first-send sequence with fresh webview events, DOM mutations and a screen recording on a new session. Identify the entry's `clientId` and lifecycle before changing code. Add the smallest regression at the public store/component boundary that demonstrates the observed disappearance, then preserve one stable visible entry through reconciliation and reload.
+Apply initial session state, every replay event and final text completion in one Immer transaction. Live queue scheduling and attention wrappers no longer run for replay. A store subscription regression fails if any intermediate update publishes zero messages.
+
+## Fix evidence — 2026-11-25 02:14 +03:00
+
+Hygiene: the new empty-list regression was red before the change; chat store, attention and replay suites total 65 passed afterward, with typecheck green.
+
+Functional run: fresh isolated build 19 replayed between two completed sessions. Frame-level readback stayed at one assistant container throughout (`1 → 1 → 1 → 1 → 1`) and ended on `K25 response`; the build-18 `0` frame was gone. `.tmp/k25-fixed-summary.json` and WebP `.tmp/k5-vscode/50-k25-atomic-replay.webp` were read. Report: `testcases/reports/2026-11-25_atomic_replay_build_19.md`.
+
+REAL WORLD: accumulated — the owner's original build-12 first-prompt observation; data and machine — his Windows main profile; path — first prompt in Second Side Bar. The reproduced replay defect is verified only in isolated build 19; the original first-prompt/main-profile case stays open and this bug is not DONE.
+
+TWINS: searched `messages: []`, replay loops through `get().processEvent` and `attentionSuppressed` — the single `loadSession` replay path now applies atomically; `startNewConversation` intentionally remains a real empty conversation, not a replay.
 
 ## Decisions made without the owner
 

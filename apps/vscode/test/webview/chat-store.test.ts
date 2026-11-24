@@ -476,6 +476,26 @@ describe("automatic follow-up steer", () => {
     });
   });
 
+  it("replays history without publishing an empty message list", async () => {
+    useChatStore.setState({
+      messages: [{ id: "old", role: "assistant", content: "keep visible", timestamp: 1 }],
+    });
+    const lengths: number[] = [];
+    const unsubscribe = useChatStore.subscribe((state) => { lengths.push(state.messages.length); });
+
+    await useChatStore.getState().loadSession("resumed-session", [
+      { type: "TurnBegin", payload: { user_input: "Inspect" } },
+      { type: "StepBegin", payload: { n: 1 } },
+      { type: "ContentPart", payload: { type: "text", text: "restored response" } },
+      { type: "stream_complete", result: { status: "finished" } },
+    ]);
+    unsubscribe();
+
+    expect(lengths).not.toContain(0);
+    expect(useChatStore.getState().messages.map((message) => message.role)).toEqual(["user", "assistant"]);
+    expect(useChatStore.getState().messages[1]?.steps?.[0]?.items).toContainEqual({ type: "text", content: "restored response", finished: true });
+  });
+
   it("restores the working state when live tool events follow replay and clears it on genuine completion", async () => {
     await useChatStore.getState().loadSession("resumed-session", [
       { type: "TurnBegin", payload: { user_input: "Inspect" } },

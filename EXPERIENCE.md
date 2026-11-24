@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0013 · 2026-11-25 · ❌→✅ · #chat #replay #testing
+class: guard-not-proven-against-threat
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-store.test.ts
+**Context:** session replay cleared messages and emitted each historical event as a separate store update.
+**Tried / did:** observed a real zero-assistant frame, then guarded intermediate store publications and applied reset/replay/completion in one transaction.
+**Result:** ❌→✅ — build 19 kept one assistant container through real history navigation; replay attention and live queue wrappers are no longer invoked.   → link: bugs/25_first_prompt_assistant_message_flicker.md
+**Lesson:** multi-event restoration is a transaction boundary; publishing reset and every event separately creates user-visible intermediate states even when the final state is correct.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-store.test.ts -t "without publishing an empty"`; real frame evidence is in `testcases/reports/2026-11-25_atomic_replay_build_19.md`.
+**Trigger:** replaying or rehydrating a UI state through multiple events → inspect intermediate renders, not only the final state.
+**Not for:** a genuine new conversation, where an empty message list is the intended state.
+
 ### EXP-0012 · 2026-11-25 · ❌→✅ · #chat #lifecycle #testing
 class: guard-not-proven-against-threat
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/status-pills.test.tsx apps/vscode/test/session-runtime.test.ts
