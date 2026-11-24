@@ -33,6 +33,9 @@
    `promptId` to its later `TurnBegin`, and starts a non-steered running submission as its own correlated turn. `ok:false` reuses the same
    optimistic record through idempotent `sendIdle`; only the latest failed action restores its text/media. Queue lightning is store-owned,
    uses the queued ID as `clientId`, holds the remaining queue through the selected operation and restores the original index on failure.
+   A genuine completion opens a batch window: the next idle prompt carries `drainQueue`, the host emits `QueueBatchReady` immediately after
+   `session.prompt` accepts it, and every remaining item joins through sequential steering. Terminal `turnIndex` values suppress completions
+   superseded by a newer visible turn. A failed batch item restores at its original index and stops later items.
    AUTO STEER OFF asks the host for activity so an already-idle queue advances without waiting for lightning.
 3. **Attention.** `processEvent` → `notifyEventAttention` maps terminal errors, approvals, questions and completion to a `SoundEvent`;
    replay stays silent. `Voice` plays a packaged MP3 selected by event and interface language; Glass and tones use the same webview audio

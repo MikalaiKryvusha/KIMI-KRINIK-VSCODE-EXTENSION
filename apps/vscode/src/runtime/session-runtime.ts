@@ -196,8 +196,17 @@ export class SessionRuntime {
     this.webviewIds.delete(webviewId);
   }
 
-  async prompt(input: string | LegacyContentPart[], clientId?: string): Promise<PromptResult> {
-    return this.runTurnAction(input, () => this.session.prompt(toSdkPromptInput(input)), clientId);
+  async prompt(input: string | LegacyContentPart[], clientId?: string, drainQueue = false): Promise<PromptResult> {
+    return this.runTurnAction(input, async () => {
+      await this.session.prompt(toSdkPromptInput(input));
+      if (drainQueue) {
+        this.emitStreamEvent({
+          type: "QueueBatchReady",
+          payload: clientId === undefined ? {} : { clientId },
+          _sessionId: this.id,
+        });
+      }
+    }, clientId);
   }
 
   async runTurnAction(
@@ -563,6 +572,7 @@ export class SessionRuntime {
       this.emitStreamEvent({
         type: "stream_complete",
         result: { status: "finished" },
+        turnIndex: terminal.turnId,
         _sessionId: terminal.sessionId,
       });
       this.settlePrompt({ status: "finished" });
@@ -574,6 +584,7 @@ export class SessionRuntime {
       this.emitStreamEvent({
         type: "stream_complete",
         result: { status: "cancelled" },
+        turnIndex: terminal.turnId,
         _sessionId: terminal.sessionId,
       });
       this.settlePrompt({ status: "cancelled" });

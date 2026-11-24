@@ -270,7 +270,8 @@ function isStreamChatParams(value: unknown): boolean {
     && isOptionalType(value["sessionId"], "string")
     && (value["permissionMode"] === undefined || isPermissionModeName(value["permissionMode"]))
     && (value["goalObjective"] === undefined || isNonEmptyString(value["goalObjective"]))
-    && (value["clientId"] === undefined || isNonEmptyString(value["clientId"]));
+    && (value["clientId"] === undefined || isNonEmptyString(value["clientId"]))
+    && isOptionalType(value["drainQueue"], "boolean");
 }
 
 function isContent(value: unknown): boolean {

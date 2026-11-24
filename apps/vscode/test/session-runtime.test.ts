@@ -368,6 +368,22 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     });
   });
 
+  it("announces a ready queue batch as soon as its first prompt is accepted", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    runtime.subscribe("view-a");
+
+    const completion = runtime.prompt("first", "client-batch", true);
+    await vi.waitFor(() => expect(streamData(broadcasts)).toContainEqual({
+      type: "QueueBatchReady",
+      payload: { clientId: "client-batch" },
+      _sessionId: "session-1",
+    }));
+
+    sdk.emit(turnStarted());
+    sdk.emit(turnEnded("completed"));
+    await expect(completion).resolves.toEqual({ status: "finished" });
+  });
+
   it("converts legacy media keys when a prompt crosses the SDK boundary", async () => {
     const { runtime, sdk } = createRuntime();
     const completion = runtime.prompt([
@@ -476,6 +492,7 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
         {
           type: "stream_complete",
           result: { status: expectedStatus },
+          turnIndex: 7,
           _sessionId: "session-1",
         },
       ]);

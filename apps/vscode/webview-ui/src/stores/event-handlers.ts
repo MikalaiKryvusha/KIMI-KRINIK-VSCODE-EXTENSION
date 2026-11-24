@@ -322,6 +322,8 @@ const eventHandlers: Record<string, EventHandler> = {
     }
   },
 
+  QueueBatchReady: () => undefined,
+
   stream_complete: (draft, _payload: { result: RunResult }) => {
     addTokenUsage(draft.tokenUsage, draft.activeTokenUsage);
     draft.activeTokenUsage = createEmptyTokenUsage();

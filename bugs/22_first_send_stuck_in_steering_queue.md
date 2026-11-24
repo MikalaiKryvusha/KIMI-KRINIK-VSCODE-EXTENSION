@@ -49,6 +49,10 @@ Create an immediate optimistic user/assistant pair with an internal `clientId` f
 
 Used an extension-internal `clientId` rather than changing the official SDK, matching the already accepted two-ID direction in `plans/01`. Prioritized the owner's concrete first-send blocker over the longer characterization-only phase; no public release is authorized by this fix.
 
+## Owner observation — build 12
+
+2026-11-24 23:50 +03:00 — [OWNER] «сборка 12 вроде работает стабильнее по чату», «тебе быстро мои стиринг сообщения доходят» (чат). This supports the main-profile steering path, but queue, duplicate, composer, media and reload checks remain open.
+
 ## Links
 
 - `bugs/11_steer_delivery_and_immediate_display.md`

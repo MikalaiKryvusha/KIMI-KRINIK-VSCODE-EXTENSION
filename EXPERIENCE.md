@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0012 · 2026-11-25 · ❌→✅ · #chat #lifecycle #testing
+class: guard-not-proven-against-threat
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/status-pills.test.tsx apps/vscode/test/session-runtime.test.ts
+**Context:** queue draining was triggered by a mocked `TurnBegin` after the next idle prompt.
+**Tried / did:** compared real VSIX bridge logs with model requests, found no `TurnBegin` for that prompt, and moved the trigger to an explicit host-accepted `QueueBatchReady` event.
+**Result:** ❌→✅ — build 17 delivered the selected item and both remaining items in order into one active request; the final UI had one response and no queue/error.   → link: bugs/20_queue_steer_duplicate_submission.md
+**Lesson:** a lifecycle mock must be checked against the real event stream; use the host's actual acceptance boundary when the engine does not promise a later start event.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/status-pills.test.tsx apps/vscode/test/session-runtime.test.ts`, then read `testcases/reports/2026-11-25_queue_batch_build_17.md` for the real VSIX observation.
+**Trigger:** depending on a lifecycle event for queue or turn coordination → log the real event order and verify the model/UI outcome before trusting the mock.
+**Not for:** claiming every SDK backend omits `TurnBegin`; the boundary here is that consumers must not require an event the observed path did not emit.
+
 ### EXP-0011 · 2026-11-24 · ❌→✅ · #vscode #testing #windows
 class: claim-before-evidence
 mechanized: node .tmp/k5-close.mjs

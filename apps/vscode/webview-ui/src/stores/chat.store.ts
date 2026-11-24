@@ -88,6 +88,7 @@ export interface PendingInput {
   content: string | ContentPart[];
   model: string;
   clientId?: string;
+  drainQueue?: boolean;
 }
 
 export interface QueuedItem {
@@ -224,6 +225,7 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
     .streamChat(content, model, thinkingEffort, planMode, sessionId ?? undefined, {
       ...(state.permissionMode === null ? {} : { permissionMode: state.permissionMode }),
       ...(goalObjective === undefined ? {} : { goalObjective }),
+      ...(state.pendingInput?.drainQueue === true && state.pendingInput.clientId === clientId ? { drainQueue: true } : {}),
       clientId,
     })
     .catch((error: unknown) => {
@@ -236,6 +238,11 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
         phase: "preflight",
       });
     });
+}
+
+function drainNextQueuedItem(): void {
+  const next = useChatStore.getState().queue[0];
+  if (next !== undefined) useChatStore.getState().steerQueueItem(next.id);
 }
 
 function sendIdle(content: string | ContentPart[], model: string, sentMediaIds?: ReadonlySet<string>, goalObjective?: string, existingClientId?: string) {
@@ -384,6 +391,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   processEvent: (event) => {
+    if (event.type === "stream_complete" && "turnIndex" in event && event.turnIndex !== undefined) {
+      const latestTurnIndex = get().messages.reduce(
+        (latest, message) => Math.max(latest, message.turnIndex ?? -1),
+        -1,
+      );
+      if (event.turnIndex < latestTurnIndex) return;
+    }
     const completesQueueSteer = event.type === "stream_complete" && get().queueSteerInFlight !== null;
     notifyEventAttention(event);
     if (event.type === "error" && "terminal" in event && event.terminal === false) {
@@ -406,10 +420,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }),
     );
     if (completesQueueSteer) set({ queueSteerInFlight: null });
+    if (event.type === "QueueBatchReady" && get().pendingInput?.drainQueue === true
+      && (event.payload as { clientId?: string }).clientId === get().pendingInput?.clientId) {
+      drainNextQueuedItem();
+    }
 
     if (event.type === "stream_complete" || event.type === "error") {
       const { queue, isStreaming: stillStreaming } = get();
-      if (!completesQueueSteer && !stillStreaming && queue.length > 0) {
+      if (!stillStreaming && queue.length > 0) {
         setTimeout(() => get().sendNextQueued(), 50);
       }
     }
@@ -615,13 +633,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
         if (response.ok) toast.error(t("chat.unableToSend"));
         return;
       }
-      if (response.submission.state === "queued") {
+      const draining = get().pendingInput?.drainQueue === true;
+      if (response.submission.state === "queued" && !draining) {
         discardOptimisticTurn(id);
         restore();
         set({ isStreaming: true });
         return;
       }
-      set({ isStreaming: true });
+      set({ isStreaming: true, ...(draining ? { queueSteerInFlight: null } : {}) });
+      if (draining) drainNextQueuedItem();
     }).catch((error: unknown) => {
       discardOptimisticTurn(id);
       restore();
@@ -673,7 +693,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         draft.queue = rest;
         draft.isStreaming = true;
         draft.handshakeReceived = false;
-        draft.pendingInput = { content: next.content, model: next.model, clientId };
+        draft.pendingInput = { content: next.content, model: next.model, clientId, drainQueue: true };
         draft.draftMedia = [];
       }),
     );

@@ -23,8 +23,17 @@
 
 ---
 
+### 2026-11-25 00:41 +03:00 — whole-batch queue steering verified on isolated build 17
+- [OWNER] «юзер мог накидать в очередь большую пачку сообщеений, болье двух. И ожидаемое поведение при появляении окна - ВСЕ они улетают в запросы в этом окне» · 2026-11-25 00:05 +03:00 (чат). `bugs/20` now guards stale terminal ordering, host-accepted `QueueBatchReady`, sequential steering of the remainder and failure restoration.
+- Fresh-process isolated build 17 passed the real OFF three-item queue path: one lightning selected the first item, then all three reached one active model request in order; final UI has four user bubbles including the base prompt, one assistant response, empty queue and no error. Main-profile build-17 acceptance is still pending; the owner's current main installation remains build 12.
+- Hygiene: 121 affected checks, typecheck and VSIX audit pass; full suite 589 passed, 1 skipped, 1 pre-existing `usage-status-bar` selector failure. Root lint passes code checks and stops only on the previously documented deleted non-KAIF skill link in `docs/AGENTS.md`. Report: `testcases/reports/2026-11-25_queue_batch_build_17.md`.
+- NEXT: implement the owner-approved context-ring interpolation (blue through 60%, blue→yellow 60–70%, yellow→red-orange 70–80%, then constant red-orange) and one queue-button pulse instead of three; then return to `bugs/25` first-prompt feed flicker.
+
+
 ### 2026-11-24 23:39 +03:00 — FORCE-CLOSED by owner; build 12 installed, non-KAIF skill removal is mid-flight
 - Build 12 is packaged and installed on the main-profile disk; source/installed dist SHA-256 values match. The main process still needs a full restart before real-profile acceptance.
+- 2026-11-24 23:54 +03:00 — [OWNER] reproduced twice on main-profile build 12: with AUTO STEER OFF and two queued messages, one lightning activation on the first submitted both. `bugs/20` is OPEN again; this real-path failure takes priority over the context-ring color change, which is parked after only a test-import edit.
+- 2026-11-24 23:50 +03:00 — [OWNER] «сборка 12 вроде работает стабильнее по чату», «тебе быстро мои стиринг сообщения доходят» (чат). Recorded as positive main-profile steering evidence in `bugs/11` and `bugs/22`; the remaining acceptance matrix stays open. The owner also reported a first-prompt chat-feed flash and disappearing assistant message, filed as `bugs/25_first_prompt_assistant_message_flicker.md`.
 - Owner ordered all non-KAIF skills removed. `.agents/skills/` and `skills/use-kimi-code/` are deleted; root `AGENTS.md` has only partial reference cleanup. Remaining references include `apps/kimi-code/AGENTS.md`, `packages/kap-server/AGENTS.md`, `docs/AGENTS.md`, `docs/{en,zh}/guides/other-agents.md`, `.github/pull_request_template.md` and the generic `.agents` path prose in docs. Do not treat this as a completed cleanup.
 - NEXT FIRST: finish the reference cleanup and run `pnpm lint`; then fully restart VS Code, read `v1.0.0 (12)` and run the ON/OFF queue/composer/media/hook smoke recorded below. Do not start the later ideas before this integrity cut.
 - ⚠️ Force-closed 2026-11-24 23:39 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first /skill:end-chat-soft pays this debt.
@@ -135,7 +144,7 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔬 `bugs/23_queued_multiline_steer_newlines.md` — owner screenshot shows the intentionally line-clamped queue preview; exact ON/OFF payload preservation still needs current-build verification, no payload loss is claimed yet.
 - 🔧 `bugs/22_first_send_stuck_in_steering_queue.md` — exactly-once/result contracts implemented; main-profile build-12 acceptance pending.
 - 🔧 `bugs/24_glass_preview_silent.md` — real packaged MP3 playback passed in isolation; main-profile build-12 acceptance pending.
-- 🔧 `bugs/20_queue_steer_duplicate_submission.md` — fresh-process build 6 selected-item case passed; main-profile build-12 acceptance pending.
+- 🔧 `bugs/20_queue_steer_duplicate_submission.md` — whole-batch delivery verified on fresh isolated build 17; main-profile acceptance pending.
 - 🔴 `bugs/19_tool_cards_hide_working_state.md` — completed tool cards can leave no visible «Работаю…» while the turn remains active.
 - 🔴 `bugs/18_reentrant_prompt_internal_error.md` — owner hit the generic send error in both extensions; the fresh KIMI KRINIK log proves a second ordinary prompt hit the active-response guard.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — steering bubbles wait for acknowledgement and some sends are lost at a state transition.

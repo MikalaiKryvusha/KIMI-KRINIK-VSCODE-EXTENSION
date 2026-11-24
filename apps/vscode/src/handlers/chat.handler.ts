@@ -23,6 +23,7 @@ interface StreamChatParams {
   permissionMode?: PermissionModeName;
   goalObjective?: string;
   clientId?: string;
+  drainQueue?: boolean;
 }
 
 interface RespondApprovalParams {
@@ -143,7 +144,10 @@ const streamChat: Handler<StreamChatParams, { done: boolean }> = async (params, 
 
   const systemContext = await buildSystemContext(runtime.id, ctx);
   try {
-    const result = await runtime.prompt(prependSystemContext(params.content, systemContext), params.clientId);
+    const input = prependSystemContext(params.content, systemContext);
+    const result = params.drainQueue === true
+      ? await runtime.prompt(input, params.clientId, true)
+      : await runtime.prompt(input, params.clientId);
     return { done: result.status === "finished" };
   } catch (error) {
     emitCaughtError(ctx, error, "runtime", runtime.id);

@@ -68,6 +68,8 @@ beforeEach(() => {
     isStreaming: false,
     isCompacting: false,
     draftMedia: [],
+    pendingInput: null,
+    composerRestore: null,
     pendingQuestion: null,
     lastStatus: null,
     planMode: false,
@@ -162,7 +164,7 @@ describe("live status pills", () => {
     acceptSteer(RUNNING_STEER);
   });
 
-  it("does not dequeue another item on the turn completion that was already in flight", async () => {
+  it("starts draining the remaining queue when the selected steering turn completes", async () => {
     let acceptSteer: (value: SteerChatResult) => void = () => undefined;
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { acceptSteer = resolve; }));
     useChatStore.setState({
@@ -180,8 +182,9 @@ describe("live status pills", () => {
     try {
       useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" } });
       vi.advanceTimersByTime(50);
-      expect(boundary.streamChat).not.toHaveBeenCalled();
-      expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q2"]);
+      expect(boundary.streamChat).toHaveBeenCalledTimes(1);
+      expect(boundary.streamChat.mock.calls[0]?.[0]).toBe("second");
+      expect(useChatStore.getState().queue).toEqual([]);
     } finally {
       vi.useRealTimers();
     }
@@ -219,6 +222,87 @@ describe("live status pills", () => {
     useChatStore.getState().sendNextQueued();
     expect(boundary.streamChat).toHaveBeenCalledTimes(1);
     expect(boundary.streamChat.mock.calls[0]?.[0]).toBe("second");
+  });
+
+  it("does not release the next queued item when the previous turn completes after the selected steering turn begins", async () => {
+    let acceptSteer: (value: SteerChatResult) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((resolve) => { acceptSteer = resolve; }));
+    useChatStore.setState({
+      isStreaming: true,
+      queue: [
+        { id: "q1", content: "first", model: "plain" },
+        { id: "q2", content: "second", model: "plain" },
+        { id: "q3", content: "third", model: "plain" },
+      ],
+    });
+    const user = userEvent.setup();
+    render(<StatusPills />);
+    await user.click(screen.getByText("3 Queued"));
+    await user.click(screen.getAllByTitle("Insert now (steer)")[0]!);
+
+    acceptSteer(NEW_TURN_STEER);
+    await vi.waitFor(() => expect(boundary.steerChat).toHaveBeenCalledTimes(1));
+    useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "first", turnIndex: 8, clientId: "q1" } });
+
+    vi.useFakeTimers();
+    try {
+      useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 7 });
+      vi.advanceTimersByTime(50);
+      expect(boundary.streamChat).not.toHaveBeenCalled();
+      expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q2", "q3"]);
+
+      useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 8 });
+      vi.advanceTimersByTime(50);
+      expect(boundary.streamChat).toHaveBeenCalledTimes(1);
+      expect(boundary.streamChat.mock.calls[0]?.[0]).toBe("second");
+      expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q3"]);
+    } finally {
+      vi.useRealTimers();
+    }
+
+    const clientId = (boundary.streamChat.mock.calls[0]![5] as { clientId: string }).clientId;
+    boundary.steerChat.mockResolvedValue(RUNNING_STEER);
+    useChatStore.getState().processEvent({ type: "QueueBatchReady", payload: { clientId } });
+
+    await vi.waitFor(() => expect(useChatStore.getState().queue).toEqual([]));
+    expect(boundary.steerChat).toHaveBeenCalledTimes(2);
+    expect(boundary.steerChat.mock.calls[1]?.[0]).toBe("third");
+  });
+
+  it("restores a failed batch item and leaves every later item queued", async () => {
+    let rejectSteer: (error: Error) => void = () => undefined;
+    boundary.steerChat
+      .mockResolvedValueOnce(NEW_TURN_STEER)
+      .mockImplementationOnce(() => new Promise((_, reject) => { rejectSteer = reject; }));
+    useChatStore.setState({
+      isStreaming: true,
+      queue: [
+        { id: "q1", content: "first", model: "plain" },
+        { id: "q2", content: "second", model: "plain" },
+        { id: "q3", content: "third", model: "plain" },
+        { id: "q4", content: "fourth", model: "plain" },
+      ],
+    });
+    useChatStore.getState().steerQueueItem("q1");
+    await vi.waitFor(() => expect(boundary.steerChat).toHaveBeenCalledTimes(1));
+    useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "first", turnIndex: 8, clientId: "q1" } });
+
+    vi.useFakeTimers();
+    try {
+      useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 8 });
+      vi.advanceTimersByTime(50);
+    } finally {
+      vi.useRealTimers();
+    }
+    const clientId = (boundary.streamChat.mock.calls[0]![5] as { clientId: string }).clientId;
+    useChatStore.getState().processEvent({ type: "QueueBatchReady", payload: { clientId } });
+    await vi.waitFor(() => expect(boundary.steerChat).toHaveBeenCalledTimes(2));
+
+    rejectSteer(new Error("steer failed"));
+
+    await vi.waitFor(() => expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q3", "q4"]));
+    expect(boundary.steerChat).toHaveBeenCalledTimes(2);
+    expect(boundary.streamChat).toHaveBeenCalledTimes(1);
   });
 
   it.each(["unaccepted", "rejected"] as const)("restores the same queue item at its original index after an %s steer and permits a deliberate retry", async (outcome) => {

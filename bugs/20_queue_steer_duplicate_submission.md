@@ -1,10 +1,10 @@
 # Bug 20 — Queue lightning gives no immediate response and submits duplicates
 
-**Status:** 🔧 fixed and fresh-process build-6 scoped acceptance passed; main-profile build-12 acceptance pending
+**Status:** 🔧 whole-batch delivery verified on isolated build 17; main-profile acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 16:02 +03:00, owner queue steering during an active response
 **Severity:** S2
 **Fixing:** this session before the other open chat-pipeline contracts; verify in isolated VS Code
-**Fix accepted when (observable):** the first lightning click immediately removes only the selected queue row as accepted for processing and produces exactly one `steerChat` call for that item across ten rapid activations; no other queued item is sent or removed; an unaccepted or rejected call restores the same item at its original index, while a later genuine retry can send it once.
+**Fix accepted when (observable):** the first lightning click immediately removes only the selected queue row as accepted for processing and produces exactly one `steerChat` call for that item across ten rapid activations. A stale completion from a superseded turn opens no sending window. When a genuine sending window opens, every remaining queued item is submitted exactly once in its original order: the first starts the idle turn and the rest join that active turn through steering. An unaccepted or rejected call restores the current item at its original index and stops the batch, while a later genuine retry can send it once.
 
 ## Symptom
 
@@ -88,6 +88,26 @@ The harness used Playwright `browser.close()` for a `connectOverCDP()` browser a
 2. Verify PID 44644 and the 9223 endpoint are gone before launching; after launch require a new main-process start time and a new log-session directory.
 3. Read installed build 6 and source/installed dist hashes again, then repeat the two-item OFF queue/lightning scenario and read immediate plus post-completion queue/model counts.
 4. Only then accept or reject the current product changes. Do not add another queue mechanism from the invalidated runs.
+
+## Main-profile build-12 reproduction — 2026-11-24 23:54 +03:00
+
+[OWNER] «это сообщение без автостиринга. поставлено в очереди», «это второе в очереди. первое отправлю из очереди стирингом принудительным», «бля, нажал стиринг у первого, а улетело оба в чат», «да, принудительный стиринг из очереди по-прежнему по два сообщения отправляет, хотя молнию у одного нажимаю» (чат).
+
+The owner reproduced the selected-item failure twice on build 12 with AUTO STEER OFF. Two messages were visibly queued; one lightning activation on the first submitted both. This supersedes the earlier fresh-process build-6 scoped pass and reopens the real-path exactly-once contract. The earlier positive steering-speed observation does not close this defect.
+
+2026-11-25 00:05 +03:00 — [OWNER] «юзер мог накидать в очередь большую пачку сообщеений, болье двух. И ожидаемое поведение при появляении окна - ВСЕ они улетают в запросы в этом окне» (чат). The required queue behavior is now explicit: a genuine sending window drains the whole remaining batch exactly once in order, not only one item. The stale-completion guard remains necessary so that a superseded turn does not create a false window.
+
+## Fix evidence — 2026-11-25 00:41 +03:00
+
+The store-level regression reproduced both parts of the real failure before the fix: a stale completion after a newer `TurnBegin` called `streamChat("second")`, and a three-item window released only the next item. The genuine completion path now starts a batch, while `QueueBatchReady` is emitted by the host immediately after the first prompt is accepted; later items use the existing sequential steering and failure-restoration path. Terminal events carry `turnIndex`, so a superseded turn cannot open a false window. Ordinary prompts keep the original runtime call shape.
+
+TWINS: searched `completesQueueSteer`, `queueSteerInFlight` and `sendNextQueued` scheduling across `apps/vscode` and `packages` — the affected queue scheduler is only `apps/vscode/webview-ui/src/stores/chat.store.ts`; terminal correlation is added at its existing SDK adapter/runtime source.
+
+Hygiene: red-to-green store and runtime contracts, 121 affected checks, extension typecheck and VSIX static audit pass. Full extension: 589 passed, 1 skipped, 1 pre-existing `usage-status-bar` selector failure. Root lint reaches `instructions` and stops on the previously documented dead non-KAIF skill link in `docs/AGENTS.md`.
+
+Functional run: fresh-process isolated build 17, AUTO STEER OFF, three queued messages. One lightning activation first showed only `k23 first`; the genuine window then delivered `k23 first`, `k23 second` and `k23 third` in order into the same active model request. The final UI has four user bubbles including `k23 base`, one assistant response, no queue, no error and no Retry. WebP: `.tmp/k5-vscode/46-build-17-full-batch.webp`. Report: `testcases/reports/2026-11-25_queue_batch_build_17.md`.
+
+REAL WORLD: accumulated — the owner reproduced the failure twice on main-profile build 12; data and machine — his actual queued messages and Windows profile; path — forced queue steering in Second Side Bar. The corrected build 17 is verified only on the isolated real VSIX path; main-profile acceptance remains pending, so this bug is not DONE.
 
 ## Decisions made without the owner — research update
 

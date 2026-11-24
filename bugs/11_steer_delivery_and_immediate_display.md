@@ -41,6 +41,10 @@ Add a regression that observes the bubble before releasing a deferred steer ackn
 
 Grouped immediate display and boundary delivery because they share one steering state machine; their code causes remain unproven. No product code was changed in this report.
 
+## Owner observation — build 12
+
+2026-11-24 23:50 +03:00 — [OWNER] «сборка 12 вроде работает стабильнее по чату», «тебе быстро мои стиринг сообщения доходят» (чат). This is positive main-profile evidence for steering delivery, not yet proof of the complete running→idle exactly-once acceptance criterion.
+
 ## Links
 
 - `testcases/TC_K5_live_acceptance.md` C09 and C19

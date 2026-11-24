@@ -218,7 +218,7 @@ class Bridge {
     effort: string,
     planMode: boolean,
     sessionId?: string,
-    extras: { permissionMode?: PermissionModeName; goalObjective?: string; clientId?: string } = {},
+    extras: { permissionMode?: PermissionModeName; goalObjective?: string; clientId?: string; drainQueue?: boolean } = {},
   ) {
     return this.call<{ done: boolean }>(Methods.StreamChat, { content, model, effort, planMode, sessionId, ...extras });
   }
