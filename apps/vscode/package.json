@@ -188,6 +188,7 @@
         },
         "kimi.attentionVoiceCommand": {
           "type": "array",
+          "scope": "machine",
           "default": [],
           "description": "Command used to play attention messages; {file} is replaced with the phrase file"
         },
