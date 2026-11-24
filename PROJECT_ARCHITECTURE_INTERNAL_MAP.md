@@ -66,3 +66,5 @@
 4. Only one contour delivers context-window stage prompts: built-in KIMI KRINIK ownership excludes the KAIF context hook.
 5. An optimistic `clientId` identifies one user action through bridge, runtime and live events; durable `TurnBegin`/`SteerInput`
    reconcile that record instead of creating a second bubble, while legacy events without IDs remain supported.
+6. The engine config's `thinking.effort` owns the global default for new sessions, including explicit above-default MAX/XHigh choices;
+   resumed sessions keep and announce their own engine status. Compact and expanded picker labels translate that value without persisting a second copy.

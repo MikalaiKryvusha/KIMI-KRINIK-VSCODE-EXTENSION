@@ -62,7 +62,7 @@ export function SoundSettingsModal() {
         <div className="space-y-3 py-1">
           {SOUND_EVENTS.map((event) => {
             const setting = sounds[event];
-            const disabled = !soundEnabled || setting.sound === "off";
+            const playbackDisabled = !soundEnabled || setting.sound === "off";
             return (
               <div key={event} className="rounded-md border border-border p-2 space-y-1.5" data-testid={`sound-row-${event}`}>
                 <div className="flex items-center justify-between gap-2">
@@ -72,7 +72,6 @@ export function SoundSettingsModal() {
                   </div>
                   <Select
                     value={setting.sound}
-                    disabled={disabled}
                     onValueChange={(value) => {
                       if (isSoundChoice(value)) update(event, { ...setting, sound: value });
                     }}
@@ -96,7 +95,7 @@ export function SoundSettingsModal() {
                     max={100}
                     step={5}
                     value={setting.volume}
-                    disabled={disabled}
+                    disabled={playbackDisabled}
                     aria-label={t("sound.volume", { volume: setting.volume })}
                     onChange={(changeEvent) => update(event, { ...setting, volume: Number(changeEvent.target.value) })}
                     className="flex-1 rounded accent-current outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
@@ -105,7 +104,7 @@ export function SoundSettingsModal() {
                   <Button
                     variant="ghost"
                     size="icon-xs"
-                    disabled={disabled}
+                    disabled={playbackDisabled}
                     title={t("sound.preview")}
                     onClick={() => previewSound(event, setting)}
                   >

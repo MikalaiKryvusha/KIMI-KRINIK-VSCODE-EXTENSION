@@ -147,4 +147,34 @@ describe("combined model and effort picker", () => {
     expect(screen.getByRole("option", { name: /Reasoning/ })).not.toBeNull();
     expect(screen.getByRole("option", { name: /Other/ })).not.toBeNull();
   });
+
+  it.each([
+    ["en", "Max", "High", "Low", "High", "Max"],
+    ["ru", "МАКС", "Выс.", "Низкий", "Высокий", "МАКС"],
+    ["zh", "最大", "高", "低", "高", "最大"],
+  ] as const)("localizes compact and full effort labels for %s", async (language, compactMax, compactHigh, fullLow, fullHigh, fullMax) => {
+    const models = [{
+      id: "reasoning",
+      name: "Reasoning",
+      provider: "managed:kimi-code",
+      capabilities: ["thinking"],
+      support_efforts: ["low", "high", "max"],
+      default_effort: "high",
+      max_context_tokens: 128_000,
+    }];
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language } });
+    useSettingsStore.getState().initModels(models, "reasoning", true, "max");
+    const user = userEvent.setup();
+    render(<ModelPicker availableModels={models} hasConversationHistory={false} />);
+    const trigger = screen.getByTestId("model-picker");
+
+    expect(trigger.textContent).toBe(`Reasoning · ${compactMax}`);
+    await user.click(trigger);
+    expect(screen.getByRole("button", { name: fullLow })).not.toBeNull();
+    expect(screen.getByRole("button", { name: fullHigh })).not.toBeNull();
+    expect(screen.getByRole("button", { name: fullMax })).not.toBeNull();
+
+    await user.click(screen.getByRole("button", { name: fullHigh }));
+    expect(trigger.textContent).toBe(`Reasoning · ${compactHigh}`);
+  });
 });

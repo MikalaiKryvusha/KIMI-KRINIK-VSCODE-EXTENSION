@@ -53,11 +53,32 @@ describe("Sound Settings", () => {
     expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "soundEnabled", value: false });
     const volume = document.querySelector('input[type="range"]') as HTMLInputElement;
     expect(volume.disabled).toBe(true);
+    expect(screen.getAllByRole("combobox")[0]!).toHaveProperty("disabled", false);
     expect(volume.className).toContain("accent-current");
     expect(volume.className).toContain("outline-none");
     const preview = screen.getAllByTitle("Preview")[0] as HTMLButtonElement;
     expect(preview.disabled).toBe(true);
     await user.click(preview);
     expect(boundary.previewSound).not.toHaveBeenCalled();
+  });
+
+  it("keeps an Off event selector usable so its sound can be enabled again", async () => {
+    const user = userEvent.setup();
+    render(<SoundSettingsModal />);
+    const selector = screen.getAllByRole("combobox")[0]!;
+
+    await user.click(selector);
+    await user.click(await screen.findByRole("option", { name: "Off" }));
+
+    expect(selector).toHaveProperty("disabled", false);
+    expect(document.querySelector('input[type="range"]')).toHaveProperty("disabled", true);
+    await user.click(selector);
+    await user.click(await screen.findByRole("option", { name: "Glass" }));
+
+    expect(useSettingsStore.getState().extensionConfig.sounds.approval.sound).toBe("glass");
+    expect(boundary.updateExtensionSetting).toHaveBeenLastCalledWith({
+      key: "sounds",
+      value: expect.objectContaining({ approval: expect.objectContaining({ sound: "glass" }) }),
+    });
   });
 });

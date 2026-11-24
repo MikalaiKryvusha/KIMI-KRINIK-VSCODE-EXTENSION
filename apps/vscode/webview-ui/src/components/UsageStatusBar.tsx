@@ -17,7 +17,38 @@ import { ContextViewerDialog } from "./ContextViewerDialog";
 
 const USAGE_POLL_INTERVAL_MS = 60_000;
 const COUNTDOWN_TICK_MS = 60_000;
-const CONTEXT_RING_COLOR = "#3B82F6";
+type Rgb = readonly [number, number, number];
+
+const CONTEXT_RING_BLUE: Rgb = [59, 130, 246];
+const CONTEXT_RING_YELLOW: Rgb = [250, 204, 21];
+const CONTEXT_RING_RED_ORANGE: Rgb = [255, 69, 0];
+const CONTEXT_RING_TRANSITION_START = 0.6;
+const CONTEXT_RING_YELLOW_AT = 0.7;
+const CONTEXT_RING_TRANSITION_END = 0.8;
+
+function formatRingColor(color: Rgb): string {
+  return `rgb(${color[0]} ${color[1]} ${color[2]})`;
+}
+
+function mixRingColor(from: Rgb, to: Rgb, progress: number): string {
+  return formatRingColor([
+    Math.round(from[0] + (to[0] - from[0]) * progress),
+    Math.round(from[1] + (to[1] - from[1]) * progress),
+    Math.round(from[2] + (to[2] - from[2]) * progress),
+  ]);
+}
+
+export function contextRingColor(ratio: number): string {
+  if (ratio <= CONTEXT_RING_TRANSITION_START) return formatRingColor(CONTEXT_RING_BLUE);
+  if (ratio >= CONTEXT_RING_TRANSITION_END) return formatRingColor(CONTEXT_RING_RED_ORANGE);
+  if (ratio < CONTEXT_RING_YELLOW_AT) {
+    const progress = Number(((ratio - CONTEXT_RING_TRANSITION_START) / (CONTEXT_RING_YELLOW_AT - CONTEXT_RING_TRANSITION_START)).toFixed(12));
+    return mixRingColor(CONTEXT_RING_BLUE, CONTEXT_RING_YELLOW, progress);
+  }
+  const progress = Number(((ratio - CONTEXT_RING_YELLOW_AT) / (CONTEXT_RING_TRANSITION_END - CONTEXT_RING_YELLOW_AT)).toFixed(12));
+  return mixRingColor(CONTEXT_RING_YELLOW, CONTEXT_RING_RED_ORANGE, progress);
+}
+
 
 function quotaRingColor(ratio: number): string | undefined {
   if (ratio < 0.7) return undefined;
@@ -79,7 +110,7 @@ function ContextRing({ ratio, label, detail }: ContextRingProps) {
             data-testid="context-ring"
             onClick={() => setContextOpen(true)}
             className="flex items-center rounded-full cursor-pointer outline-none transition-opacity hover:opacity-75 focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            style={{ color: CONTEXT_RING_COLOR }}
+            style={{ color: contextRingColor(ratio) }}
             aria-label={t("context.tooltip")}
           >
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block -rotate-90" aria-hidden="true">

@@ -650,7 +650,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
     });
   });
 
-  it("keeps a pick above the model's delivered default session-only", async () => {
+  it("persists a pick above the model's delivered default as the global default", async () => {
     mockConfig();
 
     await bridge.handle(
@@ -660,7 +660,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
 
     expect(host.harness.setConfig).toHaveBeenCalledWith({
       defaultModel: "kimi/reasoning",
-      thinking: { enabled: true },
+      thinking: { enabled: true, effort: "max" },
     });
   });
 
@@ -681,7 +681,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
     });
   });
 
-  it("keeps an xhigh pick session-only when the default comes from the Anthropic profile inference", async () => {
+  it("persists an xhigh pick above the default from the Anthropic profile inference", async () => {
     host.harness.getConfig.mockResolvedValue({
       defaultModel: "custom/claude",
       models: { "custom/claude": { provider: "custom", model: "claude-opus-4-7" } },
@@ -694,7 +694,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
 
     expect(host.harness.setConfig).toHaveBeenCalledWith({
       defaultModel: "custom/claude",
-      thinking: { enabled: true },
+      thinking: { enabled: true, effort: "xhigh" },
     });
   });
 

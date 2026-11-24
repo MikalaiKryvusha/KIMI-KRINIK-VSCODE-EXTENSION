@@ -23,6 +23,14 @@
 
 ---
 
+### 2026-11-25 01:43 +03:00 — owner UI findings verified on isolated build 18
+- Context ring interpolates blue→yellow at 60–70% and yellow→red-orange at 70–80%, retaining endpoints outside the range. Exact 60/65/70/75/80% checks pass; the live low-usage ring is blue.
+- `bugs/26`: sound selector stays editable with per-event Off and global Sound OFF. Live RU cycle Off → Glass re-enabled volume; main-profile acceptance pending.
+- `bugs/27`: explicit MAX/XHigh choices now persist above the model's delivered default. Isolated MAX survived a full VS Code restart, compact RU showed МАКС, the menu showed full words, and the real request body carried `thinking.effort="max"`. EN/RU/ZH label cases pass; main-profile acceptance pending.
+- Queue addition now runs one pulse/one second; the real build-18 DOM exposes one animation iteration. Full suite 595 passed, 1 skipped, 1 pre-existing usage selector failure; root lint reaches only the documented dead docs reference. Report: `testcases/reports/2026-11-25_ui_controls_build_18.md`.
+- NEXT: owner-flagged `bugs/25` first-prompt feed flicker, then the documented non-KAIF reference cleanup so root lint can exit 0. Builds 17–18 remain isolated; main profile remains build 12.
+
+
 ### 2026-11-25 00:41 +03:00 — whole-batch queue steering verified on isolated build 17
 - [OWNER] «юзер мог накидать в очередь большую пачку сообщеений, болье двух. И ожидаемое поведение при появляении окна - ВСЕ они улетают в запросы в этом окне» · 2026-11-25 00:05 +03:00 (чат). `bugs/20` now guards stale terminal ordering, host-accepted `QueueBatchReady`, sequential steering of the remainder and failure restoration.
 - Fresh-process isolated build 17 passed the real OFF three-item queue path: one lightning selected the first item, then all three reached one active model request in order; final UI has four user bubbles including the base prompt, one assistant response, empty queue and no error. Main-profile build-17 acceptance is still pending; the owner's current main installation remains build 12.
@@ -141,6 +149,9 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - ✅ `ideas/03_extension_general_settings.md` — owner approved an extension-localized General Settings page with no duplicate owners; Context Window Control and thresholds move there from Control Panel. Planned for the next development cut, not started during closure.
 ## Open bugs
 
+- 🔧 `bugs/27_effort_persistence_and_localization.md` — isolated build-18 restart/wire/labels pass; main-profile acceptance pending.
+- 🔧 `bugs/26_sound_off_disables_dropdown.md` — isolated build-18 Off → Glass pass; main-profile acceptance pending.
+- 🔴 `bugs/25_first_prompt_assistant_message_flicker.md` — owner saw a transient Kimi entry and whole-feed flash on the first prompt; reproduction/forensics pending.
 - 🔬 `bugs/23_queued_multiline_steer_newlines.md` — owner screenshot shows the intentionally line-clamped queue preview; exact ON/OFF payload preservation still needs current-build verification, no payload loss is claimed yet.
 - 🔧 `bugs/22_first_send_stuck_in_steering_queue.md` — exactly-once/result contracts implemented; main-profile build-12 acceptance pending.
 - 🔧 `bugs/24_glass_preview_silent.md` — real packaged MP3 playback passed in isolation; main-profile build-12 acceptance pending.

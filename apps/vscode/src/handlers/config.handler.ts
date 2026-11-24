@@ -43,13 +43,7 @@ const saveConfig: Handler<SessionConfig, { ok: boolean }> = async (params, ctx) 
   const effort = sessionConfigEffort(params);
   const effortChanged = params.effortChanged !== false;
   const config = await ctx.harness.getConfig({ reload: true });
-  const model = config.models?.[params.model];
-  const providerType =
-    model === undefined ? undefined : (config.providers?.[model.provider]?.type ?? model.protocol);
-  const full = thinkingConfig(
-    effort,
-    model === undefined ? undefined : effectiveModelAlias(model, providerType),
-  );
+  const full = thinkingConfig(effort);
   const patch = effortChanged ? full : { enabled: full.enabled };
   if (
     config.defaultModel !== params.model
@@ -194,21 +188,9 @@ function sessionConfigEffort(config: SessionConfig): ThinkingEffort {
   return config.thinking === true ? "on" : "off";
 }
 
-function thinkingConfig(
-  effort: ThinkingEffort,
-  model?: Pick<ModelAlias, "supportEfforts" | "defaultEffort">,
-): { enabled: boolean; effort?: string } {
+function thinkingConfig(effort: ThinkingEffort): { enabled: boolean; effort?: string } {
   if (effort === "off") return { enabled: false };
   if (effort === "on") return { enabled: true };
-  const efforts = model?.supportEfforts;
-  if (efforts !== undefined && efforts.includes(effort)) {
-    const declared = model?.defaultEffort;
-    const ceiling =
-      declared !== undefined && efforts.includes(declared)
-        ? efforts.indexOf(declared)
-        : efforts.length - 2;
-    if (efforts.indexOf(effort) > ceiling) return { enabled: true };
-  }
   return { enabled: true, effort };
 }
 

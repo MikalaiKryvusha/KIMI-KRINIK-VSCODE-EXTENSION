@@ -126,16 +126,6 @@ function defaultEffortForModel(model: ModelConfig, defaultThinking: boolean, con
   return defaultThinking ? "on" : "off";
 }
 
-function persistsAsDefaultEffort(model: ModelConfig, effort: string): boolean {
-  const efforts = model.support_efforts ?? [];
-  const declared = model.default_effort;
-  const ceiling =
-    declared !== undefined && efforts.includes(declared)
-      ? efforts.indexOf(declared)
-      : efforts.length - 2;
-  return efforts.indexOf(effort) <= ceiling;
-}
-
 export function isImageModel(model: ModelConfig): boolean {
   return model.capabilities.includes("image_in");
 }
@@ -356,8 +346,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       defaultThinkingEffort:
         effortChanged &&
         thinkingEffort !== "off" &&
-        thinkingEffort !== "on" &&
-        persistsAsDefaultEffort(model, thinkingEffort)
+        thinkingEffort !== "on"
           ? thinkingEffort
           : defaultThinkingEffort,
     });
@@ -430,8 +419,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       defaultThinking: thinkingEffort !== "off",
       defaultThinkingEffort:
         thinkingEffort !== "off" &&
-        thinkingEffort !== "on" &&
-        persistsAsDefaultEffort(model, thinkingEffort)
+        thinkingEffort !== "on"
           ? thinkingEffort
           : defaultThinkingEffort,
     });

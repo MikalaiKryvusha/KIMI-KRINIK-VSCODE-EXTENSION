@@ -102,7 +102,7 @@ describe("live status pills", () => {
     expect(screen.getByTitle("+3 / −1")).not.toBeNull();
   });
 
-  it("limits the new-queue pulse to three cycles", async () => {
+  it("uses one queue pulse when a message is added", async () => {
     render(<StatusPills />);
     act(() => {
       useChatStore.setState({ queue: [{ id: "q1", content: "first", model: "plain" }] });
@@ -111,7 +111,7 @@ describe("live status pills", () => {
     const pill = await screen.findByText("1 Queued");
     const flash = pill.parentElement?.querySelector("span.absolute");
     expect(flash?.className).toContain("animate-ping");
-    expect(flash?.className).toContain("[animation-iteration-count:3]");
+    expect(flash?.className).toContain("[animation-iteration-count:1]");
   });
 
   it("optimistically removes a steered queue item and submits it only once across ten activations", async () => {

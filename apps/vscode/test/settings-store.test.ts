@@ -436,7 +436,7 @@ describe("Webview thinking effort parity with the TUI", () => {
     expect(useSettingsStore.getState().defaultThinkingEffort).toBe("high");
   });
 
-  it("does not seed a pick above the model's delivered default", () => {
+  it("seeds a pick above the model's delivered default for future sessions", () => {
     boundary.saveConfig.mockResolvedValue({ ok: true });
     useSettingsStore.getState().initModels([
       {
@@ -453,10 +453,10 @@ describe("Webview thinking effort parity with the TUI", () => {
 
     expect(useSettingsStore.getState().thinkingEffort).toBe("high");
     expect(boundary.saveConfig).toHaveBeenCalledWith({ model: "reasoning", thinking: true, effort: "high" });
-    expect(useSettingsStore.getState().defaultThinkingEffort).toBeUndefined();
+    expect(useSettingsStore.getState().defaultThinkingEffort).toBe("high");
   });
 
-  it("does not seed the top tier when the model declares no default", () => {
+  it("seeds the top tier for future sessions when the model declares no default", () => {
     boundary.saveConfig.mockResolvedValue({ ok: true });
     useSettingsStore.getState().initModels([
       {
@@ -472,7 +472,27 @@ describe("Webview thinking effort parity with the TUI", () => {
 
     expect(useSettingsStore.getState().thinkingEffort).toBe("high");
     expect(boundary.saveConfig).toHaveBeenCalledWith({ model: "reasoning", thinking: true, effort: "high" });
-    expect(useSettingsStore.getState().defaultThinkingEffort).toBeUndefined();
+    expect(useSettingsStore.getState().defaultThinkingEffort).toBe("high");
+  });
+
+  it("restores MAX for future sessions after the persisted selection is reloaded", () => {
+    boundary.saveConfig.mockResolvedValue({ ok: true });
+    const models = [{
+      id: "reasoning",
+      name: "Reasoning",
+      provider: "managed:kimi-code",
+      capabilities: ["thinking"],
+      support_efforts: ["low", "high", "max"],
+      default_effort: "high",
+    }];
+    useSettingsStore.getState().initModels(models, "reasoning", true, "high");
+
+    useSettingsStore.getState().selectThinkingEffort("max");
+
+    expect(useSettingsStore.getState().defaultThinkingEffort).toBe("max");
+    expect(boundary.saveConfig).toHaveBeenCalledWith({ model: "reasoning", thinking: true, effort: "max" });
+    useSettingsStore.getState().initModels(models, "reasoning", true, "max");
+    expect(useSettingsStore.getState().thinkingEffort).toBe("max");
   });
 
   const SWITCH_MODELS = [

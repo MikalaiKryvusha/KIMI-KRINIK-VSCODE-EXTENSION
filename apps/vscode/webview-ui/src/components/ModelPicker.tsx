@@ -12,7 +12,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ModelPickerDialog } from "./ModelPickerDialog";
 import { getModelById, groupModelsByProvider, useSettingsStore } from "@/stores";
-import { useT } from "@/i18n";
+import { useT, type TranslationKey } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { useFavoriteModels } from "./inputarea/hooks/useFavoriteModels";
 import type { ModelConfig } from "shared/legacy-sdk";
@@ -23,8 +23,18 @@ interface ModelPickerProps {
   disabled?: boolean;
 }
 
-function effortLabel(effort: string): string {
-  return effort.charAt(0).toUpperCase() + effort.slice(1);
+const EFFORT_TEXT: Record<string, { full: TranslationKey; compact: TranslationKey }> = {
+  low: { full: "modelPicker.effort.low", compact: "modelPicker.effortCompact.low" },
+  medium: { full: "modelPicker.effort.medium", compact: "modelPicker.effortCompact.medium" },
+  high: { full: "modelPicker.effort.high", compact: "modelPicker.effortCompact.high" },
+  xhigh: { full: "modelPicker.effort.xhigh", compact: "modelPicker.effortCompact.xhigh" },
+  max: { full: "modelPicker.effort.max", compact: "modelPicker.effortCompact.max" },
+};
+
+function effortLabel(effort: string, t: ReturnType<typeof useT>, compact = false): string {
+  const text = EFFORT_TEXT[effort];
+  if (text === undefined) return effort.charAt(0).toUpperCase() + effort.slice(1);
+  return t(compact ? text.compact : text.full);
 }
 
 export function ModelPicker({ availableModels, hasConversationHistory, disabled }: ModelPickerProps) {
@@ -62,7 +72,7 @@ export function ModelPicker({ availableModels, hasConversationHistory, disabled 
   const thinkingSegmentLabel = (option: string): string => {
     if (option === "off") return t("modelPicker.thinkingOff");
     if (option === "on") return t("modelPicker.thinkingOn");
-    return effortLabel(option);
+    return effortLabel(option, t);
   };
 
   const modelItem = (model: ModelConfig) => (
@@ -95,7 +105,7 @@ export function ModelPicker({ availableModels, hasConversationHistory, disabled 
                 <span className="flex shrink-0 items-center whitespace-nowrap">
                   <span>{buttonLabel}</span>
                   {currentModelConfig !== undefined && showEffortSuffix && (
-                    <span className="shrink-0 text-blue-500">{" · "}{effortLabel(thinkingEffort)}</span>
+                    <span className="shrink-0 text-blue-500">{" · "}{effortLabel(thinkingEffort, t, true)}</span>
                   )}
                 </span>
                 {hasModels && <IconChevronDown className="size-3.5 shrink-0" />}

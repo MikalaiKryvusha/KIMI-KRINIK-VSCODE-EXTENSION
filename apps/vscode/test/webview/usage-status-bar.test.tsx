@@ -8,7 +8,7 @@ vi.mock("@/services", () => ({
   bridge: { getManagedUsage: boundary.getManagedUsage, getSessionContext: boundary.getSessionContext },
 }));
 
-import { QuotaRings, quotaWindowState, UsageStatusBar } from "../../webview-ui/src/components/UsageStatusBar";
+import { contextRingColor, QuotaRings, quotaWindowState, UsageStatusBar } from "../../webview-ui/src/components/UsageStatusBar";
 import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import { useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 
@@ -31,6 +31,18 @@ afterEach(() => {
   useChatStore.setState({ lastStatus: null });
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+});
+
+describe("context ring color", () => {
+  it("interpolates blue to yellow from 60 to 70 percent and yellow to red-orange from 70 to 80 percent", () => {
+    expect(contextRingColor(0.5)).toBe("rgb(59 130 246)");
+    expect(contextRingColor(0.6)).toBe("rgb(59 130 246)");
+    expect(contextRingColor(0.65)).toBe("rgb(155 167 134)");
+    expect(contextRingColor(0.7)).toBe("rgb(250 204 21)");
+    expect(contextRingColor(0.75)).toBe("rgb(253 137 11)");
+    expect(contextRingColor(0.8)).toBe("rgb(255 69 0)");
+    expect(contextRingColor(0.95)).toBe("rgb(255 69 0)");
+  });
 });
 
 describe("usage status", () => {
