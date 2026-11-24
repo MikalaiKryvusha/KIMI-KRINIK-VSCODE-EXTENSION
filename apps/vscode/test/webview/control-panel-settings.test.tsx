@@ -9,6 +9,7 @@ const boundary = vi.hoisted(() => ({
   setPermissionMode: vi.fn(),
   setSwarmMode: vi.fn(),
   controlGoal: vi.fn(),
+  openProjectPage: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
@@ -19,6 +20,7 @@ vi.mock("@/services", () => ({
     setPermissionMode: boundary.setPermissionMode,
     setSwarmMode: boundary.setSwarmMode,
     controlGoal: boundary.controlGoal,
+    openProjectPage: boundary.openProjectPage,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -93,11 +95,13 @@ describe("Control Panel settings", () => {
     expect(useSettingsStore.getState().extensionConfig.autoSteer).toBe(true);
   });
 
-  it("uses cyan rather than destructive red for Auto mode", () => {
+  it("uses the same blue as the other active buttons for Auto mode", () => {
     render(<PermissionModeButton />);
     const button = screen.getByTestId("permission-mode");
-    expect(button.className).toContain("bg-cyan-500/15");
-    expect(button.className).toContain("text-cyan-500");
+    expect(button.className).toContain("bg-blue-500/15");
+    expect(button.className).toContain("text-blue-600");
+    expect(button.className).toContain("dark:text-blue-400");
+    expect(button.className).not.toContain("cyan");
     expect(button.className).not.toContain("bg-destructive");
   });
 
@@ -177,5 +181,40 @@ describe("Control Panel settings", () => {
     render(<PermissionModeButton />);
 
     expect(screen.getByTestId("permission-mode").textContent).toBe("Auto");
+  });
+
+  it("keeps actions in a scrollable menu without duplicated behavior switches", async () => {
+    const user = userEvent.setup();
+    render(<ActionMenu />);
+
+    await user.click(screen.getByRole("button"));
+    expect(await screen.findByText("Control Panel")).not.toBeNull();
+    expect(screen.queryByText("Behavior")).toBeNull();
+    expect(screen.queryByRole("switch", { name: "Compact" })).toBeNull();
+    expect(screen.queryByRole("switch", { name: "Steer" })).toBeNull();
+    const content = document.querySelector('[data-slot="popover-content"]');
+    expect(content?.className).toContain("overflow-y-auto");
+    expect(content?.className).toContain("max-h-");
+    const text = content?.textContent ?? "";
+    expect(text.indexOf("English")).toBeLessThan(text.indexOf("Русский"));
+    expect(text.indexOf("Русский")).toBeLessThan(text.indexOf("中文"));
+  });
+
+  it("opens the project page from Support", async () => {
+    const user = userEvent.setup();
+    render(<ActionMenu />);
+
+    await user.click(screen.getByRole("button"));
+    await user.click(await screen.findByText("About KIMI KRINIK"));
+
+    expect(boundary.openProjectPage).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses the brand pink for checked switches and checkboxes", () => {
+    render(<ControlPanelSettingsDialog open onOpenChange={vi.fn()} />);
+
+    expect(screen.getByTestId("context-window-control-toggle").className).toContain("data-checked:bg-[#FF1A8C]");
+    expect(screen.getByTestId("control-panel-option-plan").className).toContain("data-checked:bg-[#FF1A8C]");
+    expect(screen.getByTestId("control-panel-option-plan").className).toContain("data-checked:border-[#FF1A8C]");
   });
 });

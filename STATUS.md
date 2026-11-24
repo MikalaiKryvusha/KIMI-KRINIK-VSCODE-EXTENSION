@@ -25,6 +25,11 @@
 
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
+### 2026-11-24 12:33 +03:00 — responsive/brand UI, C17 and sound contour ✅ full suite / live VSIX
+- C17 is live-pass: workspace voice decline/allow, machine priority, phrase cleanup and ENOENT logging. C24–C26 cover the pink response robot, reference composer parity, wheel+fade, wide no-scroll, scrollable Action menu, About RPC, language order and checked-control colors. Bugs 08/09 are DONE.
+- Bug 10 is DONE: latest-write volume, serialized host updates, global Sound enabled, Triple 880/660/990, packaged glass.opus and Russian Eugeny. Live VSIX: latest volume 100, OFF creates no audio, neutral tracks. Full extension: 556 passed, 1 skipped; typecheck and lint green.
+- At the measured 80% context boundary no new heavy task starts. Remaining real-world rows: C08, C11–C12 and C18–C23, including real-event sound/replay, quotas, active compaction/closure, rejected media, effort/stop, extended status and rollback. The next session must run inside KIMI KRINIK on the owner's real profile.
+
 ### 2026-11-24 07:32 +03:00 — B5/B6 and live K5 milestone ✅ hygiene / partial acceptance
 - `5c7b8ece5` secured attention voice commands with machine-only configuration, command-bound workspace approval, temp-file cleanup and logged failures; `695d3f51a` made the VSIX Extension Host smoke independent of inherited Electron Node mode; `87c26cf13` fixed the packaged header robot path. All three are pushed.
 - Bugs 01–03 are DONE after real VSIX acceptance; bugs 06/07 are DONE with red-to-green guards and live evidence. Languages, sound preview, Control Panel, ON/OFF steering and active-session Swarm controls were observed through CDP/WebP. K5 remains partial; see `testcases/TC_K5_live_acceptance.md` and `testcases/reports/2026-11-24_k5_live_acceptance.md`.
@@ -55,7 +60,7 @@ external publication wait for the owner's `AUTH:`.
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 07:44 +03:00, Windows): 535 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 12:14 +03:00, Windows): 556 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -71,15 +76,19 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-[AI] PARKED: 2026-11-24 07:32 +03:00 — soft closure entered at the measured 80% context level (81% on the closing probe). Every product change through `87c26cf13` is committed and pushed. The current K5 documentation/bug-closure milestone is being closed now; no new task starts in this chat.
+[OWNER] «тестируй всё, что можешь протестировать на стенде, полируй, доводи до хорошего состояния … На этом мы тут чат закроем, я перезапускаю VS Code с установленным тобою KIMI KRINIK 1.0.0, и я создам новую сессию прямо в нём» · 2026-11-24 10:00 +03:00 (чат)
 
-Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; ранняя ошибка изоляции CDP исправлена в K5 report/TC и launcher; корневой `.kaif/kaif.json` восстановлен и не имеет diff.
+Stand-first route is complete through C17, C24–C26 and the sound contour. At the measured 80% context boundary the current VSIX is being committed and soft-closed. The next session runs inside KIMI KRINIK on the owner's real profile and uses Windows mouse/keyboard automation and screenshots for the remaining real-world acceptance.
 
-KNOWLEDGE: permission defaults, model picker, live status/title flow and in-flight cancellation are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; live K5 observations/WebP and the remaining matrix are in `testcases/reports/2026-11-24_k5_live_acceptance.md` and `testcases/TC_K5_live_acceptance.md`; the resource-resolver lesson is `EXPERIENCE.md` EXP-0007; the one-step Extension Host route and environment dossier are in `HOUSE_RULES.md`.
+[AI] ACTIVE: 2026-11-24 10:00 +03:00 — owner-approved stand-first K5 acceptance and polishing; the previous soft closure was completed at 07:32, and this chat resumed for the new stand-first order.
 
-1. Start the next chat with `/skill:resume`; read `testcases/TC_K5_live_acceptance.md` and the K5 report first. Continue rows C08, C11, C12, C17–C23: real quotas, active compaction/closure, B5/B6 dialog/process, rejected media, model effort/stop, extended status, real-event sound/replay and rollback. No row gets DONE from hygiene alone.
+Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; ранняя ошибка изоляции CDP исправлена в K5 report/TC и launcher; корневой `.kaif/kaif.json` восстановлен и не имеет diff. Прежнее «глаза робота отличаются геометрией» оказалось неверным: совпадал размер и `rounded`, исправлено в коде KimiLogo/ChatMessage.
+
+KNOWLEDGE: responsive/brand parity is in `researches/53_control_panel_parity.md`; live K5 observations/WebP and the remaining matrix are in `testcases/reports/2026-11-24_k5_live_acceptance.md` and `testcases/TC_K5_live_acceptance.md`; voice facts are in `HOUSE_RULES.md` and `D:/work/ai_sandbox/tools/silero_tts/VOICE_RULES.md`; the resource-resolver lesson is `EXPERIENCE.md` EXP-0007.
+
+1. Start the next chat with `/skill:resume` inside the installed KIMI KRINIK 1.0.0 on the owner's accumulated profile; read `testcases/TC_K5_live_acceptance.md` and the K5 report first. Continue C08, C11–C12 and C18–C23: real quotas, active compaction/closure, rejected media, effort/stop, extended status, real-event sound/replay and rollback. No row gets DONE from hygiene alone.
 2. For C23 inspect the Swarm reminder exit/reconcile contract before filing a defect: `packages/node-sdk/src/sdk-rpc-client-v2.ts:2572` documents reminder behavior. Read `packages/agent-core-v2/AGENTS.md` before any engine change. The observed historical enter reminder alone is not proof of a bug.
-3. The ignored local harness and evidence are under `.tmp/k5-vscode*`; inspect before reuse. The committed isolated startup route is `pnpm --filter kimi-code-kaif test:extension-host --version 1.123.0`. No test process is left running by the closing ritual.
+3. Use Windows mouse/keyboard automation and regular PC screenshots per `HOUSE_RULES.md` R2. The ignored local harness and evidence are under `.tmp/k5-vscode*`; inspect before reuse. The committed isolated startup route is `pnpm --filter kimi-code-kaif test:extension-host --version 1.123.0`. No test process is left running by this closing ritual.
 4. Investigate `bugs/04_frozen_prompt_windows_path.md` and `bugs/05_pre_post_compact_hook_log_empty.md` separately; both reproduce on the original engine service and are not K2.6 regressions.
 5. Release/publication remains a separate gated step. Do not decide B9/B10 or publish without the owner's required word.
 
@@ -87,7 +96,6 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 
 ## Open bugs
 
-- 🟠 B5/B6 in `Claude_Help_for_Kimi.md` — machine-only config, command-bound workspace approval, temp-file cleanup and failure logging are green; live Extension Host acceptance remains in K5.
 - 🔴 `bugs/04_frozen_prompt_windows_path.md` — pre-existing Windows cwd/listing failure reproduced on the original engine service.
 - 🔴 `bugs/05_pre_post_compact_hook_log_empty.md` — pre-existing empty Pre/PostCompact payload list reproduced on the original engine service.
 - 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.

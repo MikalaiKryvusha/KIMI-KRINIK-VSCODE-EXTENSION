@@ -117,4 +117,59 @@ describe("Control Panel composition", () => {
     expect(indicator.tagName).toBe("SPAN");
     expect(indicator.className).toContain("bg-current");
   });
+
+  it("uses the reference element sides and layers the right actions over a fade", () => {
+    renderInputArea();
+
+    const left = screen.getByTestId("control-panel-scroll");
+    const right = screen.getByTestId("control-panel-actions");
+    expect(left.contains(screen.getByTestId("attachment-picker-toggle"))).toBe(true);
+    expect(left.contains(screen.getByTestId("model-picker"))).toBe(false);
+    expect(right.contains(screen.getByTestId("model-picker"))).toBe(true);
+    expect(right.contains(screen.getByTestId("attachment-picker-toggle"))).toBe(false);
+    expect(screen.getByTestId("attachment-picker-toggle").querySelector("svg")?.classList.contains("tabler-icon-paperclip")).toBe(true);
+    expect(right.className).toContain("bg-background");
+    expect(right.className).toContain("before:right-full");
+    expect(right.className).toContain("before:pointer-events-none");
+  });
+
+  it("scrolls the left controls with the mouse wheel in both directions", () => {
+    renderInputArea();
+
+    const left = screen.getByTestId("control-panel-scroll");
+    const content = screen.getByTestId("control-panel-content");
+    Object.defineProperties(content, { scrollWidth: { value: 260, configurable: true } });
+    Object.defineProperties(left, {
+      clientWidth: { value: 100, configurable: true },
+      scrollWidth: { value: 260, configurable: true },
+      scrollLeft: { value: 0, writable: true, configurable: true },
+    });
+    const forward = new WheelEvent("wheel", { deltaY: 120, bubbles: true, cancelable: true });
+    left.dispatchEvent(forward);
+    expect(left.scrollLeft).toBe(120);
+    expect(forward.defaultPrevented).toBe(true);
+
+    const backward = new WheelEvent("wheel", { deltaY: -40, bubbles: true, cancelable: true });
+    left.dispatchEvent(backward);
+    expect(left.scrollLeft).toBe(80);
+    expect(backward.defaultPrevented).toBe(true);
+  });
+
+  it("disables wheel scrolling when the controls already fit", () => {
+    renderInputArea();
+
+    const left = screen.getByTestId("control-panel-scroll");
+    const content = screen.getByTestId("control-panel-content");
+    Object.defineProperties(content, { scrollWidth: { value: 100, configurable: true } });
+    Object.defineProperties(left, {
+      clientWidth: { value: 100, configurable: true },
+      scrollWidth: { value: 132, configurable: true },
+      scrollLeft: { value: 0, writable: true, configurable: true },
+    });
+    const event = new WheelEvent("wheel", { deltaY: 120, bubbles: true, cancelable: true });
+    left.dispatchEvent(event);
+
+    expect(left.scrollLeft).toBe(0);
+    expect(event.defaultPrevented).toBe(false);
+  });
 });

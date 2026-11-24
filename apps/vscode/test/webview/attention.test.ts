@@ -14,18 +14,27 @@ vi.mock("../../webview-ui/src/lib/sounds", () => ({
 }));
 
 import { notifyAttention, previewSound } from "../../webview-ui/src/lib/attention";
+import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 
 const VOICE = { sound: "voice", volume: 80 } as const;
 
 beforeEach(() => {
+  useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, soundEnabled: true } });
   boundary.notifyAttention.mockReset();
   boundary.speak.mockReset();
   boundary.playTone.mockReset();
-  vi.stubGlobal("speechSynthesis", { speak: boundary.speak });
+  vi.stubGlobal("speechSynthesis", {
+    speak: boundary.speak,
+    getVoices: () => [
+      { name: "Microsoft Eugene", lang: "ru-RU" },
+      { name: "Microsoft Other", lang: "en-US" },
+    ],
+  });
   vi.stubGlobal("SpeechSynthesisUtterance", class {
     lang = "";
     rate = 1;
     volume = 1;
+    voice: { name: string; lang: string } | undefined;
     constructor(readonly text: string) {}
   });
 });
@@ -76,5 +85,34 @@ describe("attention notifications", () => {
 
     expect(boundary.playTone).toHaveBeenCalledTimes(2);
     expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({ text: "Error", volume: 0.5 });
+  });
+
+  it("stays silent when the global sound switch is off", () => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, soundEnabled: false } });
+    notifyAttention("Done", { sound: "chime", volume: 60 }, 90_000);
+    previewSound("Done", { sound: "chime", volume: 60 });
+
+    expect(boundary.playTone).not.toHaveBeenCalled();
+    expect(boundary.notifyAttention).not.toHaveBeenCalled();
+    expect(boundary.speak).not.toHaveBeenCalled();
+  });
+
+  it("plays triple and Glass without the voice route", () => {
+    notifyAttention("Triple", { sound: "triple", volume: 40 }, 100_000);
+    notifyAttention("Glass", { sound: "glass", volume: 30 }, 200_000);
+
+    expect(boundary.playTone).toHaveBeenNthCalledWith(1, "triple", 40);
+    expect(boundary.playTone).toHaveBeenNthCalledWith(2, "glass", 30);
+    expect(boundary.notifyAttention).not.toHaveBeenCalled();
+  });
+
+  it("selects Eugeny for Russian speech", () => {
+    previewSound("Нужен ответ", { sound: "voice", volume: 40 });
+
+    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({
+      lang: "ru-RU",
+      voice: { name: "Microsoft Eugene", lang: "ru-RU" },
+      volume: 0.4,
+    });
   });
 });

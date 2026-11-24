@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconCheck, IconVolume, IconAdjustmentsHorizontal } from "@tabler/icons-react";
+import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconCheck, IconVolume, IconAdjustmentsHorizontal, IconExternalLink } from "@tabler/icons-react";
 import { ControlPanelSettingsDialog } from "./ControlPanelSettingsDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { useSettingsStore } from "@/stores";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
@@ -14,8 +13,8 @@ import type { InterfaceLanguage } from "shared/types";
 
 const LANGUAGE_NAMES: ReadonlyArray<[InterfaceLanguage, string]> = [
   ["en", "English"],
-  ["zh", "中文"],
   ["ru", "Русский"],
+  ["zh", "中文"],
 ];
 
 interface ActionMenuProps {
@@ -51,27 +50,20 @@ function MenuItem({ onClick, disabled, danger, children }: { onClick: () => void
   );
 }
 
-function SwitchItem({ label, hint, checked, disabled, onChange }: { label: string; hint: string; checked: boolean; disabled?: boolean; onChange: (checked: boolean) => void }) {
-  return (
-    <label className={cn("w-full flex items-center gap-2 px-2.5 py-1.5 text-xs hover:bg-accent transition-colors cursor-pointer", disabled && "opacity-50 cursor-not-allowed")}>
-      <span className="flex-1 flex flex-col">
-        <span>{label}</span>
-        <span className="text-[10px] text-muted-foreground">{hint}</span>
-      </span>
-      <Switch size="sm" checked={checked} disabled={disabled} onCheckedChange={onChange} aria-label={label} />
-    </label>
-  );
-}
-
 export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const [controlPanelOpen, setControlPanelOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, autoCompact, autoCompactPending, changeAutoCompact, changeAutoSteer, changeLanguage, setSoundModalOpen } = useSettingsStore();
+  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, changeLanguage, setSoundModalOpen } = useSettingsStore();
   const t = useT();
 
   const handleOpenSettings = () => {
     void bridge.openSettings();
+    setOpen(false);
+  };
+
+  const handleOpenProjectPage = () => {
+    void bridge.openProjectPage();
     setOpen(false);
   };
 
@@ -124,7 +116,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
           <IconSettings className="size-3.5" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[calc(100vw-1rem)] max-w-72 p-1.5 gap-0!" align="end" side="top">
+      <PopoverContent className="w-[calc(100vw-1rem)] max-w-72 max-h-(--radix-popover-content-available-height) overflow-y-auto overscroll-contain p-1.5 gap-0!" align="end" side="top">
         <MenuSection title={t("menu.settings")}>
           <MenuItem onClick={handleChangeWorkDir}>
             <IconFolder className="size-4 text-muted-foreground" />
@@ -151,24 +143,6 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
 
         <Separator className="my-px" />
 
-        <MenuSection title={t("menu.behavior")}>
-          <SwitchItem
-            label={t("menu.autoCompact")}
-            hint={autoCompact === false ? t("menu.autoCompactOff") : t("menu.autoCompactOn")}
-            checked={autoCompact !== false}
-            disabled={autoCompact === null || autoCompactPending}
-            onChange={(enabled) => void changeAutoCompact(enabled)}
-          />
-          <SwitchItem
-            label={t("menu.autoSteer")}
-            hint={extensionConfig.autoSteer ? t("menu.autoSteerOn") : t("menu.autoSteerOff")}
-            checked={extensionConfig.autoSteer}
-            onChange={(enabled) => void changeAutoSteer(enabled)}
-          />
-        </MenuSection>
-
-        <Separator className="my-px" />
-
         <MenuSection title={t("menu.language")}>
           {LANGUAGE_NAMES.map(([language, name]) => (
             <MenuItem key={language} onClick={() => void changeLanguage(language)}>
@@ -181,6 +155,10 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
         <Separator className="my-px" />
 
         <MenuSection title={t("menu.support")} subtitle={extensionConfig.version ? `v${extensionConfig.version}` : undefined}>
+          <MenuItem onClick={handleOpenProjectPage}>
+            <IconExternalLink className="size-4 text-muted-foreground" />
+            <span className="flex-1">{t("menu.aboutProject")}</span>
+          </MenuItem>
           <MenuItem onClick={handleShowLogs}>
             <IconFileText className="size-4 text-muted-foreground" />
             <span className="flex-1">{t("menu.showLogs")}</span>

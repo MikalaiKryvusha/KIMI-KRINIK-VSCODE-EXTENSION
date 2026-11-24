@@ -50,7 +50,7 @@ English default, 中文, Русский with typed dictionaries of one key set; 
 
 ### Phase 4 — Sound settings (K4, `plans/152`)
 
-A separate sound window: event inventory, a sound and a volume per event, silent replay, fail-open audio.
+A separate sound window with a global Sound enabled switch, event inventory, a sound and a volume per event, silent replay, fail-open audio, the triple beep, Glass and Russian Eugeny speech.
 
 ### Phase 5 — Live acceptance and release 1.0.0 (K5, `plans/153`)
 

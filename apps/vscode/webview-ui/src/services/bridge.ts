@@ -170,6 +170,10 @@ class Bridge {
     return this.call<{ ok: boolean }>(Methods.OpenSettings);
   }
 
+  openProjectPage() {
+    return this.call<{ ok: boolean }>(Methods.OpenProjectPage);
+  }
+
   openFolder() {
     return this.call<{ ok: boolean }>(Methods.OpenFolder);
   }

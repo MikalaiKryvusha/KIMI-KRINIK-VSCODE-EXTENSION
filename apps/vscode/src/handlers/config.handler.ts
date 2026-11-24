@@ -88,6 +88,11 @@ const openSettings: Handler<void, { ok: boolean }> = async () => {
   return { ok: true };
 };
 
+const openProjectPage: Handler<void, { ok: boolean }> = async () => {
+  await vscode.env.openExternal(vscode.Uri.parse("https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION"));
+  return { ok: true };
+};
+
 const getModels: Handler<void, WebviewKimiConfig> = async (_, ctx) => {
   const config = await ctx.harness.getConfig({ reload: true });
   return toWebviewConfig(config);
@@ -135,6 +140,7 @@ export const configHandlers = {
   [Methods.SaveConfig]: saveConfig,
   [Methods.GetExtensionConfig]: getExtensionConfig,
   [Methods.OpenSettings]: openSettings,
+  [Methods.OpenProjectPage]: openProjectPage,
   [Methods.GetModels]: getModels,
   [Methods.GetSlashCommands]: getSlashCommands,
   [Methods.ShowLogs]: showLogs,

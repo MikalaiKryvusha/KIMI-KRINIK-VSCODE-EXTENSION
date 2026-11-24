@@ -1,7 +1,7 @@
 export const SOUND_EVENTS = ["approval", "question", "error", "turnComplete"] as const;
 export type SoundEvent = (typeof SOUND_EVENTS)[number];
 
-export const SOUND_CHOICES = ["voice", "chime", "bell", "pop", "alert", "off"] as const;
+export const SOUND_CHOICES = ["voice", "chime", "bell", "pop", "alert", "triple", "glass", "off"] as const;
 export type SoundChoice = (typeof SOUND_CHOICES)[number];
 export type ToneChoice = Exclude<SoundChoice, "voice" | "off">;
 

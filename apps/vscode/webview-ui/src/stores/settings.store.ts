@@ -9,6 +9,8 @@ import type { PermissionModeName } from "shared/modes";
 import { translate, type TranslateParams, type TranslationKey } from "@/i18n/translate";
 
 let settingsSaveRevision = 0;
+let soundSaveRevision = 0;
+let soundSavePending = false;
 
 function t(key: TranslationKey, params?: TranslateParams): string {
   return translate(useSettingsStore.getState().extensionConfig.language, key, params);
@@ -49,6 +51,7 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
     secondaryModel: true,
   },
   language: "en",
+  soundEnabled: true,
   sounds: DEFAULT_SOUND_SETTINGS,
   version: "",
 };
@@ -202,6 +205,7 @@ interface SettingsState {
   setMCPModalOpen: (open: boolean) => void;
   setSoundModalOpen: (open: boolean) => void;
   changeSounds: (sounds: SoundSettings) => Promise<void>;
+  changeSoundEnabled: (enabled: boolean) => Promise<void>;
   setWorkDirModalOpen: (open: boolean) => void;
   setCurrentWorkDir: (workDir: string | null) => void;
   setWorkspaceRoot: (root: string | null) => void;
@@ -437,19 +441,42 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     );
   },
 
-  setExtensionConfig: (extensionConfig) => set({ extensionConfig }),
+  setExtensionConfig: (extensionConfig) => {
+    if (!soundSavePending) {
+      set({ extensionConfig });
+      return;
+    }
+    set({ extensionConfig: { ...extensionConfig, sounds: get().extensionConfig.sounds } });
+  },
 
   setMCPModalOpen: (mcpModalOpen) => set({ mcpModalOpen }),
 
   setSoundModalOpen: (soundModalOpen) => set({ soundModalOpen }),
 
   changeSounds: async (sounds) => {
+    const revision = ++soundSaveRevision;
     const previous = get().extensionConfig.sounds;
+    soundSavePending = true;
     set({ extensionConfig: { ...get().extensionConfig, sounds } });
     try {
       await bridge.updateExtensionSetting({ key: "sounds", value: sounds });
     } catch (error) {
-      set({ extensionConfig: { ...get().extensionConfig, sounds: previous } });
+      if (revision === soundSaveRevision) {
+        set({ extensionConfig: { ...get().extensionConfig, sounds: previous } });
+        toast.error(t("toast.soundsNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+      }
+    } finally {
+      if (revision === soundSaveRevision) soundSavePending = false;
+    }
+  },
+
+  changeSoundEnabled: async (enabled) => {
+    const previous = get().extensionConfig.soundEnabled;
+    set({ extensionConfig: { ...get().extensionConfig, soundEnabled: enabled } });
+    try {
+      await bridge.updateExtensionSetting({ key: "soundEnabled", value: enabled });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, soundEnabled: previous } });
       toast.error(t("toast.soundsNotChanged", { error: error instanceof Error ? error.message : String(error) }));
     }
   },

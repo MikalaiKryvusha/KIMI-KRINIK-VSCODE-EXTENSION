@@ -58,14 +58,17 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 | C13 composer controls | Permission, Plan, Goal, Swarm, secondary model, settings and send → real effects | use-case walk | pass · host calls/config and active-state DOM observed |
 | C14 basic status | Working, Queued and context ring follow real events | event/state | pass · Working transitions, 1 Queued and 10.5/10.7% observed |
 | C15 languages | Switch EN → RU → ZH → EN → immediate visible strings and persisted selection | state/pairwise | pass · visible dictionaries and `kimi.language` en observed |
-| C16 sound preview | Open modal → change event sound/volume → preview → persisted and Web Audio lifecycle closes | use-case | pass · Chime 35%, peak 0.14, context closed |
-| C17 B5/B6 | Decline/allow workspace voice command; machine setting wins; phrase cleanup/error logging observed | security/error | [NOT-TESTED] real dialog/process; handler guards green |
+| C16 sound preview | Open modal → change event sound/volume → preview → persisted and Web Audio lifecycle closes | use-case | pass · Chime 35%, peak 0.14, context closed; rapid 10→20→40→80→100 remains latest; global OFF blocks audio; Triple 880/660/990 and packaged glass.opus observed; neutral tracks, no yellow outline |
+| C17 B5/B6 | Decline/allow workspace voice command; machine setting wins; phrase cleanup/error logging observed | security/error | pass · native dialog Cancel/Allow via real mouse; no spawn/write on decline; machine priority without dialog; child PID 9028/39556 and cleaned phrase files; ENOENT logged |
 | C18 rollback | Run beside official/reference → return to official → projects/sessions preserved | installation/state | [NOT-TESTED] owner accumulated profile |
 | C19 rejected steer + media | Rejected running steer restores text+media exactly once; OFF queues media | race/media | [NOT-TESTED] live media/rejection |
 | C20 model effort + stop | Choose effort and stop a running request → persisted effort and aborted model request | state/cancel | [NOT-TESTED] live effort/stop |
 | C21 extended status | Changed, Background Bash, Sub Agents, Todos and session title follow real events | event/state | [NOT-TESTED] tool/title events |
 | C22 real-event sound/replay | Real approval/question/error/complete uses configured sound; replay stays silent | event/error | [NOT-TESTED] real event and replay; owner hearing separate |
 | C23 Swarm OFF history | After ON→OFF, inspect reminder exit/reconcile semantics on the next prompt | state/contract | [NOT-TESTED] a judge request retained the historical enter reminder; this alone is not a proven defect and needs the engine contract check |
+| C24 assistant response brand | Read a real assistant response → the pink KIMI KRINIK robot replaces the blue KIMI icon and loads from the packaged resources | use-case/assets | pass · regression red before/green after; packaged images load with naturalWidth 1024; response robot now matches Working at 24×16 without rounded; blue K absent; WebP 19 read |
+| C25 responsive Control Panel | Restore reference sides and paperclip; wheel-scroll only on real overflow with fade; no wheel drift when all controls fit; pink dots/scroll button and blue Auto | state/boundary | pass · 319/640/1000 CSS px geometry and real wheel; no drift at 1000; paperclip/blue Auto/pink dots and scroll button; robot 24×16; WebP 21–24 |
+| C26 Action menu and checked controls | Remove BEHAVIOR, vertical-scroll long menu, order EN→RU→ZH, open About, pink Switch/Checkbox and no yellow outline | use-case/accessibility | pass · scrollTop 0→200→160; About host ok=true; checked rgb(255,26,140); range outlineStyle none; WebP 23/25–27 |
 
 ## 5. Control cases — MUST
 

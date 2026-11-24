@@ -36,7 +36,7 @@ const MODE_ICON: Record<PermissionModeName, typeof IconShieldCheck> = {
 const MODE_TEXT: Record<PermissionModeName, string> = {
   manual: "text-muted-foreground",
   yolo: "text-amber-500",
-  auto: "text-cyan-500",
+  auto: "text-blue-600 dark:text-blue-400",
 };
 
 export function PermissionModeButton() {
@@ -73,7 +73,7 @@ export function PermissionModeButton() {
               data-testid="permission-mode"
               className={cn(
                 "flex items-center gap-1 justify-center h-6 px-1.5 rounded-md transition-all text-xs cursor-pointer",
-                mode === "auto" && "bg-cyan-500/15 text-cyan-500 hover:bg-cyan-500/25",
+                mode === "auto" && "bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/25",
                 mode === "yolo" && "bg-amber-500/15 text-amber-500 hover:bg-amber-500/25",
                 mode === "manual" && "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
               )}

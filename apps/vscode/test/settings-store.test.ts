@@ -659,3 +659,34 @@ describe("Control Panel visibility", () => {
     expect(boundary.toastError).toHaveBeenCalledWith("Control Panel visibility was not changed: settings are read-only");
   });
 });
+
+describe("sound persistence", () => {
+  it("keeps the latest volume through stale events and an older failed write", async () => {
+    const pending: Array<{ resolve: (value: { ok: boolean }) => void; reject: (error: Error) => void }> = [];
+    boundary.updateExtensionSetting.mockImplementation(() => new Promise((resolve, reject) => {
+      pending.push({ resolve, reject });
+    }));
+    const sounds = (volume: number) => ({
+      ...DEFAULT_EXTENSION_CONFIG.sounds,
+      approval: { sound: "chime" as const, volume },
+    });
+    const writes = [10, 20, 40, 80, 100].map((volume) => useSettingsStore.getState().changeSounds(sounds(volume)));
+
+    useSettingsStore.getState().setExtensionConfig({ ...DEFAULT_EXTENSION_CONFIG, sounds: sounds(10) });
+    expect(useSettingsStore.getState().extensionConfig.sounds.approval.volume).toBe(100);
+
+    pending[0]!.reject(new Error("older write failed"));
+    for (let index = 1; index < pending.length; index += 1) pending[index]!.resolve({ ok: true });
+    await Promise.all(writes);
+
+    expect(useSettingsStore.getState().extensionConfig.sounds.approval.volume).toBe(100);
+    expect(boundary.toastError).not.toHaveBeenCalled();
+  });
+
+  it("persists the global sound-enabled switch", async () => {
+    await useSettingsStore.getState().changeSoundEnabled(false);
+
+    expect(useSettingsStore.getState().extensionConfig.soundEnabled).toBe(false);
+    expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "soundEnabled", value: false });
+  });
+});

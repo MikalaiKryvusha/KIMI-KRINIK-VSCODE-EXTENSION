@@ -86,6 +86,11 @@
           "default": "en",
           "description": "Interface language of KIMI KRINIK."
         },
+        "kimi.soundEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable all KIMI KRINIK attention sounds. Per-event sound and volume choices are preserved while this is off."
+        },
         "kimi.sounds": {
           "type": "object",
           "default": {

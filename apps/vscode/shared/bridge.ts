@@ -22,6 +22,7 @@ export const Methods = {
   SaveConfig: "saveConfig",
   GetExtensionConfig: "getExtensionConfig",
   OpenSettings: "openSettings",
+  OpenProjectPage: "openProjectPage",
   OpenFolder: "openFolder",
   GetModels: "getModels",
 
@@ -140,6 +141,7 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.Logout:
     case Methods.GetExtensionConfig:
     case Methods.OpenSettings:
+    case Methods.OpenProjectPage:
     case Methods.OpenFolder:
     case Methods.GetModels:
     case Methods.GetMCPServers:
@@ -167,6 +169,7 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.UpdateExtensionSetting:
       return isPlainObject(params) && (
         (params["key"] === "autoSteer" && typeof params["value"] === "boolean")
+        || (params["key"] === "soundEnabled" && typeof params["value"] === "boolean")
         || (params["key"] === "contextWindowControl" && typeof params["value"] === "boolean")
         || ((Object.values(CONTEXT_WINDOW_THRESHOLD_SETTINGS) as readonly unknown[]).includes(params["key"])
           && typeof params["value"] === "number" && Number.isFinite(params["value"]) && params["value"] >= 0 && params["value"] <= 100)

@@ -54,6 +54,10 @@ export const VSCodeSettings = {
     return INTERFACE_LANGUAGES.find((language) => language === value) ?? "en";
   },
 
+  get soundEnabled(): boolean {
+    return getConfig().get<boolean>("soundEnabled", true);
+  },
+
   get sounds(): SoundSettings {
     return normalizeSoundSettings(getConfig().get<unknown>("sounds"));
   },
@@ -85,6 +89,7 @@ export const VSCodeSettings = {
       contextWindowThresholds: this.kaifThresholds,
       controlPanel: this.controlPanel,
       language: this.language,
+      soundEnabled: this.soundEnabled,
       sounds: this.sounds,
       version: EXTENSION_VERSION,
     };
@@ -96,7 +101,7 @@ export function onSettingsChange(callback: (changedKeys: string[]) => void): vsc
     if (!e.affectsConfiguration("kimi")) {
       return;
     }
-    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "contextWindowControl", "kaif", "controlPanel", "language", "sounds"];
+    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "contextWindowControl", "kaif", "controlPanel", "language", "soundEnabled", "sounds"];
     const changedKeys = keys.filter((key) => e.affectsConfiguration(`kimi.${key}`));
     if (changedKeys.length > 0) {
       callback(changedKeys);

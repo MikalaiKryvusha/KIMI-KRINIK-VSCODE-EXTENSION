@@ -21,6 +21,7 @@ vi.mock("vscode", () => ({
 import { behaviorHandlers, syncContextWindowOwnership } from "../src/handlers/behavior.handler";
 import { Events, Methods, validateRpcMessage } from "../shared/bridge";
 import { CONTROL_PANEL_BUTTONS } from "../shared/types";
+import { DEFAULT_SOUND_SETTINGS } from "../shared/sounds";
 
 const setAutoCompact = behaviorHandlers[Methods.SetAutoCompact];
 const getAutoCompact = behaviorHandlers[Methods.GetAutoCompact];
@@ -184,6 +185,29 @@ describe("AUTO STEER setting", () => {
   it("writes the user-level kimi.autoSteer setting", async () => {
     await expect(updateExtensionSetting({ key: "autoSteer", value: false }, context() as never)).resolves.toEqual({ ok: true });
     expect(boundary.update).toHaveBeenCalledWith("autoSteer", false, 1);
+  });
+
+  it("writes the global sound-enabled setting and validates it", async () => {
+    await expect(updateExtensionSetting({ key: "soundEnabled", value: false }, context() as never)).resolves.toEqual({ ok: true });
+    expect(boundary.update).toHaveBeenCalledWith("soundEnabled", false, 1);
+    expect(validateRpcMessage({ id: "sound", method: Methods.UpdateExtensionSetting, params: { key: "soundEnabled", value: false } }).ok).toBe(true);
+    expect(validateRpcMessage({ id: "sound", method: Methods.UpdateExtensionSetting, params: { key: "soundEnabled", value: "false" } }).ok).toBe(false);
+  });
+
+  it("serializes sound writes so the last value is written last", async () => {
+    let release!: () => void;
+    boundary.update.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve; })).mockResolvedValueOnce(undefined);
+    const first = updateExtensionSetting({ key: "sounds", value: { ...DEFAULT_SOUND_SETTINGS, approval: { sound: "chime", volume: 10 } } }, context() as never);
+    const second = updateExtensionSetting({ key: "sounds", value: { ...DEFAULT_SOUND_SETTINGS, approval: { sound: "chime", volume: 100 } } }, context() as never);
+
+    await vi.waitFor(() => expect(boundary.update).toHaveBeenCalledTimes(1));
+    release();
+    await first;
+    await second;
+    expect(boundary.update.mock.calls.map((call) => call[1])).toEqual([
+      { ...DEFAULT_SOUND_SETTINGS, approval: { sound: "chime", volume: 10 } },
+      { ...DEFAULT_SOUND_SETTINGS, approval: { sound: "chime", volume: 100 } },
+    ]);
   });
 });
 

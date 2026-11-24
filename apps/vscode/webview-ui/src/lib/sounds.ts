@@ -6,7 +6,7 @@ interface Note {
   readonly duration: number;
 }
 
-const TONES: Record<ToneChoice, readonly Note[]> = {
+const TONES: Record<Exclude<ToneChoice, "glass">, readonly Note[]> = {
   chime: [
     { frequency: 880, start: 0, duration: 0.18 },
     { frequency: 1320, start: 0.12, duration: 0.32 },
@@ -18,10 +18,22 @@ const TONES: Record<ToneChoice, readonly Note[]> = {
     { frequency: 740, start: 0.18, duration: 0.12 },
     { frequency: 740, start: 0.36, duration: 0.12 },
   ],
+  triple: [
+    { frequency: 880, start: 0, duration: 0.16 },
+    { frequency: 660, start: 0.2, duration: 0.16 },
+    { frequency: 990, start: 0.4, duration: 0.26 },
+  ],
 };
 
 export function playTone(tone: ToneChoice, volume: number): void {
   try {
+    if (tone === "glass") {
+      const baseUri = typeof document === "undefined" ? null : document.body.getAttribute("data-baseuri");
+      const audio = new Audio(baseUri ? `${baseUri}/resources/glass.opus` : "resources/glass.opus");
+      audio.volume = Math.max(0, Math.min(volume, 100)) / 100;
+      void audio.play().catch(() => undefined);
+      return;
+    }
     if (typeof AudioContext === "undefined") return;
     const context = new AudioContext();
     const peak = Math.max(0, Math.min(volume, 100)) / 100 * 0.4;

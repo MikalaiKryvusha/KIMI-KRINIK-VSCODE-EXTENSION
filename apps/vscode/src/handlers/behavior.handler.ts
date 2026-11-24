@@ -7,8 +7,16 @@ import type { AutoCompactResult, ExtensionSettingUpdate, KaifProjection, KaifThr
 import { VSCodeSettings } from "../config/vscode-settings";
 import type { Handler, HandlerContext } from "./types";
 
+let soundWrite = Promise.resolve();
+
 const updateExtensionSetting: Handler<ExtensionSettingUpdate, { ok: boolean }> = async (params) => {
-  await vscode.workspace.getConfiguration("kimi").update(params.key, params.value, vscode.ConfigurationTarget.Global);
+  if (params.key !== "sounds" && params.key !== "soundEnabled") {
+    await vscode.workspace.getConfiguration("kimi").update(params.key, params.value, vscode.ConfigurationTarget.Global);
+    return { ok: true };
+  }
+  const write = soundWrite.then(() => vscode.workspace.getConfiguration("kimi").update(params.key, params.value, vscode.ConfigurationTarget.Global));
+  soundWrite = write.catch(() => undefined);
+  await write;
   return { ok: true };
 };
 

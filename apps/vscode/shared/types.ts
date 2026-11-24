@@ -59,6 +59,7 @@ export interface ExtensionConfig {
   contextWindowThresholds: ContextWindowThresholds;
   controlPanel: ControlPanelVisibility;
   language: InterfaceLanguage;
+  soundEnabled: boolean;
   sounds: SoundSettings;
   version: string;
 }
@@ -73,6 +74,7 @@ export type ExtensionSettingUpdate =
   | { key: ContextWindowThresholdSettingKey; value: number }
   | { key: ControlPanelSettingKey; value: boolean }
   | { key: "language"; value: InterfaceLanguage }
+  | { key: "soundEnabled"; value: boolean }
   | { key: "sounds"; value: SoundSettings };
 
 export type KaifProjection = "projected" | "absent";

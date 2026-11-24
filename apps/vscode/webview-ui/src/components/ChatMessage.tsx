@@ -18,6 +18,7 @@ import { useChatStore } from "@/stores";
 import { bridge } from "@/services";
 import { useT } from "@/i18n";
 import { WorkingIndicator } from "./WorkingIndicator";
+import { KimiLogo } from "./KimiLogo";
 import type { ChatMessage as ChatMessageType, UIStep, UIStepItem } from "@/stores/chat.store";
 import type { ContentPart } from "shared/legacy-sdk";
 
@@ -70,7 +71,7 @@ function StepContent({ step, showConnector }: { step: UIStep; showConnector?: bo
       {showIndicator ? (
         <div className="hidden @[420px]:flex shrink-0 w-5 flex-col items-center relative">
           <div
-            className={cn("size-1.5 rounded-full mt-2 shrink-0 relative z-10", hasActiveItem ? "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.6)] animate-pulse" : "bg-blue-400")}
+            className={cn("size-1.5 rounded-full mt-2 shrink-0 relative z-10", hasActiveItem ? "bg-[#FF1A8C] shadow-[0_0_8px_rgba(255,26,140,0.6)] animate-pulse" : "bg-[#FF1A8C]")}
           />
           {showConnector && (
             <div
@@ -258,7 +259,7 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
     <div className="@container px-3 py-3 group/message">
       <div className="flex gap-3 flex-col">
         <div className="flex flex-row items-center justify-start gap-2">
-          <div className="shrink-0 size-5 rounded flex items-center justify-center text-[10px] font-medium bg-blue-500 text-white">K</div>
+          <KimiLogo className="size-6 shrink-0" />
           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Kimi</div>
         </div>
 

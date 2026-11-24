@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState, useEffect } from "react";
-import { IconSend, IconPlus } from "@tabler/icons-react";
+import { IconSend, IconPaperclip } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ActionMenu } from "../ActionMenu";
@@ -59,6 +59,44 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
   const hasConversationHistory = messages.some((message) => message.role === "user");
 
   const [showPlanModeConfirm, setShowPlanModeConfirm] = useState(false);
+  const controlPanelRef = useRef<HTMLDivElement>(null);
+  const controlPanelContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = controlPanelRef.current;
+    const content = controlPanelContentRef.current;
+    if (!element || !content) return;
+    const naturalWidth = () => content.scrollWidth - (Number.parseFloat(getComputedStyle(content).paddingRight) || 0);
+    const updateOverflow = () => {
+      const overflowing = naturalWidth() > element.clientWidth;
+      element.classList.toggle("overflow-x-auto", overflowing);
+      element.classList.toggle("overflow-x-hidden", !overflowing);
+      content.classList.toggle("pr-8", overflowing);
+      if (!overflowing) element.scrollLeft = 0;
+    };
+    updateOverflow();
+    const observer = new ResizeObserver(updateOverflow);
+    observer.observe(element);
+    observer.observe(content);
+    const handleWheel = (event: WheelEvent) => {
+      if (naturalWidth() <= element.clientWidth) {
+        element.scrollLeft = 0;
+        return;
+      }
+      const maximum = element.scrollWidth - element.clientWidth;
+      const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      if (maximum <= 0 || delta === 0) return;
+      const next = Math.max(0, Math.min(maximum, element.scrollLeft + delta));
+      if (next === element.scrollLeft) return;
+      event.preventDefault();
+      element.scrollLeft = next;
+    };
+    element.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      observer.disconnect();
+      element.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   const handleTogglePlanMode = () => {
     if (planMode && isStreaming) {
@@ -380,37 +418,45 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
           />
 
           <div className="@container/composer flex items-center justify-between gap-1 px-1.5 pb-1.5">
-            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <div
+              ref={controlPanelRef}
+              data-testid="control-panel-scroll"
+              className="min-w-0 flex-1 overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              <div ref={controlPanelContentRef} data-testid="control-panel-content" className="flex w-max items-center gap-1.5">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      ref={addButtonRef}
+                      data-testid="attachment-picker-toggle"
+                      aria-label={t("input.addFilesOrMedia")}
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={handleAddButtonClick}
+                      className="text-muted-foreground"
+                    >
+                      <IconPaperclip className="size-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{t("input.addFilesOrMedia")}</TooltipContent>
+                </Tooltip>
+                {extensionConfig.controlPanel.permission && <PermissionModeButton />}
+                <BehaviorButtons />
+                <ModeButtons planMode={planMode} onTogglePlanMode={handleTogglePlanMode} />
+                {extensionConfig.controlPanel.secondaryModel && <SubagentModelDialog disabled={isStreaming} />}
+              </div>
+            </div>
+
+            <div
+              data-testid="control-panel-actions"
+              className="relative z-10 flex items-center gap-2 shrink-0 bg-background before:absolute before:inset-y-0 before:right-full before:w-8 before:bg-gradient-to-r before:from-transparent before:to-background before:pointer-events-none before:content-['']"
+            >
+              <UsageStatusBar />
               <ModelPicker
                 availableModels={availableModels}
                 hasConversationHistory={hasConversationHistory}
                 disabled={isStreaming || !hasModels}
               />
-              {extensionConfig.controlPanel.permission && <PermissionModeButton />}
-              <BehaviorButtons />
-              <ModeButtons planMode={planMode} onTogglePlanMode={handleTogglePlanMode} />
-              {extensionConfig.controlPanel.secondaryModel && <SubagentModelDialog disabled={isStreaming} />}
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    ref={addButtonRef}
-                    data-testid="attachment-picker-toggle"
-                    aria-label={t("input.addFilesOrMedia")}
-                    variant="ghost"
-                    size="icon-xs"
-                    onClick={handleAddButtonClick}
-                    className="text-muted-foreground"
-                  >
-                    <IconPlus className="size-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t("input.addFilesOrMedia")}</TooltipContent>
-              </Tooltip>
-
-              <UsageStatusBar />
               <ActionMenu onAuthAction={onAuthAction} />
 
               {isStreaming ? (

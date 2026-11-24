@@ -59,3 +59,44 @@ describe("working indicator", () => {
     expect(container.querySelector("[role=status]")?.textContent).toBe("Working…");
   });
 });
+
+describe("assistant response brand", () => {
+  it("loads the pink KIMI KRINIK robot from the packaged resources", () => {
+    document.body.setAttribute("data-baseuri", "https://extension.test");
+    try {
+      const { container } = render(
+        <ChatMessage
+          message={{ id: "assistant-brand", role: "assistant", content: "answer", steps: [], timestamp: 0 }}
+        />,
+      );
+
+      const image = container.querySelector<HTMLImageElement>('img[alt="KIMI KRINIK"]');
+      expect(image).not.toBeNull();
+      expect(image?.getAttribute("src")).toBe("https://extension.test/resources/krinik-robot-logo.png");
+      expect(image?.className).toContain("size-6");
+      expect(image?.className).not.toContain("rounded");
+      expect(image?.style.height).toBe("auto");
+    } finally {
+      document.body.removeAttribute("data-baseuri");
+    }
+  });
+
+  it("uses the brand pink for step path dots and their glow", () => {
+    const { container } = render(
+      <ChatMessage
+        message={{
+          id: "assistant-steps",
+          role: "assistant",
+          content: "",
+          steps: [{ n: 1, items: [{ type: "thinking", content: "step", finished: false }] }],
+          timestamp: 0,
+        }}
+        isStreaming
+      />,
+    );
+
+    const dot = container.querySelector(".size-1\\.5.rounded-full");
+    expect(dot?.className).toContain("bg-[#FF1A8C]");
+    expect(dot?.className).toContain("rgba(255,26,140,0.6)");
+  });
+});

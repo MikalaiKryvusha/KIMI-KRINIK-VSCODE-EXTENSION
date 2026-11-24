@@ -59,6 +59,13 @@ describe("interface dictionaries", () => {
     expect(translate("ru", "modes.plan")).toBe("План");
     expect(translate("ru", "modes.goal")).toBe("Цель");
     expect(translate("ru", "modes.swarm")).toBe("Рой");
+    expect(translate("en", "menu.aboutProject")).toBe("About KIMI KRINIK");
+    expect(translate("ru", "menu.aboutProject")).toBe("О проекте KIMI KRINIK");
+    expect(translate("zh", "menu.aboutProject")).toBe("关于 KIMI KRINIK");
+    expect(translate("en", "sound.choice.triple")).toBe("Triple beep");
+    expect(translate("ru", "sound.choice.triple")).toBe("Тройной писк");
+    expect(translate("zh", "sound.choice.triple")).toBe("三声提示音");
+    expect(translate("en", "sound.enabled")).toBe("Sound enabled");
   });
 });
 
