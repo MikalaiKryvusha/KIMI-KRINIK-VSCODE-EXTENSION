@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 02:37 +03:00 — extension suite and root lint fully green
+- Corrected the `usage-status-bar` test to read the actual separator wrapper rather than the label's immediate parent; product behavior was already correct.
+- Full extension: 48 files, 597 passed, 1 skipped, 0 failed. `pnpm lint` exits 0. Historical reports retain their earlier counts/failures; current state has no accepted test failure.
+
 ### 2026-11-25 02:29 +03:00 — deleted non-KAIF skill references cleaned; root lint green
 - Removed repository-workflow references to deleted `write-tui`, `gen-docs`, `gen-changesets`, `review-pr`, `sync-changelog` and local `use-kimi-code` artifacts from AGENTS/PR/docs paths. Other-agent guides now point to the running KAP guide instead of an installed skill.
 - Kept public engine documentation for generic `~/.agents/skills` directories: that is supported product behavior, not a deleted repository-owned skill.
@@ -102,7 +106,7 @@
 
 ## Where we are now
 
-The extension builds and typecheck is green; the latest full extension run has 586 passed, 1 skipped and the known `usage-status-bar` selector failure. The 1.0.0 scope, phases and
+The extension builds and typecheck is green; the latest full extension run has 597 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
 acceptance live in the KAIF origin repository: `D:/work/ai_sandbox/KAIF/plans/147_EPIC_kimi_krinik_1_0_0.md` and `plans/148`–`154`.
 Routine pushes of this branch go under the standing authorization of `AGENT_GUIDE.md` → Git workflow; a release, a rename and any
 external publication wait for the owner's `AUTH:`.
@@ -118,7 +122,7 @@ external publication wait for the owner's `AUTH:`.
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 22:23 +03:00, Windows): 586 passed, 1 skipped, 1 known `usage-status-bar` failure; typecheck and final package/static audit green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-25 02:36 +03:00, Windows): 597 passed, 1 skipped, 0 failures; root lint, typecheck and build-19 package/static audit green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -134,7 +138,7 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-CURRENT: build 12 is installed on the main-profile disk and byte-identical to the final dist. Fully restart VS Code, read `v1.0.0 (11)`, then repeat ON/OFF queue, duplicate, composer, media and hook-output checks before marking `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` or `bugs/24` DONE. `bugs/17` is DONE after the owner's three-language listening verdict. The known `usage-status-bar.test.tsx:57` selector failure remains separate; `bugs/19` two-client replay, the broader lifecycle matrix, sticky last message and release/publication remain later work. No release/publication without separate owner `AUTH:`.
+CURRENT: build 12 is installed on the main-profile disk and byte-identical to its final dist; builds 17–19 are isolated-only. Fully restart VS Code, read `v1.0.0 (12)`, then repeat ON/OFF queue, duplicate, composer, media and hook-output checks before marking `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` or `bugs/24` DONE. `bugs/17` is DONE after the owner's three-language listening verdict. The full extension suite and root lint are green; `bugs/19` two-client replay, original first-prompt `bugs/25`, broader lifecycle matrix, sticky last message and release/publication remain later work. No release/publication without separate owner `AUTH:`.
 
 Standing falsehood: the claims that builds 4–6 had failed live were false because the old isolated process never restarted → corrected in `bugs/20_queue_steer_duplicate_submission.md` and the fresh-process result in `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`.
 

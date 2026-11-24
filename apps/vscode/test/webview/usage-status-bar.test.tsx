@@ -66,8 +66,8 @@ describe("usage status", () => {
     expect(screen.getAllByText("resets in 3d 2h").length).toBeGreaterThan(0);
     expect(screen.getAllByText("5h quota")[0]!.className).toContain("font-semibold");
     expect(screen.getAllByText("Monthly quota")[0]!.className).toContain("font-semibold");
-    expect(screen.getAllByText("Monthly quota")[0]!.parentElement?.className).toContain("border-t");
-    expect(screen.getAllByText("Monthly quota")[0]!.parentElement?.className).toContain("pt-2");
+    expect(screen.getAllByText("Monthly quota")[0]!.parentElement?.parentElement?.className).toContain("border-t");
+    expect(screen.getAllByText("Monthly quota")[0]!.parentElement?.parentElement?.className).toContain("pt-2");
   });
 
   it("separates context numbers from the bold inspect label", async () => {
