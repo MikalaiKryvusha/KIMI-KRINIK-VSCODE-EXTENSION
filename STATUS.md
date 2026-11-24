@@ -78,9 +78,11 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 [OWNER] «тестируй всё, что можешь протестировать на стенде, полируй, доводи до хорошего состояния … На этом мы тут чат закроем, я перезапускаю VS Code с установленным тобою KIMI KRINIK 1.0.0, и я создам новую сессию прямо в нём» · 2026-11-24 10:00 +03:00 (чат)
 
-Stand-first route is complete through C17, C24–C26 and the sound contour. At the measured 80% context boundary the current VSIX is being committed and soft-closed. The next session runs inside KIMI KRINIK on the owner's real profile and uses Windows mouse/keyboard automation and screenshots for the remaining real-world acceptance.
+Stand-first route is complete through C17, C24–C26 and the sound contour. Main commit `8ac5df733` is pushed and `mikalai-kryvusha.kimi-code-kaif@1.0.0` is installed in the owner's main VS Code. The next session runs inside KIMI KRINIK on the owner's real profile and uses Windows mouse/keyboard automation and screenshots for the remaining real-world acceptance.
 
-[AI] ACTIVE: 2026-11-24 10:00 +03:00 — owner-approved stand-first K5 acceptance and polishing; the previous soft closure was completed at 07:32, and this chat resumed for the new stand-first order.
+[AI] FORCE-CLOSED: 2026-11-24 12:48 +03:00 — the window reached 90%; no new task, build, test suite or judge starts. Full suite (556/1), typecheck, lint and judge VERIFIED were completed before the forced closure.
+
+⚠️ Force-closed 2026-11-24 12:48 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first `/skill:end-chat-soft` pays this debt.
 
 Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; ранняя ошибка изоляции CDP исправлена в K5 report/TC и launcher; корневой `.kaif/kaif.json` восстановлен и не имеет diff. Прежнее «глаза робота отличаются геометрией» оказалось неверным: совпадал размер и `rounded`, исправлено в коде KimiLogo/ChatMessage.
 
