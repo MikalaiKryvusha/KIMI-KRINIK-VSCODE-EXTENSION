@@ -47,11 +47,11 @@ external publication wait for the owner's `AUTH:`.
 | K2 behavior controls | ✅ hygiene | independent Context Window Control, KAIF handoff and in-flight Auto Compact OFF cancellation are committed and verified; live flip acceptance is in K5 |
 | K3 localization and theme | ✅ hygiene | three languages and the theme tokens; live acceptance in K5 |
 | K4 sound settings | ✅ hygiene | the window, B8 terminal guard and B5/B6 command/temp-file safety are verified; live sound acceptance is in K5 |
-| K5 live acceptance and release | 🔲 todo | `plans/153`; publishing only on the owner's `AUTH:` |
+| K5 live acceptance and release | 🔧 in progress | isolated VSIX startup, Second Side Bar, bugs/02/03/06/07 pass; accumulated-profile and remaining controls/races/sound still open; publishing only on the owner's `AUTH:` |
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 04:32 +03:00, Windows): 535 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 05:23 +03:00, Windows): 535 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -67,11 +67,11 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-[AI] IN PROGRESS: 2026-11-24 04:27 +03:00 — B5/B6 are committed and pushed as `5c7b8ece5`. K5 isolated VSIX startup passed on real VS Code 1.123.0; continue the live control and visual matrix. Do not close the chat now; start soft closure only when the context-overflow hook fires.
+[AI] IN PROGRESS: 2026-11-24 05:23 +03:00 — B5/B6 and the harness fix are pushed. Bug 07 is fixed and live-verified on a rebuilt VSIX; finish its judge/commit/push and continue the remaining K5 matrix. Do not close the chat now; start soft closure only when the context-overflow hook fires.
 
 Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; отдельная коррекция дана в чате.
 
-KNOWLEDGE: permission defaults, model picker, live status/title flow and in-flight cancellation are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; B5/B6 evidence and guard gaps are in `testcases/reports/2026-11-24_attention_voice_safety.md`; the one-step Extension Host route and inherited Electron mode boundary are in `HOUSE_RULES.md` and `bugs/06_DONE_extension_host_electron_node_mode.md`.
+KNOWLEDGE: permission defaults, model picker, live status/title flow and in-flight cancellation are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; live K5 observations and WebP paths are in `testcases/reports/2026-11-24_k5_live_acceptance.md`; the one-step Extension Host route is in `HOUSE_RULES.md`; closed harness and resource defects are in `bugs/06_DONE_extension_host_electron_node_mode.md` and `bugs/07_DONE_header_robot_resource_path.md`.
 
 1. K5: drive all new controls, B5/B6 and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
 2. Investigate `bugs/04_frozen_prompt_windows_path.md` and `bugs/05_pre_post_compact_hook_log_empty.md` separately; both reproduce on the original engine service and are not K2.6 regressions.

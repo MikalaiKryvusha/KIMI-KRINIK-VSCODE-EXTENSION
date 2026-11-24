@@ -5,9 +5,6 @@ vi.mock("@/services", () => ({
   Events: {},
   bridge: { getKimiSessions: vi.fn(async () => []), on: vi.fn(() => vi.fn()) },
 }));
-vi.mock("../../webview-ui/src/components/hooks/useExtensionImageUrl", () => ({
-  useExtensionImageUrl: (name: string) => `/resources/${name}`,
-}));
 vi.mock("@/components/ui/sonner", () => ({
   toast: { error: vi.fn(), warning: vi.fn(), info: vi.fn(), success: vi.fn() },
 }));
@@ -17,6 +14,7 @@ import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 
 beforeEach(() => {
+  document.body.setAttribute("data-baseuri", "https://extension.test");
   useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG } });
   useChatStore.setState({
     sessionId: "session-1",
@@ -29,6 +27,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  document.body.removeAttribute("data-baseuri");
 });
 
 describe("session header", () => {
@@ -38,6 +37,6 @@ describe("session header", () => {
     expect(screen.getByText("KIMI KRINIK")).not.toBeNull();
     expect(screen.getByText("· Fix login")).not.toBeNull();
     expect(screen.getByText("· Fix login").className).toContain("@max-[430px]:hidden");
-    expect(screen.getByRole("img", { name: "KIMI KRINIK" }).getAttribute("src")).toBe("/resources/krinik-robot-logo.png");
+    expect(screen.getByRole("img", { name: "KIMI KRINIK" }).getAttribute("src")).toBe("https://extension.test/resources/krinik-robot-logo.png");
   });
 });
