@@ -33,3 +33,22 @@
 | `node .kaif/hooks/kimi-permission-call.mjs --selftest` | проверяет маршрут file-based voice для permission call | наличие `contour.voiceFileTool` и передачу файла фразы |
 | `node .kaif/tools/contour/voice-soft.mjs --selftest` | проверяет журнал фраз и soft-фильтр KAIF | форму voice log; не заменяет прослушивание Glass |
 | `pnpm --filter kimi-code-kaif test:extension-host --version 1.123.0` | устанавливает VSIX в изолированный профиль, активирует расширение и открывает webview | кеш `F:/Temp/kimi-vscode-test-cache`; скрипт сам очищает унаследованный `ELECTRON_RUN_AS_NODE` |
+
+## 4. Environment dossier — факты этой машины
+
+> **Environment dossier.** Taken: `2026-11-24T05:35:54+03:00` · Regeneration: `/refresh-context` → dossier step · Факты старше четырёх недель считаются гипотезами и проверяются заново.
+
+| Факт | Значение | Probe |
+|---|---|---|
+| OS | Windows 11 Pro · `10.0.26200` | `powershell.exe -NoProfile -File .tmp/k5-env-probe.ps1` |
+| CPU / RAM | AMD Ryzen 7 5700G · 16 logical cores · 31,8 GiB | тот же probe-файл |
+| Shells | Git Bash `C:/Program Files/Git/usr/bin/bash.exe` · Windows PowerShell · `cmd.exe`; `pwsh` не найден | `where bash powershell pwsh cmd` |
+| Git Bash locale / redirect | `C.UTF-8`; `Привет` записан как UTF-8 `d09fd180d0b8d0b2d0b5d182` | `locale`; `bash -c 'cat .tmp/k5-encoding-input.txt > .tmp/k5-encoding-bash.txt'` + Node hex |
+| PowerShell console / redirect | console codepage `866`; `$OutputEncoding` `20127` (US-ASCII); `Set-Content` записал Windows-866 `cff0e8e2e5f20d0a` | `.tmp/k5-env-probe.ps1` + `.tmp/k5-encoding-probe.ps1` + Node hex |
+| PowerShell locale | `ru-RU` / `ru-RU` | `.tmp/k5-env-probe.ps1` |
+| Runtime / build / VCS | Node `24.15.0` · pnpm `10.33.0` · Git `2.43.0.windows.1` | `node --version; pnpm --version; git --version` |
+| `tar` / `curl` / `find` в Git Bash | GNU `/usr/bin/tar`, `/usr/bin/find`; curl `/mingw64/bin/curl` | `type -a tar curl find` |
+| `tar` / `curl` / `find` в PowerShell | tar/find из Git `usr/bin`; curl — alias | `Get-Command tar,curl,find` в probe-файле |
+| VCS policy | `core.autocrlf=true` · credential helper `manager` | `git config --get core.autocrlf; git config --get credential.helper` |
+| Package managers | pnpm/npm из `C:/Program Files/nodejs`; winget установлен | `where pnpm npm winget` и PowerShell `Get-Command` |
+| Уроки инцидентов | `EXP-0002` red diff · `EXP-0003` voice/Windows · `EXP-0004` hook evidence · `EXP-0006` in-flight assertion | `EXPERIENCE.md` |

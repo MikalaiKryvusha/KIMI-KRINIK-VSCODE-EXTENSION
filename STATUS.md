@@ -25,6 +25,10 @@
 
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
+### 2026-11-24 07:32 +03:00 — B5/B6 and live K5 milestone ✅ hygiene / partial acceptance
+- `5c7b8ece5` secured attention voice commands with machine-only configuration, command-bound workspace approval, temp-file cleanup and logged failures; `695d3f51a` made the VSIX Extension Host smoke independent of inherited Electron Node mode; `87c26cf13` fixed the packaged header robot path. All three are pushed.
+- Bugs 01–03 are DONE after real VSIX acceptance; bugs 06/07 are DONE with red-to-green guards and live evidence. Languages, sound preview, Control Panel, ON/OFF steering and active-session Swarm controls were observed through CDP/WebP. K5 remains partial; see `testcases/TC_K5_live_acceptance.md` and `testcases/reports/2026-11-24_k5_live_acceptance.md`.
+
 ### 2026-11-24 02:34 +03:00 — in-flight Auto Compact OFF ✅ engine integration and full hygiene
 - `AgentFullCompactionService` now subscribes to `loopControl` changes and aborts only an active automatic operation when `autoCompact` becomes false. Cancellation is observed before the deferred provider response; an active manual compaction completes and applies its summary. No new automatic starts or overflow recovery occur; manual `/compact` remains available.
 - K2.6 red-to-green: the immediate-cancellation assertion failed before the subscription, both mid-flight scenarios and agent-core typecheck pass. Root lint and extension 527/1 pass. The full engine file has 121/123 passes; the two unrelated failures (Windows path in the frozen prompt and an empty Pre/PostCompact hook log) reproduce identically with the new subscription removed. Report: `testcases/reports/2026-11-24_inflight_auto_compact_off.md`.
@@ -47,11 +51,11 @@ external publication wait for the owner's `AUTH:`.
 | K2 behavior controls | ✅ hygiene | independent Context Window Control, KAIF handoff and in-flight Auto Compact OFF cancellation are committed and verified; live flip acceptance is in K5 |
 | K3 localization and theme | ✅ hygiene | three languages and the theme tokens; live acceptance in K5 |
 | K4 sound settings | ✅ hygiene | the window, B8 terminal guard and B5/B6 command/temp-file safety are verified; live sound acceptance is in K5 |
-| K5 live acceptance and release | 🔧 in progress | isolated VSIX startup, Second Side Bar, bugs/02/03/06/07 pass; accumulated-profile and remaining controls/races/sound still open; publishing only on the owner's `AUTH:` |
+| K5 live acceptance and release | 🔧 in progress | bugs/01–03/06/07, isolated startup, Second Side Bar, languages, sound preview and ON/OFF steering pass; quotas, closure, B5/B6 dialog, media-reject and rollback remain; publishing only on the owner's `AUTH:` |
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 05:23 +03:00, Windows): 535 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 07:44 +03:00, Windows): 535 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -67,21 +71,22 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-[AI] IN PROGRESS: 2026-11-24 05:23 +03:00 — B5/B6 and the harness fix are pushed. Bug 07 is fixed and live-verified on a rebuilt VSIX; finish its judge/commit/push and continue the remaining K5 matrix. Do not close the chat now; start soft closure only when the context-overflow hook fires.
+[AI] PARKED: 2026-11-24 07:32 +03:00 — soft closure entered at the measured 80% context level (81% on the closing probe). Every product change through `87c26cf13` is committed and pushed. The current K5 documentation/bug-closure milestone is being closed now; no new task starts in this chat.
 
-Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; отдельная коррекция дана в чате.
+Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; ранняя ошибка изоляции CDP исправлена в K5 report/TC и launcher; корневой `.kaif/kaif.json` восстановлен и не имеет diff.
 
-KNOWLEDGE: permission defaults, model picker, live status/title flow and in-flight cancellation are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; live K5 observations and WebP paths are in `testcases/reports/2026-11-24_k5_live_acceptance.md`; the one-step Extension Host route is in `HOUSE_RULES.md`; closed harness and resource defects are in `bugs/06_DONE_extension_host_electron_node_mode.md` and `bugs/07_DONE_header_robot_resource_path.md`.
+KNOWLEDGE: permission defaults, model picker, live status/title flow and in-flight cancellation are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; live K5 observations/WebP and the remaining matrix are in `testcases/reports/2026-11-24_k5_live_acceptance.md` and `testcases/TC_K5_live_acceptance.md`; the resource-resolver lesson is `EXPERIENCE.md` EXP-0007; the one-step Extension Host route and environment dossier are in `HOUSE_RULES.md`.
 
-1. K5: drive all new controls, B5/B6 and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
-2. Investigate `bugs/04_frozen_prompt_windows_path.md` and `bugs/05_pre_post_compact_hook_log_empty.md` separately; both reproduce on the original engine service and are not K2.6 regressions.
-3. Continue the remaining 1.0.0 release-readiness items without changing the pending B9/B10 owner decisions.
+1. Start the next chat with `/skill:resume`; read `testcases/TC_K5_live_acceptance.md` and the K5 report first. Continue rows C08, C11, C12, C17–C23: real quotas, active compaction/closure, B5/B6 dialog/process, rejected media, model effort/stop, extended status, real-event sound/replay and rollback. No row gets DONE from hygiene alone.
+2. For C23 inspect the Swarm reminder exit/reconcile contract before filing a defect: `packages/node-sdk/src/sdk-rpc-client-v2.ts:2572` documents reminder behavior. Read `packages/agent-core-v2/AGENTS.md` before any engine change. The observed historical enter reminder alone is not proof of a bug.
+3. The ignored local harness and evidence are under `.tmp/k5-vscode*`; inspect before reuse. The committed isolated startup route is `pnpm --filter kimi-code-kaif test:extension-host --version 1.123.0`. No test process is left running by the closing ritual.
+4. Investigate `bugs/04_frozen_prompt_windows_path.md` and `bugs/05_pre_post_compact_hook_log_empty.md` separately; both reproduce on the original engine service and are not K2.6 regressions.
+5. Release/publication remains a separate gated step. Do not decide B9/B10 or publish without the owner's required word.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.
 
 ## Open bugs
 
-- 🟠 `bugs/01`–`03` — fixes and red-to-green guards are committed; live Extension Host acceptance remains before DONE.
 - 🟠 B5/B6 in `Claude_Help_for_Kimi.md` — machine-only config, command-bound workspace approval, temp-file cleanup and failure logging are green; live Extension Host acceptance remains in K5.
 - 🔴 `bugs/04_frozen_prompt_windows_path.md` — pre-existing Windows cwd/listing failure reproduced on the original engine service.
 - 🔴 `bugs/05_pre_post_compact_hook_log_empty.md` — pre-existing empty Pre/PostCompact payload list reproduced on the original engine service.
@@ -89,4 +94,4 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔴 `bugs/152` (KAIF origin) — the extension can stay on «Starting Kimi Code…»; not reproduced; check B10 when it recurs.
 - 🟠 `bugs/151` (KAIF origin) — follow-up steer race; store-level fixes in place, live acceptance left.
 
-Текущий автономный дневной цикл начат 2026-11-24 03:39 +03:00 по скоупу KIMI KRINIK 1.0.0. Вопросы и запросы разрешений не отправляются; цикл идёт к заявленному функционалу и релизной готовности. Чат закрывается не сейчас, а автоматически по сигналу переполнения контекста. `[OWNER] «продолжай делать KIMI KRINIK 1.0.0. Работай автономно в дневном цикле. Без вопросов и запросов разрешений - я не смогу тебе дать на них ответы. На всё ДА, РАЗРЕШАЮ. Стремимся сделать заявленный функционал, и прийти к релизу. закроей чат автоматически по переполнению контекста чата», «закроешь, не сейчас, а когда чат переполниматься. А сейчас, пожалуйста, заложи в автономноый дневной луп» · 2026-11-24 03:39 +03:00 (чат)`
+Автономный дневной цикл начат 2026-11-24 03:39 +03:00 и завершён мягким закрытием по измеренной границе контекста 2026-11-24 07:32 +03:00. Вопросы владельцу не отправлялись; релиз не публиковался. `[OWNER] «Работай автономно в дневном цикле … На всё ДА, РАЗРЕШАЮ», «закроешь, не сейчас, а когда чат переполниматься» · 2026-11-24 03:39 +03:00 (чат)`

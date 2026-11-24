@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0007 · 2026-11-24 · ❌→✅ · #vscode #testing #assets
+class: guard-not-proven-against-threat
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/header.test.tsx
+**Context:** the header robot was broken in the installed VSIX while its component test mocked the resource URL hook.
+**Tried / did:** removed the mock, proved the original dist URL red, used the packaged resources path and inspected the rebuilt VSIX live.
+**Result:** ❌→✅ — the real hook guard and live `naturalWidth`/WebP observations passed.   → link: bugs/07_DONE_header_robot_resource_path.md
+**Lesson:** a resource test must use the production resolver and the packaged asset location; a mocked path can be green while the real image is absent.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/header.test.tsx` — the real hook must resolve `resources/krinik-robot-logo.png`; inspect image load state in the installed VSIX.
+**Trigger:** adding or moving a webview resource → run the unmocked resolver test and inspect the packaged image in the real Extension Host.
+**Not for:** replacing live visual acceptance with the unit check; it covers the path defect only.
+
 ### EXP-0006 · 2026-11-24 · ✅ · #compaction #config #testing
 class: late-cancellation-masquerades-as-live-flip
 mechanized: pnpm exec vitest run --reporter=agent packages/agent-core-v2/test/agent/fullCompaction/fullCompaction.test.ts -t "autoCompact becomes false"
