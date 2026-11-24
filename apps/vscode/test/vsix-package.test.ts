@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -55,6 +56,23 @@ describe('VSIX package CLI (target planning and validation)', () => {
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('Unknown VSIX target "plan9-x64"');
     expect(result.stderr).toContain('win32-arm64');
+  });
+});
+
+describe('VSIX build number', () => {
+  it('increments and persists the build number once per package invocation', async () => {
+    const root = await makeTempDir('kimi-build-number-');
+    const manifestPath = join(root, 'package.json');
+    await writeFile(manifestPath, `${JSON.stringify({ name: 'fixture', version: '1.0.0', buildNumber: 0 }, null, 2)}\n`);
+    const { incrementBuildNumber } = (await import(pathToFileURL(packageScript).href)) as unknown as {
+      incrementBuildNumber: (path: string) => Promise<number>;
+    };
+
+    await expect(incrementBuildNumber(manifestPath)).resolves.toBe(1);
+    await expect(incrementBuildNumber(manifestPath)).resolves.toBe(2);
+
+    const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as { buildNumber: number; version: string };
+    expect(manifest).toEqual({ name: 'fixture', version: '1.0.0', buildNumber: 2 });
   });
 });
 

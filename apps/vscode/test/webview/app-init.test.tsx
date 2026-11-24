@@ -53,6 +53,7 @@ beforeEach(() => {
     showThinkingContent: true,
     showThinkingExpanded: false,
     version: "test",
+    buildNumber: 0,
   });
   bridge.getSlashCommands.mockResolvedValue([]);
   bridge.checkLoginStatus.mockResolvedValue({ loggedIn: true, siteBase: "https://example.com" });

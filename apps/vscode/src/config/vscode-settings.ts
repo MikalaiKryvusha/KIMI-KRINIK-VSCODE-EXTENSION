@@ -3,7 +3,9 @@ import { CONTROL_PANEL_BUTTONS, INTERFACE_LANGUAGES, type ControlPanelVisibility
 import { normalizeSoundSettings, type SoundSettings } from "../../shared/sounds";
 
 declare const __EXTENSION_VERSION__: string;
+declare const __EXTENSION_BUILD_NUMBER__: number;
 const EXTENSION_VERSION = typeof __EXTENSION_VERSION__ !== "undefined" ? __EXTENSION_VERSION__ : "0.0.0";
+const EXTENSION_BUILD_NUMBER = typeof __EXTENSION_BUILD_NUMBER__ !== "undefined" ? __EXTENSION_BUILD_NUMBER__ : 0;
 
 function getConfig() {
   return vscode.workspace.getConfiguration("kimi");
@@ -92,6 +94,7 @@ export const VSCodeSettings = {
       soundEnabled: this.soundEnabled,
       sounds: this.sounds,
       version: EXTENSION_VERSION,
+      buildNumber: EXTENSION_BUILD_NUMBER,
     };
   },
 };

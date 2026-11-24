@@ -254,6 +254,18 @@ describe("Control Panel settings", () => {
     expect(await screen.findByText("Язык")).not.toBeNull();
   });
 
+  it("shows the extension version and build number in Support", async () => {
+    useSettingsStore.setState({
+      extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, version: "1.0.0", buildNumber: 37 },
+    });
+    const user = userEvent.setup();
+    render(<ActionMenu />);
+
+    await user.click(screen.getByRole("button"));
+
+    expect(await screen.findByText("v1.0.0 (37)")).not.toBeNull();
+  });
+
   it("opens the project page from Support", async () => {
     const user = userEvent.setup();
     render(<ActionMenu />);

@@ -142,7 +142,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
 
         <Separator className="my-px" />
 
-        <MenuSection title={t("menu.support")} subtitle={extensionConfig.version ? `v${extensionConfig.version}` : undefined}>
+        <MenuSection title={t("menu.support")} subtitle={extensionConfig.version ? `v${extensionConfig.version} (${extensionConfig.buildNumber})` : undefined}>
           <MenuItem onClick={handleOpenProjectPage}>
             <IconExternalLink className="size-4 text-muted-foreground" />
             <span className="flex-1">{t("menu.aboutProject")}</span>

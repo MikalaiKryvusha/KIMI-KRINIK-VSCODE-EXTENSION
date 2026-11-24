@@ -54,6 +54,7 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
   soundEnabled: true,
   sounds: DEFAULT_SOUND_SETTINGS,
   version: "",
+  buildNumber: 0,
 };
 
 export function getModelThinkingMode(model: ModelConfig): ThinkingMode {

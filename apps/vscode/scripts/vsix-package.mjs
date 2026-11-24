@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createRequire } from 'node:module';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 import { runLocalCli } from './local-cli.mjs';
@@ -64,6 +64,16 @@ function usage() {
   ].join('\n');
 }
 
+export async function incrementBuildNumber(manifestPath = join(extensionRoot, 'package.json')) {
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  if (!Number.isSafeInteger(manifest.buildNumber) || manifest.buildNumber < 0) {
+    throw new Error('package.json buildNumber must be a non-negative safe integer.');
+  }
+  manifest.buildNumber += 1;
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  return manifest.buildNumber;
+}
+
 async function main() {
   const options = parseArguments(process.argv.slice(2));
   if (options.help) {
@@ -76,6 +86,8 @@ async function main() {
   console.log(`Output directory: ${options.outputDir}`);
 
   if (!options.dryRun) {
+    const buildNumber = await incrementBuildNumber();
+    console.log(`Build number: ${buildNumber}`);
     console.log('Building the extension once before packaging all targets...');
     buildExtension();
   }

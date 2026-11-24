@@ -23,14 +23,24 @@
 
 ---
 
+### 2026-11-24 18:13 +03:00 — build 1 installed in the main profile; force-closed
+- Action Menu now renders `v1.0.0 (N)`. `apps/vscode/package.json` owns `buildNumber`; every non-dry-run `package:platform` invocation increments it once before building, and the host passes it through `ExtensionConfig`.
+- Fresh `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` is build 1. `code --install-extension ... --force` installed it into the owner's main profile; installed `package.json` reads `buildNumber: 1`, and installed extension/webview SHA-256 values exactly match the new dist files. Post-restart rendering is not yet observed.
+- Verification: new targeted tests 26/26, extension + webview typecheck and root lint green; package/static audit green. Full suite: 573 passed, 1 skipped, 1 failed at the previously documented `apps/vscode/test/webview/usage-status-bar.test.tsx:57` parent-selector assertion (`border-t` is on the separator wrapper); not called green.
+- NEXT: the owner restarts VS Code and checks `v1.0.0 (1)` plus the Language dialog in Action Menu. The next chat first observes that real-profile smoke, then fixes the usage-status-bar selector and reruns the full suite. Generate the build-number changeset before a PR; no release/publication is authorized.
+- Pre-existing `.kaif/kaif.json` modification and untracked `.kaif/kimi-refresh.json`, `.vscode-test/`, `Claude_Help_for_Kimi.md`, `KIMI CODE LOGO/GPT ROBOT REFERENCES/` are not part of this change.
+- ⚠️ Force-closed 2026-11-24 18:13 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first /skill:end-chat-soft pays this debt.
+- Standing falsehood: none — the earlier expected-current-UI installation claim was corrected above and in the 17:45 entry.
+- KNOWLEDGE: build identity is sourced from the extension manifest and was checked through the installed package and byte-identical dist hashes; the recipe and remaining UI observation are recorded here.
+
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
-### 2026-11-24 17:45 +03:00 — lifecycle and UI fixes delivered; current VSIX installed by owner
+### 2026-11-24 17:45 +03:00 — lifecycle and UI fixes delivered; installation claim corrected at 18:07
 - `bugs/22`: first/queued/steered messages now create immediate optimistic entries with stable `clientId` through store, bridge, runtime and events; durable events reconcile without duplicates and host-idle dequeue needs no lightning. Isolated VSIX: first Send appears before acknowledgement and remains one user entry/one model request.
 - `bugs/20`: queue lightning removes immediately and restores exact index on failure; ten activations produce one `steerChat`. `bugs/17`: attention voice starts exactly once with «Николай, это Кими Криник» on Glass/browser routes. `bugs/19`: live tool events restore «Работаю…»; two-client replay is unverified.
 - `ideas/01`: language selection is a dialog with selected-first order (English before Russian, Chinese last); Action Menu shows only localized `Language` / `Язык` / `语言`. Delete is localized. Quota/context headings are bold with separator borders/gaps.
 - Lifecycle full suite: 48 files, 571 passed, 1 skipped; typecheck, lint, build and Extension Host smoke green. Final usage suite is 4/5: `usage-status-bar.test.tsx:57` reads the immediate parent instead of the separator wrapper; not called green.
-- Current `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` passed Extension Host smoke and the owner confirmed `node .tmp/owner-install.mjs` installed it in the main profile. Earlier claim that latest installation was blocked is corrected by the owner's output.
+- The 17:35 `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` passed Extension Host smoke, but the owner's 18:07 restart showed that the expected current UI was not active. The earlier claim of a successful current installation is retracted; fresh packaging and installation are required.
 
 ### 2026-11-24 13:51 +03:00 — owner findings filed; chat pipeline research and repair ladder ready
 - Real-profile acceptance found six open defects: `bugs/11` immediate/lost steering, `bugs/12` obsolete composer restoration, `bugs/13` steering attachments and thumbnails, `bugs/14` missing visible queue, `bugs/15` visible internal hook output and `bugs/16` assistant avatar above the user's steering bubble. No pipeline implementation changed.
@@ -89,7 +99,7 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-FORCE-CLOSED: 2026-11-24 17:45 +03:00 — current VSIX is packaged and installed by the owner in the main profile. Next session starts by fixing the parent selector in `apps/vscode/test/webview/usage-status-bar.test.tsx:57` (use the separator wrapper), then runs full `apps/vscode/test`, lint/typecheck and a real-profile first-Send/queue/language smoke. `bugs/19` still needs two-client replay acceptance; `bugs/11`–`16` and `bugs/18` still need the broader lifecycle contracts in `plans/02_epic01_characterize_chat_pipeline.md`. `bugs/17`, `bugs/20`, `bugs/22` and `ideas/01` have implementation evidence but their DONE handoff/documentation is not fully committed yet. No release/publication without separate owner `AUTH:`.
+FORCE-CLOSED: 2026-11-24 17:45 +03:00 — a VSIX was packaged, but the owner's later restart disproved the expected-current-UI installation claim. Next session starts by fixing the parent selector in `apps/vscode/test/webview/usage-status-bar.test.tsx:57` (use the separator wrapper), then runs full `apps/vscode/test`, lint/typecheck and a real-profile first-Send/queue/language smoke. `bugs/19` still needs two-client replay acceptance; `bugs/11`–`16` and `bugs/18` still need the broader lifecycle contracts in `plans/02_epic01_characterize_chat_pipeline.md`. `bugs/17`, `bugs/20`, `bugs/22` and `ideas/01` have implementation evidence but their DONE handoff/documentation is not fully committed yet. No release/publication without separate owner `AUTH:`.
 
 ⚠️ Force-closed 2026-11-24 17:45 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first /skill:end-chat-soft pays this debt. The follow-up test-after-code waiver was also refused by the active closure hook, so the final selector fix and its real-product verification were NOT run in this chat; do not call them done.
 

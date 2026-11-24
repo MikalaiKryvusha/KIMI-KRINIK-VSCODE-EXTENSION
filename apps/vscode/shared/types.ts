@@ -62,6 +62,7 @@ export interface ExtensionConfig {
   soundEnabled: boolean;
   sounds: SoundSettings;
   version: string;
+  buildNumber: number;
 }
 
 export const INTERFACE_LANGUAGES = ["en", "zh", "ru"] as const;
