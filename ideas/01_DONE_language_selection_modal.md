@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-24
 > **Родитель:** запрос владельца в чате; `GOAL.md` критерий 6; K3 в `MASTER_PLAN.md`
-> **Статус:** ✅ одобрено владельцем; 🔧 реализация начата 2026-11-24
+> **Статус:** ✅ DONE 2026-11-25 02:42 +03:00 — реализация, changeset, EN/RU/ZH VSIX-приёмка и полный suite подтверждены
 > **Вовне:** changeset для VS Code и приёмка в изолированном VSIX
 
 [OWNER] «настройку языка делаем кнопкой, выбор языка переносим в окно, итого целая большая секция из меню сжимается до одной кнопки» · 2026-11-24 (чат)
@@ -29,9 +29,9 @@
 
 - [x] Добавить красный компонентный контракт в существующий `control-panel-settings.test.tsx`.
 - [x] Заменить inline-секцию языка одной кнопкой и добавить `LanguageSelectionDialog` на существующем Dialog.
-- [x] Запустить affected suites, typecheck, полный extension suite и `pnpm lint`; единственная оставшаяся ошибка — ранее задокументированный селектор `usage-status-bar.test.tsx:57`.
+- [x] Запустить affected suites, typecheck, полный extension suite и `pnpm lint`; финальный прогон 2026-11-25 — 597 passed, 1 skipped, 0 failed, lint 0.
 - [x] Проверить установленный VSIX: открытие меню → открытие окна → EN → RU → 中文 → сохранение после закрытия; прочитать DOM и WebP.
-- [ ] Записать changeset `patch` и закрыть идею с `DONE` только после всех проверок.
+- [x] Changeset `patch` записан в `.changeset/kaif-language-selection-dialog.md`; идея закрыта после всех проверок.
 
 ## Риски и границы
 
@@ -39,6 +39,13 @@
 - Не создавать второй store: окно использует `extensionConfig.language` и `changeLanguage` из существующего settings store.
 - Не переносить другие секции Action Menu и не менять звуковое/Control Panel окна.
 - Узкие панели проверяются по фактической ширине Dialog, а не только по классам.
+
+## ✅ STATUS: DONE (2026-11-25 02:42 +03:00)
+
+Реализована одна трёхъязычная кнопка Language в Action Menu и отдельное окно выбора с выбранным языком первым. Существующие persisted setting и rollback сохранены. Changeset присутствует.
+
+Hygiene: affected component checks, typecheck, root lint и полный extension suite зелёные; финальный полный прогон 597 passed, 1 skipped, 0 failed.
+Functional run: установленный VSIX, открытие меню/окна и последовательность EN → RU → 中文 прочитаны по DOM и WebP; выбранный язык сохраняется после закрытия, горизонтального overflow нет.
 
 ## Decisions made without the owner
 

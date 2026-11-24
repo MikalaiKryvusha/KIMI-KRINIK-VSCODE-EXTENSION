@@ -157,7 +157,7 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 
 ## Approved features
 
-- 🔧 `ideas/01_language_selection_modal.md` — owner approved one Language button in Action Menu with English → Русский → 中文 moved into a separate dialog; implementation and VSIX acceptance in progress.
+- ✅ `ideas/01_DONE_language_selection_modal.md` — one Language button and selected-first dialog implemented, changeset recorded and EN/RU/ZH VSIX acceptance passed; tagged DONE on 2026-11-25.
   [OWNER] «настройку языка делаем кнопкой, выбор языка переносим в окно, итого целая большая секция из меню сжимается до одной кнопки» · 2026-11-24 (чат)
 - ✅ `ideas/02_control_panel_skill_picker.md` — owner approved a scrollable skill picker with bold name / normal description, existing queue/Steer routing and localized metadata fallback. Deliberately deferred until KIMI KRINIK 1.0.0 is completed and released; KAIF translations remain in the linked upstream idea 39.
 - ✅ `ideas/03_extension_general_settings.md` — owner approved an extension-localized General Settings page with no duplicate owners; Context Window Control and thresholds move there from Control Panel. Planned for the next development cut, not started during closure.
