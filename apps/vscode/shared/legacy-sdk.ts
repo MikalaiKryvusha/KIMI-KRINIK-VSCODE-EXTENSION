@@ -62,6 +62,7 @@ export interface ToolResult {
 export interface TurnBegin {
   user_input: string | ContentPart[];
   turnIndex?: number;
+  clientId?: string;
 }
 
 export interface TokenUsage {
@@ -162,7 +163,7 @@ export type LegacyWireEvent =
   | { type: 'ToolCall'; payload: ToolCall }
   | { type: 'ToolCallPart'; payload: { tool_call_id?: string; arguments_part?: string | null } }
   | { type: 'ToolResult'; payload: ToolResult }
-  | { type: 'SteerInput'; payload: { user_input: string | ContentPart[] } }
+  | { type: 'SteerInput'; payload: { user_input: string | ContentPart[]; clientId?: string } }
   | { type: 'SubagentEvent'; payload: SubagentEvent }
   | { type: string; payload: unknown };
 

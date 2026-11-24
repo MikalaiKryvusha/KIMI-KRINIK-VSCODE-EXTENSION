@@ -6,6 +6,7 @@ const boundary = vi.hoisted(() => ({
   on: vi.fn(),
   getBackgroundTasks: vi.fn(),
   getSessionContext: vi.fn(),
+  steerChat: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
@@ -14,6 +15,7 @@ vi.mock("@/services", () => ({
     on: boundary.on,
     getBackgroundTasks: boundary.getBackgroundTasks,
     getSessionContext: boundary.getSessionContext,
+    steerChat: boundary.steerChat,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -37,6 +39,7 @@ beforeEach(() => {
   boundary.getBackgroundTasks.mockResolvedValue({ tasks: [] });
   boundary.getSessionContext.mockReset();
   boundary.getSessionContext.mockResolvedValue({ ok: true, snapshot: { tokenCount: 0, messages: [] } });
+  boundary.steerChat.mockReset();
   useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG } });
   useChatStore.setState({
     sessionId: "session-1",
@@ -76,6 +79,64 @@ describe("live status pills", () => {
 
     expect(await screen.findByText("1 Changed")).not.toBeNull();
     expect(screen.getByTitle("+3 / −1")).not.toBeNull();
+  });
+
+  it("optimistically removes a steered queue item and submits it only once across ten activations", async () => {
+    let acceptSteer: (value: { ok: boolean }) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((resolve) => { acceptSteer = resolve; }));
+    useChatStore.setState({
+      isStreaming: true,
+      queue: [
+        { id: "q1", content: "first", model: "plain" },
+        { id: "q2", content: "second", model: "plain" },
+      ],
+    });
+    const user = userEvent.setup();
+    render(<StatusPills />);
+    await user.click(screen.getByText("2 Queued"));
+    const lightning = screen.getAllByTitle("Insert now (steer)")[0]!;
+
+    await user.click(lightning);
+
+    expect(boundary.steerChat).toHaveBeenCalledTimes(1);
+    expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q2"]);
+    for (let index = 0; index < 9; index += 1) lightning.click();
+    expect(boundary.steerChat).toHaveBeenCalledTimes(1);
+
+    acceptSteer({ ok: true });
+    await vi.waitFor(() => expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q2"]));
+    expect(boundary.steerChat).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["unaccepted", "rejected"] as const)("restores the same queue item at its original index after an %s steer and permits a deliberate retry", async (outcome) => {
+    let settleSteer: (value: { ok: boolean }) => void = () => undefined;
+    let rejectSteer: (error: Error) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((resolve, reject) => {
+      settleSteer = resolve;
+      rejectSteer = reject;
+    }));
+    useChatStore.setState({
+      isStreaming: true,
+      queue: [
+        { id: "q1", content: "first", model: "plain" },
+        { id: "q2", content: "second", model: "plain" },
+      ],
+    });
+    const user = userEvent.setup();
+    render(<StatusPills />);
+    await user.click(screen.getByText("2 Queued"));
+
+    await user.click(screen.getAllByTitle("Insert now (steer)")[0]!);
+    expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q2"]);
+
+    if (outcome === "unaccepted") settleSteer({ ok: false });
+    else rejectSteer(new Error("steer failed"));
+    await vi.waitFor(() => expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q1", "q2"]));
+
+    boundary.steerChat.mockResolvedValue({ ok: true });
+    await user.click(screen.getAllByTitle("Insert now (steer)")[0]!);
+    expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q2"]);
+    expect(boundary.steerChat).toHaveBeenCalledTimes(2);
   });
 
   it("opens real background process and agent panels", async () => {

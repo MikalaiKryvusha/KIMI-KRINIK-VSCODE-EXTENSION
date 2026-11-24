@@ -17,12 +17,12 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
         turnId: 7,
         origin: { kind: 'user' },
       },
-      { pendingInput: 'Fix the failing test' },
+      { pendingInput: 'Fix the failing test', clientId: 'client-turn-1' },
     );
 
     expect(result.event).toEqual({
       type: 'TurnBegin',
-      payload: { user_input: 'Fix the failing test', turnIndex: 7 },
+      payload: { user_input: 'Fix the failing test', turnIndex: 7, clientId: 'client-turn-1' },
       _sessionId: 'session-1',
     });
   });

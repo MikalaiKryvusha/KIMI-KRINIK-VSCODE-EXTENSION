@@ -31,6 +31,14 @@ afterEach(() => {
 });
 
 describe("session header", () => {
+  it("keeps context percentage out of the top status panel", () => {
+    useChatStore.setState({ lastStatus: { context_usage: 0.231 } });
+    render(<Header />);
+
+    expect(screen.queryByText("23.1%")).toBeNull();
+    expect(screen.queryByTitle("Context Window Usage")).toBeNull();
+  });
+
   it("shows the KIMI KRINIK robot and the live session title", () => {
     render(<Header />);
 

@@ -565,17 +565,32 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     ]);
   });
 
-  it("echoes a successful steer into the subscribed Webview", async () => {
+  it("echoes a successful steer into the subscribed Webview with its clientId", async () => {
     const { runtime, broadcasts } = createRuntime();
     runtime.subscribe("view-a");
 
-    await runtime.steer("Use this instead");
+    await runtime.steer("Use this instead", "client-steer-1");
 
     expect(streamData(broadcasts)).toContainEqual({
       type: "SteerInput",
-      payload: { user_input: "Use this instead" },
+      payload: { user_input: "Use this instead", clientId: "client-steer-1" },
       _sessionId: "session-1",
     });
+  });
+
+  it("correlates an ordinary turn with the clientId from its prompt", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const completion = runtime.prompt("hello", "client-turn-1");
+
+    sdk.emit(turnStarted());
+
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "TurnBegin",
+      payload: { user_input: "hello", turnIndex: 7, clientId: "client-turn-1" },
+      _sessionId: "session-1",
+    });
+    sdk.emit(turnEnded("completed"));
+    await expect(completion).resolves.toEqual({ status: "finished" });
   });
 
   it.each([

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IconTrash, IconArrowUp, IconPencil, IconCheck, IconX, IconBolt } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores";
 import { bridge } from "@/services";
+import { toast } from "@/components/ui/sonner";
 import { Content } from "@/lib/content";
 import { useT } from "@/i18n";
 
@@ -10,15 +11,35 @@ import type { ContentPart } from "shared/legacy-sdk";
 
 function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: string | ContentPart[]; isStreaming: boolean; onEdit: (id: string) => void }) {
   const { removeFromQueue, moveQueueItemUp, queue } = useChatStore();
+  const steering = useRef(false);
   const t = useT();
   const text = Content.getText(content);
   const hasMedia = Content.hasMedia(content);
   const isFirst = queue[0]?.id === id;
 
   const handleSteer = async () => {
-    const result = await bridge.steerChat(content);
-    if (result.ok) {
-      removeFromQueue(id);
+    if (steering.current) return;
+    const queueBeforeSend = useChatStore.getState().queue;
+    const index = queueBeforeSend.findIndex((item) => item.id === id);
+    const item = queueBeforeSend[index];
+    if (item === undefined) return;
+    steering.current = true;
+    removeFromQueue(id);
+    const restore = () => {
+      useChatStore.setState((state) => ({
+        queue: state.queue.some((queued) => queued.id === id)
+          ? state.queue
+          : [...state.queue.slice(0, index), item, ...state.queue.slice(index)],
+      }));
+    };
+    try {
+      const result = await bridge.steerChat(content);
+      if (!result.ok) restore();
+    } catch (error) {
+      restore();
+      toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
+      steering.current = false;
     }
   };
 

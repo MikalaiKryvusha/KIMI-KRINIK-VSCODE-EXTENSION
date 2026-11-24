@@ -39,6 +39,7 @@ export const Methods = {
   ResetSession: "resetSession",
   GetSessionContext: "getSessionContext",
   GetBackgroundTasks: "getBackgroundTasks",
+  GetSessionBusy: "getSessionBusy",
   SetPlanMode: "setPlanMode",
   SteerChat: "steerChat",
   RespondApproval: "respondApproval",
@@ -149,6 +150,7 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.ResetSession:
     case Methods.GetSessionContext:
     case Methods.GetBackgroundTasks:
+    case Methods.GetSessionBusy:
     case Methods.GetKimiSessions:
     case Methods.GetAllKimiSessions:
     case Methods.GetRegisteredWorkDirs:
@@ -220,7 +222,8 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.SetPlanMode:
       return hasBoolean(params, "enabled");
     case Methods.SteerChat:
-      return isPlainObject(params) && isContent(params["content"]);
+      return isPlainObject(params) && isContent(params["content"])
+        && (params["clientId"] === undefined || isNonEmptyString(params["clientId"]));
     case Methods.GetProjectFiles:
       return params === undefined || (
         isPlainObject(params)
@@ -266,7 +269,8 @@ function isStreamChatParams(value: unknown): boolean {
     && isOptionalType(value["planMode"], "boolean")
     && isOptionalType(value["sessionId"], "string")
     && (value["permissionMode"] === undefined || isPermissionModeName(value["permissionMode"]))
-    && (value["goalObjective"] === undefined || isNonEmptyString(value["goalObjective"]));
+    && (value["goalObjective"] === undefined || isNonEmptyString(value["goalObjective"]))
+    && (value["clientId"] === undefined || isNonEmptyString(value["clientId"]));
 }
 
 function isContent(value: unknown): boolean {

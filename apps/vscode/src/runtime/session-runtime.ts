@@ -43,6 +43,7 @@ export interface SessionRuntimeOptions {
 
 interface ActivePrompt {
   readonly input: LegacyContentPart[] | string;
+  readonly clientId?: string;
   started: boolean;
   settled: boolean;
   resolve: (result: PromptResult) => void;
@@ -188,13 +189,14 @@ export class SessionRuntime {
     this.webviewIds.delete(webviewId);
   }
 
-  async prompt(input: string | LegacyContentPart[]): Promise<PromptResult> {
-    return this.runTurnAction(input, () => this.session.prompt(toSdkPromptInput(input)));
+  async prompt(input: string | LegacyContentPart[], clientId?: string): Promise<PromptResult> {
+    return this.runTurnAction(input, () => this.session.prompt(toSdkPromptInput(input)), clientId);
   }
 
   async runTurnAction(
     input: string | LegacyContentPart[],
     action: () => Promise<void>,
+    clientId?: string,
   ): Promise<PromptResult> {
     this.ensureOpen();
     if (this.isBusy) {
@@ -212,6 +214,7 @@ export class SessionRuntime {
     });
     const active: ActivePrompt = {
       input,
+      clientId,
       started: false,
       settled: false,
       resolve: resolveCompletion,
@@ -369,12 +372,12 @@ export class SessionRuntime {
     }
   }
 
-  async steer(input: string | LegacyContentPart[]): Promise<void> {
+  async steer(input: string | LegacyContentPart[], clientId?: string): Promise<void> {
     this.ensureOpen();
     await this.session.steer(toSdkPromptInput(input));
     this.emitStreamEvent({
       type: "SteerInput",
-      payload: { user_input: input },
+      payload: { user_input: input, ...(clientId === undefined ? {} : { clientId }) },
       _sessionId: this.id,
     });
   }
@@ -488,6 +491,7 @@ export class SessionRuntime {
     const pendingInput = this.activePrompt?.input;
     const adapted = adaptSdkEvent(this.adapterState, event, {
       pendingInput,
+      clientId: this.activePrompt?.clientId,
       errorPhase: this.activePrompt?.started === false ? "preflight" : "runtime",
     });
     this.adapterState = adapted.state;

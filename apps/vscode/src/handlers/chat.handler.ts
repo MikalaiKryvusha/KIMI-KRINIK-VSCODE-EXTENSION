@@ -22,6 +22,7 @@ interface StreamChatParams {
   sessionId?: string;
   permissionMode?: PermissionModeName;
   goalObjective?: string;
+  clientId?: string;
 }
 
 interface RespondApprovalParams {
@@ -142,7 +143,7 @@ const streamChat: Handler<StreamChatParams, { done: boolean }> = async (params, 
 
   const systemContext = await buildSystemContext(runtime.id, ctx);
   try {
-    const result = await runtime.prompt(prependSystemContext(params.content, systemContext));
+    const result = await runtime.prompt(prependSystemContext(params.content, systemContext), params.clientId);
     return { done: result.status === "finished" };
   } catch (error) {
     emitCaughtError(ctx, error, "runtime", runtime.id);
@@ -173,11 +174,15 @@ const setPlanMode: Handler<{ enabled: boolean }, { ok: boolean; planMode: boolea
   return { ok: true, planMode: params.enabled };
 };
 
-const steerChat: Handler<{ content: string | ContentPart[] }, { ok: boolean }> = async (params, ctx) => {
+const steerChat: Handler<{ content: string | ContentPart[]; clientId?: string }, { ok: boolean }> = async (params, ctx) => {
   const runtime = ctx.getSession();
   if (runtime === undefined || !runtime.isBusy) return { ok: false };
-  await runtime.steer(params.content);
+  await runtime.steer(params.content, params.clientId);
   return { ok: true };
+};
+
+const getSessionBusy: Handler<void, { busy: boolean }> = async (_, ctx) => {
+  return { busy: ctx.getSession()?.isBusy ?? false };
 };
 
 const getBackgroundTasks: Handler<void, { tasks: BackgroundTaskItem[] }> = async (_, ctx) => {
@@ -211,6 +216,7 @@ export const chatHandlers: Record<string, Handler<any, any>> = {
   [Methods.RespondQuestion]: respondQuestion,
   [Methods.SetPlanMode]: setPlanMode,
   [Methods.GetBackgroundTasks]: getBackgroundTasks,
+  [Methods.GetSessionBusy]: getSessionBusy,
   [Methods.SteerChat]: steerChat,
   [Methods.ResetSession]: resetSession,
 };

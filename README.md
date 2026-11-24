@@ -42,7 +42,7 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | Managed quota: 7-day ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: monthly ring with a reset countdown | — | ✅ | ✅ |
 | Sound and voice when an approval, a question or an error waits for you | — | — | ✅ · 🚧 a sound and a volume for each event |
-| Context Window Control with configurable thresholds | — | — | ✅ the extension sends threshold prompts without KAIF and supports handing context-window control back to KAIF when it is installed · 🚧 live acceptance |
+| Context Window Control with configurable thresholds | — | — | ✅ monitors context window usage and smoothly stops the current chat when the context window fills up so work can continue in a new chat · 🚧 live acceptance |
 | Interface languages | English | English, 中文 | ✅ English, 中文, Русский, chosen in the settings menu |
 | Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection · 🚧 live acceptance |
 | Live status and session header | — | ✅ | ✅ queued/changed panels, background tasks, todos, compaction viewer, session title and KIMI KRINIK robot · 🚧 live acceptance |
@@ -111,7 +111,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Квота на 7 дней: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Месячная квота: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Звук и голос, когда вас ждут одобрение, вопрос или ошибка | — | — | ✅ · 🚧 свой звук и громкость для каждого события |
-| Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ расширение само отправляет пороговые промпты без KAIF; при наличии KAIF расширение позволяет передать KAIF контроль контекстного окна · 🚧 живая приёмка |
+| Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ следит за заполнением контекстного окна и мягко останавливает работу при его переполнении, чтобы продолжить её в новом чате · 🚧 живая приёмка |
 | Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, выбор в меню настроек |
 | Панель ввода: режим разрешений, Plan, Goal, Swarm, дополнительная модель, кольцо контекста и просмотр контекста | — | ✅ | ✅ общий выбор модели и уровня рассуждений, поиск, избранное и выбор дополнительной модели · 🚧 живая приёмка |
 | Текущий статус и заголовок сессии | — | ✅ | ✅ очередь и изменения, фоновые задачи, список задач, просмотр контекста, название сессии и робот KIMI KRINIK · 🚧 живая приёмка |
@@ -179,7 +179,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 7 天配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 月度配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 需要审批、收到问题或发生错误时，用提示音和语音提醒 | — | — | ✅ · 🚧 为每个事件设置声音与音量 |
-| 上下文窗口控制与可配置阈值 | — | — | ✅ 内置扩展无需 KAIF 即可发送阈值提示；安装 KAIF 后可交还上下文窗口控制 · 🚧 实际使用验收 |
+| 上下文窗口控制与可配置阈值 | — | — | ✅ 监控上下文窗口使用量，在上下文窗口填满时平稳停止当前工作，以便在新聊天中继续 · 🚧 实际使用验收 |
 | 界面语言 | English | English、中文 | ✅ English、中文、Русский，在设置菜单中选择 |
 | 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ 模型与推理强度合并选择器、搜索、收藏及次级模型选择 · 🚧 实际使用验收 |
 | 实时状态与会话标题栏 | — | ✅ | ✅ 排队与更改、后台任务、待办、上下文查看器、会话标题及 KIMI KRINIK 机器人 · 🚧 实际使用验收 |

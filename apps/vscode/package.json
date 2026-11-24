@@ -121,7 +121,7 @@
         "kimi.contextWindowControl": {
           "type": "boolean",
           "default": false,
-          "description": "Send KIMI KRINIK context-window prompts at the configured thresholds, with or without automatic compaction. Turn Compact off for fully manual context management. No KAIF installation is required."
+          "description": "Notify the agent when context window usage reaches the configured thresholds. This works with or without automatic compaction; turn Compact off for fully manual context management."
         },
         "kimi.controlPanel.permission": {
           "type": "boolean",

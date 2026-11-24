@@ -52,6 +52,27 @@ describe("usage status", () => {
     expect(screen.getAllByText("Plan: Pro").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Monthly quota").length).toBeGreaterThan(0);
     expect(screen.getAllByText("resets in 3d 2h").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("5h quota")[0]!.className).toContain("font-semibold");
+    expect(screen.getAllByText("Monthly quota")[0]!.className).toContain("font-semibold");
+    expect(screen.getAllByText("Monthly quota")[0]!.parentElement?.className).toContain("border-t");
+    expect(screen.getAllByText("Monthly quota")[0]!.parentElement?.className).toContain("pt-2");
+  });
+
+  it("separates context numbers from the bold inspect label", async () => {
+    boundary.getManagedUsage.mockResolvedValue({ ok: true, usage: {} });
+    useChatStore.setState({
+      lastStatus: { context_usage: 0.5, context_tokens: 1024, max_context_tokens: 2048 },
+    });
+    const user = userEvent.setup();
+    render(<UsageStatusBar />);
+
+    await user.hover(await screen.findByTestId("context-ring"));
+
+    expect((await screen.findAllByText("Context window"))[0]!).toHaveProperty("className", expect.stringContaining("font-semibold"));
+    const hint = (await screen.findAllByText("Inspect the current context sent to the model (post-compaction state)"))[0]!;
+    expect(hint.className).toContain("font-semibold");
+    expect(hint.className).toContain("border-t");
+    expect(hint.className).toContain("pt-2");
   });
 
   it("renders fetch failure as unavailable rather than zero", async () => {

@@ -84,6 +84,39 @@
 
 ## Entries
 
+### EXP-0008 · 2026-11-24 · ❌→✅ · #chat #lifecycle #testing
+class: twins-missed
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-store.test.ts apps/vscode/test/settings-store.test.ts
+**Context:** immediate optimistic bubbles were added to the first-send and steering paths.
+**Tried / did:** propagated a client-generated ID through store, bridge, runtime and events; preserved model and ID in preflight recovery and host-idle dequeue.
+**Result:** ❌→✅ — the first optimistic version lost the model during error recovery; the existing settings-store regression caught it, and all 571 extension checks plus one skip now pass.   → link: bugs/22_first_send_stuck_in_steering_queue.md
+**Lesson:** optimistic UI must carry identity from the first action through every later event, and every older error/retry path must preserve that identity and its accompanying model.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-store.test.ts apps/vscode/test/settings-store.test.ts` — immediate entries reconcile once and recovery keeps the model.
+**Trigger:** adding an optimistic message, retry, queue or recovery path → prove identity and model preservation before shipping.
+**Not for:** claiming that every `running | queued | blocked` SDK state or two-client replay case is already verified; those remain separate acceptance work.
+
+### EXP-0009 · 2026-11-24 · ✅ · #i18n #vscode
+class: text-in-agents-world
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/i18n.test.ts
+**Context:** the conversation-history Delete action stayed English after the interface switched languages.
+**Tried / did:** reused the existing `common.delete` dictionary entry and added assertions for EN/RU/ZH.
+**Result:** ✅ — the action now follows the active interface language.   → link: apps/vscode/webview-ui/src/components/SessionList.tsx
+**Lesson:** check action labels inside overflow menus and dialogs, not only the visible composer and main settings.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/i18n.test.ts` — all dictionaries share one key set and `common.delete` is localized.
+**Trigger:** adding or moving a user-facing action → reuse the existing dictionary and assert each language.
+**Not for:** replacing visual acceptance of every dialog; this lesson covers the localization mechanism.
+
+### EXP-0010 · 2026-11-24 · ❌→✅ · #voice #vscode #testing
+class: text-in-agents-world
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/attention.test.ts
+**Context:** attention speech could play without identifying the speaker/project or the addressee.
+**Tried / did:** prefixed the phrase once at the shared attention boundary for Glass and browser speech, preserving idempotence and non-voice behavior.
+**Result:** ❌→✅ — red tests became 20/20; installed VSIX delivered the full phrase to Glass and constructed the same browser utterance.   → link: bugs/17_attention_voice_missing_identity.md
+**Lesson:** spoken owner-facing text needs the same identity rule at every delivery route, including fallbacks and previews.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/attention.test.ts apps/vscode/test/attention-handler.test.ts apps/vscode/test/webview/sounds.test.ts` — both routes carry the prefix exactly once.
+**Trigger:** adding a voice route or attention event → test the actual phrase before the transport, including the fallback.
+**Not for:** claiming the owner heard and accepted the sound; audible verification is separate.
+
 ### EXP-0007 · 2026-11-24 · ❌→✅ · #vscode #testing #assets
 class: guard-not-proven-against-threat
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/header.test.tsx

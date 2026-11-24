@@ -4,6 +4,7 @@ const boundary = vi.hoisted(() => ({
   streamChat: vi.fn(),
   steerChat: vi.fn(),
   abortChat: vi.fn(),
+  getSessionBusy: vi.fn(),
   trackFiles: vi.fn(),
   toastError: vi.fn(),
   toastWarning: vi.fn(),
@@ -17,6 +18,7 @@ vi.mock("@/services", () => ({
     streamChat: boundary.streamChat,
     steerChat: boundary.steerChat,
     abortChat: boundary.abortChat,
+    getSessionBusy: boundary.getSessionBusy,
     trackFiles: boundary.trackFiles,
     resetSession: boundary.resetSession,
     clearTrackedFiles: boundary.clearTrackedFiles,
@@ -44,6 +46,8 @@ beforeEach(() => {
   boundary.steerChat.mockResolvedValue({ ok: true });
   boundary.abortChat.mockReset();
   boundary.abortChat.mockResolvedValue({ aborted: true });
+  boundary.getSessionBusy.mockReset();
+  boundary.getSessionBusy.mockResolvedValue({ busy: true });
   boundary.trackFiles.mockReset();
   boundary.toastError.mockReset();
   boundary.toastWarning.mockReset();
@@ -82,7 +86,7 @@ describe("automatic follow-up steer", () => {
     beginTurn();
     useChatStore.getState().sendMessage("second");
 
-    expect(boundary.steerChat).toHaveBeenCalledWith("second");
+    expect(boundary.steerChat).toHaveBeenCalledWith("second", expect.any(String));
     expect(boundary.streamChat).toHaveBeenCalledTimes(1);
     expect(useChatStore.getState().queue).toHaveLength(0);
   });
@@ -92,7 +96,48 @@ describe("automatic follow-up steer", () => {
 
     expect(boundary.steerChat).not.toHaveBeenCalled();
     expect(boundary.streamChat).toHaveBeenCalledTimes(1);
-    expect(useChatStore.getState().pendingInput).toEqual({ content: "hello", model: "plain" });
+    expect(useChatStore.getState().pendingInput).toMatchObject({ content: "hello", model: "plain", clientId: expect.any(String) });
+  });
+
+  it("shows the first idle send immediately and reconciles its durable turn by clientId", () => {
+    useChatStore.getState().sendMessage("first");
+
+    const pending = useChatStore.getState().pendingInput;
+    const optimisticUsers = useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "first");
+    expect(optimisticUsers).toHaveLength(1);
+    expect(optimisticUsers[0]?.optimistic).toBe(true);
+    expect(pending?.clientId).toEqual(expect.any(String));
+
+    useChatStore.getState().processEvent({
+      type: "TurnBegin",
+      payload: { user_input: "first", clientId: pending!.clientId },
+    });
+    const users = useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "first");
+    expect(users).toHaveLength(1);
+    expect(users[0]?.optimistic).toBe(false);
+  });
+
+  it("shows steering immediately and reconciles SteerInput without a nested duplicate", () => {
+    let finishSteer: (value: { ok: boolean }) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((resolve) => { finishSteer = resolve; }));
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.getState().sendMessage("second");
+
+    const optimisticUsers = useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "second");
+    expect(optimisticUsers).toHaveLength(1);
+    expect(optimisticUsers[0]?.optimistic).toBe(true);
+    const clientId = boundary.steerChat.mock.calls[0]?.[1] as string;
+    expect(clientId).toEqual(expect.any(String));
+
+    useChatStore.getState().processEvent({ type: "SteerInput", payload: { user_input: "second", clientId } });
+    const users = useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "second");
+    expect(users).toHaveLength(1);
+    expect(users[0]?.optimistic).toBe(false);
+    const assistant = useChatStore.getState().messages.at(-1);
+    expect(assistant?.steps?.flatMap((step) => step.items).some((item) => item.type === "steer")).toBe(false);
+
+    finishSteer({ ok: true });
   });
 
   it("passes every manual line break unchanged to idle prompts and running-turn steers", () => {
@@ -104,7 +149,7 @@ describe("automatic follow-up steer", () => {
     beginTurn("first");
     const followUp = "correction line one\ncorrection line two";
     useChatStore.getState().sendMessage(followUp);
-    expect(boundary.steerChat).toHaveBeenCalledWith(followUp);
+    expect(boundary.steerChat).toHaveBeenCalledWith(followUp, expect.any(String));
   });
 
   it("uses a dedicated idle send exactly once when the turn ends during steer", async () => {
@@ -113,7 +158,7 @@ describe("automatic follow-up steer", () => {
     useChatStore.getState().sendMessage("first");
     beginTurn();
     useChatStore.getState().sendMessage("second");
-    expect(boundary.steerChat).toHaveBeenCalledWith("second");
+    expect(boundary.steerChat).toHaveBeenCalledWith("second", expect.any(String));
 
     useChatStore.setState({ isStreaming: false });
     finishSteer({ ok: false });
@@ -134,7 +179,7 @@ describe("automatic follow-up steer", () => {
     await vi.waitFor(() => expect(boundary.toastError).toHaveBeenCalled());
     const state = useChatStore.getState();
     expect(state.composerRestore).toBe("look");
-    expect(state.pendingInput).toEqual({ content: "first", model: "plain" });
+    expect(state.pendingInput).toMatchObject({ content: "first", model: "plain", clientId: expect.any(String) });
     expect(state.draftMedia).toEqual([{ id: "image-1", dataUri: IMAGE }]);
     expect(boundary.streamChat).toHaveBeenCalledTimes(1);
     expect(boundary.toastError.mock.calls[0]?.[0]).toBe("steer failed");
@@ -233,7 +278,7 @@ describe("automatic follow-up steer", () => {
     await vi.waitFor(() => expect(boundary.toastError).toHaveBeenCalled());
 
     expect(useChatStore.getState().composerRestore).toBe("follow-up");
-    expect(useChatStore.getState().pendingInput).toEqual({ content: "original prompt", model: "plain" });
+    expect(useChatStore.getState().pendingInput).toMatchObject({ content: "original prompt", model: "plain", clientId: expect.any(String) });
 
     useChatStore.getState().processEvent({ type: "error", code: "internal", message: "Turn failed", phase: "runtime" });
     useChatStore.getState().retryLastMessage();
@@ -313,6 +358,26 @@ describe("automatic follow-up steer", () => {
     expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-uploading" }]);
   });
 
+  it("automatically dequeues when the host is already idle and reconciles the entry once", async () => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, autoSteer: false } });
+    boundary.getSessionBusy.mockResolvedValue({ busy: false });
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.getState().sendMessage("second");
+
+    expect(useChatStore.getState().queue.map((item) => item.content)).toEqual(["second"]);
+    await vi.waitFor(() => expect(boundary.streamChat).toHaveBeenCalledTimes(2));
+    expect(useChatStore.getState().queue).toHaveLength(0);
+    const pending = useChatStore.getState().pendingInput;
+    expect(pending?.content).toBe("second");
+
+    useChatStore.getState().processEvent({
+      type: "TurnBegin",
+      payload: { user_input: "second", clientId: pending!.clientId },
+    });
+    expect(useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "second")).toHaveLength(1);
+  });
+
   it("routes each attention event to its own sound setting", () => {
     const sounds = {
       approval: { sound: "chime", volume: 20 },
@@ -346,17 +411,17 @@ describe("automatic follow-up steer", () => {
     useChatStore.setState({ goalArmed: true });
     useChatStore.getState().sendMessage("Ship the release");
 
-    expect(boundary.streamChat.mock.calls[0]?.[5]).toEqual({ goalObjective: "Ship the release" });
+    expect(boundary.streamChat.mock.calls[0]?.[5]).toEqual({ goalObjective: "Ship the release", clientId: expect.any(String) });
     expect(useChatStore.getState().goalArmed).toBe(false);
   });
 
   it("sends the permission mode only after the user chose one", () => {
     useChatStore.getState().sendMessage("first");
-    expect(boundary.streamChat.mock.calls[0]?.[5]).toEqual({});
+    expect(boundary.streamChat.mock.calls[0]?.[5]).toEqual({ clientId: expect.any(String) });
 
     useChatStore.setState({ isStreaming: false, permissionMode: "auto" });
     useChatStore.getState().sendMessage("second");
-    expect(boundary.streamChat.mock.calls[1]?.[5]).toEqual({ permissionMode: "auto" });
+    expect(boundary.streamChat.mock.calls[1]?.[5]).toEqual({ permissionMode: "auto", clientId: expect.any(String) });
   });
 
   it("follows swarm, goal, permission and title from status updates", () => {
@@ -380,6 +445,38 @@ describe("automatic follow-up steer", () => {
     });
   });
 
+  it("restores the working state when live tool events follow replay and clears it on genuine completion", async () => {
+    await useChatStore.getState().loadSession("resumed-session", [
+      { type: "TurnBegin", payload: { user_input: "Inspect" } },
+      { type: "StepBegin", payload: { n: 1 } },
+      {
+        type: "ToolCall",
+        payload: { type: "function", id: "read-old", function: { name: "ReadFile", arguments: "{}" } },
+      },
+      {
+        type: "ToolResult",
+        payload: { tool_call_id: "read-old", return_value: { is_error: false, output: "old", message: "", display: [] } },
+      },
+      { type: "stream_complete", result: { status: "finished" } },
+    ]);
+    expect(useChatStore.getState().isStreaming).toBe(false);
+
+    useChatStore.getState().processEvent({
+      type: "ToolCall",
+      payload: { type: "function", id: "read-live", function: { name: "ReadFile", arguments: "{}" } },
+    });
+    expect(useChatStore.getState().isStreaming).toBe(true);
+
+    useChatStore.getState().processEvent({
+      type: "ToolResult",
+      payload: { tool_call_id: "read-live", return_value: { is_error: false, output: "live", message: "", display: [] } },
+    });
+    expect(useChatStore.getState().isStreaming).toBe(true);
+
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" } });
+    expect(useChatStore.getState().isStreaming).toBe(false);
+  });
+
   it("keeps model and effort but clears the old session mode and title for a new conversation", async () => {
     useSettingsStore.setState({ currentModel: "reasoning", thinkingEffort: "high" });
     useChatStore.setState({ permissionMode: "manual", sessionTitle: "Old chat" });
@@ -388,6 +485,6 @@ describe("automatic follow-up steer", () => {
     useChatStore.getState().sendMessage("new conversation");
 
     expect(useChatStore.getState()).toMatchObject({ permissionMode: null, sessionTitle: null });
-    expect(boundary.streamChat).toHaveBeenCalledWith("new conversation", "reasoning", "high", false, undefined, {});
+    expect(boundary.streamChat).toHaveBeenCalledWith("new conversation", "reasoning", "high", false, undefined, { clientId: expect.any(String) });
   });
 });

@@ -7,6 +7,36 @@ import type { ChatMessage, UIStep, UIStepItem, ChatState, TokenUsage } from "./c
 import type { ContentPart, ToolCall, ToolResult, TurnBegin, SubagentEvent, ApprovalRequestPayload, DiffBlock, RunResult, QuestionRequest, StatusUpdate } from "shared/legacy-sdk";
 import type { UIStreamEvent, StreamError } from "shared/types";
 
+function sameContent(left: string | ContentPart[], right: string | ContentPart[]): boolean {
+  return typeof left === "string" || typeof right === "string"
+    ? left === right
+    : JSON.stringify(left) === JSON.stringify(right);
+}
+
+function reconcileOptimisticTurn(
+  draft: ChatState,
+  content: string | ContentPart[],
+  clientId?: string,
+  turnIndex?: number,
+  forkable?: boolean,
+): boolean {
+  const user = draft.messages.find((message) => message.role === "user" && message.optimistic === true
+    && (clientId === undefined ? sameContent(message.content, content) : message.clientId === clientId));
+  if (user === undefined) return false;
+  user.optimistic = false;
+  user.content = content;
+  user.turnIndex = turnIndex;
+  user.forkable = forkable;
+  const assistant = draft.messages.find((message) => message.role === "assistant" && message.optimistic === true && message.clientId === user.clientId);
+  if (assistant !== undefined) {
+    assistant.optimistic = false;
+    assistant.turnIndex = turnIndex;
+    assistant.forkable = forkable;
+    assistant.steps ??= [];
+  }
+  return true;
+}
+
 type EventHandler = (draft: ChatState, payload: any) => void;
 
 function createEmptyTokenUsage(): TokenUsage {
@@ -260,7 +290,11 @@ function handlePreflightError(draft: ChatState, _code: string, _message: string)
   if (lastUser?.role === "user") {
     const userContent = lastUser.content;
     draft.messages.pop();
-    draft.pendingInput = { content: userContent, model: "" };
+    draft.pendingInput = {
+      content: userContent,
+      model: draft.pendingInput?.model ?? "",
+      ...(draft.pendingInput?.clientId === undefined ? {} : { clientId: draft.pendingInput.clientId }),
+    };
   }
 }
 
@@ -328,9 +362,13 @@ const eventHandlers: Record<string, EventHandler> = {
     }
   },
 
-  TurnBegin: (draft, payload: TurnBegin & { forkable?: boolean }) => {
+  TurnBegin: (draft, payload: TurnBegin & { forkable?: boolean; clientId?: string }) => {
     draft.tokenUsage = createEmptyTokenUsage();
     draft.activeTokenUsage = createEmptyTokenUsage();
+    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId, payload.turnIndex, payload.forkable)) {
+      draft.isStreaming = true;
+      return;
+    }
 
     draft.messages.push({
       id: randomUUID(),
@@ -559,7 +597,11 @@ const eventHandlers: Record<string, EventHandler> = {
     }
   },
 
-  SteerInput: (draft, payload: { user_input: string | ContentPart[] }) => {
+  SteerInput: (draft, payload: { user_input: string | ContentPart[]; clientId?: string }) => {
+    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId)) {
+      draft.isStreaming = true;
+      return;
+    }
     const last = getLastAssistant(draft);
     if (!last?.steps) return;
 

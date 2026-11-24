@@ -10,8 +10,9 @@ describe("VS Code theme background", () => {
     expect(css).toMatch(/#root\s*\{[^}]*background-color:\s*var\(--background\);/s);
   });
 
-  it("keeps card, popover and input surfaces distinct from the page background", () => {
-    expect(css).toContain("--card: oklch(0.18 0.005 285.823);");
+  it("darkens the VS Code background for cards and keeps popover and input surfaces distinct", () => {
+    expect(css).toContain("--card: color-mix(in srgb, var(--background) 92%, black);");
+    expect(css).not.toContain("--card: oklch(0.18 0.005 285.823);");
     expect(css).toContain(
       "--popover: var(--vscode-menu-background, var(--vscode-editorWidget-background, oklch(0.18 0.005 285.823)));",
     );

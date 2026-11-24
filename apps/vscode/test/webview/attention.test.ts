@@ -42,16 +42,24 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("attention notifications", () => {
-  it("uses the configured Glass route without browser speech", async () => {
+  it("uses the configured Glass route with the owner and project identity", async () => {
     boundary.notifyAttention.mockResolvedValue({ ok: true });
     notifyAttention("Answer required", VOICE, 1_000);
     await Promise.resolve();
 
-    expect(boundary.notifyAttention).toHaveBeenCalledWith("Answer required");
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("Николай, это Кими Криник. Answer required");
     expect(boundary.speak).not.toHaveBeenCalled();
   });
 
-  it("falls back to speech at the chosen volume only when Glass is unavailable and throttles duplicates", async () => {
+  it("does not duplicate an existing identity prefix", async () => {
+    boundary.notifyAttention.mockResolvedValue({ ok: true });
+    notifyAttention("Николай, это Кими Криник. Готово", VOICE, 1_000);
+    await Promise.resolve();
+
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("Николай, это Кими Криник. Готово");
+  });
+
+  it("falls back to identified speech at the chosen volume only when Glass is unavailable and throttles duplicates", async () => {
     boundary.notifyAttention.mockResolvedValue({ ok: false });
     notifyAttention("Нужен ответ", { sound: "voice", volume: 40 }, 1_000);
     notifyAttention("Нужен ответ", { sound: "voice", volume: 40 }, 2_000);
@@ -60,7 +68,11 @@ describe("attention notifications", () => {
 
     expect(boundary.notifyAttention).toHaveBeenCalledTimes(2);
     expect(boundary.speak).toHaveBeenCalledTimes(2);
-    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({ lang: "ru-RU", volume: 0.4 });
+    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({
+      text: "Николай, это Кими Криник. Нужен ответ",
+      lang: "ru-RU",
+      volume: 0.4,
+    });
   });
 
   it("plays the chosen tone at its volume and skips the voice route", () => {
@@ -84,7 +96,7 @@ describe("attention notifications", () => {
     previewSound("Error", { sound: "voice", volume: 50 });
 
     expect(boundary.playTone).toHaveBeenCalledTimes(2);
-    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({ text: "Error", volume: 0.5 });
+    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({ text: "Николай, это Кими Криник. Error", volume: 0.5 });
   });
 
   it("stays silent when the global sound switch is off", () => {

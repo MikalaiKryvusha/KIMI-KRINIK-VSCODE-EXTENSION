@@ -73,7 +73,7 @@ function SessionItem({ session, isSelected, onSelect, onDelete, dirLabel }: Sess
                 }}
               >
                 <IconTrash className="size-3.5 mr-2" />
-                Delete
+                {t("common.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

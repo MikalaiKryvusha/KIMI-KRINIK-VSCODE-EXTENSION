@@ -1,0 +1,47 @@
+# Bug 13 — Steering attachments are not delivered and steer bubbles lack clickable thumbnails
+
+**Status:** 🔴 OPEN
+**Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
+**Severity:** S2
+**Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment
+**Fix accepted when (observable):** a steering message with an image or video appears immediately with its thumbnail, opens that attachment in the viewer on click, is delivered to the engine exactly once, and retains the same thumbnail/viewer behavior after completion and reload.
+
+## Symptom
+
+The owner reports that a steering message with an attachment is not sent. The owner also requires attachments in chat bubbles to render thumbnails that open in the media viewer.
+
+## Repro
+
+1. Start a long-running turn with AUTO STEER ON.
+2. Attach an image, send text with it, and immediately inspect the new bubble.
+3. Click the thumbnail and inspect the viewer.
+4. Read the actual model request and reload the session to check persisted rendering.
+
+## Expected result
+
+Immediate visible text and media, clickable thumbnail preview, exactly one delivered attachment, and equivalent rendering after replay.
+
+## Actual result
+
+The owner observed that the steering message with an attachment was not sent. Steer bubbles currently have no media thumbnail/viewer path.
+
+## Forensics / hypotheses
+
+- `apps/vscode/webview-ui/src/stores/chat.store.ts:284-301` builds `ContentPart[]`, marks media as steering and removes it only after acknowledgement; mocked store tests assert this path but the real delivery failure is not reproduced.
+- `apps/vscode/webview-ui/src/components/ChatMessage.tsx:31-39` renders `SteerBubble` as text only.
+- `UserMessage` already combines `MessageMedia` with `MediaPreviewModal` at `ChatMessage.tsx:206-223`; the steering renderer does not reuse that path.
+- Whether non-delivery and missing thumbnails have one cause is not established.
+
+## Fix plan
+
+First reproduce the real attachment request in an isolated VS Code environment. Fix delivery at the owning runtime/store boundary and reuse the existing media thumbnail/viewer components for optimistic and replayed steer items. Cover text+image, media-only, video, rejected send and reload without weakening existing delivery assertions.
+
+## Decisions made without the owner
+
+Recorded delivery and presentation in one media-focused bug while keeping their hypotheses separate. No product code was changed in this report.
+
+## Links
+
+- `testcases/TC_K5_live_acceptance.md` C19
+- `bugs/11_steer_delivery_and_immediate_display.md`
+- `bugs/14_steer_queue_not_added.md`

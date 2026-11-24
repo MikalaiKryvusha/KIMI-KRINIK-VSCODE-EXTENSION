@@ -51,8 +51,8 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 | C06 header robot | Load original VSIX → broken dist image; install fixed VSIX → resources image and banner loaded | control + regression | pass · bugs/07 red/live/green |
 | C07 multiline | Enter Shift+Enter text → bubble preserves line and idle/steer payloads retain exact newlines | boundary/use-case | pass · real bubble `pre-wrap`, exact fake-provider newline, WebP 10 |
 | C08 quotas | Read 5h/7d/monthly and unavailable states on real account | equivalence/error | [NOT-TESTED] accumulated account |
-| C09 AUTO STEER ON | Running Enter plus three ordered follow-ups → immediate, ordered, running→idle exactly once | race/state | pass · three ordered finished responses, no Queued, WebP 12 |
-| C10 AUTO STEER OFF | Running Enter → text enters Queued without a second request; release dequeues it | decision/race | pass · `1 Queued`, stable request count, WebP 11 |
+| C09 AUTO STEER ON | Running Enter plus three ordered follow-ups → immediate, ordered, running→idle exactly once | race/state | fail · owner real-profile findings `bugs/11`–`13`; earlier isolated text-only run had three ordered responses and WebP 12 |
+| C10 AUTO STEER OFF | Running Enter → text enters Queued without a second request; release dequeues it | decision/race | fail · owner reports no visible queue (`bugs/14`); isolated text-only runs show `1 Queued`/`1 в очереди` and WebP 11/34, but the owner's exact state/media/race is not reproduced |
 | C11 Auto Compact ON/OFF | Flip live without new session; include before/after/overflow and active cancellation | state/boundary | [NOT-TESTED] active in-flight/overflow; real config OFF observed |
 | C12 closure | Defaults 70/75/80/90 → full soft→force/farewell without apply_compaction | state/sequence | [NOT-TESTED] live closure |
 | C13 composer controls | Permission, Plan, Goal, Swarm, secondary model, settings and send → real effects | use-case walk | pass · host calls/config and active-state DOM observed |
@@ -61,7 +61,7 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 | C16 sound preview | Open modal → change event sound/volume → preview → persisted and Web Audio lifecycle closes | use-case | pass · Chime 35%, peak 0.14, context closed; rapid 10→20→40→80→100 remains latest; global OFF blocks audio; Triple 880/660/990 and packaged glass.opus observed; neutral tracks, no yellow outline |
 | C17 B5/B6 | Decline/allow workspace voice command; machine setting wins; phrase cleanup/error logging observed | security/error | pass · native dialog Cancel/Allow via real mouse; no spawn/write on decline; machine priority without dialog; child PID 9028/39556 and cleaned phrase files; ENOENT logged |
 | C18 rollback | Run beside official/reference → return to official → projects/sessions preserved | installation/state | [NOT-TESTED] owner accumulated profile |
-| C19 rejected steer + media | Rejected running steer restores text+media exactly once; OFF queues media | race/media | [NOT-TESTED] live media/rejection |
+| C19 rejected steer + media | Rejected running steer restores text+media exactly once; OFF queues media | race/media | fail · owner reports undelivered steering media and obsolete composer restoration (`bugs/12`–`14`); exact isolated rejection still open |
 | C20 model effort + stop | Choose effort and stop a running request → persisted effort and aborted model request | state/cancel | [NOT-TESTED] live effort/stop |
 | C21 extended status | Changed, Background Bash, Sub Agents, Todos and session title follow real events | event/state | [NOT-TESTED] tool/title events |
 | C22 real-event sound/replay | Real approval/question/error/complete uses configured sound; replay stays silent | event/error | [NOT-TESTED] real event and replay; owner hearing separate |
@@ -82,4 +82,4 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 
 ## 6. Verdict
 
-[NOT-TESTED] for the complete K5 feature set. C01–C07, C09, C10 and C13–C16 carry live passes; C19–C23 and every other named open row still need their own observations. The judge repeated the bugs/01–03 scenarios successfully. No release or DONE inference is made from this partial matrix.
+[NOT-TESTED] for the complete K5 feature set. C01–C07 and C13–C16 retain their scoped live passes. New owner-profile failures supersede the overall C09/C10 pass status: `bugs/11`–`15` cover immediate/lost steering, obsolete composer restoration, attachments/thumbnails, queue visibility and visible internal hook output. C19 also fails by owner observation; C08, C11–C12, C18 and C20–C23 remain open. Work is paused until the owner resumes it; no release or DONE inference is made.

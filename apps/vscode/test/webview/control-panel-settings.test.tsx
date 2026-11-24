@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -196,8 +196,62 @@ describe("Control Panel settings", () => {
     expect(content?.className).toContain("overflow-y-auto");
     expect(content?.className).toContain("max-h-");
     const text = content?.textContent ?? "";
-    expect(text.indexOf("English")).toBeLessThan(text.indexOf("Русский"));
-    expect(text.indexOf("Русский")).toBeLessThan(text.indexOf("中文"));
+    expect(text).toContain("Language");
+    expect(screen.queryByRole("button", { name: "English" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Русский" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "中文" })).toBeNull();
+  });
+
+  it("moves language selection into one dialog with ordered persistent choices", async () => {
+    const user = userEvent.setup();
+    render(<ActionMenu />);
+
+    await user.click(screen.getByRole("button"));
+    await user.click(await screen.findByText("Language"));
+
+    const dialog = await screen.findByTestId("language-selection-dialog");
+    expect(document.querySelector('[data-slot="popover-content"]')).toBeNull();
+    const english = within(dialog).getByRole("button", { name: "English" });
+    const russian = within(dialog).getByRole("button", { name: "Русский" });
+    const chinese = within(dialog).getByRole("button", { name: "中文" });
+    const currentText = () => dialog.textContent ?? "";
+    expect(currentText().indexOf("English")).toBeLessThan(currentText().indexOf("Русский"));
+    expect(currentText().indexOf("Русский")).toBeLessThan(currentText().indexOf("中文"));
+    expect(english.getAttribute("aria-pressed")).toBe("true");
+    expect(russian.getAttribute("aria-pressed")).toBe("false");
+    expect(chinese.getAttribute("aria-pressed")).toBe("false");
+
+    await user.click(russian);
+    expect(useSettingsStore.getState().extensionConfig.language).toBe("ru");
+    expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "language", value: "ru" });
+    expect(russian.getAttribute("aria-pressed")).toBe("true");
+    expect(within(dialog).getByText("Русский / English / 中文")).not.toBeNull();
+    expect(currentText().indexOf("Русский")).toBeLessThan(currentText().indexOf("English"));
+    expect(currentText().indexOf("English")).toBeLessThan(currentText().indexOf("中文"));
+
+    await user.click(chinese);
+    expect(within(dialog).getByText("中文 / English / Русский")).not.toBeNull();
+    expect(currentText().indexOf("中文")).toBeLessThan(currentText().indexOf("English"));
+    expect(currentText().indexOf("English")).toBeLessThan(currentText().indexOf("Русский"));
+
+    await user.click(english);
+    expect(useSettingsStore.getState().extensionConfig.language).toBe("en");
+    expect(boundary.updateExtensionSetting).toHaveBeenLastCalledWith({ key: "language", value: "en" });
+
+    await user.click(within(dialog).getByRole("button", { name: "Close" }));
+    expect(screen.queryByTestId("language-selection-dialog")).toBeNull();
+    expect(document.querySelector('[data-slot="popover-content"]')).toBeNull();
+    expect(useSettingsStore.getState().extensionConfig.language).toBe("en");
+  });
+
+  it("puts the selected language first in the Action Menu button", async () => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language: "ru" } });
+    const user = userEvent.setup();
+    render(<ActionMenu />);
+
+    await user.click(screen.getByRole("button"));
+
+    expect(await screen.findByText("Язык")).not.toBeNull();
   });
 
   it("opens the project page from Support", async () => {

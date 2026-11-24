@@ -1,6 +1,6 @@
 import { useChatStore } from "@/stores";
 import { cn } from "@/lib/utils";
-import { IconArrowUp, IconArrowDown, IconBrandSpeedtest, IconRefresh } from "@tabler/icons-react";
+import { IconArrowUp, IconArrowDown, IconRefresh } from "@tabler/icons-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useT } from "@/i18n";
 
@@ -49,7 +49,6 @@ export function ChatStatus() {
     return null;
   }
 
-  const { context_usage } = lastStatus;
   const retrying = lastStatus.retrying;
 
   const inputTotal =
@@ -61,8 +60,6 @@ export function ChatStatus() {
     activeTokenUsage.input_cache_creation;
 
   const outputTotal = tokenUsage.output + activeTokenUsage.output;
-
-  const contextPercent = context_usage ? Math.round(context_usage * 1000) / 10 : 0;
 
   return (
     <div className="flex items-center gap-3 text-[10px] text-muted-foreground border border-border/40 rounded-full px-2 py-0.5 select-none h-6 box-border mr-2 @max-[240px]:hidden">
@@ -80,18 +77,6 @@ export function ChatStatus() {
         </Tooltip>
       )}
       {retrying && <div className="w-px h-3 bg-border/50" />}
-      <div className="flex items-center gap-1.5" title={t("status.contextWindowUsage")}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="flex items-center gap-1.5">
-              <IconBrandSpeedtest className="size-3 opacity-70" />
-              <span className={cn(contextPercent > 80 && "text-amber-500", contextPercent > 95 && "text-destructive")}>{contextPercent}%</span>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{t("status.contextWindowUsage")}</TooltipContent>
-        </Tooltip>
-      </div>
-      <div className="w-px h-3 bg-border/50 @max-[440px]:hidden" />
       <div className="flex items-center gap-1.5 @max-[440px]:hidden" title={t("status.totalInputTokens")}>
         <Tooltip>
           <TooltipTrigger asChild>

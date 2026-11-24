@@ -576,7 +576,7 @@ describe("Webview mid-turn warnings", () => {
     useChatStore.getState().sendMessage("first message");
     useChatStore.getState().sendMessage("steered follow-up");
     expect(useChatStore.getState().isStreaming).toBe(true);
-    expect(boundary.steerChat).toHaveBeenCalledWith("steered follow-up");
+    expect(boundary.steerChat).toHaveBeenCalledWith("steered follow-up", expect.any(String));
     expect(useChatStore.getState().queue).toHaveLength(0);
 
     useChatStore.getState().processEvent({

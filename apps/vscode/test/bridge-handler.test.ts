@@ -169,6 +169,28 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     expect(cancel).toHaveBeenCalledOnce();
   });
 
+  it("reports whether the current session is busy", async () => {
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ isBusy: true } as never);
+
+    const result = await bridge.handle({ id: "rpc-busy", method: Methods.GetSessionBusy }, "view-1");
+
+    expect(result).toEqual({ id: "rpc-busy", result: { busy: true } });
+  });
+
+  it("forwards steering content and clientId to the runtime", async () => {
+    const steer = vi.fn(async () => undefined);
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ isBusy: true, steer } as never);
+
+    const result = await bridge.handle({
+      id: "rpc-steer",
+      method: Methods.SteerChat,
+      params: { content: "second", clientId: "client-steer-1" },
+    }, "view-1");
+
+    expect(result).toEqual({ id: "rpc-steer", result: { ok: true } });
+    expect(steer).toHaveBeenCalledWith("second", "client-steer-1");
+  });
+
   it.each(["missingMethod", "toString", "constructor", "__proto__"])(
     "does not dispatch the unknown or prototype method %s",
     async (method) => {
@@ -272,11 +294,13 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     const result = await bridge.handle({
       id: "rpc-chat",
       method: Methods.StreamChat,
-      params: { content: "hello", model: "kimi-test", effort: "off" },
+      params: { content: "hello", model: "kimi-test", effort: "off", clientId: "client-turn-1" },
     }, "view-1");
 
     expect(result).toEqual({ id: "rpc-chat", result: { done: true } });
     expect(openSession).toHaveBeenCalledWith(expect.objectContaining({ defaultPermissionMode: "auto" }));
+    const opened = await openSession.mock.results[0]!.value;
+    expect(opened.prompt).toHaveBeenCalledWith("hello", "client-turn-1");
   });
 
   it("keeps provider identity when configured models share a display name", async () => {

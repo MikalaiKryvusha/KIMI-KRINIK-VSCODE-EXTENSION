@@ -25,6 +25,19 @@
 
 ## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
 
+### 2026-11-24 17:45 +03:00 — lifecycle and UI fixes delivered; current VSIX installed by owner
+- `bugs/22`: first/queued/steered messages now create immediate optimistic entries with stable `clientId` through store, bridge, runtime and events; durable events reconcile without duplicates and host-idle dequeue needs no lightning. Isolated VSIX: first Send appears before acknowledgement and remains one user entry/one model request.
+- `bugs/20`: queue lightning removes immediately and restores exact index on failure; ten activations produce one `steerChat`. `bugs/17`: attention voice starts exactly once with «Николай, это Кими Криник» on Glass/browser routes. `bugs/19`: live tool events restore «Работаю…»; two-client replay is unverified.
+- `ideas/01`: language selection is a dialog with selected-first order (English before Russian, Chinese last); Action Menu shows only localized `Language` / `Язык` / `语言`. Delete is localized. Quota/context headings are bold with separator borders/gaps.
+- Lifecycle full suite: 48 files, 571 passed, 1 skipped; typecheck, lint, build and Extension Host smoke green. Final usage suite is 4/5: `usage-status-bar.test.tsx:57` reads the immediate parent instead of the separator wrapper; not called green.
+- Current `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` passed Extension Host smoke and the owner confirmed `node .tmp/owner-install.mjs` installed it in the main profile. Earlier claim that latest installation was blocked is corrected by the owner's output.
+
+### 2026-11-24 13:51 +03:00 — owner findings filed; chat pipeline research and repair ladder ready
+- Real-profile acceptance found six open defects: `bugs/11` immediate/lost steering, `bugs/12` obsolete composer restoration, `bugs/13` steering attachments and thumbnails, `bugs/14` missing visible queue, `bugs/15` visible internal hook output and `bugs/16` assistant avatar above the user's steering bubble. No pipeline implementation changed.
+- `researches/54_chat_pipeline_reliability.md` synthesizes Claude documentation/bundle 2.1.331, local `app-client`, current SDK and the owner requirements. `plans/01_EPIC_chat_pipeline_reliability.md` defines the two-ID lifecycle and Phases 0–4; `plans/02_epic01_characterize_chat_pipeline.md` details only the red-contract phase. Requirements and attribution linters pass; scenario-lint is SKIPPED (no scenario blocks).
+- Context Window descriptions, header percentage, VS Code-derived dark cards and Russian labels were edited with red-to-green targeted checks and observed in the current isolated VSIX. Full extension: 558 passed, 1 skipped; lint, typecheck, build/package and voice-lint green. `HOUSE_RULES.md` R3 records the owner's user-facing explanation style.
+- [OWNER] «тогда работаем внутри KIMI KRINIK, а фиксы - запускай и тестируй в изолированном окружении VS Code» · 2026-11-24 13:06 +03:00 (чат). Future fixes are developed inside KIMI KRINIK and run in isolated VS Code.
+
 ### 2026-11-24 12:33 +03:00 — responsive/brand UI, C17 and sound contour ✅ full suite / live VSIX
 - C17 is live-pass: workspace voice decline/allow, machine priority, phrase cleanup and ENOENT logging. C24–C26 cover the pink response robot, reference composer parity, wheel+fade, wide no-scroll, scrollable Action menu, About RPC, language order and checked-control colors. Bugs 08/09 are DONE.
 - Bug 10 is DONE: latest-write volume, serialized host updates, global Sound enabled, Triple 880/660/990, packaged glass.opus and Russian Eugeny. Live VSIX: latest volume 100, OFF creates no audio, neutral tracks. Full extension: 556 passed, 1 skipped; typecheck and lint green.
@@ -56,11 +69,11 @@ external publication wait for the owner's `AUTH:`.
 | K2 behavior controls | ✅ hygiene | independent Context Window Control, KAIF handoff and in-flight Auto Compact OFF cancellation are committed and verified; live flip acceptance is in K5 |
 | K3 localization and theme | ✅ hygiene | three languages and the theme tokens; live acceptance in K5 |
 | K4 sound settings | ✅ hygiene | the window, B8 terminal guard and B5/B6 command/temp-file safety are verified; live sound acceptance is in K5 |
-| K5 live acceptance and release | 🔧 in progress | bugs/01–03/06/07, isolated startup, Second Side Bar, languages, sound preview and ON/OFF steering pass; quotas, closure, B5/B6 dialog, media-reject and rollback remain; publishing only on the owner's `AUTH:` |
+| K5 live acceptance and release | ⏸ paused | bugs/11–15 are release-blocking owner findings from the real profile; earlier isolated ON/OFF steering passes did not cover the failing races/media/hook rendering; publishing only on the owner's `AUTH:` |
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 12:14 +03:00, Windows): 556 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 14:42 +03:00, Windows): 558 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -76,28 +89,48 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-[OWNER] «тестируй всё, что можешь протестировать на стенде, полируй, доводи до хорошего состояния … На этом мы тут чат закроем, я перезапускаю VS Code с установленным тобою KIMI KRINIK 1.0.0, и я создам новую сессию прямо в нём» · 2026-11-24 10:00 +03:00 (чат)
+FORCE-CLOSED: 2026-11-24 17:45 +03:00 — current VSIX is packaged and installed by the owner in the main profile. Next session starts by fixing the parent selector in `apps/vscode/test/webview/usage-status-bar.test.tsx:57` (use the separator wrapper), then runs full `apps/vscode/test`, lint/typecheck and a real-profile first-Send/queue/language smoke. `bugs/19` still needs two-client replay acceptance; `bugs/11`–`16` and `bugs/18` still need the broader lifecycle contracts in `plans/02_epic01_characterize_chat_pipeline.md`. `bugs/17`, `bugs/20`, `bugs/22` and `ideas/01` have implementation evidence but their DONE handoff/documentation is not fully committed yet. No release/publication without separate owner `AUTH:`.
 
-Stand-first route is complete through C17, C24–C26 and the sound contour. Main commit `8ac5df733` is pushed and `mikalai-kryvusha.kimi-code-kaif@1.0.0` is installed in the owner's main VS Code. The next session runs inside KIMI KRINIK on the owner's real profile and uses Windows mouse/keyboard automation and screenshots for the remaining real-world acceptance.
+⚠️ Force-closed 2026-11-24 17:45 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first /skill:end-chat-soft pays this debt.
+
+UI-CUT: 2026-11-24 14:42 +03:00 — isolated current VSIX accepted: no header percentage, «Панель Управления», «Думаю...», «Запрос...», exact ON/OFF descriptions and VS Code-derived darker queue/todos backgrounds read in DOM and WebP 31–36. Two changesets are written. At the measured 80% boundary no new checks start; final closure begins with full suite 558/1, lint/typecheck/package green and test processes stopped. The main work remains Phase 0 of the chat-pipeline plan.
+
+[OWNER] «а этот чат закрывай, пока работу в KIMI KRINIK откладываем. Много багов» · 2026-11-24 13:05 +03:00 (чат); «тогда работаем внутри KIMI KRINIK, а фиксы - запускай и тестируй в изолированном окружении VS Code» · 2026-11-24 13:06 +03:00 (чат)
+
+Main commit `8ac5df733` is pushed and `mikalai-kryvusha.kimi-code-kaif@1.0.0` is installed in the owner's main VS Code. This chat adds uncommitted UI edits, bug documents and the chat-pipeline research/plans; no steering implementation changed. Current main work is Phase 0 of `plans/01_EPIC_chat_pipeline_reliability.md`.
 
 [AI] FORCE-CLOSED: 2026-11-24 12:48 +03:00 — the window reached 90%; no new task, build, test suite or judge starts. Full suite (556/1), typecheck, lint and judge VERIFIED were completed before the forced closure.
 
-⚠️ Force-closed 2026-11-24 12:48 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first `/skill:end-chat-soft` pays this debt.
+Force-closed debt paid 2026-11-24 14:22 +03:00: judge pass, README/voice checks, status review and showcase linters completed. Fable judge is VERIFIED WITH CAVEATS: scenario-lint is SKIPPED and the independent README semantic recheck was interrupted; no steering implementation is claimed done.
 
-Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; ранняя ошибка изоляции CDP исправлена в K5 report/TC и launcher; корневой `.kaif/kaif.json` восстановлен и не имеет diff. Прежнее «глаза робота отличаются геометрией» оказалось неверным: совпадал размер и `rounded`, исправлено в коде KimiLogo/ChatMessage.
+Standing falsehood: ранняя «latest build is NOT installed» → исправлено в `STATUS.md` по выводу владельца: `node .tmp/owner-install.mjs` успешно установил текущий VSIX. Более раннее «Phase 0 production code stays unchanged» относилось только к characterization и не описывает последующий lifecycle-фикс; это разграничено в `bugs/22`. Последний usage suite 4/5 не назван зелёным.
 
-KNOWLEDGE: responsive/brand parity is in `researches/53_control_panel_parity.md`; live K5 observations/WebP and the remaining matrix are in `testcases/reports/2026-11-24_k5_live_acceptance.md` and `testcases/TC_K5_live_acceptance.md`; voice facts are in `HOUSE_RULES.md` and `D:/work/ai_sandbox/tools/silero_tts/VOICE_RULES.md`; the resource-resolver lesson is `EXPERIENCE.md` EXP-0007.
+KNOWLEDGE: the optimistic clientId flow and invariants now live in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; reusable lifecycle/localization/voice lessons are `EXPERIENCE.md` EXP-0008–0010; KIMI FORK working/queue parity evidence is `researches/55_kimi_fork_working_queue_parity.md`; the remaining two-client and broader lifecycle matrix is `testcases/TC_chat_pipeline_reliability.md`.
 
-1. Start the next chat with `/skill:resume` inside the installed KIMI KRINIK 1.0.0 on the owner's accumulated profile; read `testcases/TC_K5_live_acceptance.md` and the K5 report first. Continue C08, C11–C12 and C18–C23: real quotas, active compaction/closure, rejected media, effort/stop, extended status, real-event sound/replay and rollback. No row gets DONE from hygiene alone.
-2. For C23 inspect the Swarm reminder exit/reconcile contract before filing a defect: `packages/node-sdk/src/sdk-rpc-client-v2.ts:2572` documents reminder behavior. Read `packages/agent-core-v2/AGENTS.md` before any engine change. The observed historical enter reminder alone is not proof of a bug.
-3. Use Windows mouse/keyboard automation and regular PC screenshots per `HOUSE_RULES.md` R2. The ignored local harness and evidence are under `.tmp/k5-vscode*`; inspect before reuse. The committed isolated startup route is `pnpm --filter kimi-code-kaif test:extension-host --version 1.123.0`. No test process is left running by this closing ritual.
-4. Investigate `bugs/04_frozen_prompt_windows_path.md` and `bugs/05_pre_post_compact_hook_log_empty.md` separately; both reproduce on the original engine service and are not K2.6 regressions.
+1. Execute `plans/02_epic01_characterize_chat_pipeline.md`: turn `bugs/11`–`bugs/16` into red contracts at the existing runtime/store/adapter boundaries. Production code stays unchanged in Phase 0; do not commit the intentionally red suite.
+2. Phase 1 then propagates `PromptSubmissionResult` and `promptId` before optimistic UI is implemented. Read `researches/54` and the meta-plan anchors before each step; do not infer a pass from earlier C09/C10 text-only scenarios.
+3. After Phases 0–4 pass in isolated VS Code, resume C08, C11–C12 and C18–C23. The isolated startup route is `pnpm --filter kimi-code-kaif test:extension-host --version 1.123.0`; inspect `.tmp/k5-vscode*` before reuse and leave no test process running.
+4. For C23 inspect `packages/node-sdk/src/sdk-rpc-client-v2.ts:2572`; read `packages/agent-core-v2/AGENTS.md` before any engine change. Investigate bugs/04 and 05 separately from K2.6.
 5. Release/publication remains a separate gated step. Do not decide B9/B10 or publish without the owner's required word.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.
 
+## Approved features
+
+- 🔧 `ideas/01_language_selection_modal.md` — owner approved one Language button in Action Menu with English → Русский → 中文 moved into a separate dialog; implementation and VSIX acceptance in progress.
+
 ## Open bugs
 
+- 🔴 `bugs/20_queue_steer_duplicate_submission.md` — repeated lightning clicks lack immediate feedback and each starts another steer; the owner requires an optimistic response, not a disabled-only fix.
+- 🔴 `bugs/19_tool_cards_hide_working_state.md` — completed tool cards can leave no visible «Работаю…» while the turn remains active.
+- 🔴 `bugs/18_reentrant_prompt_internal_error.md` — owner hit the generic send error in both extensions; the fresh KIMI KRINIK log proves a second ordinary prompt hit the active-response guard.
+- 🔴 `bugs/17_attention_voice_missing_identity.md` — both attention voice routes pass raw event text without the required owner/project opening.
+- 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — steering bubbles wait for acknowledgement and some sends are lost at a state transition.
+- 🔴 `bugs/12_steer_composer_restores_previous_text.md` — an older steering message reappears in the composer after a newer send.
+- 🔴 `bugs/13_steer_attachments_and_thumbnails.md` — steering attachments are not delivered and steer bubbles lack clickable media thumbnails.
+- 🔴 `bugs/14_steer_queue_not_added.md` — the follow-up queue is not visibly added; exact state combination needs reproduction.
+- 🔴 `bugs/15_hook_results_visible_in_chat.md` — internal hook results render as assistant chat text; the replay rendering path is confirmed.
+- 🔴 `bugs/16_steer_avatar_precedes_user_bubble.md` — steering is nested inside assistant steps, placing the avatar above the user's bubble.
 - 🔴 `bugs/04_frozen_prompt_windows_path.md` — pre-existing Windows cwd/listing failure reproduced on the original engine service.
 - 🔴 `bugs/05_pre_post_compact_hook_log_empty.md` — pre-existing empty Pre/PostCompact payload list reproduced on the original engine service.
 - 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.

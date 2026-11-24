@@ -15,7 +15,7 @@
 | **Handlers** | one module per domain (chat, session, config, auth, attention, file, workspace, mcp) answering bridge methods | `apps/vscode/src/handlers/` |
 | **Session runtime** | one live engine session per webview: prompt, steer, abort, approvals, questions | `apps/vscode/src/runtime/session-runtime.ts`, `reverse-rpc.ts` |
 | **Event adapter** | maps SDK wire events to the webview's legacy `UIStreamEvent` stream | `apps/vscode/src/runtime/event-adapter.ts`, `shared/types.ts` |
-| **Chat store** | webview state of one conversation: messages, streaming flag, draft media, `pendingInput` (retry), `composerRestore`, queue | `apps/vscode/webview-ui/src/stores/chat.store.ts`, `event-handlers.ts` |
+| **Chat store** | webview state of one conversation: messages with optimistic `clientId`, streaming flag, draft media, `pendingInput` (retry), `composerRestore`, queue | `apps/vscode/webview-ui/src/stores/chat.store.ts`, `event-handlers.ts` |
 | **Settings store** | models, current model and effort, login, extension config | `webview-ui/src/stores/settings.store.ts` |
 | **Model picker** | combined model/effort quick selection, full search/provider filters, keyboard navigation and shared persisted favorites | `webview-ui/src/components/ModelPicker.tsx`, `ModelPickerDialog.tsx`, `inputarea/hooks/useFavoriteModels.ts` |
 | **Status pills** | live queued/changes panels, background process/agent tasks, last Todo display and compaction viewer | `webview-ui/src/components/StatusPills.tsx` |
@@ -25,11 +25,14 @@
 
 ## The flows
 
-1. **Prompt.** `InputArea` → `chat.store.sendMessage` → idle: `sendIdle` → `bridge.streamChat` → `chat.handler` →
-   `SessionRuntime` → SDK → engine. Events come back as `Events.StreamEvent` and go through `processEvent`.
-2. **Follow-up during a turn.** `sendMessage` while `isStreaming` → `steerNow` → `bridge.steerChat`. `ok:true` removes the sent
-   media; `ok:false` (the turn already ended) sends the same content once through `sendIdle`; a rejection returns the text
-   through `composerRestore` and the media to the draft. Media in flight carry `steering: true` and are never sent twice.
+1. **Prompt.** `InputArea` → `chat.store.sendMessage` → idle: `sendIdle` creates an optimistic user/assistant pair with a
+   `clientId` → `bridge.streamChat` → `chat.handler` → `SessionRuntime` → SDK → engine. `TurnBegin` carries the same ID and
+   reconciles the pair instead of duplicating it. Old events without an ID use content/order fallback.
+2. **Follow-up during a turn.** `sendMessage` while `isStreaming` → optimistic `clientId` pair → `steerNow` → `bridge.steerChat`.
+   `SteerInput` carries that ID and reconciles the same pair. `ok:true` removes the sent media; `ok:false` continues the same
+   optimistic record through `sendIdle`; a rejection discards only that record and restores its text/media. Media in flight
+   carry `steering: true` and are never sent twice. Queue lightning removes its row immediately and restores it at the original
+   index on failure. AUTO STEER OFF asks the host for activity so an already-idle queue advances without waiting for lightning.
 3. **Attention.** `processEvent` → `notifyEventAttention` (terminal errors, approvals, questions; silent during `loadSession`
    replay) → `bridge.notifyAttention` → `attention.handler` spawns the voice command; without one the webview speaks.
 4. **Managed quota.** `UsageStatusBar` polls `bridge.getManagedUsage` every 60 s for the `managed:kimi-code` provider →
@@ -56,3 +59,5 @@
 2. `pendingInput` belongs to the running turn (retry); composer restoration goes through `composerRestore` only.
 3. Replayed history never triggers attention.
 4. Only one contour delivers context-window stage prompts: built-in KIMI KRINIK ownership excludes the KAIF context hook.
+5. An optimistic `clientId` identifies one user action through bridge, runtime and live events; durable `TurnBegin`/`SteerInput`
+   reconcile that record instead of creating a second bubble, while legacy events without IDs remain supported.

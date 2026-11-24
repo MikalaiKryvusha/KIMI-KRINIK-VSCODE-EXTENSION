@@ -89,10 +89,10 @@ function ContextRing({ ratio, label, detail }: ContextRingProps) {
         </TooltipTrigger>
         <TooltipContent>
           <div className="flex flex-col gap-0.5">
-            <span>{label}</span>
+            <span className="font-semibold">{label}</span>
             {detail !== undefined && <span>{detail}</span>}
             <span>{t("usage.percentUsed", { percent: formatUsagePercent(ratio) })}</span>
-            <span className="text-muted-foreground">{t("context.tooltip")}</span>
+            <span className="mt-2 border-t border-border/60 pt-2 font-semibold text-muted-foreground">{t("context.tooltip")}</span>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -136,7 +136,7 @@ function QuotaTooltipSection({ label, state, now }: { label: string; state: Quot
             : t("usage.resetsInMinutes", { minutes: countdown.minutes });
   return (
     <div className="flex flex-col gap-0.5">
-      <span>{label}</span>
+      <span className="font-semibold">{label}</span>
       {state.ratio === null ? (
         <span>{state.error !== undefined ? t("usage.unavailable", { error: state.error }) : t("usage.loading")}</span>
       ) : (
@@ -194,7 +194,9 @@ export function QuotaRings({
         <div className="flex flex-col gap-1.5">
           {planName !== undefined && <span className="font-medium">{t("usage.plan", { name: planName })}</span>}
           <QuotaTooltipSection label={t("usage.fiveHourLimit")} state={fiveHour} now={now} />
-          <QuotaTooltipSection label={secondaryLabel} state={secondary} now={now} />
+          <div className="mt-2 border-t border-border/60 pt-2">
+            <QuotaTooltipSection label={secondaryLabel} state={secondary} now={now} />
+          </div>
         </div>
       </TooltipContent>
     </Tooltip>

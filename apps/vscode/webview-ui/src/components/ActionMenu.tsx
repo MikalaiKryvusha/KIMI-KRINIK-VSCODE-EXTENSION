@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconCheck, IconVolume, IconAdjustmentsHorizontal, IconExternalLink } from "@tabler/icons-react";
+import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconVolume, IconAdjustmentsHorizontal, IconExternalLink, IconLanguage } from "@tabler/icons-react";
 import { ControlPanelSettingsDialog } from "./ControlPanelSettingsDialog";
+import { LanguageSelectionDialog } from "./LanguageSelectionDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -9,13 +10,6 @@ import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n";
-import type { InterfaceLanguage } from "shared/types";
-
-const LANGUAGE_NAMES: ReadonlyArray<[InterfaceLanguage, string]> = [
-  ["en", "English"],
-  ["ru", "Русский"],
-  ["zh", "中文"],
-];
 
 interface ActionMenuProps {
   className?: string;
@@ -53,8 +47,9 @@ function MenuItem({ onClick, disabled, danger, children }: { onClick: () => void
 export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const [controlPanelOpen, setControlPanelOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, changeLanguage, setSoundModalOpen } = useSettingsStore();
+  const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, setSoundModalOpen } = useSettingsStore();
   const t = useT();
 
   const handleOpenSettings = () => {
@@ -134,22 +129,15 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
             <IconAdjustmentsHorizontal className="size-4 text-muted-foreground" />
             <span className="flex-1">{t("controlPanel.title")}</span>
           </MenuItem>
+          <MenuItem onClick={() => { setLanguageOpen(true); setOpen(false); }}>
+            <IconLanguage className="size-4 text-muted-foreground" />
+            <span className="flex-1">{t("menu.languageAction")}</span>
+          </MenuItem>
           <MenuItem onClick={handleOpenSettings}>
             <IconSettings className="size-4 text-muted-foreground" />
             <span className="flex-1">{t("menu.generalConfig")}</span>
             <span className="text-[10px] text-muted-foreground">↗</span>
           </MenuItem>
-        </MenuSection>
-
-        <Separator className="my-px" />
-
-        <MenuSection title={t("menu.language")}>
-          {LANGUAGE_NAMES.map(([language, name]) => (
-            <MenuItem key={language} onClick={() => void changeLanguage(language)}>
-              <span className="flex-1">{name}</span>
-              {extensionConfig.language === language && <IconCheck className="size-3.5 text-muted-foreground" />}
-            </MenuItem>
-          ))}
         </MenuSection>
 
         <Separator className="my-px" />
@@ -186,6 +174,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
       </PopoverContent>
       </Popover>
       <ControlPanelSettingsDialog open={controlPanelOpen} onOpenChange={setControlPanelOpen} />
+      <LanguageSelectionDialog open={languageOpen} onOpenChange={setLanguageOpen} />
     </>
   );
 }

@@ -217,7 +217,7 @@ class Bridge {
     effort: string,
     planMode: boolean,
     sessionId?: string,
-    extras: { permissionMode?: PermissionModeName; goalObjective?: string } = {},
+    extras: { permissionMode?: PermissionModeName; goalObjective?: string; clientId?: string } = {},
   ) {
     return this.call<{ done: boolean }>(Methods.StreamChat, { content, model, effort, planMode, sessionId, ...extras });
   }
@@ -338,8 +338,12 @@ class Bridge {
     return this.call<{ ok: boolean; planMode: boolean }>(Methods.SetPlanMode, { enabled });
   }
 
-  steerChat(content: string | ContentPart[]) {
-    return this.call<{ ok: boolean }>(Methods.SteerChat, { content });
+  steerChat(content: string | ContentPart[], clientId?: string) {
+    return this.call<{ ok: boolean }>(Methods.SteerChat, { content, clientId });
+  }
+
+  getSessionBusy() {
+    return this.call<{ busy: boolean }>(Methods.GetSessionBusy);
   }
 
   showLogs() {

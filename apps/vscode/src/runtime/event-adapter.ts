@@ -60,6 +60,7 @@ export interface EventAdapterResult {
 
 export interface AdaptSdkEventOptions {
   readonly pendingInput?: TurnBegin['user_input'];
+  readonly clientId?: string;
   readonly mainAgentId?: string;
   readonly errorPhase?: ErrorPhase;
 }
@@ -109,7 +110,11 @@ export function adaptSdkEvent(
       event: withSessionId(
         {
           type: 'TurnBegin',
-          payload: { user_input: options.pendingInput, turnIndex: sdkEvent.turnId },
+          payload: {
+            user_input: options.pendingInput,
+            turnIndex: sdkEvent.turnId,
+            ...(options.clientId === undefined ? {} : { clientId: options.clientId }),
+          },
         },
         sdkEvent.sessionId,
       ),

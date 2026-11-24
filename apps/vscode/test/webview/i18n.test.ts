@@ -49,6 +49,17 @@ describe("interface dictionaries", () => {
     expect(t("menu.settings")).toBe("Settings");
   });
 
+  it("describes context window thresholds without internal framework names", () => {
+    expect(translate("en", "controlWindow.description")).toBe("Notify the agent when context window usage reaches the configured thresholds.");
+    expect(translate("ru", "controlWindow.description")).toBe("Предупреждать агента, когда контекстное окно заполняется до заданных порогов.");
+    expect(translate("zh", "controlWindow.description")).toBe("当上下文窗口使用量达到配置的阈值时提醒代理。");
+    expect(translate("ru", "controlWindow.off")).toBe("Выкл: KIMI KRINIK не следит за заполнением контекстного окна чата. Чат может переполниться или дойти до автосжатия.");
+    expect(translate("ru", "controlWindow.on")).toBe("Вкл: KIMI KRINIK следит за заполнением контекстного окна чата и не позволяет чату переполниться или дойти до сжатия контекста. При переполнении контекстного окна чата работа будет мягко остановлена для передачи в новый чат.");
+    for (const dictionary of Object.values(dictionaries)) {
+      expect(dictionary["controlWindow.description"]).not.toContain("KAIF");
+    }
+  });
+
   it("keeps the Control Panel action names localized", () => {
     expect(translate("en", "menu.autoCompact")).toBe("Compact");
     expect(translate("ru", "menu.autoCompact")).toBe("Сжатие");
@@ -59,6 +70,9 @@ describe("interface dictionaries", () => {
     expect(translate("ru", "modes.plan")).toBe("План");
     expect(translate("ru", "modes.goal")).toBe("Цель");
     expect(translate("ru", "modes.swarm")).toBe("Рой");
+    expect(translate("ru", "controlPanel.title")).toBe("Панель Управления");
+    expect(translate("ru", "thinking.label")).toBe("Думаю...");
+    expect(translate("ru", "chat.requesting")).toBe("Запрос...");
     expect(translate("en", "menu.aboutProject")).toBe("About KIMI KRINIK");
     expect(translate("ru", "menu.aboutProject")).toBe("О проекте KIMI KRINIK");
     expect(translate("zh", "menu.aboutProject")).toBe("关于 KIMI KRINIK");
@@ -66,6 +80,12 @@ describe("interface dictionaries", () => {
     expect(translate("ru", "sound.choice.triple")).toBe("Тройной писк");
     expect(translate("zh", "sound.choice.triple")).toBe("三声提示音");
     expect(translate("en", "sound.enabled")).toBe("Sound enabled");
+    expect(translate("en", "common.delete")).toBe("Delete");
+    expect(translate("ru", "common.delete")).toBe("Удалить");
+    expect(translate("zh", "common.delete")).toBe("删除");
+    expect(translate("en", "menu.languageAction")).toBe("Language");
+    expect(translate("ru", "menu.languageAction")).toBe("Язык");
+    expect(translate("zh", "menu.languageAction")).toBe("语言");
   });
 });
 
