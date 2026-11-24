@@ -32,3 +32,4 @@
 |---|---|---|
 | `node .kaif/hooks/kimi-permission-call.mjs --selftest` | проверяет маршрут file-based voice для permission call | наличие `contour.voiceFileTool` и передачу файла фразы |
 | `node .kaif/tools/contour/voice-soft.mjs --selftest` | проверяет журнал фраз и soft-фильтр KAIF | форму voice log; не заменяет прослушивание Glass |
+| `pnpm --filter kimi-code-kaif test:extension-host --version 1.123.0` | устанавливает VSIX в изолированный профиль, активирует расширение и открывает webview | кеш `F:/Temp/kimi-vscode-test-cache`; скрипт сам очищает унаследованный `ELECTRON_RUN_AS_NODE` |

@@ -51,7 +51,7 @@ external publication wait for the owner's `AUTH:`.
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 04:08 +03:00, Windows): 534 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-24 04:32 +03:00, Windows): 535 passed, 1 skipped; typecheck, lint and extension + webview builds green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -67,11 +67,11 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-[AI] IN PROGRESS: 2026-11-24 04:04 +03:00 — B5/B6 are implemented with red-to-green guards, full hygiene and a patch changeset. Finish judge/commit/push, then run K5 live acceptance. Do not close the chat now; start soft closure only when the context-overflow hook fires.
+[AI] IN PROGRESS: 2026-11-24 04:27 +03:00 — B5/B6 are committed and pushed as `5c7b8ece5`. K5 isolated VSIX startup passed on real VS Code 1.123.0; continue the live control and visual matrix. Do not close the chat now; start soft closure only when the context-overflow hook fires.
 
 Standing falsehood: прежнее «ни один проектный хук не запустился» → исправлено в `STATUS.md`, `EXPERIENCE.md` EXP-0004 и `bugs/KAIF/04_context_window_alive_dormant.md`; отдельная коррекция дана в чате.
 
-KNOWLEDGE: permission defaults, model picker, live status/title flow and in-flight cancellation are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; B5/B6 evidence and guard gaps are in `testcases/reports/2026-11-24_attention_voice_safety.md`; B8's existing terminal guard is in `apps/vscode/webview-ui/src/stores/chat.store.ts:147`.
+KNOWLEDGE: permission defaults, model picker, live status/title flow and in-flight cancellation are in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; B5/B6 evidence and guard gaps are in `testcases/reports/2026-11-24_attention_voice_safety.md`; the one-step Extension Host route and inherited Electron mode boundary are in `HOUSE_RULES.md` and `bugs/06_DONE_extension_host_electron_node_mode.md`.
 
 1. K5: drive all new controls, B5/B6 and `bugs/01`–`03` in a real Extension Host before calling them tested or DONE. Claude sessions here get no KAIF skills or hooks; the owner declined adding `claude-code` for now.
 2. Investigate `bugs/04_frozen_prompt_windows_path.md` and `bugs/05_pre_post_compact_hook_log_empty.md` separately; both reproduce on the original engine service and are not K2.6 regressions.
