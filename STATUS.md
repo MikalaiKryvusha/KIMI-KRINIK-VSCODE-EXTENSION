@@ -23,6 +23,11 @@
 
 ---
 
+### 2026-11-25 02:29 +03:00 — deleted non-KAIF skill references cleaned; root lint green
+- Removed repository-workflow references to deleted `write-tui`, `gen-docs`, `gen-changesets`, `review-pr`, `sync-changelog` and local `use-kimi-code` artifacts from AGENTS/PR/docs paths. Other-agent guides now point to the running KAP guide instead of an installed skill.
+- Kept public engine documentation for generic `~/.agents/skills` directories: that is supported product behavior, not a deleted repository-owned skill.
+- `pnpm lint` exits 0 (12 AGENTS files, 173 references resolve); `pnpm run build` in `docs/` completes for EN/ZH. No generated docs output entered the diff.
+
 ### 2026-11-25 02:14 +03:00 — replay flicker reproduced and fixed on isolated build 19
 - `bugs/25`: build-18 session replay showed one zero-assistant/response-absent frame (~21 ms). Reset, history events and completion marking now use one state transaction; live attention/queue wrappers do not run for replay.
 - Regression was red before the fix; 65 affected checks, typecheck and VSIX audit pass. Build-19 real history navigation stayed at one assistant container on every frame and ended with the restored response. Original main-profile first-prompt route remains open; isolated instant first prompt did not reproduce it.
@@ -47,8 +52,8 @@
 - Build 12 is packaged and installed on the main-profile disk; source/installed dist SHA-256 values match. The main process still needs a full restart before real-profile acceptance.
 - 2026-11-24 23:54 +03:00 — [OWNER] reproduced twice on main-profile build 12: with AUTO STEER OFF and two queued messages, one lightning activation on the first submitted both. `bugs/20` is OPEN again; this real-path failure takes priority over the context-ring color change, which is parked after only a test-import edit.
 - 2026-11-24 23:50 +03:00 — [OWNER] «сборка 12 вроде работает стабильнее по чату», «тебе быстро мои стиринг сообщения доходят» (чат). Recorded as positive main-profile steering evidence in `bugs/11` and `bugs/22`; the remaining acceptance matrix stays open. The owner also reported a first-prompt chat-feed flash and disappearing assistant message, filed as `bugs/25_first_prompt_assistant_message_flicker.md`.
-- Owner ordered all non-KAIF skills removed. `.agents/skills/` and `skills/use-kimi-code/` are deleted; root `AGENTS.md` has only partial reference cleanup. Remaining references include `apps/kimi-code/AGENTS.md`, `packages/kap-server/AGENTS.md`, `docs/AGENTS.md`, `docs/{en,zh}/guides/other-agents.md`, `.github/pull_request_template.md` and the generic `.agents` path prose in docs. Do not treat this as a completed cleanup.
-- NEXT FIRST: finish the reference cleanup and run `pnpm lint`; then fully restart VS Code, read `v1.0.0 (12)` and run the ON/OFF queue/composer/media/hook smoke recorded below. Do not start the later ideas before this integrity cut.
+- Owner ordered all non-KAIF skills removed. `.agents/skills/` and `skills/use-kimi-code/` are deleted; stale AGENTS/PR/docs workflow references were cleaned on 2026-11-25 and `pnpm lint` now exits 0. Generic user-level `.agents/skills` documentation remains because the engine supports those directories.
+- NEXT FIRST: main-profile acceptance of the current isolated fixes; the separate `usage-status-bar` selector remains the last known full-suite failure. Do not start the later ideas before this integrity cut.
 - ⚠️ Force-closed 2026-11-24 23:39 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first /skill:end-chat-soft pays this debt.
 - Standing falsehood: apparent build 4–6 live failures were invalid because the isolated process stayed at PID 44644 → corrected in `bugs/20_queue_steer_duplicate_submission.md` and the fresh-process report. No uncorrected artifact is known.
 - KNOWLEDGE: the final build and acceptance limits are in this file and `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`; the CDP process lesson is `EXPERIENCE.md` EXP-0011; later owner-approved work is `ideas/02_control_panel_skill_picker.md` and `ideas/03_extension_general_settings.md`; root `AGENTS.md` English translation and nonblocking-subagent research remain recorded below.

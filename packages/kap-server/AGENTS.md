@@ -13,4 +13,4 @@
 ## 协议字段与内置文档
 
 - **公开协议的字段名使用 `snake_case`。** 这条约定适用于请求体、查询字符串、响应的 `data` 载荷和 WebSocket 帧。文档明确标注为透传的载荷除外。
-- **核心流程变化时同步更新内置协议指南。** 运行中的二进制通过 `GET /api/v1/kap.md` 直接提供 `packages/kap-server/docs/kap.md`。修改连接建立流程（`kimi web --json`、`server.token` / `instances`）、核心会话、对话或交互接口，或 `meta.capabilities` 时，都要更新这份指南。连接建立流程有变时，还要同步更新公开技能 `skills/use-kimi-code/SKILL.md` 和双语用户指南 `docs/{en,zh}/guides/other-agents.md`。`docs/kap.md` 保持简明（约 500 行），字段级定义由运行中的服务通过 `/openapi.json` 和 `/asyncapi.json` 提供。
+- **核心流程变化时同步更新内置协议指南。** 运行中的二进制通过 `GET /api/v1/kap.md` 直接提供 `packages/kap-server/docs/kap.md`。修改连接建立流程（`kimi web --json`、`server.token` / `instances`）、核心会话、对话或交互接口，或 `meta.capabilities` 时，都要更新这份指南和双语用户指南 `docs/{en,zh}/guides/other-agents.md`。`docs/kap.md` 保持简明（约 500 行），字段级定义由运行中的服务通过 `/openapi.json` 和 `/asyncapi.json` 提供。
