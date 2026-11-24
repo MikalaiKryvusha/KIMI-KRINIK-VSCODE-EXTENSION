@@ -2,4 +2,4 @@
 "kimi-code-kaif": patch
 ---
 
-Add the owner and KIMI KRINIK names to spoken attention notifications.
+Use short prerecorded attention phrases in English, Russian and Chinese, selected by event and interface language.

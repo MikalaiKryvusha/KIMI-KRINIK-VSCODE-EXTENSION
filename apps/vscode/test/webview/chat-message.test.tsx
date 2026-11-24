@@ -1,4 +1,4 @@
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/services", () => ({
@@ -32,6 +32,45 @@ describe("user message rendering", () => {
     expect(paragraphs[0]?.className).toBe("mb-2 last:mb-0");
     expect(paragraphs[0]?.parentElement?.className).toContain("[&_p]:whitespace-pre-wrap");
     expect(paragraphs[1]?.textContent).toBe("third paragraph");
+  });
+});
+
+describe("steering media", () => {
+  it("renders image and video thumbnails and opens the same URIs in the viewer", () => {
+    const image = "data:image/png;base64,AAAA";
+    const video = "data:video/mp4;base64,BBBB";
+    const { container } = render(
+      <ChatMessage
+        message={{
+          id: "assistant-steer-media",
+          role: "assistant",
+          content: "",
+          steps: [{
+            n: 1,
+            items: [{
+              type: "steer",
+              content: [
+                { type: "text", text: "look" },
+                { type: "image_url", image_url: { url: image } },
+                { type: "video_url", video_url: { url: video } },
+              ],
+            }],
+          }],
+          timestamp: 0,
+        }}
+      />,
+    );
+
+    const thumbnail = container.querySelector('img[alt="Media"]');
+    const videoThumbnail = container.querySelector("video");
+    expect(thumbnail?.getAttribute("src")).toBe(image);
+    expect(videoThumbnail?.getAttribute("src")).toBe(video);
+
+    fireEvent.click(thumbnail!);
+    expect(document.querySelector('img[alt="Preview"]')?.getAttribute("src")).toBe(image);
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.click(videoThumbnail!);
+    expect(document.querySelector(".fixed video")?.getAttribute("src")).toBe(video);
   });
 });
 

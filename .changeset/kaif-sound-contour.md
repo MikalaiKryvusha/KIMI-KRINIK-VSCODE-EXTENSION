@@ -2,4 +2,4 @@
 "kimi-code-kaif": minor
 ---
 
-Add a global Sound enabled switch, Triple beep and Glass sounds, and Eugeny voice selection for Russian notifications.
+Add per-event sounds and volumes, a global Sound enabled switch, Glass and Triple beep options, and prerecorded voice notifications in English, Russian and Chinese.

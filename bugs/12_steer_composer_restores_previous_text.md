@@ -1,9 +1,9 @@
 # Bug 12 — A previous steering message reappears in the composer after a newer send
 
-**Status:** 🔴 OPEN
-**Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
+**Status:** 🔧 fix implemented and contracts green; main-profile build-12 restart/acceptance pending
+**Version/build:** originally `8ac5df733`; reproduced by the owner on KIMI KRINIK 1.0.0 build 3 · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00 and again at 2026-11-24 19:07 +03:00, owner live steering acceptance
 **Severity:** S2
-**Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment
+**Fixing:** this session inside KIMI KRINIK; reproduce at the store boundary and verify fixes in an isolated VS Code environment
 **Fix accepted when (observable):** after a newer steering message is sent, a late completion or rejection of an older steer cannot restore old text into the composer; a genuine failure of the latest unsent message restores that exact text and its media exactly once.
 
 ## Symptom
@@ -26,6 +26,8 @@ Only the current failed send may be restored. An obsolete request must not overw
 
 The owner's screenshot shows the previous farewell in the composer while the newer message is already visible in chat.
 
+2026-11-24 19:07 +03:00, build 3: after an AUTO STEER OFF batch the composer contained the batch's first text (`resume` and `ну, вроде загружился новый экстеншен. сборка номер 3`). With AUTO STEER ON, one Enter likewise left the just-sent `тест стиринга. Одно сообщение. Нажимаю Enter.` in the composer. Both are owner screenshots on the accumulated real profile; the asynchronous cause is not inferred from the images.
+
 ## Forensics / hypotheses
 
 - `apps/vscode/webview-ui/src/stores/chat.store.ts:303-310` calls `rollbackInput(content)` on every steering rejection without checking whether that request is still current.
@@ -44,3 +46,10 @@ Kept this separate from delivery loss because an obsolete asynchronous restorati
 
 - `bugs/11_steer_delivery_and_immediate_display.md`
 - `apps/vscode/test/webview/chat-store.test.ts`
+
+## Fix evidence — 2026-11-24 22:02 +03:00
+
+The store restores text/media only for the latest failed outbound `clientId`. `InputArea` also refuses to restore `pendingInput` when a message with the same ID is still present; genuine failed input with no message retains the old restoration path.
+
+Hygiene: reverse-order rejection was red (`older` restored) before the guard and green afterward; the existing-message InputArea case was red (`steer base`) before the guard and green afterward. Combined affected suites pass.
+Functional run: NONE on final build 9 yet. The build is installed on the owner's main-profile disk, but full VS Code restart and composer observation are still required.

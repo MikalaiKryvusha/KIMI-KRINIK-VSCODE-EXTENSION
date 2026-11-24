@@ -58,6 +58,8 @@ beforeEach(() => {
     goalArmed: false,
     swarmMode: false,
     sessionId: null,
+    pendingInput: null,
+    composerRestore: null,
   });
   vi.stubGlobal("ResizeObserver", class {
     observe() {}
@@ -85,6 +87,25 @@ describe("attachment picker toggle", () => {
     await user.click(toggle);
     expect(screen.queryByText("Select images or videos…")).toBeNull();
     expect(container.querySelector("textarea")?.value).toBe("");
+  });
+});
+
+describe("composer restoration", () => {
+  it("does not restore pending input whose message is already present", () => {
+    useChatStore.setState({
+      pendingInput: { content: "steer base", model: "plain", clientId: "client-base" },
+      messages: [{ id: "client-base", role: "user", content: "steer base", timestamp: 0, clientId: "client-base" }],
+    });
+    const { container } = renderInputArea();
+
+    expect(container.querySelector("textarea")?.value).toBe("");
+  });
+
+  it("restores a genuinely failed input after its message was removed", () => {
+    useChatStore.setState({ pendingInput: { content: "failed text", model: "plain", clientId: "client-failed" } });
+    const { container } = renderInputArea();
+
+    expect(container.querySelector("textarea")?.value).toBe("failed text");
   });
 });
 

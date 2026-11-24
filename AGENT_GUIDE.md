@@ -533,11 +533,12 @@ Grow this tooling over time; each command, stand and device gets its row in the 
 
 ## Git workflow
 
-1. Work in the branch `kaif/no-auto-compaction`; `main` mirrors upstream and takes only fast-forward README commits.
+1. Work in `main`. Name each new branch after the feature or fix being developed, for example `feat/action-menu-build-number` or `fix/usage-status-bar-selector`; `kaif/no-auto-compaction` is a historical branch, not the standing work branch.
 2. Commit each finished, verified piece of work yourself and push it to `origin` yourself — never ask the owner for either.
 3. A release, a repository rename and any external publication wait for the owner's `AUTH:` line.
 
 `[OWNER] «комиты и пуши агенты делают сами», «это не ответственность заказчика» · 2026-11-23 19:41 +03:00 (chat)`
+`[OWNER] «пора бы начать работать в ветке main», «а новые ветки называть согласно фичам, которые в них разрабатываешь» · 2026-11-24 18:20 +03:00 (chat)`
 
 > Reconciliation with the fable-method **authorization gate**: this deployed guide IS the owner's standing authorization
 > for routine commits/pushes per the policy above. Everything beyond it — releases, deploys, external sends/publishes,

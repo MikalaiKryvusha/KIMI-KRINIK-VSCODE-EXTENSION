@@ -58,6 +58,15 @@ afterEach(() => {
 });
 
 describe("Control Panel settings", () => {
+  it("places context-window controls after every visibility checkbox", () => {
+    render(<ControlPanelSettingsDialog open onOpenChange={vi.fn()} />);
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    const lastCheckbox = checkboxes.at(-1)!;
+    const contextToggle = screen.getByTestId("context-window-control-toggle");
+    expect(lastCheckbox.compareDocumentPosition(contextToggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("persists a checkbox without closing the dialog or changing feature values", async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
@@ -207,7 +216,7 @@ describe("Control Panel settings", () => {
     render(<ActionMenu />);
 
     await user.click(screen.getByRole("button"));
-    await user.click(await screen.findByText("Language"));
+    await user.click(await screen.findByText("Language / Язык / 语言"));
 
     const dialog = await screen.findByTestId("language-selection-dialog");
     expect(document.querySelector('[data-slot="popover-content"]')).toBeNull();
@@ -244,14 +253,20 @@ describe("Control Panel settings", () => {
     expect(useSettingsStore.getState().extensionConfig.language).toBe("en");
   });
 
-  it("puts the selected language first in the Action Menu button", async () => {
-    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language: "ru" } });
+  it("shows all language action labels with the current language first", async () => {
     const user = userEvent.setup();
     render(<ActionMenu />);
 
     await user.click(screen.getByRole("button"));
 
-    expect(await screen.findByText("Язык")).not.toBeNull();
+    for (const [language, label] of [
+      ["en", "Language / Язык / 语言"],
+      ["ru", "Язык / Language / 语言"],
+      ["zh", "语言 / Language / Язык"],
+    ] as const) {
+      useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language } });
+      expect(await screen.findByText(label)).not.toBeNull();
+    }
   });
 
   it("shows the extension version and build number in Support", async () => {

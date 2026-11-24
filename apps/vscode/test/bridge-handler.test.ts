@@ -177,8 +177,9 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     expect(result).toEqual({ id: "rpc-busy", result: { busy: true } });
   });
 
-  it("forwards steering content and clientId to the runtime", async () => {
-    const steer = vi.fn(async () => undefined);
+  it("forwards steering content and clientId and returns the complete engine submission", async () => {
+    const submission = { promptId: "prompt-steer-1", createdAt: "2026-11-24T00:00:00.000Z", state: "running", turnId: 7, steered: true } as const;
+    const steer = vi.fn(async () => submission);
     vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ isBusy: true, steer } as never);
 
     const result = await bridge.handle({
@@ -187,7 +188,7 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
       params: { content: "second", clientId: "client-steer-1" },
     }, "view-1");
 
-    expect(result).toEqual({ id: "rpc-steer", result: { ok: true } });
+    expect(result).toEqual({ id: "rpc-steer", result: { ok: true, submission } });
     expect(steer).toHaveBeenCalledWith("second", "client-steer-1");
   });
 

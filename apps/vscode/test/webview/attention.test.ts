@@ -1,16 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const boundary = vi.hoisted(() => ({
-  notifyAttention: vi.fn(),
   speak: vi.fn(),
   playTone: vi.fn(),
+  playRecordedAttention: vi.fn(),
 }));
 
-vi.mock("@/services", () => ({
-  bridge: { notifyAttention: boundary.notifyAttention },
-}));
 vi.mock("../../webview-ui/src/lib/sounds", () => ({
   playTone: boundary.playTone,
+  playRecordedAttention: boundary.playRecordedAttention,
 }));
 
 import { notifyAttention, previewSound } from "../../webview-ui/src/lib/attention";
@@ -19,112 +17,68 @@ import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src
 const VOICE = { sound: "voice", volume: 80 } as const;
 
 beforeEach(() => {
-  useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, soundEnabled: true } });
-  boundary.notifyAttention.mockReset();
+  useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, soundEnabled: true, language: "ru" } });
   boundary.speak.mockReset();
   boundary.playTone.mockReset();
-  vi.stubGlobal("speechSynthesis", {
-    speak: boundary.speak,
-    getVoices: () => [
-      { name: "Microsoft Eugene", lang: "ru-RU" },
-      { name: "Microsoft Other", lang: "en-US" },
-    ],
-  });
-  vi.stubGlobal("SpeechSynthesisUtterance", class {
-    lang = "";
-    rate = 1;
-    volume = 1;
-    voice: { name: string; lang: string } | undefined;
-    constructor(readonly text: string) {}
-  });
+  boundary.playRecordedAttention.mockReset();
+  vi.stubGlobal("speechSynthesis", { speak: boundary.speak });
 });
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe("attention notifications", () => {
-  it("uses the configured Glass route with the owner and project identity", async () => {
-    boundary.notifyAttention.mockResolvedValue({ ok: true });
-    notifyAttention("Answer required", VOICE, 1_000);
-    await Promise.resolve();
+  it("plays the prerecorded Russian event without dynamic speech or an identity prefix", () => {
+    notifyAttention("approval", VOICE, 1_000);
 
-    expect(boundary.notifyAttention).toHaveBeenCalledWith("Николай, это Кими Криник. Answer required");
+    expect(boundary.playRecordedAttention).toHaveBeenCalledWith("approval", "ru", 80);
+    expect(boundary.speak).not.toHaveBeenCalled();
+    expect(boundary.playTone).not.toHaveBeenCalled();
+  });
+
+  it("throttles the same event instead of reading dynamic message text", () => {
+    notifyAttention("question", { sound: "voice", volume: 40 }, 1_000);
+    notifyAttention("question", { sound: "voice", volume: 40 }, 2_000);
+    notifyAttention("question", { sound: "voice", volume: 40 }, 7_000);
+
+    expect(boundary.playRecordedAttention).toHaveBeenCalledTimes(2);
+    expect(boundary.playRecordedAttention).toHaveBeenNthCalledWith(1, "question", "ru", 40);
+    expect(boundary.playRecordedAttention).toHaveBeenNthCalledWith(2, "question", "ru", 40);
+  });
+
+  it("uses the Chinese recording for the error event and preview without throttling", () => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, soundEnabled: true, language: "zh" } });
+    previewSound("error", { sound: "voice", volume: 50 });
+    previewSound("error", { sound: "voice", volume: 50 });
+
+    expect(boundary.playRecordedAttention).toHaveBeenNthCalledWith(1, "error", "zh", 50);
+    expect(boundary.playRecordedAttention).toHaveBeenNthCalledWith(2, "error", "zh", 50);
     expect(boundary.speak).not.toHaveBeenCalled();
   });
 
-  it("does not duplicate an existing identity prefix", async () => {
-    boundary.notifyAttention.mockResolvedValue({ ok: true });
-    notifyAttention("Николай, это Кими Криник. Готово", VOICE, 1_000);
-    await Promise.resolve();
-
-    expect(boundary.notifyAttention).toHaveBeenCalledWith("Николай, это Кими Криник. Готово");
-  });
-
-  it("falls back to identified speech at the chosen volume only when Glass is unavailable and throttles duplicates", async () => {
-    boundary.notifyAttention.mockResolvedValue({ ok: false });
-    notifyAttention("Нужен ответ", { sound: "voice", volume: 40 }, 1_000);
-    notifyAttention("Нужен ответ", { sound: "voice", volume: 40 }, 2_000);
-    notifyAttention("Нужен ответ", { sound: "voice", volume: 40 }, 7_000);
-    await Promise.resolve();
-
-    expect(boundary.notifyAttention).toHaveBeenCalledTimes(2);
-    expect(boundary.speak).toHaveBeenCalledTimes(2);
-    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({
-      text: "Николай, это Кими Криник. Нужен ответ",
-      lang: "ru-RU",
-      volume: 0.4,
-    });
-  });
-
-  it("plays the chosen tone at its volume and skips the voice route", () => {
-    notifyAttention("Approval required", { sound: "chime", volume: 30 }, 50_000);
+  it("plays the chosen tone at its volume without the recording route", () => {
+    notifyAttention("approval", { sound: "chime", volume: 30 }, 50_000);
 
     expect(boundary.playTone).toHaveBeenCalledWith("chime", 30);
-    expect(boundary.notifyAttention).not.toHaveBeenCalled();
+    expect(boundary.playRecordedAttention).not.toHaveBeenCalled();
   });
 
-  it("stays silent for an event switched off", () => {
-    notifyAttention("Done", { sound: "off", volume: 60 }, 90_000);
-
-    expect(boundary.playTone).not.toHaveBeenCalled();
-    expect(boundary.notifyAttention).not.toHaveBeenCalled();
-    expect(boundary.speak).not.toHaveBeenCalled();
-  });
-
-  it("previews a tone or the voice without the throttle", () => {
-    previewSound("Error", { sound: "bell", volume: 70 });
-    previewSound("Error", { sound: "bell", volume: 70 });
-    previewSound("Error", { sound: "voice", volume: 50 });
-
-    expect(boundary.playTone).toHaveBeenCalledTimes(2);
-    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({ text: "Николай, это Кими Криник. Error", volume: 0.5 });
-  });
-
-  it("stays silent when the global sound switch is off", () => {
+  it("stays silent for an event switched off or the global switch off", () => {
+    notifyAttention("turnComplete", { sound: "off", volume: 60 }, 90_000);
     useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, soundEnabled: false } });
-    notifyAttention("Done", { sound: "chime", volume: 60 }, 90_000);
-    previewSound("Done", { sound: "chime", volume: 60 });
+    notifyAttention("turnComplete", { sound: "chime", volume: 60 }, 90_000);
+    previewSound("turnComplete", { sound: "chime", volume: 60 });
 
     expect(boundary.playTone).not.toHaveBeenCalled();
-    expect(boundary.notifyAttention).not.toHaveBeenCalled();
+    expect(boundary.playRecordedAttention).not.toHaveBeenCalled();
     expect(boundary.speak).not.toHaveBeenCalled();
   });
 
-  it("plays triple and Glass without the voice route", () => {
-    notifyAttention("Triple", { sound: "triple", volume: 40 }, 100_000);
-    notifyAttention("Glass", { sound: "glass", volume: 30 }, 200_000);
+  it("plays triple and Glass through the existing tone route", () => {
+    notifyAttention("turnComplete", { sound: "triple", volume: 40 }, 100_000);
+    notifyAttention("approval", { sound: "glass", volume: 30 }, 200_000);
 
     expect(boundary.playTone).toHaveBeenNthCalledWith(1, "triple", 40);
     expect(boundary.playTone).toHaveBeenNthCalledWith(2, "glass", 30);
-    expect(boundary.notifyAttention).not.toHaveBeenCalled();
-  });
-
-  it("selects Eugeny for Russian speech", () => {
-    previewSound("Нужен ответ", { sound: "voice", volume: 40 });
-
-    expect(boundary.speak.mock.calls[0]?.[0]).toMatchObject({
-      lang: "ru-RU",
-      voice: { name: "Microsoft Eugene", lang: "ru-RU" },
-      volume: 0.4,
-    });
+    expect(boundary.playRecordedAttention).not.toHaveBeenCalled();
   });
 });

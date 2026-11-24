@@ -14,8 +14,3 @@ export function withoutUserPromptSubmitHookParts(
 ): ContentPart[] {
   return content.filter((part) => !isUserPromptSubmitHookPart(part));
 }
-
-export function hookResultBody(text: string): string {
-  const match = /^<hook_result hook_event="[^"]*">\n([\s\S]*)\n<\/hook_result>$/.exec(text);
-  return match?.[1] ?? text;
-}

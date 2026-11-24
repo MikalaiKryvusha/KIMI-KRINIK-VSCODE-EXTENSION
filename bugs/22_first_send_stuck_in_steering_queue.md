@@ -1,6 +1,6 @@
 # Bug 22 — First Send appears lost and requires a steering lightning retry
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 exactly-once contracts implemented; main-profile build-9 restart/acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 16:38 +03:00, urgent owner release blocker before the requested replacement VSIX
 **Severity:** S2
 **Fixing:** this session before building and installing the replacement VSIX
@@ -24,6 +24,10 @@ Every first Send has an immediate visible response and exactly one lifecycle. Th
 ## Actual result
 
 The first action appears not to work, the message lands in steering and repeated actions/retries are needed. Recent logs show ordinary `streamChat` and multiple `steerChat` calls across retries; the current UI creates visible entries only after later engine events.
+
+2026-11-24 19:07 +03:00 — build 3, owner's accumulated profile, AUTO STEER ON: the owner reported two sends after one Enter and reproduced the duplication with a second single-Enter message. The supplied screenshot shows one user bubble and the sent text restored in the composer; exact transport and durable-history counts still require instrumentation. The composer symptom is tracked in `bugs/12`. This real-path result reopens the exactly-once contract despite the earlier isolated pass.
+
+Later on build 3 the owner supplied the full visible chat transcript: the same Russian copy-editing request appears twice verbatim in the user stream, and the delayed agent reply was itself delivered twice. This independently confirms that the real-profile duplicate is not a one-screenshot misreading.
 
 ## Forensics
 
@@ -52,3 +56,10 @@ Used an extension-internal `clientId` rather than changing the official SDK, mat
 - `bugs/18_reentrant_prompt_internal_error.md`
 - `bugs/20_queue_steer_duplicate_submission.md`
 - `researches/54_chat_pipeline_reliability.md`
+
+## Fix evidence — 2026-11-24 22:02 +03:00
+
+Optimistic append is idempotent by `clientId`, including running→idle fallback. Runtime and host now preserve the complete `PromptSubmissionResult`; running/queued/blocked have separate contracts, queued prompts correlate at later turn start, and a non-steered running submission becomes its own `TurnBegin` instead of an unconditional `SteerInput`.
+
+Hygiene: the original fallback test was red with two user entries; it is green with one before and after durable reconciliation. Runtime/host and store/settings suites are green after the change.
+Functional run: fresh-process build 6 passed the scoped OFF selected-item queue case. The owner's main-profile ON duplication is not yet re-observed on build 12; full VS Code restart remains required.

@@ -29,12 +29,14 @@
    `clientId` → `bridge.streamChat` → `chat.handler` → `SessionRuntime` → SDK → engine. `TurnBegin` carries the same ID and
    reconciles the pair instead of duplicating it. Old events without an ID use content/order fallback.
 2. **Follow-up during a turn.** `sendMessage` while `isStreaming` → optimistic `clientId` pair → `steerNow` → `bridge.steerChat`.
-   `SteerInput` carries that ID and reconciles the same pair. `ok:true` removes the sent media; `ok:false` continues the same
-   optimistic record through `sendIdle`; a rejection discards only that record and restores its text/media. Media in flight
-   carry `steering: true` and are never sent twice. Queue lightning removes its row immediately and restores it at the original
-   index on failure. AUTO STEER OFF asks the host for activity so an already-idle queue advances without waiting for lightning.
-3. **Attention.** `processEvent` → `notifyEventAttention` (terminal errors, approvals, questions; silent during `loadSession`
-   replay) → `bridge.notifyAttention` → `attention.handler` spawns the voice command; without one the webview speaks.
+   The host returns the complete `PromptSubmissionResult`; runtime emits `SteerInput` only for an accepted running steer, maps a queued
+   `promptId` to its later `TurnBegin`, and starts a non-steered running submission as its own correlated turn. `ok:false` reuses the same
+   optimistic record through idempotent `sendIdle`; only the latest failed action restores its text/media. Queue lightning is store-owned,
+   uses the queued ID as `clientId`, holds the remaining queue through the selected operation and restores the original index on failure.
+   AUTO STEER OFF asks the host for activity so an already-idle queue advances without waiting for lightning.
+3. **Attention.** `processEvent` → `notifyEventAttention` maps terminal errors, approvals, questions and completion to a `SoundEvent`;
+   replay stays silent. `Voice` plays a packaged MP3 selected by event and interface language; Glass and tones use the same webview audio
+   boundary. No host text-to-speech command or browser speech fallback participates.
 4. **Managed quota.** `UsageStatusBar` polls `bridge.getManagedUsage` every 60 s for the `managed:kimi-code` provider →
    `auth.handler` → `harness.auth.getManagedUsage` → `shared/managed-usage.ts` view.
 5. **Compaction.** The engine checks before and after each step and on context overflow; with `auto_compact = false` none of the

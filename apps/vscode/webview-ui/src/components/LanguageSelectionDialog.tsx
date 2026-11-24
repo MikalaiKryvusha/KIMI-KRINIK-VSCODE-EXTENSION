@@ -11,7 +11,7 @@ const LANGUAGE_NAMES: ReadonlyArray<[InterfaceLanguage, string]> = [
   ["zh", "中文"],
 ];
 
-function orderedLanguages(selectedLanguage: InterfaceLanguage): typeof LANGUAGE_NAMES {
+export function orderedLanguages(selectedLanguage: InterfaceLanguage): typeof LANGUAGE_NAMES {
   return [
     ...LANGUAGE_NAMES.filter(([language]) => language === selectedLanguage),
     ...LANGUAGE_NAMES.filter(([language]) => language !== selectedLanguage),

@@ -59,7 +59,10 @@ beforeEach(() => {
   boundary.streamChat.mockReset();
   boundary.streamChat.mockResolvedValue({ done: false });
   boundary.steerChat.mockReset();
-  boundary.steerChat.mockResolvedValue({ ok: true });
+  boundary.steerChat.mockResolvedValue({
+    ok: true,
+    submission: { promptId: "prompt-steer", createdAt: "2026-11-24T00:00:00.000Z", state: "running", turnId: 7, steered: true },
+  });
   boundary.abortChat.mockReset();
   boundary.abortChat.mockResolvedValue({ aborted: true });
   boundary.trackFiles.mockReset();

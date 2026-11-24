@@ -107,7 +107,7 @@ export function SoundSettingsModal() {
                     size="icon-xs"
                     disabled={disabled}
                     title={t("sound.preview")}
-                    onClick={() => previewSound(t(EVENT_TEXT[event].label), setting)}
+                    onClick={() => previewSound(event, setting)}
                   >
                     <IconPlayerPlay className="size-3.5" />
                   </Button>

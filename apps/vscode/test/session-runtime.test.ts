@@ -5,6 +5,7 @@ import type {
   JsonObject,
   PermissionMode,
   PromptInput,
+  PromptSubmissionResult,
   QuestionHandler,
   QuestionRequest,
   Session,
@@ -32,6 +33,14 @@ interface BaselineRecord {
   readonly webviewIds: readonly string[];
 }
 
+const RUNNING_STEER_RESULT: PromptSubmissionResult = {
+  promptId: "prompt-steer-1",
+  createdAt: "2026-11-24T00:00:00.000Z",
+  state: "running",
+  turnId: 7,
+  steered: true,
+};
+
 interface FakeSessionBoundary {
   readonly session: Session;
   readonly promptInputs: Array<string | PromptInput>;
@@ -44,6 +53,7 @@ interface FakeSessionBoundary {
   readonly cancelCompactionCount: () => number;
   readonly closeCount: () => number;
   emit(event: Event): void;
+  setSteerResult(result: PromptSubmissionResult): void;
   rejectNextPrompt(error: Error): void;
   rejectNextMetadataUpdate(error: Error): void;
   requestApproval(request: ApprovalRequest): Promise<Awaited<ReturnType<ApprovalHandler>>>;
@@ -68,6 +78,7 @@ function createFakeSession(): FakeSessionBoundary {
   let compactionCancellations = 0;
   let closes = 0;
   let permission: PermissionMode = "manual";
+  let steerResult = RUNNING_STEER_RESULT;
 
   const summary: SessionSummary = {
     id: "session-1",
@@ -105,6 +116,7 @@ function createFakeSession(): FakeSessionBoundary {
     },
     async steer(input: string | PromptInput) {
       steerInputs.push(input);
+      return steerResult;
     },
     async cancel() {
       cancellations += 1;
@@ -153,6 +165,9 @@ function createFakeSession(): FakeSessionBoundary {
     emit(event) {
       for (const listener of listeners) listener(event);
     },
+    setSteerResult(result) {
+      steerResult = result;
+    },
     rejectNextPrompt(error) {
       nextPromptError = error;
     },
@@ -191,13 +206,14 @@ function streamData(records: readonly BroadcastRecord[]): unknown[] {
   return records.filter((record) => record.event === Events.StreamEvent).map((record) => record.data);
 }
 
-function turnStarted(): Event {
+function turnStarted(promptId?: string): Event {
   return {
     type: "turn.started",
     sessionId: "session-1",
     agentId: "main",
     turnId: 7,
     origin: { kind: "user" },
+    ...(promptId === undefined ? {} : { promptId }),
   };
 }
 
@@ -576,6 +592,46 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
       payload: { user_input: "Use this instead", clientId: "client-steer-1" },
       _sessionId: "session-1",
     });
+  });
+
+  it("returns a new running steer as its own correlated turn", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    runtime.subscribe("view-a");
+    sdk.setSteerResult({ ...RUNNING_STEER_RESULT, steered: false });
+
+    await expect(runtime.steer("Use this instead", "client-steer-1")).resolves.toEqual({ ...RUNNING_STEER_RESULT, steered: false });
+
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "TurnBegin",
+      payload: { user_input: "Use this instead", turnIndex: 7, clientId: "client-steer-1" },
+      _sessionId: "session-1",
+    });
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "SteerInput" }));
+  });
+
+  it("keeps a queued steer correlated until its prompt starts", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const queued = { promptId: "prompt-queued", createdAt: "2026-11-24T00:00:00.000Z", state: "queued", steered: false } as const;
+    sdk.setSteerResult(queued);
+
+    await expect(runtime.steer("Queue this", "client-queued")).resolves.toEqual(queued);
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "SteerInput" }));
+
+    sdk.emit(turnStarted("prompt-queued"));
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "TurnBegin",
+      payload: { user_input: "Queue this", turnIndex: 7, clientId: "client-queued" },
+      _sessionId: "session-1",
+    });
+  });
+
+  it("returns a blocked steer without emitting a success echo", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const blocked = { promptId: "prompt-blocked", createdAt: "2026-11-24T00:00:00.000Z", state: "blocked", steered: false } as const;
+    sdk.setSteerResult(blocked);
+
+    await expect(runtime.steer("Blocked", "client-blocked")).resolves.toEqual(blocked);
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "SteerInput" }));
   });
 
   it("correlates an ordinary turn with the clientId from its prompt", async () => {

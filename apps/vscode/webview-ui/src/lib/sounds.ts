@@ -1,4 +1,5 @@
-import type { ToneChoice } from "shared/sounds";
+import type { SoundEvent, ToneChoice } from "shared/sounds";
+import type { InterfaceLanguage } from "shared/types";
 
 interface Note {
   readonly frequency: number;
@@ -25,13 +26,23 @@ const TONES: Record<Exclude<ToneChoice, "glass">, readonly Note[]> = {
   ],
 };
 
+function playPackagedAudio(path: string, volume: number): void {
+  const baseUri = typeof document === "undefined" ? null : document.body.getAttribute("data-baseuri");
+  const audio = new Audio(baseUri ? `${baseUri}/${path}` : path);
+  audio.volume = Math.max(0, Math.min(volume, 100)) / 100;
+  void audio.play().catch((error: unknown) => {
+    console.error(`KIMI KRINIK audio playback failed: ${path}`, error);
+  });
+}
+
+export function playRecordedAttention(event: SoundEvent, language: InterfaceLanguage, volume: number): void {
+  playPackagedAudio(`resources/attention/${language}/${event}.mp3`, volume);
+}
+
 export function playTone(tone: ToneChoice, volume: number): void {
   try {
     if (tone === "glass") {
-      const baseUri = typeof document === "undefined" ? null : document.body.getAttribute("data-baseuri");
-      const audio = new Audio(baseUri ? `${baseUri}/resources/glass.opus` : "resources/glass.opus");
-      audio.volume = Math.max(0, Math.min(volume, 100)) / 100;
-      void audio.play().catch(() => undefined);
+      playPackagedAudio("resources/glass.mp3", volume);
       return;
     }
     if (typeof AudioContext === "undefined") return;

@@ -4,7 +4,7 @@ import { isKimiError } from "@moonshot-ai/kimi-code-sdk";
 import { Events, Methods } from "../../shared/bridge";
 import type { ApprovalResponse, BackgroundTaskItem, ContentPart } from "../../shared/legacy-sdk";
 import { getUserMessage } from "../../shared/errors";
-import type { ErrorPhase } from "../../shared/types";
+import type { ErrorPhase, SteerChatResult } from "../../shared/types";
 import { VSCodeSettings } from "../config/vscode-settings";
 import { normalizeEffort } from "../runtime/kimi-runtime";
 import type { SessionRuntime } from "../runtime/session-runtime";
@@ -174,11 +174,11 @@ const setPlanMode: Handler<{ enabled: boolean }, { ok: boolean; planMode: boolea
   return { ok: true, planMode: params.enabled };
 };
 
-const steerChat: Handler<{ content: string | ContentPart[]; clientId?: string }, { ok: boolean }> = async (params, ctx) => {
+const steerChat: Handler<{ content: string | ContentPart[]; clientId?: string }, SteerChatResult> = async (params, ctx) => {
   const runtime = ctx.getSession();
   if (runtime === undefined || !runtime.isBusy) return { ok: false };
-  await runtime.steer(params.content, params.clientId);
-  return { ok: true };
+  const submission = await runtime.steer(params.content, params.clientId);
+  return { ok: true, submission };
 };
 
 const getSessionBusy: Handler<void, { busy: boolean }> = async (_, ctx) => {

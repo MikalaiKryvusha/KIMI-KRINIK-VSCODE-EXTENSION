@@ -43,7 +43,7 @@ describe("Sound Settings", () => {
 
     await user.click(screen.getAllByRole("combobox")[0]!);
     expect(await screen.findByText("Triple beep")).not.toBeNull();
-    expect(screen.getByText("Glass")).not.toBeNull();
+    expect(document.querySelector('[data-slot="select-content"]')?.textContent).toContain("Glass");
     await user.keyboard("{Escape}");
     const enabled = screen.getByTestId("sound-enabled-toggle");
     expect(enabled.getAttribute("data-state")).toBe("checked");

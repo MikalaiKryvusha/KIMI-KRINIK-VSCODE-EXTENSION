@@ -17,6 +17,7 @@ import type {
   ExtensionConfig,
   WorkspaceStatus,
   LoginStatus,
+  SteerChatResult,
   UIStreamEvent,
 } from "shared/types";
 import type { ManagedUsageResult } from "shared/managed-usage";
@@ -339,7 +340,7 @@ class Bridge {
   }
 
   steerChat(content: string | ContentPart[], clientId?: string) {
-    return this.call<{ ok: boolean }>(Methods.SteerChat, { content, clientId });
+    return this.call<SteerChatResult>(Methods.SteerChat, { content, clientId });
   }
 
   getSessionBusy() {

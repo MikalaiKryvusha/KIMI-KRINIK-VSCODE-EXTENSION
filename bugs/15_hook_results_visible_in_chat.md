@@ -1,6 +1,6 @@
 # Bug 15 — Internal KAIF hook results are rendered as assistant chat text
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 replay rendering fixed; main-profile build-12 restart/acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment
@@ -45,3 +45,10 @@ Classified these messages as internal because their contents are agent instructi
 - `apps/vscode/src/utils/hook-parts.ts`
 - `apps/vscode/src/runtime/replay-adapter.ts`
 - `apps/vscode/test/replay-adapter.test.ts`
+
+## Fix evidence — 2026-11-24 22:21 +03:00
+
+The replay adapter no longer turns `UserPromptSubmit` hook parts into assistant `ContentPart` events. `withoutUserPromptSubmitHookParts` still controls the visible user content, while the hook payload remains in engine input. The now-unused body extraction helper was removed.
+
+Hygiene: the changed existing regression was red before removal because `merged hook note` was visible; after removal 31/31 replay tests pass and `Merged prompt` remains. TWINS: searched `hookResultBody`, `isUserPromptSubmitHookPart`, `hook_result` and `user prompt submit hook` across `apps/vscode`; no second product rendering site remains.
+Functional run: NONE on final build 11 yet. The owner's real-profile screenshot after full VS Code restart is still required.

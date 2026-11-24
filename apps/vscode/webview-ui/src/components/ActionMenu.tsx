@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconVolume, IconAdjustmentsHorizontal, IconExternalLink, IconLanguage } from "@tabler/icons-react";
 import { ControlPanelSettingsDialog } from "./ControlPanelSettingsDialog";
-import { LanguageSelectionDialog } from "./LanguageSelectionDialog";
+import { LanguageSelectionDialog, orderedLanguages } from "./LanguageSelectionDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +10,7 @@ import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n";
+import { translate } from "@/i18n/translate";
 
 interface ActionMenuProps {
   className?: string;
@@ -51,6 +52,9 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const [loading, setLoading] = useState(false);
   const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, setSoundModalOpen } = useSettingsStore();
   const t = useT();
+  const languageAction = orderedLanguages(extensionConfig.language)
+    .map(([language]) => translate(language, "menu.languageAction"))
+    .join(" / ");
 
   const handleOpenSettings = () => {
     void bridge.openSettings();
@@ -131,7 +135,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
           </MenuItem>
           <MenuItem onClick={() => { setLanguageOpen(true); setOpen(false); }}>
             <IconLanguage className="size-4 text-muted-foreground" />
-            <span className="flex-1">{t("menu.languageAction")}</span>
+            <span className="flex-1">{languageAction}</span>
           </MenuItem>
           <MenuItem onClick={handleOpenSettings}>
             <IconSettings className="size-4 text-muted-foreground" />

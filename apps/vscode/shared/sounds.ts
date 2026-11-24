@@ -13,10 +13,10 @@ export interface SoundEventSetting {
 export type SoundSettings = Readonly<Record<SoundEvent, SoundEventSetting>>;
 
 export const DEFAULT_SOUND_SETTINGS: SoundSettings = {
-  approval: { sound: "voice", volume: 80 },
+  approval: { sound: "glass", volume: 80 },
   question: { sound: "voice", volume: 80 },
-  error: { sound: "voice", volume: 80 },
-  turnComplete: { sound: "off", volume: 60 },
+  error: { sound: "alert", volume: 80 },
+  turnComplete: { sound: "chime", volume: 60 },
 };
 
 function isSoundChoice(value: unknown): value is SoundChoice {

@@ -145,6 +145,10 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
       return;
     }
 
+    if (pendingInput.clientId !== undefined && messages.some((message) => message.clientId === pendingInput.clientId)) {
+      return;
+    }
+
     const textContent = Content.getText(pendingInput.content);
     if (textContent) {
       setText(textContent);
@@ -153,7 +157,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
         adjustHeight(textareaRef.current);
       }, 0);
     }
-  }, [pendingInput, isStreaming]);
+  }, [pendingInput, isStreaming, messages]);
 
   useEffect(() => {
     if (composerRestore === null) {

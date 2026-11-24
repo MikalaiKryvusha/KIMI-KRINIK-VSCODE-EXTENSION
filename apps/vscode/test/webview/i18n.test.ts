@@ -54,10 +54,39 @@ describe("interface dictionaries", () => {
     expect(translate("ru", "controlWindow.description")).toBe("Предупреждать агента, когда контекстное окно заполняется до заданных порогов.");
     expect(translate("zh", "controlWindow.description")).toBe("当上下文窗口使用量达到配置的阈值时提醒代理。");
     expect(translate("ru", "controlWindow.off")).toBe("Выкл: KIMI KRINIK не следит за заполнением контекстного окна чата. Чат может переполниться или дойти до автосжатия.");
-    expect(translate("ru", "controlWindow.on")).toBe("Вкл: KIMI KRINIK следит за заполнением контекстного окна чата и не позволяет чату переполниться или дойти до сжатия контекста. При переполнении контекстного окна чата работа будет мягко остановлена для передачи в новый чат.");
+    expect(translate("ru", "controlWindow.on")).toBe("Вкл: KIMI KRINIK следит за заполнением контекстного окна чата и не позволяет чату переполниться или дойти до сжатия контекста. При приближении к переполнению контекстного окна чата работа будет мягко остановлена для передачи в новый чат.");
     for (const dictionary of Object.values(dictionaries)) {
       expect(dictionary["controlWindow.description"]).not.toContain("KAIF");
     }
+  });
+
+  it("ends Russian feature descriptions with a full stop", () => {
+    const keys = [
+      "controlPanel.description",
+      "controlWindow.description",
+      "controlWindow.on",
+      "controlWindow.off",
+      "menu.autoCompactOn",
+      "menu.autoCompactOff",
+      "menu.autoSteerOn",
+      "menu.autoSteerOff",
+      "sound.description",
+      "sound.enabledDescription",
+      "sound.event.approvalWhen",
+      "sound.event.questionWhen",
+      "sound.event.errorWhen",
+      "sound.event.turnCompleteWhen",
+      "subagent.description",
+      "input.switchCacheNote",
+      "permMode.descManual",
+      "permMode.descYolo",
+      "permMode.descAuto",
+      "modes.planDesc",
+      "modes.swarmDesc",
+      "modes.goalDesc",
+    ] as const;
+    for (const key of keys) expect(translate("ru", key), key).toMatch(/\.$/);
+    expect(translate("ru", "controlWindow.on")).toContain("При приближении к переполнению контекстного окна чата");
   });
 
   it("keeps the Control Panel action names localized", () => {
@@ -70,9 +99,18 @@ describe("interface dictionaries", () => {
     expect(translate("ru", "modes.plan")).toBe("План");
     expect(translate("ru", "modes.goal")).toBe("Цель");
     expect(translate("ru", "modes.swarm")).toBe("Рой");
+    expect(translate("en", "controlPanel.title")).toBe("Control Panel");
     expect(translate("ru", "controlPanel.title")).toBe("Панель Управления");
-    expect(translate("ru", "thinking.label")).toBe("Думаю...");
+    expect(translate("zh", "controlPanel.title")).toBe("控制面板");
+    expect(translate("ru", "toast.controlPanelNotChanged", { error: "x" })).toBe("Видимость панели управления не изменена: x");
+    expect(translate("zh", "toast.controlPanelNotChanged", { error: "x" })).toBe("控制面板可见性未更改：x");
+    expect(translate("ru", "thinking.label")).toBe("Рассуждение");
     expect(translate("ru", "chat.requesting")).toBe("Запрос...");
+    expect(translate("en", "sound.choice.glass")).toBe("Glass");
+    expect(translate("ru", "sound.choice.glass")).toBe("Стекло");
+    expect(translate("zh", "sound.choice.glass")).toBe("玻璃");
+    expect(translate("ru", "pills.agentsTitle")).toBe("Субагенты · выполняется {count}");
+    expect(translate("ru", "subagent.description")).toBe("Выберите существующую модель для субагентов вместо основной.");
     expect(translate("en", "menu.aboutProject")).toBe("About KIMI KRINIK");
     expect(translate("ru", "menu.aboutProject")).toBe("О проекте KIMI KRINIK");
     expect(translate("zh", "menu.aboutProject")).toBe("关于 KIMI KRINIK");

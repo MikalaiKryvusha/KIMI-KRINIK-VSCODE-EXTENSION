@@ -28,6 +28,7 @@ import type { ChatMessage } from "@/stores/chat.store";
 type PanelId = "queue" | "changes" | "bash" | "agents" | "todos";
 
 const TASKS_POLL_INTERVAL_MS = 2500;
+const QUEUE_FLASH_DURATION_MS = 3000;
 const MAX_PANEL_TASKS = 20;
 const FAILED_STATUSES = new Set(["failed", "timed_out", "killed", "lost"]);
 
@@ -115,7 +116,7 @@ export function StatusPills() {
     prevQueueLen.current = queue.length;
     if (!grew) return;
     setQueueFlash(true);
-    const timer = setTimeout(() => setQueueFlash(false), 1800);
+    const timer = setTimeout(() => setQueueFlash(false), QUEUE_FLASH_DURATION_MS);
     return () => clearTimeout(timer);
   }, [queue.length]);
 
@@ -237,7 +238,7 @@ export function StatusPills() {
         <div className="flex items-center gap-1 min-w-0">
           {hasQueue && (
             <button type="button" onClick={() => togglePanel("queue")} className={cn(queuePillClass(openPanel === "queue"), "relative")}>
-              {queueFlash && <span aria-hidden className="absolute inset-0 rounded bg-blue-500/40 animate-ping" />}
+              {queueFlash && <span aria-hidden className="absolute inset-0 rounded bg-blue-500/40 animate-ping [animation-iteration-count:3]" />}
               <IconStack2 className="size-3.5" />
               <span>{t("queue.queuedCount", { count: queue.length })}</span>
             </button>

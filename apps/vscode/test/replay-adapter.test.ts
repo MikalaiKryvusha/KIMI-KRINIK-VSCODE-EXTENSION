@@ -419,19 +419,7 @@ describe("replay adapter (renders the public SDK resume state for the Webview)",
         _sessionId: "session-1",
       },
     ]);
-    const hookIndex = events.findIndex(
-      (event) => event.type === "ContentPart" && JSON.stringify(event).includes("merged hook note"),
-    );
-    expect(events[hookIndex - 1]).toEqual({
-      type: "StepBegin",
-      payload: { n: 1 },
-      _sessionId: "session-1",
-    });
-    expect(events[hookIndex]).toEqual({
-      type: "ContentPart",
-      payload: { type: "text", text: "merged hook note" },
-      _sessionId: "session-1",
-    });
+    expect(events.some((event) => JSON.stringify(event).includes("merged hook note"))).toBe(false);
   });
 
   it("restores a user-invoked skill as its original slash command", () => {

@@ -123,21 +123,6 @@
 - 还没公开的功能，放在实验开关后面。开关由环境变量驱动，默认关闭：`KIMI_CODE_EXPERIMENTAL_<NAME>` 控制单个开关，`KIMI_CODE_EXPERIMENTAL_FLAG` 打开全部。优先级是：单个开关的环境变量 > 配置里的 `[experimental]` > 总开关环境变量 > 开关的 `default`。正式发布时，把对应条目的 `default` 改成 `true`。
   - `packages/agent-core-v2` 和 kap-server 的模块：没有集中的开关目录。在所属领域里用 `registerFlagDefinition` 在导入时声明开关，再用 `IFlagService.enabled(id)` 检查。
 
-## 技能
-
-技能在 `.agents/skills/` 下。技能的操作细则写在技能里，不要抄进 `AGENTS.md`；「工作流要求」里关于 changeset 的几条是硬约束，有意保留在这里。
-
-| 技能 | 什么时候用 |
-|---|---|
-| `write-tui` | 编写或修改 `apps/kimi-code/src/tui` 下的终端界面 |
-| `write-pr` | 创建或更新 PR 描述 |
-| `gen-changesets` | 生成 changeset：判断要不要写、写哪个包、升哪一级、怎么措辞 |
-| `gen-docs` | 代码改动影响了产品行为或用户体验，需要更新用户文档时 |
-| `translate-docs` | 在 `docs/zh/` 和 `docs/en/` 之间翻译、同步双语文档 |
-| `review-pr` | 评审 PR；只在用户明确要求时使用 |
-| `pre-changelog` | 合并发版 PR 前预览 CLI 和桌面端的中文更新日志 |
-| `sync-changelog` | 同步 CLI 发布日志到文档站，或为桌面端更新对话框准备双语日志 |
-
 ## 说明文件怎么维护
 
 - 代码改动让某份 `AGENTS.md` 写的事实（路径、命令、地图条目）不再成立时，在同一个 PR 里更新它。
@@ -162,12 +147,12 @@
 - `.oxlintrc.ratchet.json` 里的规则在现有代码中已有违规，按文件冻结在 `scripts/checks/baselines/oxlint-ratchet.json`。新代码不能增加违规；修掉现有违规后，运行 `node scripts/checks/ratchet.mjs --update` 降低基线。
 - 不要运行 `pnpm lint:fix`：oxlint 的有些自动修复会改变行为（例如 `unicorn/no-unnecessary-await` 会删掉一个 `await`，后面代码的执行时机就变了）。
 - 在公开文本和测试数据里，用中性的占位符（例如 `example.com`、`example.test` 和 `YOUR_API_KEY`）替换真实的内部标识。开 PR 之前，请一个只读 agent 审查 diff，看有没有和具体环境相关的内部标识。
-- 创建 PR 时，用 `write-pr` 技能（`.agents/skills/write-pr/SKILL.md`）写 PR 描述。PR 标题必须用 Conventional Commit 格式，例如 `chore: remove legacy format commands`（由 `.github/workflows/pr-title-checker.yml` 检查）。
+- 创建或更新 PR 时，填写 `.github/pull_request_template.md`；PR 标题必须用 Conventional Commit 格式，例如 `chore: remove legacy format commands`（由 `.github/workflows/pr-title-checker.yml` 检查）。
 - AI agent 创建或更新 PR 时，要填写 `.github/pull_request_template.md`：关联相关 issue 或说明问题，再描述改了什么。不要留下占位文字，也不要只给出泛泛的 diff 摘要。
 - 不要提交含糊的、AI 生成的 PR 文字。提交 PR 的人类作者必须足够理解这个改动，能讲清代码、边界情况，以及为什么这个做法适合这个仓库。
-- 完成任务后、提交 PR 之前，必须运行 `gen-changesets` 技能（见 `.agents/skills/gen-changesets/SKILL.md`），按它的规则在 `.changeset/` 下生成 changeset。
-- CLI、桌面端或 VS Code 扩展有用户可感知的变化时，按产品各写一句简短的英文 changeset。库源码改动按技能规则写技术条目，纯文档、测试和忽略包的处理见该技能。
-- 生成 changeset 时，**绝不**自行决定 `major` 版本升级：先停下来说明理由，得到用户明确确认后再做；默认用 `minor`，其次用 `patch`。见 `.agents/skills/gen-changesets/SKILL.md`。
+- 完成任务后、提交 PR 之前，必须按本文件的产品边界在 `.changeset/` 下写 changeset。
+- CLI、桌面端或 VS Code 扩展有用户可感知的变化时，按产品各写一句简短的英文 changeset。库源码改动写技术条目；纯文档、测试和忽略包不需要 changeset。
+- 生成 changeset 时，**绝不**自行决定 `major` 版本升级：先停下来说明理由，得到用户明确确认后再做；默认用 `minor`，其次用 `patch`。
 - 导入优先用 `import ... from '#/...'`，它和 `import ... from '@/...'` 的作用相同。
 - 不要提交临时的草稿或探索性文件。永远不要暂存：
   - agent 的工作笔记，或交接、总结文档（例如 `HANDOVER-*.md`、`HANDOFF-*.md`、`handoff.md`）。
@@ -177,7 +162,7 @@
 
 ## 代码评审规则
 
-这些规则适用于每一次 PR 评审，自动评审和人工评审都一样。规则里提到的用户人群和契约文件，列在 `.agents/skills/review-pr/surfaces.md` 里。
+这些规则适用于每一次 PR 评审，自动评审和人工评审都一样。按本节列出的契约文件和所有受影响的现有用户检查 diff。
 
 ### 评审范围：PR 的 diff，而不是整个仓库
 
@@ -185,7 +170,7 @@
 - 一类问题一次报全：一个问题在 diff 里出现在多处时，一次列出所有位置，不要分好几轮提。
 - 不提纯风格或个人偏好的问题。每个问题都要标严重程度：P0 阻塞 / P1 应该修 / P2 建议。
 - 复审是增量的：只看上次评审之后改动的部分；不要重复针对没改动代码的问题，也不要重新提出已解决的讨论。把已解决的讨论当作定论之前，先核实当前代码：只有问题确实修好了、或者问题已不成立时，才不再报。
-- 各领域的规则有各自的正式归属：changeset（`.agents/skills/gen-changesets/SKILL.md`）、注释（「通用编码规则」）、PR 文字（`write-pr` 技能）。按这些归属评审，不要按临时的个人口味评审。
+- 各领域的规则有各自的正式归属：changeset（本文件「工作流要求」）、注释（「通用编码规则」）、PR 文字（`.github/pull_request_template.md`）。按这些归属评审，不要按临时的个人口味评审。
 
 ### 列出改变了的行为，而不只是找 bug
 

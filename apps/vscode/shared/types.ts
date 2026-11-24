@@ -84,6 +84,18 @@ export type AutoCompactResult =
   | { ok: true; enabled: boolean; kaif?: KaifProjection }
   | { ok: false; enabled: boolean; error: string };
 
+export interface SteerSubmission {
+  promptId: string;
+  createdAt: string;
+  state: "running" | "queued" | "blocked";
+  turnId?: number;
+  steered: boolean;
+}
+
+export type SteerChatResult =
+  | { ok: true; submission: SteerSubmission }
+  | { ok: false };
+
 export interface WorkspaceStatus {
   hasWorkspace: boolean;
   path?: string;

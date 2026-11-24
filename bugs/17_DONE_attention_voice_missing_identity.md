@@ -1,6 +1,8 @@
-# Bug 17 — Attention voice omits the owner and project identity
+# Bug 17 — Attention voice identity; superseded by prerecorded localized notifications
 
-**Status:** 🔴 OPEN
+> 2026-11-24 21:28 +03:00: the owner replaced the original identity-prefix requirement. Attention voice now means a packaged short MP3 selected by event and interface language, with no dynamic speech synthesis and no owner name. The previous prefix implementation and its tests are historical, not the current acceptance contract.
+
+**Status:** ✅ DONE — superseded contract implemented and owner accepted all three voice languages
 **Version/build:** KIMI KRINIK 1.0.0 · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 15:26 +03:00, tossed by the owner during chat-pipeline characterization
 **Severity:** S2
 **Fixing:** this session, before the parked chat-pipeline contracts resume; verify in isolated VS Code
@@ -54,3 +56,10 @@ Classified attention speech as covered by the existing R1 identity rule because 
 - `apps/vscode/webview-ui/src/lib/attention.ts`
 - `apps/vscode/test/webview/attention.test.ts`
 - `apps/vscode/test/attention-handler.test.ts`
+
+## ✅ STATUS: DONE (2026-11-24 22:02 +03:00)
+
+The owner replaced dynamic speech with packaged event/language MP3 recordings. Every recording starts with a localized project identity and none addresses the owner by name. RU uses local Eugene; EN/ZH use prerecorded voices. The Chinese identity is phonetic: «这是基米·克里尼克». Completion says «Задача завершена» and the RU error says «Возникла ошибка».
+
+Hygiene: attention, sound, chat-store and localization checks pass; no dynamic speech or host text route participates.
+Functional run: installed VSIX preview resolved real audio playback for all three languages with no media error; the owner listened and wrote «я послушал, работают хорошо все три языка голосов». Report: `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`.

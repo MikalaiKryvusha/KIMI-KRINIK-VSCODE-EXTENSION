@@ -1,4 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { SteerChatResult } from "../../shared/types";
+
+const RUNNING_STEER: SteerChatResult = {
+  ok: true,
+  submission: { promptId: "prompt-steer", createdAt: "2026-11-24T00:00:00.000Z", state: "running", turnId: 7, steered: true },
+};
 
 const boundary = vi.hoisted(() => ({
   streamChat: vi.fn(),
@@ -43,7 +49,7 @@ beforeEach(() => {
   boundary.streamChat.mockReset();
   boundary.streamChat.mockResolvedValue({ done: false });
   boundary.steerChat.mockReset();
-  boundary.steerChat.mockResolvedValue({ ok: true });
+  boundary.steerChat.mockResolvedValue(RUNNING_STEER);
   boundary.abortChat.mockReset();
   boundary.abortChat.mockResolvedValue({ aborted: true });
   boundary.getSessionBusy.mockReset();
@@ -65,6 +71,7 @@ beforeEach(() => {
     tokenUsage: { input_other: 0, output: 0, input_cache_read: 0, input_cache_creation: 0 },
     activeTokenUsage: { input_other: 0, output: 0, input_cache_read: 0, input_cache_creation: 0 },
     pendingInput: null,
+    composerRestore: null,
     queue: [],
     pendingQuestion: null,
     planMode: false,
@@ -118,7 +125,7 @@ describe("automatic follow-up steer", () => {
   });
 
   it("shows steering immediately and reconciles SteerInput without a nested duplicate", () => {
-    let finishSteer: (value: { ok: boolean }) => void = () => undefined;
+    let finishSteer: (value: SteerChatResult) => void = () => undefined;
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { finishSteer = resolve; }));
     useChatStore.getState().sendMessage("first");
     beginTurn();
@@ -137,7 +144,7 @@ describe("automatic follow-up steer", () => {
     const assistant = useChatStore.getState().messages.at(-1);
     expect(assistant?.steps?.flatMap((step) => step.items).some((item) => item.type === "steer")).toBe(false);
 
-    finishSteer({ ok: true });
+    finishSteer(RUNNING_STEER);
   });
 
   it("passes every manual line break unchanged to idle prompts and running-turn steers", () => {
@@ -153,12 +160,13 @@ describe("automatic follow-up steer", () => {
   });
 
   it("uses a dedicated idle send exactly once when the turn ends during steer", async () => {
-    let finishSteer: (value: { ok: boolean }) => void = () => undefined;
+    let finishSteer: (value: SteerChatResult) => void = () => undefined;
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { finishSteer = resolve; }));
     useChatStore.getState().sendMessage("first");
     beginTurn();
     useChatStore.getState().sendMessage("second");
     expect(boundary.steerChat).toHaveBeenCalledWith("second", expect.any(String));
+    const clientId = boundary.steerChat.mock.calls[0]?.[1] as string;
 
     useChatStore.setState({ isStreaming: false });
     finishSteer({ ok: false });
@@ -166,7 +174,30 @@ describe("automatic follow-up steer", () => {
     await vi.waitFor(() => expect(boundary.streamChat).toHaveBeenCalledTimes(2));
     expect(boundary.steerChat).toHaveBeenCalledTimes(1);
     expect(useChatStore.getState().queue).toHaveLength(0);
+    expect(useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "second")).toHaveLength(1);
+    useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "second", clientId } });
+    expect(useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "second")).toHaveLength(1);
     expect(boundary.toastError).not.toHaveBeenCalled();
+  });
+
+  it("ignores an older steer rejection after a newer send succeeds", async () => {
+    let rejectOlder: (error: Error) => void = () => undefined;
+    let acceptNewer: (value: SteerChatResult) => void = () => undefined;
+    boundary.steerChat
+      .mockImplementationOnce(() => new Promise((_, reject) => { rejectOlder = reject; }))
+      .mockImplementationOnce(() => new Promise((resolve) => { acceptNewer = resolve; }));
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.getState().sendMessage("older");
+    useChatStore.getState().sendMessage("newer");
+
+    acceptNewer(RUNNING_STEER);
+    rejectOlder(new Error("late older failure"));
+
+    await vi.waitFor(() => expect(boundary.toastError).toHaveBeenCalled());
+    expect(useChatStore.getState().composerRestore).toBeNull();
+    expect(useChatStore.getState().messages.some((message) => message.role === "user" && message.content === "newer")).toBe(true);
+    expect(boundary.streamChat).toHaveBeenCalledTimes(1);
   });
 
   it("restores text and ready media after an actual steer failure", async () => {
@@ -186,7 +217,7 @@ describe("automatic follow-up steer", () => {
   });
 
   it("clears media only after an accepted steer acknowledgement", async () => {
-    let acceptSteer: (value: { ok: boolean }) => void = () => undefined;
+    let acceptSteer: (value: SteerChatResult) => void = () => undefined;
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { acceptSteer = resolve; }));
     useChatStore.getState().sendMessage("first");
     beginTurn();
@@ -196,7 +227,7 @@ describe("automatic follow-up steer", () => {
     useChatStore.getState().sendMessage("look");
 
     expect(useChatStore.getState().draftMedia).toHaveLength(2);
-    acceptSteer({ ok: true });
+    acceptSteer(RUNNING_STEER);
     await vi.waitFor(() => expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-2-still-uploading" }]));
     expect(boundary.steerChat.mock.calls[0]?.[0]).toMatchObject([
       { type: "text", text: "look" },
@@ -228,9 +259,9 @@ describe("automatic follow-up steer", () => {
     });
 
     expect(boundary.notifyAttention.mock.calls.map((call) => call[0])).toEqual([
-      "Action failed",
-      "Approval required: Run tests",
-      "Choose next step",
+      "error",
+      "approval",
+      "question",
     ]);
   });
 
@@ -242,10 +273,10 @@ describe("automatic follow-up steer", () => {
     expect(boundary.notifyAttention).not.toHaveBeenCalled();
   });
 
-  it("speaks the actual error message of a stream error", () => {
+  it("uses the prerecorded error event without speaking the dynamic error text", () => {
     useChatStore.getState().processEvent({ type: "error", code: "quota", message: "Quota exceeded", phase: "runtime" });
 
-    expect(boundary.notifyAttention).toHaveBeenCalledWith("Quota exceeded", DEFAULT_SOUND_SETTINGS.error);
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("error", DEFAULT_SOUND_SETTINGS.error);
   });
 
   it("stays silent for non-terminal retry warnings", () => {
@@ -261,13 +292,13 @@ describe("automatic follow-up steer", () => {
     expect(boundary.toastWarning).toHaveBeenCalledWith("Retrying request");
   });
 
-  it("never speaks an empty approval reason", () => {
+  it("uses the approval event without speaking the approval reason", () => {
     useChatStore.getState().processEvent({
       type: "ApprovalRequest",
       payload: { id: "a1", tool_call_id: "t1", sender: "agent", action: "", description: "" },
     });
 
-    expect(boundary.notifyAttention).toHaveBeenCalledWith("Approval required", DEFAULT_SOUND_SETTINGS.approval);
+    expect(boundary.notifyAttention).toHaveBeenCalledWith("approval", DEFAULT_SOUND_SETTINGS.approval);
   });
 
   it("keeps the running prompt for retry after a rejected steer", async () => {
@@ -288,7 +319,7 @@ describe("automatic follow-up steer", () => {
   });
 
   it("keeps media attached during an in-flight steer when the turn has already ended", async () => {
-    let finishSteer: (value: { ok: boolean }) => void = () => undefined;
+    let finishSteer: (value: SteerChatResult) => void = () => undefined;
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { finishSteer = resolve; }));
     useChatStore.getState().sendMessage("first");
     beginTurn();
@@ -308,7 +339,7 @@ describe("automatic follow-up steer", () => {
   });
 
   it("does not resend media that is still waiting for a steer acknowledgement", async () => {
-    const pending: Array<(value: { ok: boolean }) => void> = [];
+    const pending: Array<(value: SteerChatResult) => void> = [];
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { pending.push(resolve); }));
     useChatStore.getState().sendMessage("first");
     beginTurn();
@@ -322,7 +353,7 @@ describe("automatic follow-up steer", () => {
     ]);
     expect(boundary.steerChat.mock.calls[1]?.[0]).toBe("and this");
 
-    for (const resolve of pending) resolve({ ok: true });
+    for (const resolve of pending) resolve(RUNNING_STEER);
     await vi.waitFor(() => expect(useChatStore.getState().draftMedia).toEqual([]));
   });
 
@@ -400,10 +431,10 @@ describe("automatic follow-up steer", () => {
     useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "cancelled" } });
 
     expect(boundary.notifyAttention.mock.calls).toEqual([
-      ["Quota exceeded", sounds.error],
-      ["Approval required: Run tests", sounds.approval],
-      ["Which one?", sounds.question],
-      ["Done", sounds.turnComplete],
+      ["error", sounds.error],
+      ["approval", sounds.approval],
+      ["question", sounds.question],
+      ["turnComplete", sounds.turnComplete],
     ]);
   });
 

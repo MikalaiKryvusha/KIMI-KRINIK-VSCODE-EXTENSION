@@ -365,6 +365,10 @@ const eventHandlers: Record<string, EventHandler> = {
   TurnBegin: (draft, payload: TurnBegin & { forkable?: boolean; clientId?: string }) => {
     draft.tokenUsage = createEmptyTokenUsage();
     draft.activeTokenUsage = createEmptyTokenUsage();
+    if (payload.clientId !== undefined) {
+      draft.queue = draft.queue.filter((item) => item.id !== payload.clientId);
+      if (draft.queueSteerInFlight === payload.clientId) draft.queueSteerInFlight = null;
+    }
     if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId, payload.turnIndex, payload.forkable)) {
       draft.isStreaming = true;
       return;

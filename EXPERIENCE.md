@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0011 · 2026-11-24 · ❌→✅ · #vscode #testing #windows
+class: claim-before-evidence
+mechanized: node .tmp/k5-close.mjs
+**Context:** several VSIX builds appeared to fail identically in an isolated VS Code window.
+**Tried / did:** compared process start time, log-session path and installed/source hashes before changing product code again.
+**Result:** ❌→✅ — Playwright `browser.close()` had only disconnected the CDP client; raw CDP `Browser.close` terminated the old process, and the next build passed its scoped queue check.   → link: bugs/20_queue_steer_duplicate_submission.md
+**Lesson:** a package hash proves the installed bytes, never the running build; before a live verdict require a new main-process start and log session.
+**Repro:** run `node .tmp/k5-close.mjs`, then verify the previous PID is absent before `node .tmp/k5-vscode-ui.mjs launch`.
+**Trigger:** reinstalling a VSIX into a running CDP-controlled VS Code → prove process replacement before observing behavior.
+**Not for:** claiming that unit or jsdom contracts alone prove the real running product.
+
 ### EXP-0008 · 2026-11-24 · ❌→✅ · #chat #lifecycle #testing
 class: twins-missed
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-store.test.ts apps/vscode/test/settings-store.test.ts
@@ -100,9 +111,9 @@ class: text-in-agents-world
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/i18n.test.ts
 **Context:** the conversation-history Delete action stayed English after the interface switched languages.
 **Tried / did:** reused the existing `common.delete` dictionary entry and added assertions for EN/RU/ZH.
-**Result:** ✅ — the action now follows the active interface language.   → link: apps/vscode/webview-ui/src/components/SessionList.tsx
-**Lesson:** check action labels inside overflow menus and dialogs, not only the visible composer and main settings.
-**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/i18n.test.ts` — all dictionaries share one key set and `common.delete` is localized.
+**Result:** ✅ — the action now follows the active interface language; a later live ZH review caught `Control Panel` and both ZH/RU failure toasts still English, so the same guard now pins those strings too.   → link: apps/vscode/webview-ui/src/components/SessionList.tsx · apps/vscode/webview-ui/src/i18n/zh.ts
+**Lesson:** check action labels inside overflow menus, dialogs and failure toasts, not only the visible composer and main settings.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/i18n.test.ts` — all dictionaries share one key set; `common.delete`, `controlPanel.title` and the ZH/RU Control Panel failure toasts are localized.
 **Trigger:** adding or moving a user-facing action → reuse the existing dictionary and assert each language.
 **Not for:** replacing visual acceptance of every dialog; this lesson covers the localization mechanism.
 
@@ -111,11 +122,12 @@ class: text-in-agents-world
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/attention.test.ts
 **Context:** attention speech could play without identifying the speaker/project or the addressee.
 **Tried / did:** prefixed the phrase once at the shared attention boundary for Glass and browser speech, preserving idempotence and non-voice behavior.
-**Result:** ❌→✅ — red tests became 20/20; installed VSIX delivered the full phrase to Glass and constructed the same browser utterance.   → link: bugs/17_attention_voice_missing_identity.md
+**Result:** ❌→✅ — red tests became 20/20; installed VSIX delivered the full phrase to Glass and constructed the same browser utterance.   → link: bugs/17_DONE_attention_voice_missing_identity.md
 **Lesson:** spoken owner-facing text needs the same identity rule at every delivery route, including fallbacks and previews.
 **Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/attention.test.ts apps/vscode/test/attention-handler.test.ts apps/vscode/test/webview/sounds.test.ts` — both routes carry the prefix exactly once.
 **Trigger:** adding a voice route or attention event → test the actual phrase before the transport, including the fallback.
 **Not for:** claiming the owner heard and accepted the sound; audible verification is separate.
+**Superseded:** dynamic attention speech and the owner-name prefix were later replaced by packaged event/language recordings with a localized project identity; see `GOAL.md` criterion 7 and `bugs/17_DONE_attention_voice_missing_identity.md`.
 
 ### EXP-0007 · 2026-11-24 · ❌→✅ · #vscode #testing #assets
 class: guard-not-proven-against-threat

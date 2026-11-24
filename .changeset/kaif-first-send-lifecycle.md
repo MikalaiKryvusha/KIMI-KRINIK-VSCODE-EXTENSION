@@ -2,4 +2,4 @@
 "kimi-code-kaif": patch
 ---
 
-Make chat sends and activity updates appear immediately and prevent duplicate steering submissions.
+Keep chat sends, queued follow-ups, composer state and media consistent across running and idle transitions.

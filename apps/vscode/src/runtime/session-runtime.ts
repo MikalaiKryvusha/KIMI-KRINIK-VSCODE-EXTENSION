@@ -3,6 +3,7 @@ import {
   type ContentPart as SdkContentPart,
   type Event,
   type PromptInput,
+  type PromptSubmissionResult,
   type Session,
   type SessionSummary,
 } from "@moonshot-ai/kimi-code-sdk";
@@ -55,6 +56,11 @@ export interface PromptResult {
   readonly status: "finished" | "cancelled" | "failed";
 }
 
+interface PendingSteer {
+  readonly input: LegacyContentPart[] | string;
+  readonly clientId?: string;
+}
+
 interface SuppressedError {
   readonly code: string;
   readonly message: string;
@@ -78,6 +84,7 @@ export class SessionRuntime {
   private readonly unsubscribe: () => void;
   private adapterState: EventAdapterState = createEventAdapterState();
   private activePrompt: ActivePrompt | undefined;
+  private readonly pendingSteers = new Map<string, PendingSteer>();
   private hostActionActive = false;
   private hostActionSequence = 0;
   private activeHostActionId: number | undefined;
@@ -372,14 +379,27 @@ export class SessionRuntime {
     }
   }
 
-  async steer(input: string | LegacyContentPart[], clientId?: string): Promise<void> {
+  async steer(input: string | LegacyContentPart[], clientId?: string): Promise<PromptSubmissionResult> {
     this.ensureOpen();
-    await this.session.steer(toSdkPromptInput(input));
-    this.emitStreamEvent({
-      type: "SteerInput",
-      payload: { user_input: input, ...(clientId === undefined ? {} : { clientId }) },
-      _sessionId: this.id,
-    });
+    const result = await this.session.steer(toSdkPromptInput(input));
+    if (result.state === "queued") {
+      this.pendingSteers.set(result.promptId, { input, ...(clientId === undefined ? {} : { clientId }) });
+    } else if (result.state === "running") {
+      this.emitStreamEvent(result.steered ? {
+        type: "SteerInput",
+        payload: { user_input: input, ...(clientId === undefined ? {} : { clientId }) },
+        _sessionId: this.id,
+      } : {
+        type: "TurnBegin",
+        payload: {
+          user_input: input,
+          ...(result.turnId === undefined ? {} : { turnIndex: result.turnId }),
+          ...(clientId === undefined ? {} : { clientId }),
+        },
+        _sessionId: this.id,
+      });
+    }
+    return result;
   }
 
   respondApproval(id: string, response: ApprovalResponse): boolean {
@@ -395,6 +415,7 @@ export class SessionRuntime {
     this.closed = true;
     this.pendingHostCompaction?.reject(new Error("Session closed during context compaction."));
     this.pendingHostCompaction = undefined;
+    this.pendingSteers.clear();
     this.reverseRpc.cancelAll("Session closed");
     this.unsubscribe();
     this.session.setApprovalHandler(undefined);
@@ -488,10 +509,13 @@ export class SessionRuntime {
       return;
     }
 
-    const pendingInput = this.activePrompt?.input;
+    const pendingSteer = event.type === "turn.started" && event.promptId !== undefined
+      ? this.pendingSteers.get(event.promptId)
+      : undefined;
+    if (event.type === "turn.started" && event.promptId !== undefined) this.pendingSteers.delete(event.promptId);
     const adapted = adaptSdkEvent(this.adapterState, event, {
-      pendingInput,
-      clientId: this.activePrompt?.clientId,
+      pendingInput: pendingSteer?.input ?? this.activePrompt?.input,
+      clientId: pendingSteer?.clientId ?? this.activePrompt?.clientId,
       errorPhase: this.activePrompt?.started === false ? "preflight" : "runtime",
     });
     this.adapterState = adapted.state;

@@ -31,6 +31,7 @@ The owner reports that the queue is not added. No isolated reproduction has yet 
 - `QueuedMessagesPanel` returns nothing for an empty queue and shows only text plus a media label, not thumbnails.
 - The existing AUTO STEER OFF store test checks queue state, not the immediately rendered panel or the real completion transition.
 - 2026-11-24 14:12 +03:00, isolated current VSIX: a long first request started, a second text follow-up immediately showed `1 в очереди`, and the queue row was visible with the VS Code-derived background. An earlier agent statement that the queue was missing was premature and is corrected: the first request was still initializing. This text-only run does not reproduce the owner's failure; the exact switch state, attachment combination and completion race remain open.
+- 2026-11-24 19:07 +03:00, build 3, owner's accumulated profile, AUTO STEER OFF: three text follow-ups were visibly queued and the owner prepared a fourth. Text-only queue insertion and rendering therefore pass in this live run; dequeue, media and lightning behavior remain separate open cases.
 
 ## Fix plan
 

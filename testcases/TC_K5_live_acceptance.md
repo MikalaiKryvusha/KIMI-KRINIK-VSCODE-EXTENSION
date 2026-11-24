@@ -23,6 +23,7 @@ Maintain the official engine and accumulated user state while proving every visi
 | R10 | WHEN sound settings or events run, the system shall persist per-event sound/volume without replay or chat failure | Modal/audio calls · live user path · settings observed and replay silent |
 | R11 | WHEN the VSIX is installed beside other extensions, the system shall remain self-contained and reversible | Isolated install/rollback · real VS Code · projects/sessions retained |
 | R12 | WHEN live acceptance finishes, the system shall leave independently repeatable evidence | Judge rerun · claims and traces · no unverified DONE |
+| R13 | WHEN the user opens Action Menu, the system shall display the extension version and its persisted build number | Visible support subtitle · real installed VSIX · `v1.0.0 (1)` for build 1, increasing by one per package invocation |
 
 ## 3. Coverage matrix — dimensions and holes
 
@@ -58,7 +59,7 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 | C13 composer controls | Permission, Plan, Goal, Swarm, secondary model, settings and send → real effects | use-case walk | pass · host calls/config and active-state DOM observed |
 | C14 basic status | Working, Queued and context ring follow real events | event/state | pass · Working transitions, 1 Queued and 10.5/10.7% observed |
 | C15 languages | Switch EN → RU → ZH → EN → immediate visible strings and persisted selection | state/pairwise | pass · visible dictionaries and `kimi.language` en observed |
-| C16 sound preview | Open modal → change event sound/volume → preview → persisted and Web Audio lifecycle closes | use-case | pass · Chime 35%, peak 0.14, context closed; rapid 10→20→40→80→100 remains latest; global OFF blocks audio; Triple 880/660/990 and packaged glass.opus observed; neutral tracks, no yellow outline |
+| C16 sound preview | Open modal → change event sound/volume → preview → persisted and Web Audio lifecycle closes | use-case | pass · Chime 35%, peak 0.14, context closed; rapid 10→20→40→80→100 remains latest; global OFF blocks audio; Triple 880/660/990 observed; packaged glass.mp3 and localized event recordings resolved real playback; neutral tracks, no yellow outline |
 | C17 B5/B6 | Decline/allow workspace voice command; machine setting wins; phrase cleanup/error logging observed | security/error | pass · native dialog Cancel/Allow via real mouse; no spawn/write on decline; machine priority without dialog; child PID 9028/39556 and cleaned phrase files; ENOENT logged |
 | C18 rollback | Run beside official/reference → return to official → projects/sessions preserved | installation/state | [NOT-TESTED] owner accumulated profile |
 | C19 rejected steer + media | Rejected running steer restores text+media exactly once; OFF queues media | race/media | fail · owner reports undelivered steering media and obsolete composer restoration (`bugs/12`–`14`); exact isolated rejection still open |
@@ -69,6 +70,9 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 | C24 assistant response brand | Read a real assistant response → the pink KIMI KRINIK robot replaces the blue KIMI icon and loads from the packaged resources | use-case/assets | pass · regression red before/green after; packaged images load with naturalWidth 1024; response robot now matches Working at 24×16 without rounded; blue K absent; WebP 19 read |
 | C25 responsive Control Panel | Restore reference sides and paperclip; wheel-scroll only on real overflow with fade; no wheel drift when all controls fit; pink dots/scroll button and blue Auto | state/boundary | pass · 319/640/1000 CSS px geometry and real wheel; no drift at 1000; paperclip/blue Auto/pink dots and scroll button; robot 24×16; WebP 21–24 |
 | C26 Action menu and checked controls | Remove BEHAVIOR, vertical-scroll long menu, order EN→RU→ZH, open About, pink Switch/Checkbox and no yellow outline | use-case/accessibility | pass · scrollTop 0→200→160; About host ok=true; checked rgb(255,26,140); range outlineStyle none; WebP 23/25–27 |
+| C27 build-number smoke | Open Action Menu on the pre-build VSIX, then on build 1 → old subtitle lacks a build number; new subtitle reads `v1.0.0 (1)` | control + use-case | pass · pre-build `v1.0.0`; build 1 `(1)` and final build 3 `(3)` read in the isolated VSIX |
+| C28 language-dialog smoke | Click Language in Action Menu → separate dialog opens with the selected language first, then the other two choices; Action Menu shows all three action translations with the active one first | use-case/state | pass · build 3 EN `Language / Язык / 语言`, RU `Язык / Language / 语言`, ZH `语言 / Language / Язык`; DOM and WebP read |
+| C29 Control Panel localization | Switch to 中文 and open Action Menu → `控制面板`; ZH/RU save-failure text uses the same localized name | use-case + twin sweep | pass · build 3 live ZH `控制面板`; ZH/RU toast assertions green |
 
 ## 5. Control cases — MUST
 

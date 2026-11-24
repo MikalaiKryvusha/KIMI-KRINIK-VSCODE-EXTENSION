@@ -1,47 +1,21 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { IconTrash, IconArrowUp, IconPencil, IconCheck, IconX, IconBolt } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores";
-import { bridge } from "@/services";
-import { toast } from "@/components/ui/sonner";
 import { Content } from "@/lib/content";
 import { useT } from "@/i18n";
 
 import type { ContentPart } from "shared/legacy-sdk";
 
 function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: string | ContentPart[]; isStreaming: boolean; onEdit: (id: string) => void }) {
-  const { removeFromQueue, moveQueueItemUp, queue } = useChatStore();
-  const steering = useRef(false);
+  const { removeFromQueue, moveQueueItemUp, steerQueueItem, queue } = useChatStore();
+
   const t = useT();
   const text = Content.getText(content);
   const hasMedia = Content.hasMedia(content);
   const isFirst = queue[0]?.id === id;
 
-  const handleSteer = async () => {
-    if (steering.current) return;
-    const queueBeforeSend = useChatStore.getState().queue;
-    const index = queueBeforeSend.findIndex((item) => item.id === id);
-    const item = queueBeforeSend[index];
-    if (item === undefined) return;
-    steering.current = true;
-    removeFromQueue(id);
-    const restore = () => {
-      useChatStore.setState((state) => ({
-        queue: state.queue.some((queued) => queued.id === id)
-          ? state.queue
-          : [...state.queue.slice(0, index), item, ...state.queue.slice(index)],
-      }));
-    };
-    try {
-      const result = await bridge.steerChat(content);
-      if (!result.ok) restore();
-    } catch (error) {
-      restore();
-      toast.error(error instanceof Error ? error.message : String(error));
-    } finally {
-      steering.current = false;
-    }
-  };
+  const handleSteer = () => steerQueueItem(id);
 
   return (
     <div className="group flex items-start px-2.5 py-0.5 hover:bg-muted/50 transition-colors">
@@ -55,9 +29,7 @@ function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: 
             variant="ghost"
             size="icon"
             className="size-5 border-0! text-amber-500 hover:text-amber-600"
-            onClick={() => {
-              void handleSteer();
-            }}
+            onClick={handleSteer}
             title={t("queue.insertNow")}
           >
             <IconBolt className="size-3" />

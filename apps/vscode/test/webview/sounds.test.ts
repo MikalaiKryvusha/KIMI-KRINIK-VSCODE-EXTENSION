@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { playTone } from "../../webview-ui/src/lib/sounds";
+import { playRecordedAttention, playTone } from "../../webview-ui/src/lib/sounds";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -47,6 +47,33 @@ describe("sound generation", () => {
     expect(stops).toEqual([0.16, 0.36, 0.66]);
   });
 
+  it("plays the exact packaged recording for the event and language", () => {
+    document.body.setAttribute("data-baseuri", "https://extension.test");
+    const audio = { volume: 1, play: vi.fn(async () => undefined) };
+    const AudioMock = vi.fn(function (this: typeof audio) { Object.assign(this, audio); });
+    vi.stubGlobal("Audio", AudioMock);
+
+    playRecordedAttention("error", "zh", 45);
+
+    expect(AudioMock).toHaveBeenCalledWith("https://extension.test/resources/attention/zh/error.mp3");
+    expect(AudioMock.mock.instances[0]?.volume).toBe(0.45);
+    expect(audio.play).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports a rejected packaged-audio play instead of swallowing it", async () => {
+    const failure = new Error("play rejected");
+    const audio = { volume: 1, play: vi.fn(async () => { throw failure; }) };
+    const AudioMock = vi.fn(function (this: typeof audio) { Object.assign(this, audio); });
+    vi.stubGlobal("Audio", AudioMock);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    playTone("glass", 30);
+    await Promise.resolve();
+
+    expect(error).toHaveBeenCalledWith("KIMI KRINIK audio playback failed: resources/glass.mp3", failure);
+    error.mockRestore();
+  });
+
   it("plays the packaged Glass audio at the chosen volume", () => {
     document.body.setAttribute("data-baseuri", "https://extension.test");
     const audio = {
@@ -63,7 +90,7 @@ describe("sound generation", () => {
 
     playTone("glass", 30);
 
-    expect(AudioMock).toHaveBeenCalledWith("https://extension.test/resources/glass.opus");
+    expect(AudioMock).toHaveBeenCalledWith("https://extension.test/resources/glass.mp3");
     expect(AudioMock.mock.instances[0]?.volume).toBe(0.3);
     expect(audio.play).toHaveBeenCalledTimes(1);
   });
