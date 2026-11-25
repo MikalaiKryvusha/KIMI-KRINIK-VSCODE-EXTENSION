@@ -1,10 +1,10 @@
 # Bug 32 — Steering moves the robot and Working indicator to an empty assistant
 
-**Status:** 🔧 component/store fix verified; packaged VSIX and accumulated-profile acceptance pending
+**Status:** 🔧 verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:15 +03:00, owner steering review
 **Severity:** S2
 **Fixing:** this session, after the sticky boundaries
-**Fix accepted when (observable):** immediately after a steering send, the existing assistant keeps its robot and «Работаю…» without a second empty robot/indicator; when real post-steer content arrives, its assistant section appears after the steering bubble and owns the indicator.
+**Fix accepted when (observable):** immediately after a steering send, the user entry sits above one trailing avatar/«Работаю…» without a second empty KIMI header; when real post-steer content arrives, its assistant section appears after the steering bubble and owns the indicator.
 
 ## Symptom
 
@@ -56,6 +56,13 @@ Hygiene: the DOM-order regression was red before the follow-up and green afterwa
 Functional run: NONE on the follow-up. A new VSIX must be packaged and observed.
 
 corrected: `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`, `.changeset/kaif-chat-rendering-stability.md`, this bug and `testcases/reports/2026-11-25_steer_presentation.md` now describe the user-entry → trailing-Working order instead of retaining Working inside the original assistant.
+
+## Isolated build-25 evidence — 2026-11-25 20:11 +03:00
+
+Hygiene: full extension 621 passed / 1 skipped; typecheck and root lint green; VSIX static audit and Extension Host smoke pass.
+Functional run: on packaged build 25, selecting `check-kimi-code-docs` during a held turn delivered exactly one `/skill:check-kimi-code-docs` entry into the active model request, with no queue and no second empty KIMI header. A held turn with AUTO STEER OFF and a queued skill showed `1 в очереди`, while `/skill:experience` was absent from the model request. The owner-required steering-entry → trailing-Working order is covered by the component regression; the live UI showed the same presentation path.
+
+REAL WORLD: accumulated — the owner's build-22 steering screenshot remains the original observation; data and machine — isolated Windows VS Code 1.123.0 with packaged build 25; path — immediate Steer and queue in Second Side Bar. The isolated real product is verified. The owner's accumulated main profile has build 25 installed but its running Extension Host has not been restarted, so this bug is not DONE.
 
 ## Decisions made without the owner
 

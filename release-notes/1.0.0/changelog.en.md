@@ -14,7 +14,13 @@ KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FOR
 
 - Send images, video and media-only prompts with clickable thumbnails and the same viewer after replay. Preserve manual line breaks and blank lines.
 
-- Keep the prompt that owns the visible response on top. Expand and collapse it with an animated chevron, and see localized send times inside user bubbles.
+- Keep the prompt that owns the visible response on top. Expand and collapse it with an animated chevron in the corner, and see localized send times to the left of user bubbles.
+
+- Always start an empty chat with the full localized shortcut guide and the pink robot centered beside KIMI without clipping on narrow sidebars.
+
+- Open the Skill picker in Control Panel: browse a scrollable two-line list with localized descriptions, then send a skill immediately with Steer or queue it with Steer OFF.
+
+- Hide sticky prompts at the top of the chat and collapse them on user scrolling or when another prompt becomes sticky. Steering messages sit above one trailing Working indicator until real content arrives.
 
 - Choose models and reasoning effort through one picker with search and favorites. Explicit MAX/XHigh choices persist, while resumed sessions keep their own effort.
 
@@ -24,13 +30,11 @@ KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FOR
 
 - Use responsive Control Panel actions, live status panels, the Working indicator and the pink KIMI KRINIK robot. Read the version and build number in Action Menu.
 
-- Keep history stable during replay and late request-setup errors. Internal instructions do not appear as assistant text, and unrelated turns are not deleted.
+- Keep history stable during replay and late request-setup errors. Visible responses remain in the conversation through streaming finalization, internal instructions do not appear as assistant text during live work or history replay, and unrelated turns are not deleted.
 
 ## Verification
 
-The release candidate has 607 passing checks and 1 skipped check, green typecheck and lint, and successful static/import verification for six package targets. Build 19 passed isolated VS Code scenarios for steering, replay, media, context thresholds and sticky prompts. The accumulated main profile delivered the real 70% context warning.
-
-Acceptance of the remaining corrected chat paths on the accumulated main profile is still being completed.
+Build 25 has 621 passing checks and 1 skipped check, green typecheck and lint, and successful packaging and static checks. Isolated packaged build 25 passed the fixed welcome layout, localized skill picker, immediate Steer, queued skill selection, sticky top/collapse boundaries and ON/OFF tooltip scenarios. Build 25 is installed on the main profile with matching extension and webview hashes; acceptance there requires the running Extension Host to be restarted.
 
 ## Install
 

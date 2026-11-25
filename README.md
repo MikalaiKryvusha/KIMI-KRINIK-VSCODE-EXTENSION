@@ -41,8 +41,8 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | Queue actions and failures | ordinary queue | forced steering can repeat or skip items | ✅ the whole batch joins once in order; rejected items return to their original positions |
 | Attachments in chat and steering | — | can lose attachments | ✅ image, video and media-only prompts, clickable thumbnails, the same viewer after replay |
 | Multiline prompts | standard Markdown whitespace | standard Markdown whitespace | ✅ manual line breaks and blank lines reach the model unchanged |
-| Sticky user prompt while reading a long conversation | — | — | ✅ the prompt owning the visible response stays on top; expand/collapse uses a chevron and the existing media viewer |
-| User message send time | — | — | ✅ localized send time inside the user bubble |
+| Sticky user prompt while reading a long conversation | — | — | ✅ hidden at chat start and collapsed on user scrolling or ownership change; expand/collapse uses a chevron and the existing media viewer |
+| User message send time | — | — | ✅ localized `HH:MM` send time to the left of the user bubble |
 | Managed quota: 5-hour ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: 7-day ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: monthly ring with a reset countdown | — | ✅ | ✅ |
@@ -54,7 +54,8 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | History replay and internal events | — | — | ✅ atomic replay without blank frames; internal hook results never become assistant text |
 | Context ring and queue feedback | — | ✅ | ✅ blue → yellow → red-orange ring interpolation and one pulse when an item joins the queue |
 | Control Panel at narrow widths | — | ✅ | ✅ horizontal scrolling only on real overflow, with fading edges and one-click actions |
-| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (19)` |
+| Control Panel skill picker | — | — | ✅ scrollable two-line rows with localized descriptions; selection uses immediate Steer or the ordinary queue |
+| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (25)` |
 | Late preflight errors | can surface a generic internal error | can surface a generic internal error | ✅ unrelated and newer chat turns stay intact; only the send that actually failed is rolled back |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
@@ -119,8 +120,8 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Действия с очередью и ошибки отправки | обычная очередь | принудительный steering может повторить или пропустить сообщения | ✅ вся пачка отправляется один раз по порядку; отклонённые сообщения возвращаются на исходные места |
 | Вложения в чате и steering | — | вложения могут теряться | ✅ изображения, видео и сообщения без текста, кликабельные миниатюры и существующий просмотрщик после восстановления истории |
 | Многострочные сообщения | обычное Markdown-разбиение строк | обычное Markdown-разбиение строк | ✅ ручные переносы строк и пустые строки доходят до модели без изменений |
-| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ запрос, которому принадлежит читаемый ответ, остаётся сверху; шеврон раскрывает текст и медиа в существующем просмотрщике |
-| Время отправки сообщения пользователя | — | — | ✅ локализованное время отправки внутри пузыря сообщения |
+| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ скрывается в начале чата и сворачивается при прокрутке или смене запроса; шеврон раскрывает текст и медиа в существующем просмотрщике |
+| Время отправки сообщения пользователя | — | — | ✅ локализованное время `HH:MM` слева от пузыря сообщения |
 | Квота на 5 часов: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Квота на 7 дней: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Месячная квота: кольцо с отсчётом до сброса | — | ✅ | ✅ |
@@ -132,7 +133,8 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | История и внутренние события | — | — | ✅ восстановление истории без пустых кадров; внутренние служебные инструкции не отображаются как ответ агента |
 | Кольцо контекста и отклик очереди | — | ✅ | ✅ плавный переход синего в жёлтый и красно-оранжевый, один импульс при добавлении сообщения |
 | Панель управления на узком экране | — | ✅ | ✅ горизонтальная прокрутка только при реальном переполнении, затухание краёв и действия одним кликом |
-| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (19)` |
+| Кнопка «Навык» в Control Panel | — | — | ✅ прокручиваемый список из двух строк с локализованными описаниями; выбор сразу отправляется через Steer или встаёт в очередь |
+| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (25)` |
 | Запоздавшие ошибки подготовки запроса | общая ошибка без подробностей | общая ошибка без подробностей | ✅ не связанные с ошибкой и более новые ходы чата сохраняются; откатывается только текущая неудачная отправка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
@@ -196,8 +198,8 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 队列操作与发送失败 | 普通队列 | 强制 steering 可能重复或跳过消息 | ✅ 整批消息按顺序仅发送一次；被拒绝的消息回到原位置 |
 | 聊天和 steering 中的附件 | — | 可能丢失附件 | ✅ 图片、视频及纯媒体消息，可点击缩略图，replay 后使用同一查看器 |
 | 多行消息 | 标准 Markdown 空白处理 | 标准 Markdown 空白处理 | ✅ 手动换行和空行原样传递给模型 |
-| 长聊天中置顶的用户消息 | — | — | ✅ 当前回答所属的用户请求保持置顶；通过 chevron 展开或折叠，并使用现有媒体查看器 |
-| 用户消息发送时间 | — | — | ✅ 用户气泡内显示本地化的发送时间 |
+| 长聊天中置顶的用户消息 | — | — | ✅ 聊天开始时自动隐藏，用户滚动或切换请求时自动折叠；通过 chevron 展开或折叠，并使用现有媒体查看器 |
+| 用户消息发送时间 | — | — | ✅ 用户气泡左侧显示本地化的 `HH:MM` 发送时间 |
 | 5 小时配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 7 天配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 月度配额：带重置倒计时的圆环 | — | ✅ | ✅ |
@@ -209,7 +211,8 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 历史 replay 与内部事件 | — | — | ✅ 原子 replay 不出现空白帧；内部 hook 结果不会成为助手文本 |
 | 上下文圆环与队列反馈 | — | ✅ | ✅ 蓝色 → 黄色 → 红橙色平滑渐变，消息入队时仅脉冲一次 |
 | 窄宽度下的 Control Panel | — | ✅ | ✅ 仅在实际溢出时横向滚动，边缘渐隐，单击执行操作 |
-| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (19)` |
+| Control Panel Skill 选择器 | — | — | ✅ 可滚动的双行本地化描述列表；选择后立即通过 Steer 发送或进入普通队列 |
+| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (25)` |
 | 延迟到达的 preflight 错误 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 无关及更新的聊天消息保持不变，仅回滚当前失败的发送 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 

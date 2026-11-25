@@ -1,6 +1,6 @@
 # Idea 02 — Control Panel skill picker with localized descriptions
 
-> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 implemented and component/integration verified on 2026-11-25; packaged VSIX acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
+> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 implemented and verified on isolated build 25 on 2026-11-25; accumulated main-profile running-build acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
 
 ## Goal vector
 
@@ -40,7 +40,8 @@ This extends the existing Control Panel and three-language UI without changing t
 - [x] Control Panel has a localized Skill button and a scrollable two-line dialog, plus `kimi.controlPanel.skills` and the matching settings checkbox.
 - [x] Selection uses the existing `sendMessage`: one immediate steer while ON, one queued item while OFF.
 - [x] Real parser, host inventory, localization, row layout, ON/OFF and visibility regressions pass; full extension is 621 passed / 1 skipped, SDK typecheck/build and root lint pass.
-- [ ] Packaged VSIX and accumulated-profile visual/delivery acceptance remain open.
+- [x] Isolated packaged build 25 showed 47 skills in a scrollable two-line dialog, delivered one immediate-skill entry into the active model request, and showed `1 в очереди` with no queued skill in the model request.
+- [ ] Accumulated main-profile running-build acceptance remains open: build 25 is installed with matching hashes, but the current Extension Host has not been restarted.
 
 Contract consumers: `packages/node-sdk/src/index.ts` gains one additive function and its metadata type. The VS Code extension is the only new consumer; older SDK clients and KAP payloads are unchanged.
 

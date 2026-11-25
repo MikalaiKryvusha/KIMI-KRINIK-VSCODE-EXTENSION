@@ -1,6 +1,6 @@
 # Bug 30 — Sticky prompt duplicates the start of the chat at the top
 
-**Status:** 🔧 component fix verified; packaged VSIX and accumulated-profile acceptance pending
+**Status:** 🔧 verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:12 +03:00, owner visual review
 **Severity:** S2
 **Fixing:** this session, before the remaining 1.0.0 UI work
@@ -44,6 +44,13 @@ TWINS: searched `getLatestPromptKey(messages)`, `expandedPromptId` and scroll-bo
 TWINS-MECH: an unnecessary duplicate can come from initial state, a boundary shortcut, or stale ownership state. Those forms were searched in the same hook and `ChatArea`; no second sticky renderer exists.
 
 REAL WORLD: accumulated — the owner's build-22 screenshot and existing sessions; data and machine — his Windows VS Code; path — conversation top in Second Side Bar. The code path is fixed and component-verified, but the real world is not yet observed on a new VSIX.
+
+## Isolated build-25 evidence — 2026-11-25 20:11 +03:00
+
+Hygiene: full extension 621 passed / 1 skipped; typecheck and root lint green; VSIX static audit and Extension Host smoke pass.
+Functional run: on packaged build 25, after three completed turns, `scrollTop = 0` produced `sticky = null` after React settled. At the bottom the 40-line prompt became sticky and expanded; a real wheel event changed `expandedBefore: true` to `expandedAfter: false`. The installed webview hash matched the source.
+
+REAL WORLD: accumulated — the owner's main-profile build-22 screenshot remains the original observation; data and machine — isolated Windows VS Code 1.123.0 with packaged build 25; path — top and expanded sticky in Second Side Bar. The fix is verified on the isolated real product. The owner's accumulated main profile has build 25 installed but its running Extension Host has not been restarted, so this bug is not DONE.
 
 ## Decisions made without the owner
 

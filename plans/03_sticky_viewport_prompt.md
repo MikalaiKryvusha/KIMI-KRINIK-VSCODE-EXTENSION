@@ -2,9 +2,9 @@
 
 > **Created:** 2026-11-24
 > **Parent:** owner's sticky-message request and `researches/54_chat_pipeline_reliability.md`
-> **Status:** implemented and verified on isolated packaged build 22; accumulated main-profile running-build acceptance pending
+> **Status:** implemented and verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
 > **Outbound:** final main-profile acceptance and release
-> **Verification:** [TESTED: 2026-11-25 17:16 +03:00 · isolated build-22 collapsed/expanded sticky, left timestamps and small viewport with DOM, computed geometry and WebP readback — `testcases/reports/2026-11-25_chat_rendering_build_22.md`]
+> **Verification:** [TESTED: 2026-11-25 20:11 +03:00 · isolated build-25 top boundary, expansion and wheel collapse with DOM and model evidence — `testcases/reports/2026-11-25_build_25_ui_acceptance.md`]
 
 ## 1. Goal vector
 

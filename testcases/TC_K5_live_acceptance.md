@@ -78,7 +78,7 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 | C31 skill descriptions | Read EN/RU/ZH and missing metadata/key → EN uses base; RU/ZH use localized fields or base fallback | equivalence/fallback | pass (real parser + inventory + component) · nested YAML metadata read |
 | C32 skill Steer ON | Select skill during a running turn → one visible entry and one immediate steer, no queue | state/delivery | pass (store/component) · `steerChat('/skill:review')`, zero queued items |
 | C33 skill Steer OFF | Select skill during a running turn with AUTO STEER OFF → one queued `/skill:review`, no immediate steer | state/delivery | pass (store/component) · one queued item, zero steer calls |
-| C34 skill visibility and VSIX | Toggle Skill visibility and run the packaged picker on the installed VSIX | persistence/install | [NOT-TESTED] packaged VSIX and accumulated profile; default is visible, hidden leaves skills available |
+| C34 skill visibility and VSIX | Toggle Skill visibility and run the packaged picker on the installed VSIX | persistence/install | pass (isolated build 25) · 47 rows, immediate and queued delivery; accumulated main-profile running build pending |
 
 ## 5. Control cases — MUST
 

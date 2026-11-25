@@ -84,6 +84,62 @@
 
 ## Entries
 
+### EXP-0021 · 2026-11-25 · ❌→✅ · #chat #steer #testing
+class: text-in-agents-world
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-area.test.tsx -t "steering presentation"
+**Context:** the first steering presentation fix kept Working inside the original assistant, leaving the steering user message below the animation.
+**Tried / did:** followed the owner's explicit visual order and asserted DOM position: steering user entry first, one trailing Working indicator second; normal post-steer assistant rendering is unchanged.
+**Result:** ❌→✅ — the new order test was red before the change and green afterward; full extension is 621/1.   → link: bugs/32 · bugs/19
+**Lesson:** stable identity is not enough for perceived stability; the live indicator must also follow the user's chronological position in the timeline.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-area.test.tsx -t "steering presentation"` — the steering text precedes trailing Working and post-content Working belongs to the real assistant.
+**Trigger:** placing Working around optimistic user/assistant entries → assert actual DOM order, not only which record owns the indicator.
+**Not for:** reverting to a second empty KIMI header or inferring packaged acceptance from jsdom alone.
+
+### EXP-0020 · 2026-11-25 · ❌→✅ · #skills #i18n #testing
+class: field-dropped-in-rebuild
+mechanized: pnpm exec vitest run --reporter=agent packages/node-sdk/test/session-skills.test.ts apps/vscode/test/kimi-harness.integration.test.ts
+**Context:** localized skill descriptions were lost between YAML frontmatter and the Control Panel inventory.
+**Tried / did:** reused the existing parser through an additive SDK metadata reader, flattened the nested metadata block at that boundary and asserted real files through host inventory and UI fallbacks.
+**Result:** ❌→✅ — parser and host checks were red before implementation; the final parser/inventory/UI checks and extension suite 621/1 pass.   → link: ideas/02 · packages/node-sdk/src/skill-metadata.ts
+**Lesson:** when a summary drops source metadata, project the needed fields at one existing parser boundary instead of writing a second parser or widening every external protocol.
+**Repro:** `pnpm exec vitest run --reporter=agent packages/node-sdk/test/session-skills.test.ts -t "reads localized descriptions"` and `pnpm exec vitest run --reporter=agent apps/vscode/test/kimi-harness.integration.test.ts -t "carries localized skill descriptions"` — both must pass.
+**Trigger:** adding localized fields to an existing inventory → inspect nested metadata projection and test the real source file through the public consumer.
+**Not for:** the unrelated old Windows path-separator failure recorded in bugs/33, or claiming packaged acceptance without a VSIX run.
+
+### EXP-0019 · 2026-11-25 · ❌→✅ · #chat #steer #testing
+class: guard-not-proven-against-threat
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-area.test.tsx apps/vscode/test/webview/chat-store.test.ts
+**Context:** a steering send moved the robot and Working indicator into a new empty assistant before real content arrived.
+**Tried / did:** preserved the optimistic event target but deferred only its presentation; asserted robot/indicator ownership before and after content plus TurnBegin/idle reveal.
+**Result:** ❌→✅ — three checks were red before the fix; targets are 42/42 and the full extension suite is 615/1.   → link: bugs/32 · bugs/16 · bugs/19
+**Lesson:** an optimistic record needed for future events does not have to be visible immediately; separate event identity from presentation readiness and test ownership before and after real content.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-area.test.tsx apps/vscode/test/webview/chat-store.test.ts` — one pre-content robot and correct post-content ownership must pass.
+**Trigger:** adding an optimistic assistant placeholder → define which assistant owns Working before content and test durable/fallback reveal paths.
+**Not for:** claiming steering delivery or accumulated-profile visual acceptance from component evidence alone.
+**Superseded:** the owner later required the steering user entry above one trailing Working indicator, rather than the original assistant retaining it; see EXP-0021.
+
+### EXP-0018 · 2026-11-25 · ❌→✅ · #chat #viewport #testing
+class: guard-not-proven-against-threat
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-area.test.tsx
+**Context:** a sticky prompt appeared at the conversation top and expanded sticky geometry fed scrolling oscillation.
+**Tried / did:** read the selection and expansion owners instead of reproducing live; added top, wheel/touch and ownership-return boundaries with red-first component checks.
+**Result:** ❌→✅ — all three checks failed before the fix and passed afterward; the full extension suite is 613/1.   → link: bugs/30 · bugs/31 · plans/03
+**Lesson:** a viewport overlay needs explicit initial, boundary and ownership-reset states; testing only its steady selected state misses duplicate and feedback-loop defects.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-area.test.tsx` — top, collapse and ownership-return cases must pass.
+**Trigger:** adding or changing a sticky/overlay viewport element → test initial render, both scroll boundaries and replacement/return ownership.
+**Not for:** claiming packaged or accumulated-profile acceptance without a real VSIX observation.
+
+### EXP-0017 · 2026-11-25 · ❌→✅ · #voice #windows #kaif
+class: text-in-agents-world
+mechanized: node .kaif/tools/contour/voice-soft.mjs --selftest
+**Context:** a restart call used the generic review contour and produced its beep/system-voice route instead of the owner's standing Glass route.
+**Tried / did:** compared `review.mjs` with `voice-soft.mjs` and the configured `contour.voiceFileTool`, then replayed the same phrase through the direct Silero + Glass command.
+**Result:** ❌→✅ — `soft voice: F:\Temp\soft-voice-q4k7zv6y\soft.wav` and exit 0 were observed; R1 now explicitly routes owner calls through `voice-soft.mjs`, not `review.mjs --call`.   → link: HOUSE_RULES.md R1 · EXP-0003
+**Lesson:** when a project has a configured file-based voice route, the generic review caller is not an equivalent shortcut; use the wrapper that actually reads that configuration.
+**Repro:** `node .kaif/tools/contour/voice-soft.mjs --selftest`; for a real call write the phrase file, then `node .kaif/tools/contour/voice-soft.mjs --file <file> --play` and read `soft voice:` plus exit 0.
+**Trigger:** any owner call → choose the R1 file-based Glass route before the generic review contour.
+**Not for:** product notification sounds, dry runs, selftests, or claiming the owner heard the audio; those remain separate surfaces and observations.
+
 ### EXP-0016 · 2026-11-25 · ❌→✅ · #chat #markdown #hooks #testing
 class: guard-not-proven-against-threat
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-message.test.tsx apps/vscode/test/event-adapter.test.ts

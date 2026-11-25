@@ -1,6 +1,6 @@
 # Bug 31 — Expanded sticky prompt oscillates during scrolling
 
-**Status:** 🔧 component fix verified; packaged VSIX and accumulated-profile acceptance pending
+**Status:** 🔧 verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:12 +03:00, owner visual review
 **Severity:** S2
 **Fixing:** this session, together with the sticky top boundary
@@ -43,6 +43,13 @@ TWINS: searched `expandedPromptId`, `onWheelCapture` and `scrollTop <= 0` across
 TWINS-MECH: viewport oscillation can be fed by expansion state, ownership state, resize observation or programmatic scroll compensation. The first three state paths were checked; the existing compensation was deliberately preserved and the new tests guard against stale expansion reappearing.
 
 REAL WORLD: accumulated — the owner's build-22 large prompt and scrolling path; data and machine — his Windows VS Code; path — expanded sticky in Second Side Bar. The state fix is component-verified, but dancing on the real accumulated profile is not yet re-observed on a new VSIX.
+
+## Isolated build-25 evidence — 2026-11-25 20:11 +03:00
+
+Hygiene: full extension 621 passed / 1 skipped; typecheck and root lint green; VSIX static audit and Extension Host smoke pass.
+Functional run: on packaged build 25, a 40-line sticky prompt expanded at the bottom of a real conversation, then a real wheel event collapsed it (`expandedBefore: true`, `expandedAfter: false`). At `scrollTop = 0` no sticky was present. The installed webview hash matched the source.
+
+REAL WORLD: accumulated — the owner's build-22 large-prompt oscillation remains the original observation; data and machine — isolated Windows VS Code 1.123.0 with packaged build 25; path — expanded sticky and wheel in Second Side Bar. The collapse boundary is verified on the isolated real product. The owner's accumulated main profile has build 25 installed but its running Extension Host has not been restarted, so this bug is not DONE.
 
 ## Decisions made without the owner
 
