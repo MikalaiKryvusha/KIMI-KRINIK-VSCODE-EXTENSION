@@ -1,6 +1,6 @@
 # Idea 03 — KIMI KRINIK-owned General Settings
 
-> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** ✅ owner-approved; planned for the next development cut, not started during the closing chat · **Outbound:** none
+> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 custom localized General Settings implemented and component-verified; build 33 installed, real accumulated-profile acceptance pending · **Outbound:** none
 
 ## Goal vector
 

@@ -110,6 +110,14 @@ describe("composer restoration", () => {
 });
 
 describe("Control Panel composition", () => {
+  it("places Skill immediately after Auto by default", () => {
+    renderInputArea();
+
+    expect(screen.getByTestId("permission-mode").style.order).toBe("0");
+    expect(screen.getByTestId("skill-picker").style.order).toBe("1");
+    expect(screen.getByTestId("mode-compact").style.order).toBe("2");
+  });
+
   it("hides every configured button while keeping the attachment control available", () => {
     useSettingsStore.setState({
       extensionConfig: {

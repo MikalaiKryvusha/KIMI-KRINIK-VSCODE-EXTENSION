@@ -39,6 +39,7 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
     expect(result.event).toEqual({
       type: 'ContentPart',
       payload: { type: 'text', text: 'Done' },
+      turnIndex: 7,
       _sessionId: 'session-1',
     });
   });
@@ -68,6 +69,7 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
     expect(result.event).toEqual({
       type: 'ContentPart',
       payload: { type: 'think', think: 'Checking the types' },
+      turnIndex: 7,
       _sessionId: 'session-1',
     });
   });
@@ -428,6 +430,7 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
         event: {
           type: 'ContentPart',
           payload: { type: 'text', text: 'Child result' },
+          turnIndex: 1,
         },
       },
       _sessionId: 'session-1',

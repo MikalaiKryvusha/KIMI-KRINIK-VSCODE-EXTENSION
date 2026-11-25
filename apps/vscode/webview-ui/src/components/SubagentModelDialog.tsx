@@ -34,6 +34,7 @@ export function SubagentModelDialog({ disabled }: { disabled?: boolean }) {
   const models = useSettingsStore((state) => state.models);
   const secondaryModel = useSettingsStore((state) => state.secondaryModel);
   const updateSecondaryModel = useSettingsStore((state) => state.updateSecondaryModel);
+  const controlPanelOrder = useSettingsStore((state) => state.extensionConfig.controlPanelOrder);
   const [open, setOpen] = useState(false);
   const t = useT();
   const modelGroups = useMemo(() => groupModelsByProvider(models), [models]);
@@ -53,6 +54,7 @@ export function SubagentModelDialog({ disabled }: { disabled?: boolean }) {
           <button
             type="button"
             data-testid="secondary-model"
+            style={{ order: controlPanelOrder.indexOf("secondaryModel") }}
             onClick={() => setOpen(true)}
             disabled={disabled || models.length === 0}
             className={cn(

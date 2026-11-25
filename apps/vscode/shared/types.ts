@@ -23,11 +23,42 @@ export interface FileChange {
   deletions: number;
 }
 
-export const CONTROL_PANEL_BUTTONS = ["permission", "compact", "steer", "control", "skills", "plan", "goal", "swarm", "secondaryModel"] as const;
+export const CONTROL_PANEL_BUTTONS = ["permission", "skills", "compact", "steer", "control", "plan", "goal", "swarm", "secondaryModel"] as const;
 
 export type ControlPanelButton = (typeof CONTROL_PANEL_BUTTONS)[number];
 export type ControlPanelVisibility = Record<ControlPanelButton, boolean>;
 export type ControlPanelSettingKey = `controlPanel.${ControlPanelButton}`;
+
+export const GENERAL_BOOLEAN_SETTINGS = [
+  "autosave",
+  "useCtrlEnterToSend",
+  "enableNewConversationShortcut",
+  "showThinkingContent",
+  "showThinkingExpanded",
+] as const;
+
+export type GeneralBooleanSetting = (typeof GENERAL_BOOLEAN_SETTINGS)[number];
+export const EDITOR_CONTEXT_VALUES = ["never", "onConversationStart", "onFileChange"] as const;
+export type EditorContext = (typeof EDITOR_CONTEXT_VALUES)[number];
+
+export type GeneralSettingUpdate =
+  | { key: GeneralBooleanSetting; value: boolean }
+  | { key: "editorContext"; value: EditorContext };
+
+export function normalizeControlPanelOrder(value: unknown): ControlPanelButton[] {
+  const requested = Array.isArray(value) ? value : [];
+  const known = requested.filter((entry): entry is ControlPanelButton =>
+    (CONTROL_PANEL_BUTTONS as readonly unknown[]).includes(entry));
+  const unique = [...new Set(known)];
+  return [...unique, ...CONTROL_PANEL_BUTTONS.filter((button) => !unique.includes(button))];
+}
+
+export function isControlPanelOrder(value: unknown): value is ControlPanelButton[] {
+  return Array.isArray(value)
+    && value.length === CONTROL_PANEL_BUTTONS.length
+    && new Set(value).size === CONTROL_PANEL_BUTTONS.length
+    && value.every((entry) => (CONTROL_PANEL_BUTTONS as readonly unknown[]).includes(entry));
+}
 
 export interface ContextWindowThresholds {
   warnPct: number;
@@ -58,6 +89,8 @@ export interface ExtensionConfig {
   contextWindowControl: boolean;
   contextWindowThresholds: ContextWindowThresholds;
   controlPanel: ControlPanelVisibility;
+  controlPanelOrder: ControlPanelButton[];
+  editorContext: EditorContext;
   language: InterfaceLanguage;
   soundEnabled: boolean;
   sounds: SoundSettings;
@@ -70,10 +103,12 @@ export const INTERFACE_LANGUAGES = ["en", "zh", "ru"] as const;
 export type InterfaceLanguage = (typeof INTERFACE_LANGUAGES)[number];
 
 export type ExtensionSettingUpdate =
+  | GeneralSettingUpdate
   | { key: "autoSteer"; value: boolean }
   | { key: "contextWindowControl"; value: boolean }
   | { key: ContextWindowThresholdSettingKey; value: number }
   | { key: ControlPanelSettingKey; value: boolean }
+  | { key: "controlPanelOrder"; value: ControlPanelButton[] }
   | { key: "language"; value: InterfaceLanguage }
   | { key: "soundEnabled"; value: boolean }
   | { key: "sounds"; value: SoundSettings };
@@ -118,7 +153,7 @@ export type UIStreamEvent =
   | { type: "stream_complete"; result: RunResult; turnIndex?: number; _sessionId?: string }
   | { type: "QueueBatchReady"; payload: { clientId?: string }; _sessionId?: string }
   | (StreamError & { _sessionId?: string })
-  | (StreamEvent & { _sessionId?: string });
+  | (StreamEvent & { _sessionId?: string; turnIndex?: number });
 
 export interface LoginStatus {
   loggedIn: boolean;

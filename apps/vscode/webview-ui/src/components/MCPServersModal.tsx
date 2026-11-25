@@ -134,7 +134,7 @@ function KeyValueFields({
           onClick={() => onChange([...fields, { key: "", value: "" }])}
           className="text-xs text-muted-foreground hover:text-foreground"
         >
-          + Add
+          + {t("common.add")}
         </button>
       </div>
       {fields.map((field, index) => (
@@ -261,7 +261,7 @@ function ServerForm({
                 onClick={() => set("args", [...data.args, ""])}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
-                + Add
+                + {t("common.add")}
               </button>
             </div>
             {data.args.map((arg, index) => (
@@ -298,7 +298,7 @@ function ServerForm({
 
       <div className="flex justify-end gap-2">
         <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={onCancel}>
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button size="sm" className="h-6 text-xs" onClick={handleSubmit}>
           {submitLabel}
@@ -526,7 +526,7 @@ export function MCPServersModal() {
           <div className="flex items-center gap-1">
             <Button variant="outline" size="sm" className="h-6 text-xs" onClick={() => setShowAdd(true)}>
               <IconPlus className="size-3 mr-1" />
-              Add
+              {t("common.add")}
             </Button>
             <Button variant="ghost" size="icon" className="size-6" onClick={() => setMCPModalOpen(false)}>
               <IconX className="size-3.5" />

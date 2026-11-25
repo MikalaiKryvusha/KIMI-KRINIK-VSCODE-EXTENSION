@@ -148,6 +148,41 @@ describe("automatic follow-up steer", () => {
     finishSteer(RUNNING_STEER);
   });
 
+  it("routes a late original response to its own assistant after a steer arrives", () => {
+    useChatStore.getState().sendMessage("first");
+    useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "first", turnIndex: 0 } });
+    useChatStore.getState().processEvent({ type: "StepBegin", payload: { n: 1 } });
+    const original = useChatStore.getState().messages.at(-1)!;
+    useChatStore.getState().sendMessage("second");
+    const steered = useChatStore.getState().messages.at(-1)!;
+
+    useChatStore.getState().processEvent({ type: "ContentPart", payload: { type: "text", text: "late original response" }, turnIndex: 0 });
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 0 });
+
+    expect(useChatStore.getState().messages.find((message) => message.id === original.id)?.steps?.flatMap((step) => step.items))
+      .toContainEqual({ type: "text", content: "late original response", finished: true });
+    expect(useChatStore.getState().messages.find((message) => message.id === steered.id)?.steps?.flatMap((step) => step.items) ?? [])
+      .not.toContainEqual(expect.objectContaining({ type: "text", content: "late original response" }));
+  });
+
+  it("keeps visible assistant progress through a prompt-only steering turn", () => {
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.getState().processEvent({ type: "ContentPart", payload: { type: "text", text: "visible progress" } });
+    const original = useChatStore.getState().messages.at(-1)!;
+    useChatStore.getState().sendMessage("second");
+    const clientId = boundary.steerChat.mock.calls[0]?.[1] as string;
+    useChatStore.getState().processEvent({ type: "SteerInput", payload: { user_input: "second", clientId } });
+
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 0 });
+    useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "second", clientId, turnIndex: 7 } });
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 7 });
+
+    const preserved = useChatStore.getState().messages.find((message) => message.id === original.id);
+    expect(preserved?.steps?.flatMap((step) => step.items)).toContainEqual(expect.objectContaining({ type: "text", content: "visible progress" }));
+    expect(useChatStore.getState().messages.filter((message) => message.role === "assistant")).toHaveLength(2);
+  });
+
   it("reveals the deferred assistant when a non-steered running submission becomes its own turn", () => {
     useChatStore.getState().sendMessage("first");
     beginTurn();

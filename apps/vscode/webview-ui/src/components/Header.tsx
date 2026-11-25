@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IconPlus, IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StreamingConfirmDialog } from "./StreamingConfirmDialog";
 import { KimiLogo } from "./KimiLogo";
@@ -45,20 +46,26 @@ export function Header() {
       </div>
       <div className="flex items-center gap-1">
         {sessionId && (
-          <Button
-            variant="ghost"
-            size="xs"
-            className="gap-1 h-6 border-0! pl-px! pr-1! text-muted-foreground hover:text-foreground @max-[320px]:hidden"
-            onClick={() => setShowSessionInfo(true)}
-          >
-            <span className="text-[11px] @max-[500px]:hidden">{t("header.session")}</span>
-            <IconInfoCircle className="size-3.5 hidden @max-[500px]:block" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="xs"
+                data-testid="session-info-trigger"
+                className="gap-1 h-6 rounded-lg! border-border/40! pl-px! pr-1! text-muted-foreground hover:text-foreground @max-[320px]:hidden"
+                onClick={() => setShowSessionInfo(true)}
+              >
+                <span className="text-[11px] @max-[500px]:hidden">{t("header.session")}</span>
+                <IconInfoCircle className="size-3.5 hidden @max-[500px]:block" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t("header.sessionTooltip")}</TooltipContent>
+          </Tooltip>
         )}
         <ChatStatus />
         <Popover open={showSessionList} onOpenChange={setShowSessionList}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="xs" className="gap-1 h-6">
+            <Button variant="ghost" size="xs" data-testid="session-history-trigger" className="gap-1 h-6 rounded-lg! border-border/40!">
               <span className="text-xs @max-[280px]:hidden">{t("header.history")}</span>
               <IconChevronDown className="size-3.5" />
             </Button>
@@ -67,15 +74,21 @@ export function Header() {
             <SessionList onClose={() => setShowSessionList(false)} />
           </PopoverContent>
         </Popover>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={() => {
-            void handleNewSession();
-          }}
-        >
-          <IconPlus className="size-3.5" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              data-testid="new-chat-trigger"
+              onClick={() => {
+                void handleNewSession();
+              }}
+            >
+              <IconPlus className="size-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t("header.newChatTooltip")}</TooltipContent>
+        </Tooltip>
       </div>
 
       <Dialog open={showSessionInfo} onOpenChange={setShowSessionInfo}>

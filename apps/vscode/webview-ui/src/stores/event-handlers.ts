@@ -21,14 +21,17 @@ function reconcileOptimisticTurn(
   forkable?: boolean,
   revealAssistant = true,
 ): boolean {
-  const user = draft.messages.find((message) => message.role === "user" && message.optimistic === true
-    && (clientId === undefined ? sameContent(message.content, content) : message.clientId === clientId));
+  const user = draft.messages.find((message) => message.role === "user" && (clientId === undefined
+    ? message.optimistic === true && sameContent(message.content, content)
+    : message.clientId === clientId));
   if (user === undefined) return false;
   user.optimistic = false;
   user.content = content;
   user.turnIndex = turnIndex;
   user.forkable = forkable;
-  const assistant = draft.messages.find((message) => message.role === "assistant" && message.optimistic === true && message.clientId === user.clientId);
+  const assistant = draft.messages.find((message) => message.role === "assistant" && (clientId === undefined
+    ? message.optimistic === true && message.clientId === user.clientId
+    : message.clientId === user.clientId));
   if (assistant !== undefined) {
     assistant.optimistic = false;
     assistant.turnIndex = turnIndex;
@@ -39,7 +42,7 @@ function reconcileOptimisticTurn(
   return true;
 }
 
-type EventHandler = (draft: ChatState, payload: any) => void;
+type EventHandler = (draft: ChatState, payload: any, turnIndex?: number) => void;
 
 function createEmptyTokenUsage(): TokenUsage {
   return { input_other: 0, output: 0, input_cache_read: 0, input_cache_creation: 0 };
@@ -59,7 +62,11 @@ function extractDiffPaths(display?: { type: string; path?: string }[]): string[]
   return display.filter((block): block is DiffBlock => block.type === "diff" && typeof block.path === "string").map((block) => block.path);
 }
 
-function getLastAssistant(draft: ChatState): ChatMessage | undefined {
+function getLastAssistant(draft: ChatState, turnIndex?: number): ChatMessage | undefined {
+  if (turnIndex !== undefined) {
+    const owner = draft.messages.find((message) => message.role === "assistant" && message.turnIndex === turnIndex);
+    if (owner !== undefined) return owner;
+  }
   const last = draft.messages.at(-1);
   return last?.role === "assistant" ? last : undefined;
 }
@@ -335,14 +342,14 @@ const eventHandlers: Record<string, EventHandler> = {
 
   QueueBatchReady: () => undefined,
 
-  stream_complete: (draft, _payload: { result: RunResult }) => {
+  stream_complete: (draft, _payload: { result: RunResult }, turnIndex?: number) => {
     addTokenUsage(draft.tokenUsage, draft.activeTokenUsage);
     draft.activeTokenUsage = createEmptyTokenUsage();
     draft.isStreaming = false;
     draft.isCompacting = false;
     draft.pendingInput = null;
     useApprovalStore.getState().clearRequests();
-    const lastAssistant = getLastAssistant(draft);
+    const lastAssistant = getLastAssistant(draft, turnIndex);
     if (lastAssistant?.steps) {
       finishAllTextItems(lastAssistant.steps);
     }
@@ -464,8 +471,8 @@ const eventHandlers: Record<string, EventHandler> = {
     }
   },
 
-  ContentPart: (draft, payload: ContentPart) => {
-    const last = getLastAssistant(draft);
+  ContentPart: (draft, payload: ContentPart, turnIndex?: number) => {
+    const last = getLastAssistant(draft, turnIndex);
     if (!last?.steps) {
       return;
     }
@@ -635,6 +642,7 @@ export function processEvent(draft: ChatState, event: UIStreamEvent): void {
 
   if (handler) {
     const payload = "payload" in event ? event.payload : event;
-    handler(draft, payload);
+    const turnIndex = "turnIndex" in event && typeof event.turnIndex === "number" ? event.turnIndex : undefined;
+    handler(draft, payload, turnIndex);
   }
 }

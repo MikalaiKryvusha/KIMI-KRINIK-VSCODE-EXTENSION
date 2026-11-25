@@ -23,17 +23,16 @@
 
 ---
 
-### 2026-11-25 21:26 +03:00 — OWNER PRIORITY: investigate the lost refresh-marker write first
-- `bugs/34_refresh_marker_write_lost.md` records the proven stale marker and mtime, the successful second write and the ranked culprit layers. The timer matched the stale file, so the update was lost rather than the interval being miscalculated. Next chat starts with the controlled reproduction and layer assignment, then the smallest fix and guard, before returning to build-25 acceptance.
-
-### 2026-11-25 20:35 +03:00 — SOFT CLOSURE: build 25 verified; handover to the next chat
-- Build 25 is implemented, installed on the main profile and verified on isolated VS Code. Commits through `27ee17990` are pushed to `main`; `bugs/33` is DONE and SDK `session-skills` is 14/14. Extension suite is 621 passed / 1 skipped; typecheck, root lint, build, static audit and voice checks are green.
-- Post-closure verification: named chat/event-adapter suites passed 39/39, and a fresh build-25 prompt left `K25 final smoke answer` visible with invisible hook text and the same payload in model input. `test debt: none` after the documented direct-node waiver; evidence is appended to `testcases/reports/2026-11-25_build_25_ui_acceptance.md`.
-- Main-profile running-build acceptance is the first next step: restart VS Code to load build 25 and verify the accumulated world. `bugs/29` is the next clear technical verification after it. Publication remains unauthorized and requires separate owner `AUTH:`.
+### 2026-11-26 00:17 +03:00 — BUILD 33 INSTALLED; accumulated acceptance remains
+- Implemented the owner's skill inventory choices, always-large skill dialog with animated two-clear-line/faded-third descriptions and hover-matched fade, persistent Control Panel ordering, custom General Settings, welcome/model/header/MCP refinements, and sticky preview preservation with smooth max-height/fade animation.
+- `bugs/25` now has deterministic fixes for late-turn delta routing and duplicate prompt-only reconciliation; `bugs/31` and `plans/03` record the revised sticky contract. Full extension: 643 passed / 1 skipped; lint, typecheck, build and VSIX static audit are green.
+- Build 33 SHA-256: `1924bb5496f708f3e26d1e7812d6af1db634fcf648be625218e4756c4842ed7c`; installed on main and isolated profiles. Build 32 real visual smoke passed: 32px dialog margins, 42 skills with rejected ones absent, no compact toggle, description `60 → 100 → 60px`, welcome robot/KIMI 48px high with 16px gap. Build 33 sticky and accumulated running profile were not observed.
+- The final fake-model smoke showed `K29 late original` but did not exercise the held-first-chunk race because the script was already consumed. Next chat must run the real held-response → steer DOM check before closing `bugs/25`. No release publication is authorized.
+- `node .kaif/hooks/test-after-code.mjs --status` still printed `test debt: 43` after the final full suite; this session does not claim `test debt: none`. The executed commands and outcomes are in the build-33 report; the hook bookkeeping remains a separate debt.
 
 ## Where we are now
 
-The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `5c493b98e4d56d4356315858aecee5573a05664ea2d4631d12f8fb0811ad9d04`. The extension has 621 passed / 1 skipped and 0 failures. Build 25 is installed on the main profile: manifest `buildNumber: 25`, with source/installed extension and webview hashes matching. No GitHub Release exists.
+The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `1924bb5496f708f3e26d1e7812d6af1db634fcf648be625218e4756c4842ed7c`. The extension has 643 passed / 1 skipped and 0 failures. Build 33 is installed on main and isolated profiles; its accumulated running-profile acceptance is pending. No GitHub Release exists.
 
 ## ❓ Awaiting human review
 
@@ -42,25 +41,25 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 ## Where to continue next session
 
-1. First investigate `bugs/34_refresh_marker_write_lost.md`: controlled write/readback, identify the responsible layer, apply the smallest fix and a mutation-proved guard. Do not start release work before this owner-priority investigation is closed.
-2. On the accumulated main profile restart VS Code to load build 25, then verify the owner scenarios in `testcases/reports/2026-11-25_build_25_ui_acceptance.md` and `testcases/reports/2026-11-25_chat_rendering_build_22.md`. Do not publish without separate owner `AUTH:`.
-3. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
-4. Next clear work is real VSIX preflight verification for `bugs/29`, then accumulated-profile acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` when the owner prioritizes it. `bugs/33` is DONE. `bugs/11` stays parked by the owner's Pareto direction; resume only with new deterministic evidence. `ideas/02` is implemented and isolated-verified on build 25; main-profile acceptance is pending. `ideas/03` is the next development cut after the release path.
+1. Restart/reload the main Extension Host to load build 33, then observe the accumulated profile: always-large skill dialog and animated descriptions, Control Panel order, custom General Settings, header/MCP labels, and the new sticky preview/animation. Record results beside `testcases/reports/2026-11-26_build_33_release_polish.md`.
+2. Close the real `bugs/25` boundary: start a fresh fake model in `hold-after-first` before any request, install the MutationObserver from `.tmp/k29-race-observe.mjs`, send the base prompt, steer while held, then release and read every assistant text frame. The prior smoke only saw the unscripted `K29 late original`; it did not exercise the race.
+3. Investigate `bugs/34_refresh_marker_write_lost.md` as the remaining owner-priority machinery bug, then run real VSIX preflight verification for `bugs/29`.
+4. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
 
 ## Open bugs
 
 - 🔴 `bugs/34_refresh_marker_write_lost.md` — owner-priority investigation into the lost refresh-marker update; timer matches the stale file, culprit not yet assigned.
-- 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/31_expanded_sticky_scroll_oscillation.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated packaged build-25 acceptance passes; accumulated main-profile running-build acceptance pending.
+- 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated build-25 acceptance passed; `bugs/31_expanded_sticky_scroll_oscillation.md` has the revised scroll-preservation and animation contract, component-verified with build-33 real observation pending.
 - 🔧 `bugs/29_preflight_error_deletes_unrelated_history.md` — deterministic regressions and full suite pass; real VSIX preflight path pending.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — repeated owner symptom, three isolated non-reproductions; parked with evidence, not DONE.
 - 🔧 `bugs/19_tool_cards_hide_working_state.md`, `bugs/18_reentrant_prompt_internal_error.md`, `bugs/16_steer_avatar_precedes_user_bubble.md` — isolated paths pass; original main-profile paths pending.
-- 🔧 `bugs/25_first_prompt_assistant_message_flicker.md`, `bugs/15_hook_results_visible_in_chat.md` — isolated build-22 live and replay fixes pass; accumulated main-profile running-build acceptance pending.
+- 🔧 `bugs/25_first_prompt_assistant_message_flicker.md` — late-delta turn routing and prompt-only duplicate reconciliation fixed with deterministic regressions; true held-response VSIX and accumulated-profile observation pending. `bugs/15_hook_results_visible_in_chat.md` — isolated build-22 fixes passed, accumulated acceptance pending.
 - 🔧 `bugs/27_effort_persistence_and_localization.md`, `bugs/26_sound_off_disables_dropdown.md`, `bugs/22_first_send_stuck_in_steering_queue.md`, `bugs/24_glass_preview_silent.md`, `bugs/20_queue_steer_duplicate_submission.md` — isolated fixes pass; accumulated main-profile acceptance pending.
 - 🔧 `bugs/12_steer_composer_restores_previous_text.md`, `bugs/13_steer_attachments_and_thumbnails.md`, `bugs/14_steer_queue_not_added.md` — isolated paths pass; accumulated main-profile acceptance pending.
 - 🔧 `bugs/04_frozen_prompt_windows_path.md` — Windows 123/123; Linux CI row unrun because WSL/Docker are unavailable.
 - 🔧 `bugs/KAIF/04` / upstream #204 and `bugs/KAIF/05` / upstream #206 — framework-local issues remain open until origin updates absorb them.
 - 🔴 `bugs/152` (KAIF origin) — «Starting Kimi Code…» not reproduced; 🟠 `bugs/151` — follow-up steer race, live acceptance left.
 
-KNOWLEDGE: build-25 isolated acceptance is in `testcases/reports/2026-11-25_build_25_ui_acceptance.md`; skill metadata projection is in `ideas/02_control_panel_skill_picker.md`; sticky requirements are in `plans/03_sticky_viewport_prompt.md`; steering order is in `bugs/32_steer_working_indicator_jumps.md`; preflight ownership is in `bugs/29_preflight_error_deletes_unrelated_history.md`; the old Windows SDK test issue is closed in `bugs/33_DONE_skill_variant_windows_path_separator_test.md`.
+KNOWLEDGE: turn-scoped identity and the steering race are recorded in `bugs/25` and `EXPERIENCE.md` EXP-0022; the revised sticky contract is in `plans/03` and `bugs/31`; build-33 evidence and explicit verification debt are in `testcases/reports/2026-11-26_build_33_release_polish.md`; the owner's per-skill decisions are in `interviews/interview_002_engine_skills.md` and `HOUSE_RULES.md` R6.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md`, `KIMI CODE LOGO/GPT ROBOT REFERENCES/` and `interviews/decisions/`; do not sweep them into a commit.

@@ -404,6 +404,30 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
     ]);
   });
 
+  it("omits engine skills removed by the owner from the KIMI KRINIK inventory", async () => {
+    const commands = await configHandlers[Methods.GetSlashCommands]!(undefined, {
+      workDir: "/workspace",
+      harness: {
+        listWorkspaceSkills: async () => [
+          { name: "check-kimi-code-docs", description: "Docs", path: "builtin://check-kimi-code-docs", source: "builtin", type: "inline" },
+          { name: "custom-theme", description: "Themes", path: "builtin://custom-theme", source: "builtin", type: "inline" },
+          { name: "sub-skill", description: "Group", path: "builtin://sub-skill", source: "builtin", type: "inline" },
+          { name: "sub-skill.review", description: "Review", path: "builtin://sub-skill/review", source: "builtin", type: "inline" },
+          { name: "sub-skill.consolidate", description: "Move", path: "builtin://sub-skill/consolidate", source: "builtin", type: "inline" },
+        ],
+      },
+      logError: () => undefined,
+    } as unknown as HandlerContext);
+
+    expect((commands as Array<{ name: string }>).map((command) => command.name)).toContain("skill:check-kimi-code-docs");
+    expect((commands as Array<{ name: string }>).map((command) => command.name)).not.toEqual(expect.arrayContaining([
+      "skill:custom-theme",
+      "skill:sub-skill",
+      "skill:sub-skill.review",
+      "skill:sub-skill.consolidate",
+    ]));
+  });
+
   it("carries localized skill descriptions into the existing slash inventory", async () => {
     const root = await mkdtemp(join(tmpdir(), "kimi-vscode-skill-metadata-"));
     try {

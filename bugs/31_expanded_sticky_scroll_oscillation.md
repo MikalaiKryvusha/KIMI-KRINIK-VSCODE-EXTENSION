@@ -1,15 +1,23 @@
 # Bug 31 — Expanded sticky prompt oscillates during scrolling
 
-**Status:** 🔧 verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
-**Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:12 +03:00, owner visual review
+**Status:** 🔧 owner revised the collapse contract on 2026-11-25 23:18 +03:00; new preservation/animation refinement in progress
+**Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:12–23:18 +03:00, owner visual review
 **Severity:** S2
-**Fixing:** this session, together with the sticky top boundary
-**Fix accepted when (observable):** an expanded sticky prompt collapses on user wheel/touch scrolling and whenever another prompt becomes sticky; expansion no longer feeds repeated geometry changes back into active-prompt selection.
+**Fixing:** this session, with the revised sticky behavior and animation
+**Fix accepted when (observable):** an expanded sticky prompt remains expanded during wheel/touch scrolling and collapses only manually or when another prompt becomes sticky; expansion no longer feeds repeated geometry changes back into active-prompt selection; height and text fade animate in both directions.
 
 ## Symptom
 
 [OWNER] «если попасть в тонкий момент чата, где сообщение большое и оно же в стики в верхнем, который развернёт - полотно чата начинает плясать, дергается, то вверх, то вниз. Баг.» · 2026-11-25 (чат)
 [OWNER] «все стики сообщения, которые развернуты - нужно автоматически сворачивать при листании пользователем чата и закреплении другого любого сообщения как стики.» · 2026-11-25 (чат)
+
+## Owner correction — 2026-11-25 23:18 +03:00
+
+[OWNER] «Оно не должно сворачиваться, когда я скролю чат, а должно остоваться раскрытым до момента, пока оно - или вручную пользователем не свернуто - или чат не пролиста до ДРУГОГО собщения, и ОНО стало стики.» · 2026-11-25 23:04 +03:00 (chat)
+
+This supersedes the earlier automatic wheel/touch-collapse requirement and its build-25 expected evidence below. The old evidence remains historical, not the current acceptance criterion. The owner also requires downward height growth with text fade-in, upward collapse with fade-out, and small top/side padding around the sticky bubble.
+
+Component evidence for the revised contract: the updated sticky suite is 11/11, covering wheel/touch preservation, manual collapse, active-prompt replacement, two-way grid/fade classes and top/side padding. Packaged visual observation remains pending.
 
 ## Repro
 

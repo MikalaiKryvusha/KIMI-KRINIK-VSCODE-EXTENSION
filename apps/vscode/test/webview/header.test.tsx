@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/services", () => ({
@@ -14,6 +15,11 @@ import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
 
 beforeEach(() => {
+  vi.stubGlobal("ResizeObserver", class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  });
   document.body.setAttribute("data-baseuri", "https://extension.test");
   useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG } });
   useChatStore.setState({
@@ -27,6 +33,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
   document.body.removeAttribute("data-baseuri");
 });
 
@@ -37,6 +44,35 @@ describe("session header", () => {
 
     expect(screen.queryByText("23.1%")).toBeNull();
     expect(screen.queryByTitle("Context Window Usage")).toBeNull();
+  });
+
+  it("uses matching rounded containers and only extension tooltips in the header", () => {
+    useChatStore.setState({ lastStatus: { context_usage: 0.1 } });
+    render(<Header />);
+
+    const session = screen.getByTestId("session-info-trigger");
+    const history = screen.getByTestId("session-history-trigger");
+    const tokens = screen.getByTestId("token-status-container");
+    for (const element of [session, history, tokens]) {
+      expect(element.className).toContain("rounded-lg");
+    }
+    expect(tokens.className).not.toContain("rounded-full");
+    expect(session.className).toContain("border-border/40");
+    expect(history.className).toContain("border-border/40");
+    expect(screen.queryByTitle("Total Input Tokens")).toBeNull();
+    expect(screen.queryByTitle("Total Output Tokens")).toBeNull();
+  });
+
+  it("shows the localized new-chat tooltip", async () => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language: "ru" } });
+    const user = userEvent.setup();
+    render(<Header />);
+
+    await user.hover(screen.getByTestId("new-chat-trigger"));
+
+    expect(await screen.findByRole("tooltip", { name: "Создать новый чат" })).not.toBeNull();
+    await user.hover(screen.getByTestId("session-info-trigger"));
+    expect(await screen.findByRole("tooltip", { name: "Показать детали текущего чата" })).not.toBeNull();
   });
 
   it("shows the KIMI KRINIK robot and the live session title", () => {

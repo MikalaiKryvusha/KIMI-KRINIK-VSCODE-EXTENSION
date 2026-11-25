@@ -2,9 +2,9 @@
 
 > **Created:** 2026-11-24
 > **Parent:** owner's sticky-message request and `researches/54_chat_pipeline_reliability.md`
-> **Status:** implemented and verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
+> **Status:** revised scroll-preservation and max-height/fade animation implemented; full extension 643/1 green; build 33 installed, real accumulated acceptance pending
 > **Outbound:** final main-profile acceptance and release
-> **Verification:** [TESTED: 2026-11-25 20:11 +03:00 · isolated build-25 top boundary, expansion and wheel collapse with DOM and model evidence — `testcases/reports/2026-11-25_build_25_ui_acceptance.md`]
+> **Verification:** [TESTED: 2026-11-26 00:15 +03:00 · component boundaries and build-32 packaged UI smoke — `testcases/reports/2026-11-26_build_33_release_polish.md`; build-33 sticky observation pending]
 
 ## 1. Goal vector
 
@@ -31,7 +31,9 @@
 | AC11 | Expand a sticky prompt | the collapse chevron sits in its top-right corner without a separate full-width control row; prompt text starts at the top content row and does not overlap the chevron |
 | AC12 | Read a collapsed sticky prompt | the summary is raised and optically centered vertically inside the bubble rather than sitting low |
 | AC13 | Open or return to the very beginning of the conversation | no sticky prompt is rendered at `scrollTop = 0`; scrolling into an assistant turn can activate it again |
-| AC14 | Scroll with an expanded sticky prompt, then pin another prompt and return | wheel/touch scrolling collapses the expansion; a replaced prompt's expansion is cleared and does not reappear on return |
+| AC14 | Scroll with an expanded sticky prompt, then pin another prompt and return | wheel/touch scrolling preserves the expansion; only manual collapse or a different prompt becoming sticky closes it, and a replaced prompt's expansion does not reappear on return; height grows downward with text fade-in and collapses upward with fade-out |
+| AC15 | Read the sticky bubble inside its container | small top/left/right padding leaves visible space around the bubble |
+| AC16 | Expand and collapse a long sticky prompt | collapsed preview shows one clear line and part of the second under a bubble-colored fade; max-height animates smoothly in both directions with reduced-motion support |
 
 ## 3. Reference findings
 
@@ -60,7 +62,7 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 - [x] Overlay the expanded sticky chevron in the top-right corner, remove the empty full-width control row and verify that the first text line starts at the top without overlapping the button.
 - [x] Raise the collapsed summary and center it optically within the sticky bubble; verify with computed geometry and a WebP screenshot.
 - [x] Hide the sticky prompt at the top of the conversation and suppress its initial-render flash.
-- [x] Collapse expanded sticky state on user wheel/touch scrolling and clear it when another prompt becomes sticky.
+- [x] Preserve expanded sticky state during user wheel/touch scrolling; clear it only on manual collapse or active-prompt replacement, animate height downward/upward with text fade, and add small top/side padding around the bubble.
 
 ## 5. Verification by observation
 

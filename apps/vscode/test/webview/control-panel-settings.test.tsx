@@ -12,6 +12,7 @@ const boundary = vi.hoisted(() => ({
   openProjectPage: vi.fn(),
   steerChat: vi.fn(),
   getSessionBusy: vi.fn(),
+  openSettings: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
@@ -25,6 +26,7 @@ vi.mock("@/services", () => ({
     openProjectPage: boundary.openProjectPage,
     steerChat: boundary.steerChat,
     getSessionBusy: boundary.getSessionBusy,
+    openSettings: boundary.openSettings,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -34,12 +36,14 @@ vi.mock("@/components/ui/sonner", () => ({
 import { BehaviorButtons } from "../../webview-ui/src/components/BehaviorButtons";
 import { ActionMenu } from "../../webview-ui/src/components/ActionMenu";
 import { ControlPanelSettingsDialog } from "../../webview-ui/src/components/ControlPanelSettingsDialog";
+import { GeneralSettingsDialog } from "../../webview-ui/src/components/GeneralSettingsDialog";
 import { ModeButtons } from "../../webview-ui/src/components/ModeButtons";
 import { PermissionModeButton } from "../../webview-ui/src/components/PermissionModeButton";
 import { SkillPickerDialog, localizedSkillDescription } from "../../webview-ui/src/components/SkillPickerDialog";
 import { SubagentModelDialog } from "../../webview-ui/src/components/SubagentModelDialog";
 import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
+import { CONTROL_PANEL_BUTTONS } from "../../shared/types";
 
 beforeEach(() => {
   vi.stubGlobal("ResizeObserver", class {
@@ -64,16 +68,16 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("Control Panel settings", () => {
-  it("places context-window controls after every visibility checkbox", () => {
+  it("keeps context-window controls out of Control Panel settings", () => {
     render(<ControlPanelSettingsDialog open onOpenChange={vi.fn()} />);
 
-    const checkboxes = screen.getAllByRole("checkbox");
-    const lastCheckbox = checkboxes.at(-1)!;
-    const contextToggle = screen.getByTestId("context-window-control-toggle");
-    expect(lastCheckbox.compareDocumentPosition(contextToggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId("context-window-control-toggle")).toBeNull();
+    expect(screen.queryByTestId("context-window-threshold-warnPct")).toBeNull();
+    expect(screen.getAllByRole("checkbox")).toHaveLength(9);
   });
 
   it("persists a checkbox without closing the dialog or changing feature values", async () => {
@@ -87,6 +91,69 @@ describe("Control Panel settings", () => {
     expect(useSettingsStore.getState().extensionConfig.autoSteer).toBe(true);
     expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "controlPanel.plan", value: false });
     expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("moves hidden and visible buttons with chevrons and persists their top-to-bottom order", async () => {
+    const user = userEvent.setup();
+    useSettingsStore.setState({
+      extensionConfig: {
+        ...DEFAULT_EXTENSION_CONFIG,
+        controlPanel: { ...DEFAULT_EXTENSION_CONFIG.controlPanel, skills: false },
+        controlPanelOrder: ["permission", "skills", "compact", "steer", "control", "plan", "goal", "swarm", "secondaryModel"],
+      },
+    });
+    render(<ControlPanelSettingsDialog open onOpenChange={vi.fn()} />);
+
+    expect(screen.getByTestId("control-panel-move-up-permission")).toHaveProperty("disabled", true);
+    expect(screen.getByTestId("control-panel-move-down-secondaryModel")).toHaveProperty("disabled", true);
+    await user.click(screen.getByTestId("control-panel-move-down-skills"));
+
+    expect(useSettingsStore.getState().extensionConfig.controlPanel.skills).toBe(false);
+    expect(useSettingsStore.getState().extensionConfig.controlPanelOrder).toEqual(["permission", "compact", "skills", "steer", "control", "plan", "goal", "swarm", "secondaryModel"]);
+    expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({
+      key: "controlPanelOrder",
+      value: ["permission", "compact", "skills", "steer", "control", "plan", "goal", "swarm", "secondaryModel"],
+    });
+  });
+
+  it("applies a saved order to every Control Panel button", () => {
+    const controlPanelOrder = CONTROL_PANEL_BUTTONS.toReversed();
+    useSettingsStore.setState({
+      extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, controlPanelOrder },
+      slashCommands: [{ name: "skill:review", aliases: [], description: "Review" }],
+      models: [{ id: "main", name: "Main", provider: "managed:kimi-code", capabilities: [] }],
+    });
+    render(
+      <>
+        <PermissionModeButton />
+        <BehaviorButtons />
+        <ModeButtons planMode={false} onTogglePlanMode={vi.fn()} />
+        <SubagentModelDialog />
+      </>,
+    );
+    const testId = {
+      permission: "permission-mode",
+      skills: "skill-picker",
+      compact: "mode-compact",
+      steer: "mode-steer",
+      control: "mode-control",
+      plan: "mode-plan",
+      goal: "mode-goal",
+      swarm: "mode-swarm",
+      secondaryModel: "secondary-model",
+    };
+
+    for (const [index, button] of controlPanelOrder.entries()) {
+      expect(screen.getByTestId(testId[button]).style.order, button).toBe(String(index));
+    }
+  });
+
+  it("keeps a normal cursor while Compact persists its state", () => {
+    render(<BehaviorButtons />);
+
+    const compact = screen.getByTestId("mode-compact");
+    expect(compact.className).toContain("disabled:cursor-default");
+    expect(compact.className).not.toContain("disabled:cursor-not-allowed");
   });
 
   it("hides only the unchecked behavior and mode buttons", () => {
@@ -131,13 +198,52 @@ describe("Control Panel settings", () => {
     await user.click(screen.getByRole("button"));
     await user.click(await screen.findByText("Control Panel"));
 
-    expect(await screen.findByText("Choose which buttons are visible. Hidden features keep working and remain available in General settings.")).not.toBeNull();
+    expect(await screen.findByText("Choose visible buttons and use chevrons to set their order. Higher rows appear farther left; hidden features keep working in General settings.")).not.toBeNull();
     expect(screen.getAllByRole("checkbox")).toHaveLength(9);
+  });
+
+  it("opens localized General Settings in the extension instead of VS Code", async () => {
+    const user = userEvent.setup();
+    render(<ActionMenu />);
+
+    await user.click(screen.getByRole("button"));
+    await user.click(await screen.findByText("General Settings"));
+
+    expect(await screen.findByTestId("general-settings-dialog")).not.toBeNull();
+    expect(screen.getByTestId("general-setting-autosave")).not.toBeNull();
+    expect(boundary.openSettings).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["ru", "Общие настройки"],
+    ["zh", "通用设置"],
+  ] as const)("renders General Settings in %s", (language, title) => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language } });
+    render(<GeneralSettingsDialog open onOpenChange={vi.fn()} />);
+
+    expect(screen.getByText(title)).not.toBeNull();
+    expect(screen.getByTestId("general-settings-dialog")).not.toBeNull();
+  });
+
+  it("persists general booleans and editor context without duplicating dedicated screens", async () => {
+    const user = userEvent.setup();
+    render(<GeneralSettingsDialog open onOpenChange={vi.fn()} />);
+
+    await user.click(screen.getByTestId("general-setting-autosave"));
+
+    expect(useSettingsStore.getState().extensionConfig.autosave).toBe(false);
+    expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "autosave", value: false });
+    await user.selectOptions(screen.getByTestId("general-editor-context"), "onFileChange");
+    expect(useSettingsStore.getState().extensionConfig.editorContext).toBe("onFileChange");
+    expect(boundary.updateExtensionSetting).toHaveBeenLastCalledWith({ key: "editorContext", value: "onFileChange" });
+    expect(screen.queryByTestId("language-selection-dialog")).toBeNull();
+    expect(screen.queryByTestId("sound-settings-dialog")).toBeNull();
+    expect(screen.queryByTestId("control-panel-option-plan")).toBeNull();
   });
 
   it("disables thresholds while Control is off and edits them while Control is on", async () => {
     const user = userEvent.setup();
-    render(<ControlPanelSettingsDialog open onOpenChange={vi.fn()} />);
+    render(<GeneralSettingsDialog open onOpenChange={vi.fn()} />);
     const threshold = screen.getByTestId("context-window-threshold-warnPct") as HTMLInputElement;
     expect(threshold.disabled).toBe(true);
 
@@ -302,11 +408,12 @@ describe("Control Panel settings", () => {
   });
 
   it("uses the brand pink for checked switches and checkboxes", () => {
-    render(<ControlPanelSettingsDialog open onOpenChange={vi.fn()} />);
+    const { rerender } = render(<ControlPanelSettingsDialog open onOpenChange={vi.fn()} />);
 
-    expect(screen.getByTestId("context-window-control-toggle").className).toContain("data-checked:bg-[#FF1A8C]");
     expect(screen.getByTestId("control-panel-option-plan").className).toContain("data-checked:bg-[#FF1A8C]");
     expect(screen.getByTestId("control-panel-option-plan").className).toContain("data-checked:border-[#FF1A8C]");
+    rerender(<GeneralSettingsDialog open onOpenChange={vi.fn()} />);
+    expect(screen.getByTestId("context-window-control-toggle").className).toContain("data-checked:bg-[#FF1A8C]");
   });
 
   it("resolves localized skill descriptions and their fallbacks", () => {
@@ -328,16 +435,76 @@ describe("Control Panel settings", () => {
 
     await user.click(screen.getByTestId("skill-picker"));
     const dialog = await screen.findByTestId("skill-picker-dialog");
+    expect(dialog.className).toContain("h-[calc(100vh-4rem)]");
+    expect(dialog.className).toContain("max-w-[calc(100%-4rem)]");
     const row = within(dialog).getByRole("button", { name: /review/ });
     expect(within(row).getByTestId("skill-picker-name").textContent).toBe("review");
     expect(within(row).getByTestId("skill-picker-name").className).toContain("font-semibold");
     expect(within(row).getByTestId("skill-picker-description").textContent).toBe("English description");
     expect(within(row).getByTestId("skill-picker-description").className).toContain("font-normal");
+    expect(within(dialog).queryByTestId("skill-description-toggle")).toBeNull();
 
     await user.click(row);
     expect(boundary.steerChat).toHaveBeenCalledWith("/skill:review", expect.any(String));
     expect(useChatStore.getState().queue).toHaveLength(0);
     expect(screen.queryByTestId("skill-picker-dialog")).toBeNull();
+  });
+
+  it("keeps the skill window large without a compact-view toggle", async () => {
+    const user = userEvent.setup();
+    useSettingsStore.setState({
+      slashCommands: [{ name: "skill:review", aliases: [], description: "Review" }],
+    });
+    render(<SkillPickerDialog />);
+
+    await user.click(screen.getByTestId("skill-picker"));
+    const dialog = await screen.findByTestId("skill-picker-dialog");
+    expect(dialog.className).toContain("h-[calc(100vh-4rem)]");
+    expect(screen.queryByTestId("skill-view-toggle")).toBeNull();
+    expect(screen.getByTestId("skill-picker-list").className).not.toContain("max-h-64");
+  });
+
+  it("does not show a chevron when the description fits exactly two lines", async () => {
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(40);
+    const user = userEvent.setup();
+    useSettingsStore.setState({
+      slashCommands: [{ name: "skill:three-lines", aliases: [], description: "Three rendered lines" }],
+    });
+    render(<SkillPickerDialog />);
+
+    await user.click(screen.getByTestId("skill-picker"));
+    const dialog = await screen.findByTestId("skill-picker-dialog");
+    expect(within(dialog).queryByTestId("skill-description-toggle")).toBeNull();
+    expect(within(dialog).queryByTestId("skill-description-fade")).toBeNull();
+    expect(within(dialog).getByTestId("skill-picker-description").className).not.toContain("line-clamp-4");
+  });
+
+  it("shows two clear lines and a faded third with animated expansion", async () => {
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(100);
+    const user = userEvent.setup();
+    useSettingsStore.setState({
+      slashCommands: [{ name: "skill:long", aliases: [], description: "A long description that needs more than two rendered lines to read in full." }],
+    });
+    render(<SkillPickerDialog />);
+
+    await user.click(screen.getByTestId("skill-picker"));
+    const dialog = await screen.findByTestId("skill-picker-dialog");
+    const animation = within(dialog).getByTestId("skill-description-animation");
+    expect(animation.style.maxHeight).toBe("60px");
+    expect(animation.className).toContain("transition-[max-height]");
+    expect(within(dialog).getByTestId("skill-description-measurement").className).toContain("line-clamp-2");
+    const fade = within(dialog).getByTestId("skill-description-fade");
+    expect(fade.className).toContain("bg-gradient-to-t");
+    expect(fade.className).toContain("group-hover:from-accent");
+
+    await user.click(within(dialog).getByTestId("skill-description-toggle"));
+    expect(animation.style.maxHeight).toBe("100px");
+    expect(within(dialog).queryByTestId("skill-description-fade")).toBeNull();
+    expect(boundary.steerChat).not.toHaveBeenCalled();
+    expect(useChatStore.getState().queue).toHaveLength(0);
+
+    await user.click(within(dialog).getByTestId("skill-description-toggle"));
+    expect(animation.style.maxHeight).toBe("60px");
   });
 
   it("queues a selected skill as one message while Steer is off", async () => {

@@ -17,6 +17,7 @@ import type {
 } from "../../shared/legacy-sdk";
 import type { ExtensionConfig, SessionConfig } from "../../shared/types";
 import { VSCodeSettings } from "../config/vscode-settings";
+import { isRemovedEngineSkill } from "../config/removed-skills";
 import { persistSecondaryModelSelection } from "../config/secondary-model";
 import type { Handler } from "./types";
 
@@ -99,6 +100,7 @@ const getSlashCommands: Handler<void, SlashCommandInfo[]> = async (_, ctx) => {
     const skills = await ctx.harness.listWorkspaceSkills(ctx.workDir);
     const skillNames = new Set<string>();
     const skillCommands = await Promise.all(skills
+      .filter((skill) => !isRemovedEngineSkill(skill.name))
       .filter((skill) => isUserActivatableSkill(skill.type) && skill.scopes === undefined)
       .filter((skill) => {
         const name = skill.name.toLowerCase();

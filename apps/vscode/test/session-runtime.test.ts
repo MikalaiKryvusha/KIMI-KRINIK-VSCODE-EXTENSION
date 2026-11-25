@@ -419,6 +419,7 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     expect(streamData(broadcasts)).toContainEqual({
       type: "ContentPart",
       payload: { type: "text", text: "Implemented" },
+      turnIndex: 7,
       _sessionId: "session-1",
     });
   });
@@ -437,6 +438,7 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     expect(streamData(broadcasts)).toContainEqual({
       type: "ContentPart",
       payload: { type: "think", think: "Checking the edge case" },
+      turnIndex: 7,
       _sessionId: "session-1",
     });
   });
@@ -865,6 +867,23 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     });
 
     expect(baselines).toEqual([]);
+  });
+
+  it("rejects a removed engine skill without listing or activating it", async () => {
+    const listSkills = vi.fn();
+    const runTurnAction = vi.fn();
+    const runtime = {
+      session: { listSkills, activateSkill: vi.fn() },
+      runTurnAction,
+    } as unknown as SessionRuntime;
+
+    await expect(runHostSlashCommand(
+      runtime,
+      { name: "skill:sub-skill.review", args: "", raw: "/skill:sub-skill.review" },
+      {} as HandlerContext,
+    )).rejects.toThrow("Skill 'sub-skill.review' is not available in KIMI KRINIK.");
+    expect(listSkills).not.toHaveBeenCalled();
+    expect(runTurnAction).not.toHaveBeenCalled();
   });
 
   it("passes the visible variant path when the default skill is filtered out", async () => {

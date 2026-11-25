@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const boundary = vi.hoisted(() => ({
   settings: new Map<string, unknown>(),
   update: vi.fn(),
+  onDidChangeConfiguration: vi.fn(),
 }));
 
 vi.mock("vscode", () => ({
@@ -15,12 +16,14 @@ vi.mock("vscode", () => ({
       get: (key: string, fallback: unknown) => (boundary.settings.has(key) ? boundary.settings.get(key) : fallback),
       update: boundary.update,
     }),
+    onDidChangeConfiguration: boundary.onDidChangeConfiguration,
   },
 }));
 
 import { behaviorHandlers, syncContextWindowOwnership } from "../src/handlers/behavior.handler";
+import { onSettingsChange } from "../src/config/vscode-settings";
 import { Events, Methods, validateRpcMessage } from "../shared/bridge";
-import { CONTROL_PANEL_BUTTONS } from "../shared/types";
+import { CONTROL_PANEL_BUTTONS, normalizeControlPanelOrder } from "../shared/types";
 import { DEFAULT_SOUND_SETTINGS } from "../shared/sounds";
 
 const setAutoCompact = behaviorHandlers[Methods.SetAutoCompact];
@@ -66,6 +69,7 @@ beforeEach(() => {
   markerAtSetConfig = undefined;
   boundary.settings.clear();
   boundary.update.mockReset();
+  boundary.onDidChangeConfiguration.mockReset();
 });
 
 afterEach(() => rmSync(root, { recursive: true, force: true }));
@@ -194,6 +198,16 @@ describe("AUTO STEER setting", () => {
     expect(validateRpcMessage({ id: "sound", method: Methods.UpdateExtensionSetting, params: { key: "soundEnabled", value: "false" } }).ok).toBe(false);
   });
 
+  it("validates custom General Settings updates", () => {
+    const message = (params: unknown) => validateRpcMessage({ id: "general", method: Methods.UpdateExtensionSetting, params });
+    expect(message({ key: "autosave", value: false }).ok).toBe(true);
+    expect(message({ key: "useCtrlEnterToSend", value: true }).ok).toBe(true);
+    expect(message({ key: "showThinkingContent", value: false }).ok).toBe(true);
+    expect(message({ key: "autosave", value: "false" }).ok).toBe(false);
+    expect(message({ key: "editorContext", value: "onConversationStart" }).ok).toBe(true);
+    expect(message({ key: "editorContext", value: "always" }).ok).toBe(false);
+  });
+
   it("serializes sound writes so the last value is written last", async () => {
     let release!: () => void;
     boundary.update.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve; })).mockResolvedValueOnce(undefined);
@@ -212,9 +226,41 @@ describe("AUTO STEER setting", () => {
 });
 
 describe("Control Panel and Context Window settings", () => {
+  it("normalizes an older or incomplete order without losing buttons", () => {
+    expect(normalizeControlPanelOrder(["skills", "skills", "unknown"])).toEqual([
+      "skills",
+      ...CONTROL_PANEL_BUTTONS.filter((button) => button !== "skills"),
+    ]);
+    expect(normalizeControlPanelOrder(undefined)).toEqual(CONTROL_PANEL_BUTTONS);
+  });
+
+  it("broadcasts Control Panel order changes from another window", () => {
+    let listener: ((event: { affectsConfiguration: (key: string) => boolean }) => void) | undefined;
+    boundary.onDidChangeConfiguration.mockImplementation((callback: typeof listener) => {
+      listener = callback;
+      return { dispose: vi.fn() };
+    });
+    const changed = vi.fn();
+    onSettingsChange(changed);
+
+    expect(listener).toBeDefined();
+    listener!({ affectsConfiguration: (key) => key === "kimi" || key === "kimi.controlPanelOrder" });
+    expect(changed).toHaveBeenCalledWith(["controlPanelOrder"]);
+  });
+
   it("writes one nested user-level boolean without changing the feature value", async () => {
     await expect(updateExtensionSetting({ key: "controlPanel.plan", value: false }, context() as never)).resolves.toEqual({ ok: true });
     expect(boundary.update).toHaveBeenCalledWith("controlPanel.plan", false, 1);
+  });
+
+  it("writes and validates the complete Control Panel order", async () => {
+    const value = CONTROL_PANEL_BUTTONS.toReversed();
+    await expect(updateExtensionSetting({ key: "controlPanelOrder", value }, context() as never)).resolves.toEqual({ ok: true });
+    expect(boundary.update).toHaveBeenCalledWith("controlPanelOrder", value, 1);
+    const message = (params: unknown) => validateRpcMessage({ id: "order", method: Methods.UpdateExtensionSetting, params });
+    expect(message({ key: "controlPanelOrder", value }).ok).toBe(true);
+    expect(message({ key: "controlPanelOrder", value: [...value.slice(0, -1), value[0]] }).ok).toBe(false);
+    expect(message({ key: "controlPanelOrder", value: [...value.slice(1), "unknown"] }).ok).toBe(false);
   });
 
   it("accepts only declared Control Panel booleans", () => {
@@ -242,5 +288,7 @@ describe("Control Panel and Context Window settings", () => {
     }
     expect(properties["kimi.controlPanel.attachments"]).toBeUndefined();
     expect(properties["kimi.controlPanel.model"]).toBeUndefined();
+    expect(properties["kimi.controlPanelOrder"]).toMatchObject({ type: "array", default: CONTROL_PANEL_BUTTONS });
+    expect(CONTROL_PANEL_BUTTONS.slice(0, 3)).toEqual(["permission", "skills", "compact"]);
   });
 });

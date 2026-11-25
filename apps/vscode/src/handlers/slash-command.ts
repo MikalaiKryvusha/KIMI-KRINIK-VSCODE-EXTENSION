@@ -5,6 +5,7 @@ import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import * as vscode from "vscode";
 
 import type { SessionRuntime } from "../runtime/session-runtime";
+import { isRemovedEngineSkill } from "../config/removed-skills";
 import {
   buildExportMarkdown,
   isImportableTextFile,
@@ -51,6 +52,9 @@ export async function runHostSlashCommand(
 ): Promise<boolean> {
   if (command.name.startsWith("skill:")) {
     const skillName = command.name.slice("skill:".length);
+    if (isRemovedEngineSkill(skillName)) {
+      throw new Error(`Skill '${skillName}' is not available in KIMI KRINIK.`);
+    }
     const skills = await runtime.session.listSkills();
     const candidates = skills.filter((skill) =>
       skill.name.toLowerCase() === skillName.toLowerCase() &&

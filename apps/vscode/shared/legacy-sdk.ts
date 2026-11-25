@@ -159,7 +159,7 @@ export type LegacyWireEvent =
   | { type: 'CompactionBegin'; payload: Record<string, never> }
   | { type: 'CompactionEnd'; payload: Record<string, never> }
   | { type: 'StatusUpdate'; payload: StatusUpdate }
-  | { type: 'ContentPart'; payload: ContentPart }
+  | { type: 'ContentPart'; payload: ContentPart; turnIndex?: number }
   | { type: 'ToolCall'; payload: ToolCall }
   | { type: 'ToolCallPart'; payload: { tool_call_id?: string; arguments_part?: string | null } }
   | { type: 'ToolResult'; payload: ToolResult }

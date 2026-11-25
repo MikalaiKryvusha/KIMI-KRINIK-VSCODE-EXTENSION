@@ -1,4 +1,4 @@
-import { CONTEXT_WINDOW_THRESHOLD_SETTINGS, CONTROL_PANEL_BUTTONS, INTERFACE_LANGUAGES } from "./types";
+import { CONTEXT_WINDOW_THRESHOLD_SETTINGS, CONTROL_PANEL_BUTTONS, EDITOR_CONTEXT_VALUES, GENERAL_BOOLEAN_SETTINGS, INTERFACE_LANGUAGES, isControlPanelOrder } from "./types";
 import { isSoundSettings } from "./sounds";
 import { GOAL_ACTIONS, isPermissionModeName } from "./modes";
 
@@ -171,11 +171,14 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.UpdateExtensionSetting:
       return isPlainObject(params) && (
         (params["key"] === "autoSteer" && typeof params["value"] === "boolean")
+        || (GENERAL_BOOLEAN_SETTINGS.some((key) => params["key"] === key) && typeof params["value"] === "boolean")
+        || (params["key"] === "editorContext" && (EDITOR_CONTEXT_VALUES as readonly unknown[]).includes(params["value"]))
         || (params["key"] === "soundEnabled" && typeof params["value"] === "boolean")
         || (params["key"] === "contextWindowControl" && typeof params["value"] === "boolean")
         || ((Object.values(CONTEXT_WINDOW_THRESHOLD_SETTINGS) as readonly unknown[]).includes(params["key"])
           && typeof params["value"] === "number" && Number.isFinite(params["value"]) && params["value"] >= 0 && params["value"] <= 100)
         || (typeof params["value"] === "boolean" && CONTROL_PANEL_BUTTONS.some((button) => params["key"] === `controlPanel.${button}`))
+        || (params["key"] === "controlPanelOrder" && isControlPanelOrder(params["value"]))
         || (params["key"] === "language" && (INTERFACE_LANGUAGES as readonly unknown[]).includes(params["value"]))
         || (params["key"] === "sounds" && isSoundSettings(params["value"]))
       );

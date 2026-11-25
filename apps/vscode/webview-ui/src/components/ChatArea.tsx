@@ -95,12 +95,7 @@ export function ChatArea() {
   }
 
   return (
-    <div
-      ref={hostRef}
-      className="h-full relative"
-      onWheelCapture={() => setExpandedPromptId(undefined)}
-      onTouchMoveCapture={() => setExpandedPromptId(undefined)}
-    >
+    <div ref={hostRef} className="h-full relative">
       <ScrollToBottom className="h-full" scrollViewClassName="chat-scroll-view h-full overflow-y-auto overflow-x-hidden" followButtonClassName="hidden" initialScrollBehavior="auto">
         <StickyUserPrompt message={activePrompt} expanded={expandedPromptId === activePromptId} onToggle={toggleExpandedPrompt} />
         <MessageList />

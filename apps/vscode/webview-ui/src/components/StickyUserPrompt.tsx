@@ -10,6 +10,7 @@ import { MediaPreviewModal } from "./MediaPreviewModal";
 const PROMPT_BOUNDARY_PX = 80;
 const PROMPT_HYSTERESIS_PX = 24;
 const BOTTOM_THRESHOLD_PX = 32;
+const COLLAPSED_STICKY_PREVIEW_HEIGHT = 32;
 
 export function getPromptKey(message: ChatMessage, index: number): string {
   if (message.clientId !== undefined) return message.clientId;
@@ -114,7 +115,9 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
   const t = useT();
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const summaryRef = useRef<HTMLSpanElement>(null);
+  const fullRef = useRef<HTMLDivElement>(null);
   const [truncated, setTruncated] = useState(false);
+  const [fullHeight, setFullHeight] = useState(COLLAPSED_STICKY_PREVIEW_HEIGHT);
   const text = message ? Content.getText(message.content) : "";
   const images = message ? Content.getImages(message.content) : [];
   const videos = message ? Content.getVideos(message.content) : [];
@@ -132,13 +135,23 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
     return () => resizeObserver?.disconnect();
   }, [text, expanded]);
 
+  useLayoutEffect(() => {
+    const full = fullRef.current;
+    if (!full) return;
+    const update = () => setFullHeight(full.scrollHeight);
+    update();
+    const resizeObserver = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update);
+    resizeObserver?.observe(full);
+    return () => resizeObserver?.disconnect();
+  }, [text, images.length, videos.length, expanded]);
+
   if (!message) return null;
 
   const canExpand = text.includes("\n") || images.length > 0 || videos.length > 0 || truncated;
   const action = expanded ? t("sticky.collapse") : t("sticky.expand");
 
   return (
-    <div data-testid="sticky-user-prompt" className="sticky top-0 z-20 border-b bg-background text-foreground shadow-sm">
+    <div data-testid="sticky-user-prompt" className="sticky top-0 z-20 border-b bg-background px-2 pt-2 text-foreground shadow-sm">
       <div data-testid="sticky-prompt-bubble" className="relative w-full rounded-2xl rounded-br-md bg-zinc-100 px-3.5 py-1.5 transition-colors duration-200 motion-reduce:transition-none dark:bg-zinc-800">
         <button
           type="button"
@@ -147,17 +160,34 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
           aria-label={expanded || canExpand ? action : undefined}
           aria-expanded={expanded}
           aria-controls="sticky-prompt-full"
-          className={expanded
+          className={expanded || canExpand
             ? "absolute right-2 top-1.5 z-10 flex size-5 items-center justify-center rounded-md text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
             : "flex w-full min-w-0 items-center gap-3 text-left"}
         >
-          {!expanded && <span ref={summaryRef} className="min-w-0 flex-1 truncate text-xs leading-none">{text || t("queue.mediaOnly")}</span>}
+          {!expanded && <span ref={summaryRef} className={canExpand ? "sr-only" : "min-w-0 flex-1 truncate text-xs leading-none"}>{text || t("queue.mediaOnly")}</span>}
           {(expanded || canExpand) && <IconChevronDown className={`ml-auto size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`} />}
         </button>
-        {expanded && (
-          <div id="sticky-prompt-full" data-testid="sticky-prompt-full" className="min-w-0 animate-in fade-in slide-in-from-top-1 pr-6 text-xs leading-relaxed duration-200 motion-reduce:animate-none">
-            {text && <div className="whitespace-pre-wrap wrap-break-word">{text}</div>}
-            <MessageMedia images={images} videos={videos} onPreview={setPreviewMedia} />
+        {(canExpand || expanded) && (
+          <div
+            data-testid="sticky-prompt-expansion"
+            className="relative overflow-hidden transition-[max-height] duration-300 ease-in-out motion-reduce:transition-none"
+            style={{ maxHeight: expanded ? fullHeight : COLLAPSED_STICKY_PREVIEW_HEIGHT }}
+          >
+            <div
+              id="sticky-prompt-full"
+              data-testid="sticky-prompt-full"
+              aria-hidden={!expanded}
+              inert={!expanded}
+              className="min-w-0 pr-6 text-xs leading-relaxed opacity-100"
+            >
+              <div ref={fullRef}>
+                {text && <div className="whitespace-pre-wrap wrap-break-word">{text}</div>}
+                <MessageMedia images={images} videos={videos} onPreview={setPreviewMedia} />
+              </div>
+            </div>
+            {!expanded && (
+              <span data-testid="sticky-prompt-fade" className="pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-zinc-100 via-zinc-100/85 to-transparent dark:from-zinc-800 dark:via-zinc-800/85" />
+            )}
           </div>
         )}
       </div>

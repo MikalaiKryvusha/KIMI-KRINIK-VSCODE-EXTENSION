@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CONTROL_PANEL_BUTTONS, INTERFACE_LANGUAGES, type ControlPanelVisibility, type ExtensionConfig, type InterfaceLanguage, type KaifThresholds } from "../../shared/types";
+import { CONTROL_PANEL_BUTTONS, INTERFACE_LANGUAGES, normalizeControlPanelOrder, type ControlPanelVisibility, type EditorContext, type ExtensionConfig, type InterfaceLanguage, type KaifThresholds } from "../../shared/types";
 import { normalizeSoundSettings, type SoundSettings } from "../../shared/sounds";
 
 declare const __EXTENSION_VERSION__: string;
@@ -51,6 +51,10 @@ export const VSCodeSettings = {
     ) as ControlPanelVisibility;
   },
 
+  get controlPanelOrder(): ExtensionConfig["controlPanelOrder"] {
+    return normalizeControlPanelOrder(getConfig().get<unknown>("controlPanelOrder"));
+  },
+
   get language(): InterfaceLanguage {
     const value = getConfig().get<string>("language", "en");
     return INTERFACE_LANGUAGES.find((language) => language === value) ?? "en";
@@ -74,8 +78,8 @@ export const VSCodeSettings = {
     };
   },
 
-  get editorContext(): "never" | "onConversationStart" | "onFileChange" {
-    return getConfig().get<"never" | "onConversationStart" | "onFileChange">("editorContext", "never");
+  get editorContext(): EditorContext {
+    return getConfig().get<EditorContext>("editorContext", "never");
   },
 
   getExtensionConfig(): ExtensionConfig {
@@ -90,6 +94,8 @@ export const VSCodeSettings = {
       contextWindowControl: this.contextWindowControl,
       contextWindowThresholds: this.kaifThresholds,
       controlPanel: this.controlPanel,
+      controlPanelOrder: this.controlPanelOrder,
+      editorContext: this.editorContext,
       language: this.language,
       soundEnabled: this.soundEnabled,
       sounds: this.sounds,
@@ -104,7 +110,7 @@ export function onSettingsChange(callback: (changedKeys: string[]) => void): vsc
     if (!e.affectsConfiguration("kimi")) {
       return;
     }
-    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "contextWindowControl", "kaif", "controlPanel", "language", "soundEnabled", "sounds"];
+    const keys = ["yoloMode", "autosave", "enableNewConversationShortcut", "useCtrlEnterToSend", "showThinkingContent", "showThinkingExpanded", "editorContext", "autoSteer", "contextWindowControl", "kaif", "controlPanel", "controlPanelOrder", "language", "soundEnabled", "sounds"];
     const changedKeys = keys.filter((key) => e.affectsConfiguration(`kimi.${key}`));
     if (changedKeys.length > 0) {
       callback(changedKeys);

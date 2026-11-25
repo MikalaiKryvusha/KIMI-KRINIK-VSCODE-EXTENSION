@@ -1,6 +1,6 @@
 # Idea 02 — Control Panel skill picker with localized descriptions
 
-> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 implemented and verified on isolated build 25 on 2026-11-25; accumulated main-profile running-build acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
+> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 owner refinements implemented; build 32 isolated visual smoke passed and build 33 is installed; accumulated main-profile acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
 
 ## Goal vector
 
@@ -16,6 +16,10 @@
 - RU reads `metadata.description_ru`; ZH reads `metadata.description_zh`; missing `metadata` or the requested key falls back to `description`; EN always reads only `description`.
 - Component/parser regressions run before implementation is accepted; the real installed VSIX path is read after implementation.
 - The skill picker ships in KIMI KRINIK 1.0.0; the owner's 2026-11-25 18:10 +03:00 decision revokes the earlier post-release deferral.
+- The non-KAIF `.agents/skills` content is removed from this project. By the owner's interview #002 decision, `check-kimi-code-docs`, `update-config`, `write-goal`, `mcp-config` and `import-from-cc-codex` remain fully English; `custom-theme`, `sub-skill`, `sub-skill.review` and `sub-skill.consolidate` are unavailable in KIMI KRINIK, including manual slash activation.
+- The open dialog always occupies nearly the full webview with 2rem margins on every side and has no compact-view toggle. A collapsed long description shows two clear lines and a faded third; only text exceeding two lines gets a chevron. Max-height animation expands and collapses the description with reduced-motion support, and the fade follows the card's hover background.
+- Skill is the first behavior button immediately after Permission mode by default.
+- Control Panel settings provide Up/Down chevrons for every button, including hidden ones. Their persisted top-to-bottom order becomes left-to-right order on Control Panel.
 
 ## Essence
 

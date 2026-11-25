@@ -62,7 +62,7 @@ export function ChatStatus() {
   const outputTotal = tokenUsage.output + activeTokenUsage.output;
 
   return (
-    <div className="flex items-center gap-3 text-[10px] text-muted-foreground border border-border/40 rounded-full px-2 py-0.5 select-none h-6 box-border mr-2 @max-[240px]:hidden">
+    <div data-testid="token-status-container" className="flex items-center gap-3 text-[10px] text-muted-foreground border border-border/40 rounded-lg px-2 py-0.5 select-none h-6 box-border @max-[240px]:hidden">
       {retrying && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -77,7 +77,7 @@ export function ChatStatus() {
         </Tooltip>
       )}
       {retrying && <div className="w-px h-3 bg-border/50" />}
-      <div className="flex items-center gap-1.5 @max-[440px]:hidden" title={t("status.totalInputTokens")}>
+      <div className="flex items-center gap-1.5 @max-[440px]:hidden">
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="flex items-center gap-1.5">
@@ -89,7 +89,7 @@ export function ChatStatus() {
         </Tooltip>
       </div>
       <div className="w-px h-3 bg-border/50 @max-[440px]:hidden" />
-      <div className="flex items-center gap-1.5 @max-[440px]:hidden" title={t("status.totalOutputTokens")}>
+      <div className="flex items-center gap-1.5 @max-[440px]:hidden">
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="flex items-center gap-1.5">

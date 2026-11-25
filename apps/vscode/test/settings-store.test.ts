@@ -679,7 +679,7 @@ describe("Control Panel visibility", () => {
 
     expect(useSettingsStore.getState().extensionConfig.controlPanel.goal).toBe(true);
     expect(useSettingsStore.getState().extensionConfig.autoSteer).toBe(DEFAULT_EXTENSION_CONFIG.autoSteer);
-    expect(boundary.toastError).toHaveBeenCalledWith("Control Panel visibility was not changed: settings are read-only");
+    expect(boundary.toastError).toHaveBeenCalledWith("Control Panel settings were not changed: settings are read-only");
   });
 });
 

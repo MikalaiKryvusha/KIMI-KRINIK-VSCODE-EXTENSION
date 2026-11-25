@@ -119,9 +119,10 @@ describe("interface dictionaries", () => {
     expect(translate("en", "controlPanel.title")).toBe("Control Panel");
     expect(translate("ru", "controlPanel.title")).toBe("Панель Управления");
     expect(translate("zh", "controlPanel.title")).toBe("控制面板");
-    expect(translate("ru", "toast.controlPanelNotChanged", { error: "x" })).toBe("Видимость панели управления не изменена: x");
-    expect(translate("zh", "toast.controlPanelNotChanged", { error: "x" })).toBe("控制面板可见性未更改：x");
+    expect(translate("ru", "toast.controlPanelNotChanged", { error: "x" })).toBe("Настройки панели управления не изменены: x");
+    expect(translate("zh", "toast.controlPanelNotChanged", { error: "x" })).toBe("控制面板设置未更改：x");
     expect(translate("ru", "thinking.label")).toBe("Рассуждение");
+    expect(translate("ru", "modelPicker.thinking")).toBe("Уровень рассуждений");
     expect(translate("ru", "chat.requesting")).toBe("Запрос...");
     expect(translate("en", "sound.choice.glass")).toBe("Glass");
     expect(translate("ru", "sound.choice.glass")).toBe("Стекло");

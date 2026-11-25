@@ -6,7 +6,7 @@ import { useSettingsStore } from "@/stores";
 import { useT } from "@/i18n";
 
 function behaviorButtonClass(active: boolean): string {
-  return `flex items-center gap-1 h-6 px-1.5 rounded-md transition-all text-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+  return `flex items-center gap-1 h-6 px-1.5 rounded-md transition-all text-xs cursor-pointer disabled:opacity-50 disabled:cursor-default ${
     active
       ? "bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/25"
       : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -31,6 +31,7 @@ export function BehaviorButtons() {
             <button
               type="button"
               data-testid="mode-compact"
+              style={{ order: extensionConfig.controlPanelOrder.indexOf("compact") }}
               disabled={autoCompact === null || autoCompactPending}
               onClick={() => void changeAutoCompact(autoCompact === false)}
               className={behaviorButtonClass(compactEnabled)}
@@ -49,6 +50,7 @@ export function BehaviorButtons() {
             <button
               type="button"
               data-testid="mode-steer"
+              style={{ order: extensionConfig.controlPanelOrder.indexOf("steer") }}
               onClick={() => void changeAutoSteer(!extensionConfig.autoSteer)}
               className={behaviorButtonClass(extensionConfig.autoSteer)}
             >
@@ -66,6 +68,7 @@ export function BehaviorButtons() {
             <button
               type="button"
               data-testid="mode-control"
+              style={{ order: extensionConfig.controlPanelOrder.indexOf("control") }}
               onClick={() => void changeContextWindowControl(!extensionConfig.contextWindowControl)}
               className={behaviorButtonClass(extensionConfig.contextWindowControl)}
             >

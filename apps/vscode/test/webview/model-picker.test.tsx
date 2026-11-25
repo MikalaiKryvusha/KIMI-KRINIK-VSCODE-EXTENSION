@@ -69,10 +69,15 @@ describe("combined model and effort picker", () => {
     const trigger = screen.getByTestId("model-picker");
 
     expect(trigger.textContent).toBe("Reasoning · High");
+    expect(trigger.querySelector(".whitespace-pre")).not.toBeNull();
     expect(trigger.className).toContain("shrink-0");
     expect(trigger.querySelector(".whitespace-nowrap")).not.toBeNull();
 
     await user.click(trigger);
+    const content = document.querySelector('[data-slot="dropdown-menu-content"]');
+    expect(content?.className).toContain("w-max");
+    expect(content?.className).toContain("min-w-56");
+    expect(content?.className).toContain("max-w-[calc(100vw-1rem)]");
     expect(screen.getByText(/Switching models or thinking effort invalidates/)).not.toBeNull();
     await user.click(screen.getByRole("button", { name: "Low" }));
 

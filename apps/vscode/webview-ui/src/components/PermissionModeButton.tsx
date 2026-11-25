@@ -43,6 +43,7 @@ export function PermissionModeButton() {
   const t = useT();
   const chosen = useChatStore((state) => state.permissionMode);
   const defaultPermissionMode = useSettingsStore((state) => state.defaultPermissionMode);
+  const controlPanelOrder = useSettingsStore((state) => state.extensionConfig.controlPanelOrder);
   const mode = chosen ?? defaultPermissionMode;
   const ModeIcon = MODE_ICON[mode];
 
@@ -71,6 +72,7 @@ export function PermissionModeButton() {
             <button
               type="button"
               data-testid="permission-mode"
+              style={{ order: controlPanelOrder.indexOf("permission") }}
               className={cn(
                 "flex items-center gap-1 justify-center h-6 px-1.5 rounded-md transition-all text-xs cursor-pointer",
                 mode === "auto" && "bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/25",

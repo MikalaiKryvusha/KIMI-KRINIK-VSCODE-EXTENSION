@@ -224,14 +224,14 @@ function mapLegacyWireEvent(
     case 'assistant.delta':
       return {
         state,
-        event: { type: 'ContentPart', payload: { type: 'text', text: sdkEvent.delta } },
+        event: { type: 'ContentPart', payload: { type: 'text', text: sdkEvent.delta }, turnIndex: sdkEvent.turnId },
       };
     case 'hook.result':
       return { state };
     case 'thinking.delta':
       return {
         state,
-        event: { type: 'ContentPart', payload: { type: 'think', think: sdkEvent.delta } },
+        event: { type: 'ContentPart', payload: { type: 'think', think: sdkEvent.delta }, turnIndex: sdkEvent.turnId },
       };
     case 'tool.call.started': {
       const toolCallId = scopedToolCallId(

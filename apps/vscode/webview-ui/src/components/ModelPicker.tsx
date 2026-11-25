@@ -105,7 +105,7 @@ export function ModelPicker({ availableModels, hasConversationHistory, disabled 
                 <span className="flex shrink-0 items-center whitespace-nowrap">
                   <span>{buttonLabel}</span>
                   {currentModelConfig !== undefined && showEffortSuffix && (
-                    <span className="shrink-0 text-blue-500">{" · "}{effortLabel(thinkingEffort, t, true)}</span>
+                    <span className="shrink-0 whitespace-pre text-blue-500">{" · "}{effortLabel(thinkingEffort, t, true)}</span>
                   )}
                 </span>
                 {hasModels && <IconChevronDown className="size-3.5 shrink-0" />}
@@ -114,7 +114,7 @@ export function ModelPicker({ availableModels, hasConversationHistory, disabled 
           </TooltipTrigger>
           <TooltipContent>{buttonLabel}</TooltipContent>
         </Tooltip>
-        <DropdownMenuContent className="w-56" align="start">
+        <DropdownMenuContent className="w-max min-w-56 max-w-[calc(100vw-1rem)]" align="start">
           {favoriteModels.length > 0 && (
             <>
               <DropdownMenuLabel>{t("modelPicker.favorites")}</DropdownMenuLabel>

@@ -11,7 +11,15 @@
 [OWNER] «когда я тебе это сообщение отправил первое - в полотне чато что-то резко моргнуло. словно какое-то сообщение от КИМИ появилось и тут же исчезло - баг» · 2026-11-24 23:46 +03:00 (чат)
 [OWNER] «сразу как я тебе первое сообщение resume отправил - в полотне чата твоё какое-то сообщение появилось и мгновенно исчезло. Баг присутвтствует.» · 2026-11-25 16:41 +03:00 (чат)
 
+[OWNER] «только что ты написал сообщение и оно исчезло» · 2026-11-25 23:07 +03:00 (chat)
+
+2026-11-25 23:08 +03:00 — the current accumulated main-profile wire contains both real progress text parts of turn 31, including the tooltip/sticky plan at 23:04:50 and the sticky cause at 23:06:22. Turn 31 then completed, while the following sticky-padding turn 32 was prompt-only and ended without a step. The text therefore reached the engine/UI event stream; its disappearance is not a missing model generation. The optimistic-steer store path does not obviously remove the original assistant, so no new fix is claimed yet. The next packaged check must observe this exact progress-text → prompt-only steer sequence with DOM mutations.
+
 The whole chat feed flickered immediately after the first prompt. The owner perceived a short-lived Kimi message that appeared and disappeared. Whether this was an optimistic assistant placeholder, a durable event reconciliation, or another render path is not yet known.
+
+2026-11-25 23:24 +03:00 — a deterministic public-store sequence for visible progress → SteerInput → original completion → prompt-only TurnBegin exposed a separate identity defect: TurnBegin no longer matched the already-reconciled user and appended a third assistant. `reconcileOptimisticTurn` now matches a known clientId regardless of its prior optimistic flag; the regression is red before and green afterward, with chat-store 33/33. The original visible progress remained in the store even in the broken sequence, so this duplicate-turn fix is relevant hygiene but is not yet claimed as the disappearance fix. Real packaged DOM observation remains required.
+
+2026-11-25 23:34 +03:00 — the owner's steering-race hypothesis reproduced deterministically at the public store boundary. With an original turn 0 and an optimistic steering assistant already appended, a late turn-0 ContentPart was written into the steering assistant; turn-0 completion also finalized that wrong assistant. The SDK had supplied turnId all along, but the event adapter discarded it. ContentPart now carries optional additive turnIndex metadata, and ContentPart/stream completion select the owning assistant with legacy fallback for events without an index. Adapter and store regressions were red before and green afterward: 65/65. This is the confirmed routing race, but the owner's rendered disappearance is not called verified-fixed until the packaged held-response → steer DOM run.
 
 ## Repro
 

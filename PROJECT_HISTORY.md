@@ -27,6 +27,11 @@
 
 ## Entries (newest first)
 
+### 2026-11-25 20:35 +03:00 — SOFT CLOSURE: build 25 verified; handover to the next chat
+- Build 25 is implemented, installed on the main profile and verified on isolated VS Code. Commits through `27ee17990` are pushed to `main`; `bugs/33` is DONE and SDK `session-skills` is 14/14. Extension suite is 621 passed / 1 skipped; typecheck, root lint, build, static audit and voice checks are green.
+- Post-closure verification: named chat/event-adapter suites passed 39/39, and a fresh build-25 prompt left `K25 final smoke answer` visible with invisible hook text and the same payload in model input. `test debt: none` after the documented direct-node waiver; evidence is appended to `testcases/reports/2026-11-25_build_25_ui_acceptance.md`.
+- Main-profile running-build acceptance is the first next step: restart VS Code to load build 25 and verify the accumulated world. `bugs/29` is the next clear technical verification after it. Publication remains unauthorized and requires separate owner `AUTH:`.
+
 ### 2026-11-25 20:11 +03:00 — build 25 passes the owner-requested isolated UI acceptance
 - Fixed welcome guide and centered robot/KIMI, localized Compact/Steer descriptions, `ideas/02` skill picker and `bugs/30`–`32` are implemented and verified on isolated packaged build 25. The skill dialog showed 47 rows; immediate skill delivery appeared once in the active model request, OFF showed `1 в очереди` with no queued skill in the request. Sticky was absent at `scrollTop = 0` and collapsed on wheel.
 - Full extension: 621 passed / 1 skipped / 0 failed; typecheck and root lint green. `session-skills` is 14/14 after the old Windows path-comparison test was fixed in `bugs/33_DONE_skill_variant_windows_path_separator_test.md`.

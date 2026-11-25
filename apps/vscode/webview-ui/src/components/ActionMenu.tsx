@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IconSettings, IconServer, IconLogout, IconLogin, IconLoader2, IconRefresh, IconFileText, IconFolder, IconVolume, IconAdjustmentsHorizontal, IconExternalLink, IconLanguage } from "@tabler/icons-react";
 import { ControlPanelSettingsDialog } from "./ControlPanelSettingsDialog";
+import { GeneralSettingsDialog } from "./GeneralSettingsDialog";
 import { LanguageSelectionDialog, orderedLanguages } from "./LanguageSelectionDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ function MenuItem({ onClick, disabled, danger, children }: { onClick: () => void
 export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const [controlPanelOpen, setControlPanelOpen] = useState(false);
+  const [generalSettingsOpen, setGeneralSettingsOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setMCPModalOpen, isLoggedIn, setIsLoggedIn, extensionConfig, setSoundModalOpen } = useSettingsStore();
@@ -55,11 +57,6 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
   const languageAction = orderedLanguages(extensionConfig.language)
     .map(([language]) => translate(language, "menu.languageAction"))
     .join(" / ");
-
-  const handleOpenSettings = () => {
-    void bridge.openSettings();
-    setOpen(false);
-  };
 
   const handleOpenProjectPage = () => {
     void bridge.openProjectPage();
@@ -137,10 +134,9 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
             <IconLanguage className="size-4 text-muted-foreground" />
             <span className="flex-1">{languageAction}</span>
           </MenuItem>
-          <MenuItem onClick={handleOpenSettings}>
+          <MenuItem onClick={() => { setGeneralSettingsOpen(true); setOpen(false); }}>
             <IconSettings className="size-4 text-muted-foreground" />
             <span className="flex-1">{t("menu.generalConfig")}</span>
-            <span className="text-[10px] text-muted-foreground">↗</span>
           </MenuItem>
         </MenuSection>
 
@@ -178,6 +174,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
       </PopoverContent>
       </Popover>
       <ControlPanelSettingsDialog open={controlPanelOpen} onOpenChange={setControlPanelOpen} />
+      <GeneralSettingsDialog open={generalSettingsOpen} onOpenChange={setGeneralSettingsOpen} />
       <LanguageSelectionDialog open={languageOpen} onOpenChange={setLanguageOpen} />
     </>
   );

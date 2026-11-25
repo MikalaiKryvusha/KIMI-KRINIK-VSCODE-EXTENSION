@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
-import type { ContextWindowThresholds, ControlPanelButton, ExtensionConfig, InterfaceLanguage } from "shared/types";
-import { CONTEXT_WINDOW_THRESHOLD_SETTINGS } from "shared/types";
+import type { ContextWindowThresholds, ControlPanelButton, ExtensionConfig, GeneralSettingUpdate, InterfaceLanguage } from "shared/types";
+import { CONTEXT_WINDOW_THRESHOLD_SETTINGS, CONTROL_PANEL_BUTTONS } from "shared/types";
 import { DEFAULT_SOUND_SETTINGS, type SoundSettings } from "shared/sounds";
 import type { ModelConfig, SecondaryModelSelection, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
 import type { PermissionModeName } from "shared/modes";
@@ -51,6 +51,8 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
     swarm: true,
     secondaryModel: true,
   },
+  controlPanelOrder: [...CONTROL_PANEL_BUTTONS],
+  editorContext: "never",
   language: "en",
   soundEnabled: true,
   sounds: DEFAULT_SOUND_SETTINGS,
@@ -211,6 +213,8 @@ interface SettingsState {
   changeContextWindowControl: (enabled: boolean) => Promise<void>;
   changeContextWindowThreshold: (name: keyof ContextWindowThresholds, value: number) => Promise<void>;
   changeControlPanelVisibility: (button: ControlPanelButton, visible: boolean) => Promise<void>;
+  moveControlPanelButton: (button: ControlPanelButton, direction: -1 | 1) => Promise<void>;
+  changeGeneralSetting: (update: GeneralSettingUpdate) => Promise<void>;
   changeLanguage: (language: InterfaceLanguage) => Promise<void>;
 }
 
@@ -325,6 +329,35 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         },
       });
       toast.error(t("toast.controlPanelNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  moveControlPanelButton: async (button, direction) => {
+    const previous = get().extensionConfig.controlPanelOrder;
+    const from = previous.indexOf(button);
+    const to = from + direction;
+    if (from < 0 || to < 0 || to >= previous.length) return;
+    const controlPanelOrder = [...previous];
+    const [moved] = controlPanelOrder.splice(from, 1);
+    if (moved === undefined) return;
+    controlPanelOrder.splice(to, 0, moved);
+    set({ extensionConfig: { ...get().extensionConfig, controlPanelOrder } });
+    try {
+      await bridge.updateExtensionSetting({ key: "controlPanelOrder", value: controlPanelOrder });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, controlPanelOrder: previous } });
+      toast.error(t("toast.controlPanelNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeGeneralSetting: async (update) => {
+    const previous = get().extensionConfig;
+    set({ extensionConfig: { ...previous, [update.key]: update.value } as ExtensionConfig });
+    try {
+      await bridge.updateExtensionSetting(update);
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, [update.key]: previous[update.key] } as ExtensionConfig });
+      toast.error(t("toast.generalNotChanged", { error: error instanceof Error ? error.message : String(error) }));
     }
   },
 

@@ -4,7 +4,7 @@
   "displayName": "KIMI KRINIK",
   "description": "An improved and advanced Kimi Code extension for VS Code based on vanilla Kimi Code and Kimi Fork",
   "version": "1.0.0",
-  "buildNumber": 25,
+  "buildNumber": 33,
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
@@ -168,6 +168,36 @@
           "type": "boolean",
           "default": true,
           "description": "Show the secondary-model robot in Control Panel. Hiding the button does not change the selected secondary model."
+        },
+        "kimi.controlPanelOrder": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "permission",
+              "skills",
+              "compact",
+              "steer",
+              "control",
+              "plan",
+              "goal",
+              "swarm",
+              "secondaryModel"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "permission",
+            "skills",
+            "compact",
+            "steer",
+            "control",
+            "plan",
+            "goal",
+            "swarm",
+            "secondaryModel"
+          ],
+          "description": "Control Panel button order from left to right. The Control Panel settings window provides Up and Down chevrons."
         },
         "kimi.kaif.warnPercent": {
           "type": "number",

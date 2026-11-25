@@ -43,6 +43,7 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
   const goal = useChatStore((state) => state.goal);
   const goalArmed = useChatStore((state) => state.goalArmed);
   const controlPanel = useSettingsStore((state) => state.extensionConfig.controlPanel);
+  const controlPanelOrder = useSettingsStore((state) => state.extensionConfig.controlPanelOrder);
   const [goalMenuOpen, setGoalMenuOpen] = useState(false);
 
   const toggleSwarm = () => {
@@ -72,7 +73,7 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
       {controlPanel.plan && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <button type="button" onClick={onTogglePlanMode} className={modeButtonClass(planMode)} data-testid="mode-plan">
+            <button type="button" onClick={onTogglePlanMode} className={modeButtonClass(planMode)} data-testid="mode-plan" style={{ order: controlPanelOrder.indexOf("plan") }}>
               <IconClipboardList className="size-3.5" />
               <span className="leading-none @max-[480px]/composer:hidden">{t("modes.plan")}</span>
             </button>
@@ -86,7 +87,7 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <DropdownMenuTrigger asChild>
-                <button type="button" className={modeButtonClass(true)} data-testid="mode-goal">
+                <button type="button" className={modeButtonClass(true)} data-testid="mode-goal" style={{ order: controlPanelOrder.indexOf("goal") }}>
                   <IconTarget className="size-3.5" />
                   <span className="leading-none @max-[480px]/composer:hidden">{t("modes.goal")}</span>
                 </button>
@@ -131,7 +132,7 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
               type="button"
               onClick={() => useChatStore.setState({ goalArmed: !goalArmed })}
               className={modeButtonClass(goalArmed)}
-              data-testid="mode-goal"
+              data-testid="mode-goal" style={{ order: controlPanelOrder.indexOf("goal") }}
             >
               <IconTarget className="size-3.5" />
               <span className="leading-none @max-[480px]/composer:hidden">{t("modes.goal")}</span>
@@ -144,7 +145,7 @@ export function ModeButtons({ planMode, onTogglePlanMode }: ModeButtonsProps) {
       {controlPanel.swarm && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <button type="button" onClick={toggleSwarm} className={modeButtonClass(swarmMode)} data-testid="mode-swarm">
+            <button type="button" onClick={toggleSwarm} className={modeButtonClass(swarmMode)} data-testid="mode-swarm" style={{ order: controlPanelOrder.indexOf("swarm") }}>
               <IconSparkles className="size-3.5" />
               <span className="leading-none @max-[480px]/composer:hidden">{t("modes.swarm")}</span>
             </button>

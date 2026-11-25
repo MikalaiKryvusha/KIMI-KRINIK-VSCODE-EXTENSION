@@ -97,19 +97,28 @@ describe("sticky user prompt", () => {
     const { container } = render(<ChatArea />);
     const sticky = screen.getByTestId("sticky-user-prompt");
     expect(sticky.textContent).toContain("second full prompt");
+    expect(sticky.className).toContain("px-2");
+    expect(sticky.className).toContain("pt-2");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("w-full");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("bg-zinc-100");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("rounded-2xl");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("rounded-br-md");
-    expect(sticky.querySelector("button span")?.className).toContain("leading-none");
+    expect(screen.getByTestId("sticky-prompt-expansion").style.maxHeight).toBe("32px");
+    expect(screen.getByTestId("sticky-prompt-expansion").className).toContain("transition-[max-height]");
+    expect(screen.getByTestId("sticky-prompt-fade").className).toContain("from-zinc-100");
+    expect(screen.getByTestId("sticky-prompt-fade").className).toContain("dark:from-zinc-800");
     expect(sticky.querySelector("button")?.className).toContain("items-center");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("transition-transform");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("motion-reduce:transition-none");
 
     fireEvent.click(within(sticky).getByRole("button", { name: /Expand/ }));
-    expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).toContain("animate-in");
-    expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).toContain("motion-reduce:animate-none");
-    expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).toContain("pr-6");
+    const expansion = screen.getByTestId("sticky-prompt-expansion");
+    expect(expansion.style.maxHeight).toBe("1000px");
+    expect(expansion.className).toContain("transition-[max-height]");
+    expect(expansion.className).toContain("motion-reduce:transition-none");
+    const fullPrompt = screen.getByTestId("sticky-prompt-full");
+    expect(fullPrompt.className).toContain("opacity-100");
+    expect(fullPrompt.className).toContain("pr-6");
     expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).not.toContain("mt-2");
     expect(within(sticky).getByRole("button", { name: /Collapse/ }).className).toContain("absolute");
     expect(within(sticky).getByRole("button", { name: /Collapse/ }).className).toContain("right-2");
@@ -122,7 +131,10 @@ describe("sticky user prompt", () => {
     fireEvent.keyDown(document, { key: "Escape" });
 
     fireEvent.click(within(sticky).getByRole("button", { name: /Collapse/ }));
-    expect(sticky.querySelector("[data-testid=sticky-prompt-full]")).toBeNull();
+    expect(screen.getByTestId("sticky-prompt-expansion").style.maxHeight).toBe("32px");
+    expect(screen.getByTestId("sticky-prompt-full").className).toContain("opacity-100");
+    expect(screen.getByTestId("sticky-prompt-fade")).not.toBeNull();
+    expect(screen.getByTestId("sticky-prompt-full").getAttribute("aria-hidden")).toBe("true");
     expect(container.querySelectorAll("[data-testid=sticky-user-prompt]")).toHaveLength(1);
   });
 
@@ -161,7 +173,7 @@ describe("sticky user prompt", () => {
     expect(screen.queryByTestId("sticky-user-prompt")).not.toBeNull();
   });
 
-  it("collapses an expanded sticky prompt on wheel and touch scrolling", () => {
+  it("keeps an expanded sticky prompt open on wheel and touch scrolling", () => {
     useChatStore.setState({
       messages: [
         { id: "user-long", role: "user", content: "first line\nsecond line", timestamp: 1, turnIndex: 0 },
@@ -173,13 +185,14 @@ describe("sticky user prompt", () => {
     const scroll = document.querySelector(".chat-scroll-view")!;
 
     fireEvent.click(screen.getByRole("button", { name: /Expand/ }));
-    expect(screen.queryByTestId("sticky-prompt-full")).not.toBeNull();
+    expect(screen.getByTestId("sticky-prompt-full").getAttribute("aria-hidden")).toBe("false");
     fireEvent.wheel(scroll);
-    expect(screen.queryByTestId("sticky-prompt-full")).toBeNull();
+    expect(screen.getByRole("button", { name: /Collapse/ })).not.toBeNull();
+    expect(screen.getByTestId("sticky-prompt-full").getAttribute("aria-hidden")).toBe("false");
 
-    fireEvent.click(screen.getByRole("button", { name: /Expand/ }));
     fireEvent.touchMove(scroll);
-    expect(screen.queryByTestId("sticky-prompt-full")).toBeNull();
+    expect(screen.getByRole("button", { name: /Collapse/ })).not.toBeNull();
+    expect(screen.getByTestId("sticky-prompt-full").getAttribute("aria-hidden")).toBe("false");
   });
 
   it("does not resurrect an expansion after another prompt becomes sticky", () => {
@@ -195,7 +208,8 @@ describe("sticky user prompt", () => {
     act(() => useChatStore.setState({ messages: promptMessages }));
     act(() => useChatStore.setState({ messages: firstMessages }));
 
-    expect(screen.queryByTestId("sticky-prompt-full")).toBeNull();
+    expect(screen.getByTestId("sticky-prompt-full").getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByTestId("sticky-prompt-expansion").style.maxHeight).toBe("32px");
   });
 });
 
@@ -274,7 +288,8 @@ describe("welcome screen", () => {
     expect(robot.parentElement?.className).toContain("items-center");
     expect(robot.parentElement?.className).toContain("justify-center");
     expect(robot.parentElement?.className).toContain("max-w-full");
-    expect(robot.className).toContain("w-14");
+    expect(robot.className).toContain("w-[72px]");
+    expect(robot.parentElement?.className).toContain("gap-4");
     expect(wordmark.className).toContain("min-w-0");
   });
 });

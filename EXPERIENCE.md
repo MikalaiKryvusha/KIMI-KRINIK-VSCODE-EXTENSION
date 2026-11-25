@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0022 · 2026-11-26 · ❌→✅ · #chat #steer #testing
+class: field-dropped-in-rebuild
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/event-adapter.test.ts apps/vscode/test/session-runtime.test.ts apps/vscode/test/webview/chat-store.test.ts
+**Context:** a late original assistant response could arrive after the user had created an optimistic steering turn.
+**Tried / did:** reproduced the race with turn 0 held until after steer, found the adapter dropping turnId and the store defaulting to the last assistant, then carried additive turnIndex metadata through text/thinking and completion.
+**Result:** ❌→✅ — the original delta and completion were red on the broken route and green afterward; the final extension suite is 643/1.   → link: bugs/25
+**Lesson:** turn-scoped identity must survive every adapter boundary; a late event cannot safely use the currently last UI record when a newer optimistic turn exists.
+**Repro:** run the mechanized suites above; the late-original-response and prompt-only reconciliation cases must pass.
+**Trigger:** adding optimistic turns or translating SDK events → preserve turn identity through the public consumer and test arrival after a newer turn.
+**Not for:** claiming the owner's accumulated profile or a true held-response VSIX run before those observations exist.
+
 ### EXP-0021 · 2026-11-25 · ❌→✅ · #chat #steer #testing
 class: text-in-agents-world
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-area.test.tsx -t "steering presentation"
