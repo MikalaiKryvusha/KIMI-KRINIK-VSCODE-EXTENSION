@@ -36,6 +36,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   document.body.removeAttribute("data-baseuri");
+  document.documentElement.classList.remove("dark");
   vi.restoreAllMocks();
 });
 
@@ -242,5 +243,31 @@ describe("steering presentation", () => {
     expect(screen.getAllByRole("img", { name: "KIMI KRINIK" })).toHaveLength(2);
     expect(screen.getByRole("status").closest("[data-message-id]")?.getAttribute("data-message-id")).toBe("assistant-steered");
     document.body.removeAttribute("data-baseuri");
+  });
+});
+
+describe("welcome screen", () => {
+  it("always shows the full shortcut guide and centers the robot with KIMI", () => {
+    document.body.setAttribute("data-baseuri", "https://extension.test");
+    document.documentElement.classList.add("dark");
+    const random = vi.spyOn(Math, "random").mockReturnValue(0.99);
+    useChatStore.setState({ messages: [], isStreaming: false });
+    render(<ChatArea />);
+
+    expect(random).not.toHaveBeenCalled();
+    expect(screen.getByText("⚡ Commands")).not.toBeNull();
+    expect(screen.getByText("💡 Tips")).not.toBeNull();
+    expect(screen.getByText("🚀 Pro Tips")).not.toBeNull();
+    expect(screen.getByText("/compact")).not.toBeNull();
+    expect(screen.getByText("Alt+K")).not.toBeNull();
+
+    const robot = screen.getByRole("img", { name: "KIMI KRINIK" });
+    const wordmark = screen.getByRole("img", { name: "KIMI" });
+    expect(robot.getAttribute("src")).toBe("https://extension.test/resources/krinik-robot-logo.png");
+    expect(wordmark.getAttribute("src")).toBe("https://extension.test/dist/kimi-banner-dark.svg");
+    expect(robot.parentElement).toBe(wordmark.parentElement);
+    expect(robot.nextElementSibling).toBe(wordmark);
+    expect(robot.parentElement?.className).toContain("items-center");
+    expect(robot.parentElement?.className).toContain("justify-center");
   });
 });
