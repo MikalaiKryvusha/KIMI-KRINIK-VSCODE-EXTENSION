@@ -23,6 +23,11 @@
 
 ---
 
+### 2026-11-25 04:45 +03:00 — B12 complete: planName and side panel/editor backgrounds
+- Managed userLevelName reaches `usage.planName` through the public auth facade; optional user-info failure does not hide real quota failures.
+- Real side panel and New Tab both compute `rgb(25, 26, 27)`; editor containers are transparent over the same body background, so no sideBar/editor mismatch was reproduced. WebP read.
+- B5–B8/B11 and B12 are complete; B9/B10 remain owner decisions. Report: `testcases/reports/2026-11-25_b12_backgrounds.md`.
+
 ### 2026-11-25 04:39 +03:00 — managed plan names reach the usage tooltip
 - `KimiAuthFacade` now exposes the toolkit's managed user-info path with the same runtime auth resolution as quota. The extension fills `planName` from `userLevelName`; user-info failure is optional and does not hide quota data or its real errors.
 - Affected handler tests, SDK/extension typechecks and full suite 597 passed, 1 skipped, 0 failed; root lint 0. B12 editor-background verification remains separate; B9/B10 stay with the owner.
@@ -172,7 +177,7 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
 
-- [ ] B12 editor-background verification only. B5–B8/B11 and the `planName` gap are complete; B9/B10 remain owner decisions.
+
 - [ ] `KAIF/framework/hooks` bugs/156 (one sequential Stop): commit, rebuild `dist`, then `node .kaif/kaif-core.mjs update --source D:/work/ai_sandbox/KAIF/dist` here.
 
 ## ❓ Awaiting human review (interviews / homework)
