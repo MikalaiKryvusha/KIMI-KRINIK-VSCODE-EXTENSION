@@ -28,7 +28,7 @@ KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FOR
 
 ## Verification
 
-The release candidate has 607 passing checks and 1 skipped check, green typecheck and lint, and successful static/import verification for six package targets. Build 18 passed isolated VS Code scenarios for steering, replay, media, context thresholds and sticky prompts. The accumulated main profile delivered the real 70% context warning.
+The release candidate has 607 passing checks and 1 skipped check, green typecheck and lint, and successful static/import verification for six package targets. Build 19 passed isolated VS Code scenarios for steering, replay, media, context thresholds and sticky prompts. The accumulated main profile delivered the real 70% context warning.
 
 Acceptance of the remaining corrected chat paths on the accumulated main profile is still being completed.
 

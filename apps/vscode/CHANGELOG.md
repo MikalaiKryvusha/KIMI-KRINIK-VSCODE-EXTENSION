@@ -4,7 +4,20 @@
 
 ### Minor Changes
 
-- Play a sound and speak a message when an approval, question, or error needs attention.
+- Use the official Kimi Code 2.7.2 engine with the KIMI FORK interface, responsive Control Panel actions, live status panels and the pink KIMI KRINIK robot.
+- Turn off automatic compaction, including an operation already in progress, while keeping manual `/compact` available.
+- Use independent Context Window Control with configurable thresholds and a clean KAIF handoff. The accumulated main profile confirmed real threshold delivery.
+- Send follow-ups immediately with AUTO STEER or restore the ordinary queue. Deliver ordered batches once and restore rejected items to their original positions.
+- Send images, video and media-only prompts with clickable thumbnails and the same viewer after replay. Preserve manual line breaks and blank lines.
+- Keep the prompt that owns the visible response on top with an animated chevron, and show localized send times inside user bubbles.
+- Choose models and reasoning effort through one picker with search and favorites. Persist explicit MAX/XHigh choices while resumed sessions keep their own effort.
+- Switch between English, Russian and Chinese with a selected-first language dialog and localized controls.
+- Configure a sound and volume per event with prerecorded clips in all three languages. Keep sound selectors editable after choosing Off.
+- Show the version and build number in Action Menu.
+
+### Patch Changes
+
+- Keep history stable during replay and late request-setup errors. Internal instructions do not appear as assistant text, and unrelated turns are not deleted.
 
 ## 0.9.1
 

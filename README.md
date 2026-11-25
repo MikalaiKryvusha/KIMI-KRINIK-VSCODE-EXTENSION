@@ -55,7 +55,7 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | History replay and internal events | — | — | ✅ atomic replay without blank frames; internal hook results never become assistant text |
 | Context ring and queue feedback | — | ✅ | ✅ blue → yellow → red-orange ring interpolation and one pulse when an item joins the queue |
 | Control Panel at narrow widths | — | ✅ | ✅ horizontal scrolling only on real overflow, with fading edges and one-click actions |
-| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (18)` |
+| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (19)` |
 | Late preflight errors | can surface a generic internal error | can surface a generic internal error | ✅ unrelated and newer chat turns stay intact; only the send that actually failed is rolled back · 🚧 VSIX acceptance |
 | Optional KAIF integration | — | — | ✅ built-in Context Window Control works without KAIF; when KAIF is present, one explicitly assigned owner sends all threshold messages |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
@@ -136,7 +136,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | История и внутренние события | — | — | ✅ восстановление истории без пустых кадров; внутренние служебные инструкции не отображаются как ответ агента |
 | Кольцо контекста и отклик очереди | — | ✅ | ✅ плавный переход синего в жёлтый и красно-оранжевый, один импульс при добавлении сообщения |
 | Панель управления на узком экране | — | ✅ | ✅ горизонтальная прокрутка только при реальном переполнении, затухание краёв и действия одним кликом |
-| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (18)` |
+| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (19)` |
 | Запоздавшие ошибки подготовки запроса | общая ошибка без подробностей | общая ошибка без подробностей | ✅ не связанные с ошибкой и более новые ходы чата сохраняются; откатывается только текущая неудачная отправка · 🚧 приёмка VSIX |
 | Интеграция с KAIF по желанию | — | — | ✅ встроенный Контроль работает без KAIF; при наличии KAIF расширение явно назначает единственного владельца пороговых сообщений |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
@@ -216,7 +216,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 历史 replay 与内部事件 | — | — | ✅ 原子 replay 不出现空白帧；内部 hook 结果不会成为助手文本 |
 | 上下文圆环与队列反馈 | — | ✅ | ✅ 蓝色 → 黄色 → 红橙色平滑渐变，消息入队时仅脉冲一次 |
 | 窄宽度下的 Control Panel | — | ✅ | ✅ 仅在实际溢出时横向滚动，边缘渐隐，单击执行操作 |
-| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (18)` |
+| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (19)` |
 | 延迟到达的 preflight 错误 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 无关及更新的聊天消息保持不变，仅回滚当前失败的发送 · 🚧 VSIX 验收 |
 | 可选的 KAIF 集成 | — | — | ✅ 内置上下文控制无需 KAIF；存在 KAIF 时，扩展明确指定唯一控制方，阈值消息仅由该控制方发送 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
