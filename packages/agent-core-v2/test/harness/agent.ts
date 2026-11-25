@@ -648,7 +648,7 @@ export function homeDirServices(homeDir: string | undefined): TestAgentServiceOv
   });
 }
 
-export function hostEnvironmentServices(homeDir: string): TestAgentServiceOverride {
+export function hostEnvironmentServices(homeDir: string, pathClass: 'posix' | 'win32' = 'posix'): TestAgentServiceOverride {
   return appServices((reg) => {
     reg.defineInstance(
       IHostEnvironment,
@@ -659,7 +659,7 @@ export function hostEnvironmentServices(homeDir: string): TestAgentServiceOverri
         osVersion: 'test',
         shellName: 'bash',
         shellPath: '/bin/bash',
-        pathClass: 'posix',
+        pathClass,
         homeDir,
         ready: Promise.resolve(),
       } satisfies IHostEnvironment,

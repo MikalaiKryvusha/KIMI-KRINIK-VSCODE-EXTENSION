@@ -1,6 +1,6 @@
 # Bug 05 — PreCompact and PostCompact hook log is empty
 
-**Status:** 🔴 OPEN
+**Status:** ✅ DONE — real hook child processes and payload log verified on Windows; full compaction file 123/123
 **Build:** KIMI KRINIK 1.0.0 · `74a76daf2` · **Environment:** Windows · Node v24.15.0 · real agent-core harness · **Evidence:** assertion diff at `fullCompaction.test.ts:494` and `testcases/reports/2026-11-24_inflight_auto_compact_off.md`
 **Version/build:** KIMI KRINIK 1.0.0 · `74a76daf2` · **When/context:** 2026-11-24 02:28 +03:00, full `fullCompaction` suite after K2.6
 **Severity:** S2
@@ -21,7 +21,7 @@ The compaction hook test reads an empty hook payload list instead of the require
 
 ## Actual result
 
-The mapped list is `[]`.
+After quoting the logger executable and script path, the mapped list is `[PreCompact, PostCompact]`, with the required payload fields and ordering.
 
 ## Forensics
 
@@ -31,13 +31,18 @@ The mapped list is `[]`.
 
 ## Root cause / Hypotheses
 
-1. PreCompact/PostCompact are not invoked by the compaction module on this path.
-2. The hook runner writes to a different log than `readHookPayloads` reads.
-3. Hook registration or payload persistence is broken on Windows. No cause has been confirmed; this is not yet evidence that the product hooks never run.
+1. Refuted: PreCompact and PostCompact were both invoked by the compaction module; diagnostic callbacks observed both.
+2. Confirmed: `hookPayloadLoggerCommand` returned an unquoted command while Node lives at `C:\Program Files\nodejs\node.exe`; shell execution split the executable path and no payload file was written.
+3. The product hook runner and registration were not changed.
 
-## Fix plan
+## Resolution
 
-Trace the runner registration and the log path, then verify whether the calls are absent or only the evidence is missing. Repair the owning layer and prove the guard red by suppressing each hook once, then green with both calls in order. Keep this separate from K2.6 and bug 04.
+Quote both `process.execPath` and the generated script path in the test logger command. Removed the temporary resolution diagnostics after proving both hooks fired.
+
+## ✅ STATUS: DONE (2026-11-25 03:45 +03:00)
+
+Hygiene: the original empty-list test was red before quoting and green afterward; full compaction 123/123, agent-core typecheck and root lint pass.
+Functional run: real agent-core compaction invoked two actual Node child hook processes. The JSONL log contained PreCompact then PostCompact with session/cwd/trigger and token-count fields, not an empty file. Evidence: `testcases/reports/2026-11-25_windows_compaction_harness.md`.
 
 ## Decisions made without the owner
 

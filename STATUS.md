@@ -23,6 +23,11 @@
 
 ---
 
+### 2026-11-25 03:45 +03:00 — Windows compaction harness repaired; bugs/05 DONE
+- `bugs/04`: real Windows temp paths now select win32 path mapping and host-native expected resolution; cwd/listing case passes. Linux row remains unrun because WSL is not installed and Docker is unavailable, so bug 04 stays open.
+- `bugs/05`: both hooks were already invoked; unquoted Node path under Program Files emptied the logger output. Quoting executable/script produced ordered PreCompact/PostCompact payloads. DONE.
+- Full compaction 123/123, agent-core typecheck and root lint green. No production source changed. Report: `testcases/reports/2026-11-25_windows_compaction_harness.md`.
+
 ### 2026-11-25 03:26 +03:00 — steering avatar/user order verified; bugs/16 DONE
 - Immediate, two-consecutive and replayed steering on isolated build 19 preserve base → steer one → steer two → assistant response. Clean replay offsets were 14/61/71/87 with no avatar inversion, error or Retry; three WebP frames were read.
 - Report: `testcases/reports/2026-11-25_steer_avatar_order.md`. Current lifecycle already had the fix; no product change was needed.
@@ -134,7 +139,7 @@ external publication wait for the owner's `AUTH:`.
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-25 02:36 +03:00, Windows): 597 passed, 1 skipped, 0 failures; root lint, typecheck and build-19 package/static audit green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine file is 121/123; the two unrelated pre-existing failures are documented in `bugs/04` and `bugs/05`, not hidden as a baseline. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-25 02:36 +03:00, Windows): 597 passed, 1 skipped, 0 failures; root lint, typecheck and build-19 package/static audit green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine compaction file is 123/123 on Windows; `bugs/05` is DONE and `bugs/04` awaits only its unrun Linux row. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -187,8 +192,7 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔧 `bugs/13_steer_attachments_and_thumbnails.md` — thumbnails/viewer fixed and observed; media delivery and main-profile build-12 acceptance pending.
 - 🔴 `bugs/14_steer_queue_not_added.md` — the follow-up queue is not visibly added; exact state combination needs reproduction.
 - 🔧 `bugs/15_hook_results_visible_in_chat.md` — replay hook rendering fixed; main-profile build-12 confirmation pending.
-- 🔴 `bugs/04_frozen_prompt_windows_path.md` — pre-existing Windows cwd/listing failure reproduced on the original engine service.
-- 🔴 `bugs/05_pre_post_compact_hook_log_empty.md` — pre-existing empty Pre/PostCompact payload list reproduced on the original engine service.
+- 🔧 `bugs/04_frozen_prompt_windows_path.md` — Windows harness fixed and full file 123/123; Linux CI row remains unrun (WSL not installed, Docker unavailable).
 - 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.
 - 🔴 `bugs/152` (KAIF origin) — the extension can stay on «Starting Kimi Code…»; not reproduced; check B10 when it recurs.
 - 🟠 `bugs/151` (KAIF origin) — follow-up steer race; store-level fixes in place, live acceptance left.

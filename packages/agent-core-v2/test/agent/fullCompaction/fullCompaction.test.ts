@@ -1,4 +1,5 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { resolve as resolveHostPath } from 'node:path';
 import { appendContext } from '../contextMemory/stubs';
 import { tmpdir } from 'node:os';
 import { join } from 'pathe';
@@ -291,7 +292,7 @@ describe('FullCompaction', () => {
       writeFileSync(join(workDir, 'AGENTS.md'), 'old project instructions', 'utf-8');
       const ctx = testAgent(
         execEnvServices({ hostFs: new HostFileSystem() }),
-        hostEnvironmentServices(homeDir),
+        hostEnvironmentServices(homeDir, process.platform === 'win32' ? 'win32' : 'posix'),
         { autoConfigure: false, cwd: workDir },
       );
       ctx.configureRuntimeModel(CATALOGUED_PROVIDER, CATALOGUED_MODEL_CAPABILITIES);
@@ -3928,7 +3929,7 @@ function countEvents(events: ReturnType<TestAgentContext['newEvents']>, type: st
 
 function exactCompactionPrompt(workDir: string, agentsMd: string): string {
   return [
-    `cwd:${workDir}`,
+    `cwd:${resolveHostPath(workDir)}`,
     'os:Linux',
     'shell:bash:/bin/bash',
     `agents:<!-- From: ${join(workDir, 'AGENTS.md')} -->\n${agentsMd}`,
@@ -4073,7 +4074,7 @@ function hookPayloadLoggerCommand(logPath: string): string {
     '});',
   ].join('');
   writeFileSync(scriptPath, script);
-  return `${process.execPath} ${scriptPath}`;
+  return `"${process.execPath}" "${scriptPath}"`;
 }
 
 function readHookPayloads(logPath: string): Array<Record<string, unknown>> {

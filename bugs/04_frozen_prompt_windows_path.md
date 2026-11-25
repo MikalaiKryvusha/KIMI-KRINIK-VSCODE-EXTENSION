@@ -1,6 +1,6 @@
 # Bug 04 — Frozen compaction prompt has a concatenated Windows cwd and unreadable listing
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 Windows harness fixed and full file 123/123; Linux CI acceptance pending
 **Build:** KIMI KRINIK 1.0.0 · `74a76daf2` · **Environment:** Windows · Node v24.15.0 · real agent-core harness · **Evidence:** assertion diff at `fullCompaction.test.ts:303` and `testcases/reports/2026-11-24_inflight_auto_compact_off.md`
 **Version/build:** KIMI KRINIK 1.0.0 · `74a76daf2` · **When/context:** 2026-11-24 02:28 +03:00, full `fullCompaction` suite after K2.6
 **Severity:** S2
@@ -21,7 +21,7 @@ The frozen-profile test builds an invalid prompt: the expected temporary cwd is 
 
 ## Actual result
 
-`before` instead contains `cwd:/work/ai_sandbox/KIMI-KRINIK-VSCODE-EXTENSION/F:/Temp/kimi-compact-refresh-work-<suffix>` and `ls:[not readable]`. The expected value starts with `cwd:F:/Temp/kimi-compact-refresh-work-<suffix>`.
+The original failure reproduced on Windows. After the harness fix, the same test passes with host-native absolute cwd and readable `AGENTS.md`; Linux remains unrun locally.
 
 ## Forensics
 
@@ -31,13 +31,15 @@ The frozen-profile test builds an invalid prompt: the expected temporary cwd is 
 
 ## Root cause / Hypotheses
 
-1. Windows absolute path handling joins the repository cwd and a drive-letter temp path incorrectly.
-2. The fixture uses a path shape the prompt builder does not normalize, which also makes the AGENTS directory read fail.
-3. The expected-value helper and the actual context resolver use different path semantics. No code cause has been confirmed.
+1. Confirmed: the test supplied real Windows temp paths and HostFS to `hostEnvironmentServices`, which hardcoded POSIX path mapping. POSIX resolve prefixed the repository cwd and made listing unreadable.
+2. Confirmed: expected cwd now uses host-native path resolution; Windows uses backslashes while AGENTS display paths retain their existing normalized form.
+3. The production environment path mapping was not changed.
 
-## Fix plan
+## Fix evidence — 2026-11-25 03:45 +03:00
 
-Trace `exactCompactionPrompt` and the real profile context/cwd listing on Windows, then fix the owning path normalization or the incorrect expectation. Add a Windows regression that asserts both the prompt cwd and the listing; run Linux CI to preserve the existing contract. This is the next engine-test investigation after the current handover, not part of K2.6.
+`hostEnvironmentServices` accepts an explicit path class with POSIX default; only this real-host test selects win32 on Windows. `exactCompactionPrompt` uses `node:path.resolve` for the host-native expected cwd. The original prefixed-path/unreadable-listing assertion was red before and green after; the full compaction file is 123/123, agent-core typecheck and root lint pass.
+
+Linux verification: not run. `wsl.exe` exists but reports WSL is not installed; no Docker executable is available. POSIX remains the helper default and Linux expected resolution is unchanged, but this is not claimed as an observed Linux pass. The bug stays open pending CI.
 
 ## Decisions made without the owner
 
@@ -46,4 +48,4 @@ Deferred as a separate pre-existing defect after proving it on the original serv
 ## Links
 
 - `testcases/reports/2026-11-24_inflight_auto_compact_off.md`
-- `bugs/05_pre_post_compact_hook_log_empty.md`
+- `bugs/05_DONE_pre_post_compact_hook_log_empty.md`

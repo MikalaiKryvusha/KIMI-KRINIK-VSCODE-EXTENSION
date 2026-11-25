@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0014 · 2026-11-25 · ❌→✅ · #windows #hooks #testing
+class: shell-lied
+mechanized: pnpm exec vitest run --reporter=agent packages/agent-core-v2/test/agent/fullCompaction/fullCompaction.test.ts
+**Context:** compaction hooks fired but their JSONL evidence stayed empty on Windows.
+**Tried / did:** observed both hook callbacks, then inspected the generated shell command and quoted the Node executable and script path.
+**Result:** ❌→✅ — the unquoted `C:\Program Files\nodejs\node.exe` had been split by the shell; both real child payloads now land in order and the full file is 123/123.   → link: bugs/05_DONE_pre_post_compact_hook_log_empty.md
+**Lesson:** a successful event callback does not prove a shell command ran correctly; quote executable and script paths and read process output/evidence before blaming registration.
+**Repro:** `pnpm exec vitest run --reporter=agent packages/agent-core-v2/test/agent/fullCompaction/fullCompaction.test.ts -t "fires PreCompact and PostCompact"`.
+**Trigger:** generating a shell command from host paths → quote every path and test it on a host whose executable directory contains spaces.
+**Not for:** claiming every empty hook log is a quoting issue; invocation and evidence paths must still be observed separately.
+
 ### EXP-0013 · 2026-11-25 · ❌→✅ · #chat #replay #testing
 class: guard-not-proven-against-threat
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-store.test.ts
