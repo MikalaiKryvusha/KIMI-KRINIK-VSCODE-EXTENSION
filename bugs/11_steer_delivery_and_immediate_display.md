@@ -55,6 +55,16 @@ Next-session reproduction: hold an assistant response, send a user steer, and co
 
 The owner subsequently reported the same disappearance again («опять твое сообщение появилось на секунду и исчезло»). This is now a repeated symptom, not a one-off flicker; the steering relationship remains a hypothesis, not a confirmed cause.
 
+## Parked live reproduction — owner prioritizes deterministic high-value fixes
+
+2026-11-25 12:11 +03:00 — [OWNER] «давай не будем ловить сложновоспроизводимые баги, а будет чинить то, что однозначно понятно, как чинить», «и у тебя под руками код - его анализ может тебе показать, где есть баги однозначно», «давай в первую очередь делать и чинить то, что А) аонятно как делать или как чинить) Б) дает 80% пользы при 20% усилий» (чат).
+
+The main-profile Action Menu showed `v1.0.0 (14)`, Context Window Control was visibly ON and `kimi.contextWindowControl` was `true`. Installed extension/webview hashes matched the build-14 VSIX, and the fresh Extension Host activated KIMI KRINIK.
+
+Three isolated build-14 variants were walked with a visible assistant chunk, AUTO STEER ON, DOM MutationObserver and bridge-event tracing: one steering message; two consecutive steering messages; and a send triggered synchronously by the first `stream_complete` at the running→idle boundary. The first scenario also completed history replay. No assistant-container loss was observed. Removed text nodes were immediately replaced while their assistant containers and text remained present. The consecutive diagnostic's later duplicate was caused by an extra harness send and is excluded from the product verdict.
+
+This is not a DONE claim and does not refute the owner's repeated symptom. The exact original trigger remains unproven. Further live hunting is parked by the owner's explicit priority; deterministic code-level defects come first. Run report: `testcases/reports/2026-11-25_steer_response_stability.md`.
+
 ## Links
 
 - `testcases/TC_K5_live_acceptance.md` C09 and C19

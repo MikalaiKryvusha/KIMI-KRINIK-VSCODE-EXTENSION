@@ -23,6 +23,11 @@
 
 ---
 
+### 2026-11-25 12:11 +03:00 — PARKED: difficult bug reproduction; deterministic high-value fixes first
+- [OWNER] «давай не будем ловить сложновоспроизводимые баги, а будет чинить то, что однозначно понятно, как чинить», «и у тебя под руками код - его анализ может тебе показать, где есть баги однозначно», «давай в первую очередь делать и чинить то, что А) аонятно как делать или как чинить) Б) дает 80% пользы при 20% усилий» (чат). This applies the existing Pareto principle in `PHILOSOPHY.md:68-72`; no duplicate house rule is kept.
+- Main-profile build 14 and Context Window Control ON are confirmed by the real Action Menu (`v1.0.0 (14)`), visible enabled control, setting and Extension Host activation. `bugs/11` received three isolated non-reproductions and is PARKED, not DONE: single steer, consecutive steers, running→idle and replay preserved assistant containers. Report: `testcases/reports/2026-11-25_steer_response_stability.md`.
+- `bugs/29` is fixed at the store boundary: two ownership regressions were red before and green after, the genuine-current-send control stayed green; focused 31/31, full extension 601 passed / 1 skipped, typecheck and root lint are green. The real VSIX preflight path remains unobserved, so the bug stays 🔧 rather than DONE. Changeset and twin sweep are recorded.
+
 ### 2026-11-25 10:50 +03:00 — CLOSING to full-work build 14 and a fresh chat
 - [OWNER] «давай билд 14 установим, и этот чат закроем с передачей дел в новый чат… я буду знать, что Контроль работает» · 2026-11-25 10:48 +03:00 (чат). This chat fixed and packaged the Context Window Control delivery defect, produced full-work build 14, verified it twice in isolated VS Code, and filed the test-debt false positive as KAIF #206. Build 14 is installed on the main profile: manifest `buildNumber: 14`, installed/source dist SHA-256 match. All merge conflicts are resolved in `main`; lint, typecheck and affected suites are green. Final Desktop E2E smoke was interrupted by the owner; Nix itself is unavailable and the workspace checker has a Windows path-separator false positive.
 - [OWNER] «ты только что писал ответ, а затем он исчез - похоже на баг», «вероятно, стиринг сообщения пользователя могут как-то "ломать" ответы КИМИ в чате» · 2026-11-25 10:48 +03:00 (чат). Recorded in `bugs/11`: assistant-entry stability after steering is now an explicit acceptance requirement; cause is unproven. Next chat must compare DOM removals with steer/turn/replay events before editing the store.
@@ -118,7 +123,7 @@
 
 ## Where we are now
 
-The extension builds and typecheck is green; the latest full extension run has 598 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
+The extension builds and typecheck is green; the latest full extension run has 601 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
 acceptance live in the KAIF origin repository: `D:/work/ai_sandbox/KAIF/plans/147_EPIC_kimi_krinik_1_0_0.md` and `plans/148`–`154`.
 Routine pushes of this branch go under the standing authorization of `AGENT_GUIDE.md` → Git workflow; a release, a rename and any
 external publication wait for the owner's `AUTH:`.
@@ -149,7 +154,7 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-CURRENT: start with `/skill:resume` in the fresh chat on main-profile build 14. First confirm the loaded build and Context Window Control ON, then reproduce the owner-reported assistant-response disappearance during steering in `bugs/11` with DOM and turn/replay evidence. Verify a real threshold closure on the accumulated profile before marking `bugs/28` DONE. After those owner-flagged paths, resume ON/OFF queue, duplicate, composer, media and hook-output acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24`. Builds 17–20 remain isolated-only. Main source has 598 passed / 1 skipped and root lint green; `bugs/19` two-client replay, original first-prompt `bugs/25`, broader lifecycle matrix, sticky last message and release/publication remain later work. No release/publication without separate owner `AUTH:`.
+CURRENT: `bugs/29` has a verified store ownership guard and is ready to commit; its real VSIX preflight path remains open. `bugs/11` is parked by the owner's explicit Pareto direction after three non-reproductions; resume it only with new deterministic evidence, not more blind live hunting. Next verify a real threshold closure on the accumulated profile before marking `bugs/28` DONE, then resume clear ON/OFF queue, duplicate, composer, media and hook-output acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24`. Main source has 601 passed / 1 skipped and root lint green; two-client replay, original first-prompt `bugs/25`, broader lifecycle matrix, sticky last message and release/publication remain later work. No release/publication without separate owner `AUTH:`.
 
 Standing falsehood: the claims that builds 4–6 had failed live were false because the old isolated process never restarted → corrected in `bugs/20_queue_steer_duplicate_submission.md` and the fresh-process result in `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`.
 
@@ -174,6 +179,7 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - ✅ `ideas/03_extension_general_settings.md` — owner approved an extension-localized General Settings page with no duplicate owners; Context Window Control and thresholds move there from Control Panel. Planned for the next development cut, not started during closure.
 ## Open bugs
 
+- 🔧 `bugs/29_preflight_error_deletes_unrelated_history.md` — ownership guard and deterministic regressions pass; real VSIX preflight path pending.
 - 🔧 `bugs/28_context_window_control_empty_skills_rejected.md` — root cause fixed and real active-turn control observed on isolated builds 20, 13 and full-work 14; main-profile build-14 acceptance pending.
 - 🔧 `bugs/19_tool_cards_hide_working_state.md` — active/completion/replay pass on isolated build 19; original main-profile path pending.
 - 🔧 `bugs/18_reentrant_prompt_internal_error.md` — ON/OFF/fallback contracts and isolated paths pass; original main-profile path pending.
