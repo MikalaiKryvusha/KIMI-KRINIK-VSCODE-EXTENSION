@@ -1,6 +1,6 @@
 # Bug 18 — Sending during an active response surfaces a generic internal error
 
-**Status:** 🔴 OPEN
+**Status:** ✅ DONE — current ON/OFF/fallback contracts and clean isolated build-19 user paths show no generic reentrant-send error
 **Version/build:** KIMI KRINIK 1.0.0 and official `moonshot-ai.kimi-code-0.9.0` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 15:24:10 +03:00, owner chat sends; reported during chat-pipeline characterization
 **Severity:** S2
 **Fixing:** this session as owner debt; include the contract in the chat-pipeline characterization before implementation
@@ -24,14 +24,7 @@ The owner path is reproduced by the existing runtime-level reentrant-prompt case
 
 ## Actual result
 
-At 2026-11-24 15:24:10 +03:00 the KIMI KRINIK output log recorded:
-
-```text
-Session runtime error: Error: A response is already being generated for this session.
-[bridge] id=296_1795523050193 method=streamChat ok=true durationMs=21
-```
-
-The UI maps that event to the generic non-terminal warning `Internal error occurred.` while the earlier `streamChat` remains active until 15:24:19.
+The current user paths no longer reproduce the generic toast: AUTO STEER ON uses steering, OFF shows the queue, and running→idle fallback/batch tests preserve one submission. Direct reentrant `streamChat` remains guarded and covered as a low-level control, not a valid webview send route.
 
 ## Forensics
 
@@ -45,9 +38,27 @@ The UI maps that event to the generic non-terminal warning `Internal error occur
 
 The immediate cause of the generic toast is confirmed: the runtime's reentrant-prompt guard fires and the webview hides the useful detail behind a generic message. The triggering outbound-state mismatch is a chat-pipeline defect related to `bugs/11` and `bugs/14`; it is not evidence of a provider failure.
 
-## Fix plan
+## Original failure evidence
 
-Add the owner symptom and fresh log signature to the Phase 0 matrix. Characterize the public store/host path where an active response receives `streamChat`, including ON/OFF and running→idle cases. Preserve the low-level reentrant guard as a control, but route valid user sends through the required steer/queue lifecycle and surface actionable detail if a genuine conflict remains. Verify the isolated installed VSIX and do not modify the separately installed official extension.
+At 2026-11-24 15:24:10 +03:00 the KIMI KRINIK output log recorded:
+
+```text
+Session runtime error: Error: A response is already being generated for this session.
+[bridge] id=296_1795523050193 method=streamChat ok=true durationMs=21
+```
+
+The UI mapped that event to `Internal error occurred.` while the earlier `streamChat` remained active until 15:24:19.
+
+## Resolution
+
+The optimistic lifecycle, full `PromptSubmissionResult` propagation, stale-state fallback and visible queue now cover the valid user routes that previously reached the reentrant guard. The low-level guard and its non-terminal warning test remain intact.
+
+## ✅ STATUS: DONE (2026-11-25 03:51 +03:00)
+
+Hygiene: 106 runtime/settings/chat-store checks pass, including the low-level active-response guard, unchanged streaming state, ON/OFF routing and exactly-once fallback. Full extension suite remains 597 passed, 1 skipped, 0 failed; root lint exits 0.
+Functional run: current isolated build 19 ON consecutive steering and OFF queue/dequeue paths completed without `Internal error occurred.`; build 17 genuine running→idle batch also delivered without the generic error. Evidence: `testcases/reports/2026-11-25_steer_avatar_order.md`, `testcases/reports/2026-11-25_multiline_queue_steer.md`, `testcases/reports/2026-11-25_queue_batch_build_17.md`, and `testcases/reports/2026-11-25_reentrant_send_contract.md`.
+
+The official extension was not modified.
 
 ## Decisions made without the owner
 

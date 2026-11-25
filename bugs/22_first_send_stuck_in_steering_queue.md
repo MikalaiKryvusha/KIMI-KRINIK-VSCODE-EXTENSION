@@ -57,7 +57,7 @@ Used an extension-internal `clientId` rather than changing the official SDK, mat
 
 - `bugs/11_steer_delivery_and_immediate_display.md`
 - `bugs/14_steer_queue_not_added.md`
-- `bugs/18_reentrant_prompt_internal_error.md`
+- `bugs/18_DONE_reentrant_prompt_internal_error.md`
 - `bugs/20_queue_steer_duplicate_submission.md`
 - `researches/54_chat_pipeline_reliability.md`
 

@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 03:51 +03:00 — active-response user sends verified; bugs/18 DONE
+- 106 runtime/settings/chat-store contracts pass. Current isolated ON steering, OFF queue/dequeue and running→idle batch paths show no `Internal error occurred.`; direct invalid reentrant prompt remains guarded and the first turn continues.
+- Historical owner log is preserved in `bugs/18_DONE_reentrant_prompt_internal_error.md`; official extension unchanged. Report: `testcases/reports/2026-11-25_reentrant_send_contract.md`.
+
 ### 2026-11-25 03:45 +03:00 — Windows compaction harness repaired; bugs/05 DONE
 - `bugs/04`: real Windows temp paths now select win32 path mapping and host-native expected resolution; cwd/listing case passes. Linux row remains unrun because WSL is not installed and Docker is unavailable, so bug 04 stays open.
 - `bugs/05`: both hooks were already invoked; unquoted Node path under Program Files emptied the logger output. Quoting executable/script produced ordered PreCompact/PostCompact payloads. DONE.
@@ -186,7 +190,6 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔧 `bugs/22_first_send_stuck_in_steering_queue.md` — exactly-once/result contracts implemented; main-profile build-12 acceptance pending.
 - 🔧 `bugs/24_glass_preview_silent.md` — real packaged MP3 playback passed in isolation; main-profile build-12 acceptance pending.
 - 🔧 `bugs/20_queue_steer_duplicate_submission.md` — whole-batch delivery verified on fresh isolated build 17; main-profile acceptance pending.
-- 🔴 `bugs/18_reentrant_prompt_internal_error.md` — owner hit the generic send error in both extensions; the fresh KIMI KRINIK log proves a second ordinary prompt hit the active-response guard.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — steering bubbles wait for acknowledgement and some sends are lost at a state transition.
 - 🔧 `bugs/12_steer_composer_restores_previous_text.md` — stale/latest composer contracts fixed; main-profile build-12 acceptance pending.
 - 🔧 `bugs/13_steer_attachments_and_thumbnails.md` — thumbnails/viewer fixed and observed; media delivery and main-profile build-12 acceptance pending.
