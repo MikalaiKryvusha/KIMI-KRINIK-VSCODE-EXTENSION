@@ -275,25 +275,34 @@ function isTaskToolResult(steps: UIStep[] | undefined, toolCallId: string): bool
 }
 
 function handlePreflightError(draft: ChatState, _code: string, _message: string): void {
+  const pendingInput = draft.pendingInput;
+  const lastAssistant = getLastAssistant(draft);
+  const lastUser = draft.messages.at(-2);
+  if (!draft.isStreaming || pendingInput === null || lastAssistant === undefined || lastUser?.role !== "user") return;
+
+  const ownsFailedTurn = pendingInput.clientId === undefined
+    ? sameContent(lastUser.content, pendingInput.content)
+    : lastUser.clientId === pendingInput.clientId && lastAssistant.clientId === pendingInput.clientId;
+  if (!ownsFailedTurn) return;
+
   addTokenUsage(draft.tokenUsage, draft.activeTokenUsage);
   draft.activeTokenUsage = createEmptyTokenUsage();
   draft.isStreaming = false;
   draft.isCompacting = false;
   useApprovalStore.getState().clearRequests();
 
-  const lastAssistant = getLastAssistant(draft);
-  if (lastAssistant && !hasContent(lastAssistant)) {
+  if (!hasContent(lastAssistant)) {
     draft.messages.pop();
   }
 
-  const lastUser = draft.messages.at(-1);
-  if (lastUser?.role === "user") {
-    const userContent = lastUser.content;
+  const failedUser = draft.messages.at(-1);
+  if (failedUser?.role === "user") {
+    const userContent = failedUser.content;
     draft.messages.pop();
     draft.pendingInput = {
       content: userContent,
-      model: draft.pendingInput?.model ?? "",
-      ...(draft.pendingInput?.clientId === undefined ? {} : { clientId: draft.pendingInput.clientId }),
+      model: pendingInput.model,
+      ...(pendingInput.clientId === undefined ? {} : { clientId: pendingInput.clientId }),
     };
   }
 }

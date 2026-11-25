@@ -538,4 +538,41 @@ describe("automatic follow-up steer", () => {
     expect(useChatStore.getState()).toMatchObject({ permissionMode: null, sessionTitle: null });
     expect(boundary.streamChat).toHaveBeenCalledWith("new conversation", "reasoning", "high", false, undefined, { clientId: expect.any(String) });
   });
+
+  it("keeps interrupted history when a preflight error arrives with no active send", () => {
+    useChatStore.setState({
+      messages: [
+        { id: "interrupted-user", role: "user", content: "keep", timestamp: 1 },
+        { id: "interrupted-assistant", role: "assistant", content: "", timestamp: 2, steps: [] },
+      ],
+    });
+
+    useChatStore.getState().processEvent({ type: "error", code: "internal", message: "late failure", phase: "preflight" });
+
+    expect(useChatStore.getState().messages.map((message) => message.id)).toEqual(["interrupted-user", "interrupted-assistant"]);
+    expect(useChatStore.getState().isStreaming).toBe(false);
+  });
+
+  it("does not let a stale preflight error remove a newer steering turn", () => {
+    useChatStore.getState().sendMessage("first");
+    beginTurn("first");
+    useChatStore.getState().sendMessage("second");
+
+    useChatStore.getState().processEvent({ type: "error", code: "internal", message: "stale failure", phase: "preflight" });
+
+    expect(useChatStore.getState().messages.map((message) => message.content)).toEqual(["first", "", "second", ""]);
+    expect(useChatStore.getState().pendingInput?.content).toBe("first");
+    expect(useChatStore.getState().isStreaming).toBe(true);
+  });
+
+  it("rolls back the current optimistic turn on its own preflight error", () => {
+    useChatStore.getState().sendMessage("first");
+    const pending = useChatStore.getState().pendingInput;
+
+    useChatStore.getState().processEvent({ type: "error", code: "internal", message: "current failure", phase: "preflight" });
+
+    expect(useChatStore.getState().messages).toEqual([]);
+    expect(useChatStore.getState().pendingInput).toMatchObject({ content: "first", model: "plain", clientId: pending?.clientId });
+    expect(useChatStore.getState().isStreaming).toBe(false);
+  });
 });
