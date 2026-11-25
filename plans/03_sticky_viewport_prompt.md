@@ -30,6 +30,8 @@
 | AC10 | Expand a prompt and read an ordinary user message | the existing chevron rotates with reduced-motion-safe animation; the ordinary user bubble shows localized `HH:MM` send time to the left of the bubble |
 | AC11 | Expand a sticky prompt | the collapse chevron sits in its top-right corner without a separate full-width control row; prompt text starts at the top content row and does not overlap the chevron |
 | AC12 | Read a collapsed sticky prompt | the summary is raised and optically centered vertically inside the bubble rather than sitting low |
+| AC13 | Open or return to the very beginning of the conversation | no sticky prompt is rendered at `scrollTop = 0`; scrolling into an assistant turn can activate it again |
+| AC14 | Scroll with an expanded sticky prompt, then pin another prompt and return | wheel/touch scrolling collapses the expansion; a replaced prompt's expansion is cleared and does not reappear on return |
 
 ## 3. Reference findings
 
@@ -57,6 +59,8 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 - [x] Move the ordinary user-message timestamp to the left side of its bubble and cover narrow-width rendering.
 - [x] Overlay the expanded sticky chevron in the top-right corner, remove the empty full-width control row and verify that the first text line starts at the top without overlapping the button.
 - [x] Raise the collapsed summary and center it optically within the sticky bubble; verify with computed geometry and a WebP screenshot.
+- [x] Hide the sticky prompt at the top of the conversation and suppress its initial-render flash.
+- [x] Collapse expanded sticky state on user wheel/touch scrolling and clear it when another prompt becomes sticky.
 
 ## 5. Verification by observation
 

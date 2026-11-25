@@ -1,8 +1,10 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+let scrollTop = 0;
+
 vi.mock("react-scroll-to-bottom", () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  default: ({ children, scrollViewClassName }: { children: React.ReactNode; scrollViewClassName?: string }) => <div className={scrollViewClassName}>{children}</div>,
   useScrollToBottom: () => vi.fn(),
   useSticky: () => [false],
 }));
@@ -20,6 +22,11 @@ import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import type { ChatMessage as ChatMessageType } from "../../webview-ui/src/stores/chat.store";
 
 beforeEach(() => {
+  scrollTop = 100;
+  vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(1000);
+  vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(200);
+  vi.spyOn(Element.prototype, "scrollTop", "get").mockImplementation(() => scrollTop);
+  vi.spyOn(Element.prototype, "scrollTop", "set").mockImplementation((value: number) => { scrollTop = value; });
   useChatStore.setState({
     messages: [{ id: "assistant-1", role: "assistant", content: "answer", steps: [], timestamp: 0 }],
     isStreaming: false,
@@ -136,5 +143,56 @@ describe("sticky user prompt", () => {
     render(<ChatArea />);
 
     expect(screen.getByTestId("sticky-user-prompt").textContent).toContain("(media)");
+  });
+
+  it("hides the sticky prompt at the top and restores it after scrolling", () => {
+    useChatStore.setState({ messages: promptMessages, isStreaming: false });
+    scrollTop = 0;
+    render(<ChatArea />);
+
+    expect(screen.queryByTestId("sticky-user-prompt")).toBeNull();
+    const scroll = document.querySelector(".chat-scroll-view")!;
+    act(() => {
+      scrollTop = 100;
+      fireEvent.scroll(scroll);
+    });
+    expect(screen.queryByTestId("sticky-user-prompt")).not.toBeNull();
+  });
+
+  it("collapses an expanded sticky prompt on wheel and touch scrolling", () => {
+    useChatStore.setState({
+      messages: [
+        { id: "user-long", role: "user", content: "first line\nsecond line", timestamp: 1, turnIndex: 0 },
+        { id: "assistant-long", role: "assistant", content: "answer", timestamp: 2, steps: [], turnIndex: 0 },
+      ],
+      isStreaming: false,
+    });
+    render(<ChatArea />);
+    const scroll = document.querySelector(".chat-scroll-view")!;
+
+    fireEvent.click(screen.getByRole("button", { name: /Expand/ }));
+    expect(screen.queryByTestId("sticky-prompt-full")).not.toBeNull();
+    fireEvent.wheel(scroll);
+    expect(screen.queryByTestId("sticky-prompt-full")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /Expand/ }));
+    fireEvent.touchMove(scroll);
+    expect(screen.queryByTestId("sticky-prompt-full")).toBeNull();
+  });
+
+  it("does not resurrect an expansion after another prompt becomes sticky", () => {
+    const firstMessages: ChatMessageType[] = [
+      { id: "user-long", role: "user", content: "first line\nsecond line", timestamp: 1, turnIndex: 0 },
+      { id: "assistant-long", role: "assistant", content: "answer", timestamp: 2, steps: [], turnIndex: 0 },
+    ];
+    useChatStore.setState({ messages: firstMessages, isStreaming: false });
+    render(<ChatArea />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Expand/ }));
+    expect(screen.queryByTestId("sticky-prompt-full")).not.toBeNull();
+    act(() => useChatStore.setState({ messages: promptMessages }));
+    act(() => useChatStore.setState({ messages: firstMessages }));
+
+    expect(screen.queryByTestId("sticky-prompt-full")).toBeNull();
   });
 });

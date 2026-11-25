@@ -63,7 +63,7 @@ export function selectActivePromptId(
 }
 
 export function useActivePromptId(messages: readonly ChatMessage[], hostRef: RefObject<HTMLDivElement | null>): string | undefined {
-  const [activePromptId, setActivePromptId] = useState(() => getLatestPromptKey(messages));
+  const [activePromptId, setActivePromptId] = useState<string>();
 
   useEffect(() => {
     const scroll = hostRef.current?.querySelector<HTMLElement>(".chat-scroll-view");
@@ -73,6 +73,10 @@ export function useActivePromptId(messages: readonly ChatMessage[], hostRef: Ref
     }
 
     const update = () => {
+      if (scroll.scrollTop <= 0) {
+        setActivePromptId(undefined);
+        return;
+      }
       const atBottom = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight <= BOTTOM_THRESHOLD_PX;
       if (atBottom) {
         setActivePromptId(getLatestPromptKey(messages));

@@ -51,7 +51,7 @@ export function ChatArea() {
   const activePromptId = useActivePromptId(messages, hostRef);
   const sessionId = useChatStore((s) => s.sessionId);
   const [expandedPromptId, setExpandedPromptId] = useState<string>();
-  useEffect(() => { setExpandedPromptId(undefined); }, [sessionId]);
+  useEffect(() => { setExpandedPromptId(undefined); }, [sessionId, activePromptId]);
   const activePromptIndex = messages.findIndex((message, index) => message.role === "user" && getPromptKey(message, index) === activePromptId);
   const activePrompt = activePromptIndex < 0 ? undefined : messages[activePromptIndex];
 
@@ -77,7 +77,12 @@ export function ChatArea() {
   }
 
   return (
-    <div ref={hostRef} className="h-full relative">
+    <div
+      ref={hostRef}
+      className="h-full relative"
+      onWheelCapture={() => setExpandedPromptId(undefined)}
+      onTouchMoveCapture={() => setExpandedPromptId(undefined)}
+    >
       <ScrollToBottom className="h-full" scrollViewClassName="chat-scroll-view h-full overflow-y-auto overflow-x-hidden" followButtonClassName="hidden" initialScrollBehavior="auto">
         <StickyUserPrompt message={activePrompt} expanded={expandedPromptId === activePromptId} onToggle={toggleExpandedPrompt} />
         <MessageList />
