@@ -218,6 +218,9 @@ export const zh: Record<TranslationKey, string> = {
   "filePicker.selectMedia": "选择图片或视频…",
   "filePicker.noFilesFound": "未找到文件",
   "slash.noCommands": "未找到命令",
+  "skills.button": "技能",
+  "skills.tooltip": "选择技能",
+  "skills.empty": "未找到技能",
 
   "common.add": "添加",
   "common.update": "更新",

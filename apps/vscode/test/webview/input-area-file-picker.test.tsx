@@ -114,7 +114,7 @@ describe("Control Panel composition", () => {
     useSettingsStore.setState({
       extensionConfig: {
         ...DEFAULT_EXTENSION_CONFIG,
-        controlPanel: { permission: false, compact: false, steer: false, control: false, plan: false, goal: false, swarm: false, secondaryModel: false },
+        controlPanel: { permission: false, compact: false, steer: false, control: false, skills: false, plan: false, goal: false, swarm: false, secondaryModel: false },
       },
     });
     renderInputArea();
@@ -123,6 +123,7 @@ describe("Control Panel composition", () => {
     expect(screen.queryByTestId("mode-compact")).toBeNull();
     expect(screen.queryByTestId("mode-steer")).toBeNull();
     expect(screen.queryByTestId("mode-control")).toBeNull();
+    expect(screen.queryByTestId("skill-picker")).toBeNull();
     expect(screen.queryByTestId("mode-plan")).toBeNull();
     expect(screen.queryByTestId("mode-goal")).toBeNull();
     expect(screen.queryByTestId("mode-swarm")).toBeNull();

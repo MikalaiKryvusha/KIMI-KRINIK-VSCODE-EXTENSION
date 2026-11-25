@@ -12,6 +12,7 @@ const BUTTON_LABEL: Record<ControlPanelButton, TranslationKey> = {
   compact: "menu.autoCompact",
   steer: "menu.autoSteer",
   control: "controlWindow.button",
+  skills: "skills.button",
   plan: "modes.plan",
   goal: "modes.goal",
   swarm: "modes.swarm",

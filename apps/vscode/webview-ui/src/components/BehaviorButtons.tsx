@@ -1,6 +1,7 @@
 import { IconBrandSpeedtest, IconLocationPlus, IconViewportShort } from "@tabler/icons-react";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { SkillPickerDialog } from "./SkillPickerDialog";
 import { useSettingsStore } from "@/stores";
 import { useT } from "@/i18n";
 
@@ -75,6 +76,8 @@ export function BehaviorButtons() {
           <TooltipContent>{extensionConfig.contextWindowControl ? t("controlWindow.on") : t("controlWindow.off")}</TooltipContent>
         </Tooltip>
       )}
+
+      {extensionConfig.controlPanel.skills && <SkillPickerDialog className={behaviorButtonClass(false)} />}
     </>
   );
 }

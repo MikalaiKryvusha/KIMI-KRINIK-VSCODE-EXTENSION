@@ -18,6 +18,7 @@
 | **Chat store** | webview state of one conversation: messages with optimistic `clientId`, streaming flag, draft media, `pendingInput` (retry), `composerRestore`, queue | `apps/vscode/webview-ui/src/stores/chat.store.ts`, `event-handlers.ts` |
 | **Settings store** | models, current model and effort, login, extension config | `webview-ui/src/stores/settings.store.ts` |
 | **Model picker** | combined model/effort quick selection, full search/provider filters, keyboard navigation and shared persisted favorites | `webview-ui/src/components/ModelPicker.tsx`, `ModelPickerDialog.tsx`, `inputarea/hooks/useFavoriteModels.ts` |
+| **Skill picker** | existing slash inventory plus localized metadata; two-line rows use the ordinary chat store for queue-or-Steer delivery | `webview-ui/src/components/SkillPickerDialog.tsx`, `BehaviorButtons.tsx`, `src/handlers/config.handler.ts`, `packages/node-sdk/src/skill-metadata.ts` |
 | **Status pills** | live queued/changes panels, background process/agent tasks, last Todo display and compaction viewer | `webview-ui/src/components/StatusPills.tsx` |
 | **Engine** | the agent loop and compaction; `loopControl.autoCompact === false` refuses every automatic compaction | `packages/agent-core-v2/src/agent/fullCompaction/fullCompactionService.ts` |
 | **Context Window Control** | independent per-session threshold decisions and serialized self-contained prompt delivery from SDK status; no KAIF marker or wire file required | `apps/vscode/src/runtime/context-window-control.ts`, wired by `kimi-runtime.ts` and `session-runtime.ts` |
@@ -58,6 +59,9 @@
 8. **Status and title.** `StatusPills` polls `runtime.session.listBackgroundTasks()` for process/agent rows, reads queue/file-change
    events, the last `SetTodoList` display and compaction state. `summary.title` and `session.meta.updated` flow through
    `StatusUpdate.session_title` into the chat store and header; starting/loading another conversation clears the old title first.
+9. **Skill selection.** `getSlashCommands` reads each skill's parsed metadata through `readSkillMetadata` and adds optional RU/ZH descriptions.
+   `SkillPickerDialog` resolves only the active language with base-description fallback; selection calls the same `sendMessage` as ordinary input,
+   so AUTO STEER chooses immediate steer or queue without a second delivery path.
 
 ## Invariants
 

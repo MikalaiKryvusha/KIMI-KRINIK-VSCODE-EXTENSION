@@ -144,6 +144,11 @@
           "default": true,
           "description": "Show the Control button in Control Panel. Hiding the button does not change Context Window Control."
         },
+        "kimi.controlPanel.skills": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Skill button in Control Panel. Hiding the button does not disable skills or slash commands."
+        },
         "kimi.controlPanel.plan": {
           "type": "boolean",
           "default": true,

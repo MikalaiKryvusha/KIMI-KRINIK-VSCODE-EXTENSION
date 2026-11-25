@@ -24,6 +24,7 @@ Maintain the official engine and accumulated user state while proving every visi
 | R11 | WHEN the VSIX is installed beside other extensions, the system shall remain self-contained and reversible | Isolated install/rollback · real VS Code · projects/sessions retained |
 | R12 | WHEN live acceptance finishes, the system shall leave independently repeatable evidence | Judge rerun · claims and traces · no unverified DONE |
 | R13 | WHEN the user opens Action Menu, the system shall display the extension version and its persisted build number | Visible support subtitle · real installed VSIX · `v1.0.0 (1)` for build 1, increasing by one per package invocation |
+| R14 | WHEN the user opens and selects a skill in Control Panel, the system shall show localized two-line rows and use the ordinary queue-or-Steer path | EN/RU/ZH descriptions and fallbacks · one visible entry and one engine submission · real installed VSIX |
 
 ## 3. Coverage matrix — dimensions and holes
 
@@ -73,6 +74,11 @@ Statuses use `pass` · `fail` · `blocked` · `skipped`; `[NOT-TESTED]` means no
 | C27 build-number smoke | Open Action Menu on the pre-build VSIX, then on build 1 → old subtitle lacks a build number; new subtitle reads `v1.0.0 (1)` | control + use-case | pass · pre-build `v1.0.0`; build 1 `(1)` and final build 3 `(3)` read in the isolated VSIX |
 | C28 language-dialog smoke | Click Language in Action Menu → separate dialog opens with the selected language first, then the other two choices; Action Menu shows all three action translations with the active one first | use-case/state | pass · build 3 EN `Language / Язык / 语言`, RU `Язык / Language / 语言`, ZH `语言 / Language / Язык`; DOM and WebP read |
 | C29 Control Panel localization | Switch to 中文 and open Action Menu → `控制面板`; ZH/RU save-failure text uses the same localized name | use-case + twin sweep | pass · build 3 live ZH `控制面板`; ZH/RU toast assertions green |
+| C30 skill picker rows | Open Skill → bold name on line one, regular description on line two, scrollable list | use-case/layout | pass (component) · real dialog classes and structure |
+| C31 skill descriptions | Read EN/RU/ZH and missing metadata/key → EN uses base; RU/ZH use localized fields or base fallback | equivalence/fallback | pass (real parser + inventory + component) · nested YAML metadata read |
+| C32 skill Steer ON | Select skill during a running turn → one visible entry and one immediate steer, no queue | state/delivery | pass (store/component) · `steerChat('/skill:review')`, zero queued items |
+| C33 skill Steer OFF | Select skill during a running turn with AUTO STEER OFF → one queued `/skill:review`, no immediate steer | state/delivery | pass (store/component) · one queued item, zero steer calls |
+| C34 skill visibility and VSIX | Toggle Skill visibility and run the packaged picker on the installed VSIX | persistence/install | [NOT-TESTED] packaged VSIX and accumulated profile; default is visible, hidden leaves skills available |
 
 ## 5. Control cases — MUST
 

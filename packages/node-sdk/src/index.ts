@@ -88,6 +88,8 @@ export { effectiveModelAlias, loadRuntimeConfigSafe } from '#/config/index';
 export { resolveConfigPath } from '@moonshot-ai/agent-core-v2';
 export { limitAgentReplayByTurns } from '#/replay';
 export { parseAgentFileText, resolveAgentPath } from '@moonshot-ai/agent-core-v2';
+export { readSkillMetadata } from '#/skill-metadata';
+export type { SkillMetadata } from '@moonshot-ai/agent-core-v2/features/skill/catalog/types';
 export { SECONDARY_DERIVED_MODEL_ALIAS } from '#/config/index';
 
 export { installGlobalProxyDispatcher } from '#/proxy';

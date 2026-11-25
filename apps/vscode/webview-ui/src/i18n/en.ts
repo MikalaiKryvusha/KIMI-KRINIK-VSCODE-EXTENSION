@@ -219,6 +219,9 @@ export const en = {
   "filePicker.selectMedia": "Select images or videos…",
   "filePicker.noFilesFound": "No files found",
   "slash.noCommands": "No commands found",
+  "skills.button": "Skill",
+  "skills.tooltip": "Choose a skill",
+  "skills.empty": "No skills found",
 
   "common.add": "Add",
   "common.update": "Update",

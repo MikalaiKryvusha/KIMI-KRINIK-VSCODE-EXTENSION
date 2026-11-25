@@ -1,6 +1,6 @@
 # Idea 02 — Control Panel skill picker with localized descriptions
 
-> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** ✅ owner-approved; deliberately deferred until KIMI KRINIK 1.0.0 is completed and released · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
+> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 implemented and component/integration verified on 2026-11-25; packaged VSIX acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
 
 ## Goal vector
 
@@ -15,7 +15,7 @@
 - Selecting a skill sends its prompt through the existing path: queued while AUTO STEER is OFF, immediate Steer while ON, with one visible entry and one engine submission.
 - RU reads `metadata.description_ru`; ZH reads `metadata.description_zh`; missing `metadata` or the requested key falls back to `description`; EN always reads only `description`.
 - Component/parser regressions run before implementation is accepted; the real installed VSIX path is read after implementation.
-- Work starts only after KIMI KRINIK 1.0.0 is completed and released, not during the current closure.
+- The skill picker ships in KIMI KRINIK 1.0.0; the owner's 2026-11-25 18:10 +03:00 decision revokes the earlier post-release deferral.
 
 ## Essence
 
@@ -32,6 +32,26 @@ This extends the existing Control Panel and three-language UI without changing t
 3. Add the Control Panel button and a scrollable two-line-row dialog using existing dialog/store patterns.
 4. Route selection through the existing `sendMessage` lifecycle and cover ON/OFF, EN/RU/ZH, missing metadata and missing localized keys.
 5. Verify component tests, full hygiene and the installed VSIX user path.
+
+## Implementation status — 2026-11-25 19:22 +03:00
+
+- [x] `readSkillMetadata` exposes the existing parser through an additive SDK API; nested YAML `metadata` is projected once, with no second parser or KAP change.
+- [x] `getSlashCommands` carries optional `description_ru` / `description_zh`; missing files, metadata and localized keys keep the base description.
+- [x] Control Panel has a localized Skill button and a scrollable two-line dialog, plus `kimi.controlPanel.skills` and the matching settings checkbox.
+- [x] Selection uses the existing `sendMessage`: one immediate steer while ON, one queued item while OFF.
+- [x] Real parser, host inventory, localization, row layout, ON/OFF and visibility regressions pass; full extension is 621 passed / 1 skipped, SDK typecheck/build and root lint pass.
+- [ ] Packaged VSIX and accumulated-profile visual/delivery acceptance remain open.
+
+Contract consumers: `packages/node-sdk/src/index.ts` gains one additive function and its metadata type. The VS Code extension is the only new consumer; older SDK clients and KAP payloads are unchanged.
+
+## Decisions made without the owner
+
+[AI] by mandate — the owner required the existing inventory and message path.
+
+- Used an additive SDK metadata reader instead of changing `SkillSummary`, KAP or adding a YAML dependency.
+- Placed Skill after Control in the existing K2 group; an empty inventory disables the button and shows the localized empty tooltip.
+- Limited metadata projection to the two requested optional fields and the base-description fallback.
+- `bugs/33` records a separate pre-existing Windows test-portability failure; it is not changed by this feature.
 
 ## Open questions / what needs the human's answer
 
@@ -56,6 +76,8 @@ None. The button, row layout, scrolling, routing, fallback rules and release dep
 D:\work\ai_sandbox\KAIF\ideas\39_srill_multilang_descriptions.md
 
 потом будет делать, когда KIMI KRINIK 1.0.0 доделаем и зарелизим»
+
+[OWNER] «кнопку навыков на панели управления я заказывал. Это делаем в 1.0.0!!!» · 2026-11-25 18:10 +03:00 (чат) — отменяет перенос кнопки на период после релиза 1.0.0.
 
 ```yaml
 ---

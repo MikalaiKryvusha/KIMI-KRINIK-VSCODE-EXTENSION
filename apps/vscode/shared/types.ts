@@ -23,7 +23,7 @@ export interface FileChange {
   deletions: number;
 }
 
-export const CONTROL_PANEL_BUTTONS = ["permission", "compact", "steer", "control", "plan", "goal", "swarm", "secondaryModel"] as const;
+export const CONTROL_PANEL_BUTTONS = ["permission", "compact", "steer", "control", "skills", "plan", "goal", "swarm", "secondaryModel"] as const;
 
 export type ControlPanelButton = (typeof CONTROL_PANEL_BUTTONS)[number];
 export type ControlPanelVisibility = Record<ControlPanelButton, boolean>;

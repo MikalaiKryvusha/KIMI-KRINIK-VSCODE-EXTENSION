@@ -45,6 +45,7 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
     compact: true,
     steer: true,
     control: true,
+    skills: true,
     plan: true,
     goal: true,
     swarm: true,

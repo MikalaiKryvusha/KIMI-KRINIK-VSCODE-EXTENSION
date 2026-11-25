@@ -182,6 +182,8 @@ export interface SlashCommandInfo {
   name: string;
   description: string;
   aliases: string[];
+  description_ru?: string;
+  description_zh?: string;
 }
 
 export interface ModelConfig {

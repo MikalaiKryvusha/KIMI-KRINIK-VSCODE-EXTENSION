@@ -218,6 +218,9 @@ export const ru: Record<TranslationKey, string> = {
   "filePicker.selectMedia": "Выбрать изображения или видео…",
   "filePicker.noFilesFound": "Файлы не найдены",
   "slash.noCommands": "Команды не найдены",
+  "skills.button": "Навык",
+  "skills.tooltip": "Выбрать навык",
+  "skills.empty": "Навыки не найдены",
 
   "common.add": "Добавить",
   "common.update": "Обновить",

@@ -404,6 +404,44 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
     ]);
   });
 
+  it("carries localized skill descriptions into the existing slash inventory", async () => {
+    const root = await mkdtemp(join(tmpdir(), "kimi-vscode-skill-metadata-"));
+    try {
+      const skillDir = join(root, "localized");
+      const skillPath = join(skillDir, "SKILL.md");
+      await mkdir(skillDir, { recursive: true });
+      await writeFile(skillPath, [
+        "---",
+        "name: localized",
+        "description: English description",
+        "metadata:",
+        "  description_ru: Русское описание",
+        "  description_zh: 中文说明",
+        "---",
+        "",
+        "Run the skill.",
+      ].join("\n"));
+
+      const commands = await configHandlers[Methods.GetSlashCommands]!(undefined, {
+        workDir: root,
+        harness: {
+          listWorkspaceSkills: async () => [{ name: "localized", description: "English description", path: skillPath, source: "project", type: "prompt" }],
+        },
+        logError: () => undefined,
+      } as unknown as HandlerContext);
+
+      expect(commands).toContainEqual({
+        name: "skill:localized",
+        aliases: [],
+        description: "English description",
+        description_ru: "Русское описание",
+        description_zh: "中文说明",
+      });
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it("omits skills restricted to specific client scopes from the slash commands", async () => {
     const commands = await configHandlers[Methods.GetSlashCommands]!(undefined, {
       workDir: "/workspace",

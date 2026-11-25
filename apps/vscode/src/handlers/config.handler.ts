@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import {
   effectiveModelAlias,
+  readSkillMetadata,
   type KimiConfig as SdkKimiConfig,
   type ModelAlias,
   type ProviderType,
@@ -97,7 +98,7 @@ const getSlashCommands: Handler<void, SlashCommandInfo[]> = async (_, ctx) => {
   try {
     const skills = await ctx.harness.listWorkspaceSkills(ctx.workDir);
     const skillNames = new Set<string>();
-    const skillCommands = skills
+    const skillCommands = await Promise.all(skills
       .filter((skill) => isUserActivatableSkill(skill.type) && skill.scopes === undefined)
       .filter((skill) => {
         const name = skill.name.toLowerCase();
@@ -106,10 +107,18 @@ const getSlashCommands: Handler<void, SlashCommandInfo[]> = async (_, ctx) => {
         return true;
       })
       .toSorted((left, right) => left.name.localeCompare(right.name))
-      .map((skill) => ({
-        name: `skill:${skill.name}`,
-        aliases: [],
-        description: skill.description ?? "",
+      .map(async (skill) => {
+        const metadata = await readSkillMetadata(skill.path).catch((error: unknown) => {
+          ctx.logError(`Unable to read metadata for skill ${skill.name}`, error);
+          return undefined;
+        });
+        return {
+          name: `skill:${skill.name}`,
+          aliases: [],
+          description: skill.description ?? "",
+          ...(typeof metadata?.["description_ru"] === "string" ? { description_ru: metadata["description_ru"] } : {}),
+          ...(typeof metadata?.["description_zh"] === "string" ? { description_zh: metadata["description_zh"] } : {}),
+        };
       }));
     return [...SLASH_COMMANDS, ...skillCommands];
   } catch (error) {

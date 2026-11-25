@@ -36,8 +36,8 @@ are fixed. Left: the inventory, red tests for the K1–K4 contracts, the in-flig
 
 ### Phase 1 — UI convergence (K1, `plans/149`)
 
-Header, Working, status pills, the composer panel (permission, Plan, Goal, Swarm, secondary model), context and quota rings,
-the combined model picker; the visible brand is KIMI KRINIK.
+Header, Working, status pills, the composer panel (permission, Plan, Goal, Swarm, secondary model and the skill picker),
+context and quota rings, the combined model picker; the visible brand is KIMI KRINIK.
 
 ### Phase 2 — Behavior controls (K2, `plans/150`)
 

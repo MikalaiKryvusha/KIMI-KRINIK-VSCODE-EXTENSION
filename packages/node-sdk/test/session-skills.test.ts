@@ -5,6 +5,7 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import {
   createKimiHarness,
+  readSkillMetadata,
   type Event,
   type KimiError,
   type SkillActivatedEvent,
@@ -417,6 +418,29 @@ describe('Session skills', () => {
   it('exposes public skill event and summary types', () => {
     expectTypeOf<SkillSummary['name']>().toEqualTypeOf<string>();
     expectTypeOf<SkillActivatedEvent['skillName']>().toEqualTypeOf<string>();
+  });
+});
+
+describe('Skill metadata', () => {
+  it('reads localized descriptions through the existing skill parser', async () => {
+    const workDir = await makeTempDir(tempDirs, 'kimi-sdk-skill-metadata-');
+    await writeSkill(workDir, 'localized', [
+      '---',
+      'name: localized',
+      'description: English description',
+      'metadata:',
+      '  description_ru: Русское описание',
+      '  description_zh: 中文说明',
+      '---',
+      '',
+      'Run the skill.',
+    ]);
+
+    await expect(readSkillMetadata(join(workDir, '.kimi-code', 'skills', 'localized', 'SKILL.md'))).resolves.toMatchObject({
+      description: 'English description',
+      description_ru: 'Русское описание',
+      description_zh: '中文说明',
+    });
   });
 });
 

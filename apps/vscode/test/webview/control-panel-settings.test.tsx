@@ -10,6 +10,8 @@ const boundary = vi.hoisted(() => ({
   setSwarmMode: vi.fn(),
   controlGoal: vi.fn(),
   openProjectPage: vi.fn(),
+  steerChat: vi.fn(),
+  getSessionBusy: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
@@ -21,6 +23,8 @@ vi.mock("@/services", () => ({
     setSwarmMode: boundary.setSwarmMode,
     controlGoal: boundary.controlGoal,
     openProjectPage: boundary.openProjectPage,
+    steerChat: boundary.steerChat,
+    getSessionBusy: boundary.getSessionBusy,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -32,6 +36,7 @@ import { ActionMenu } from "../../webview-ui/src/components/ActionMenu";
 import { ControlPanelSettingsDialog } from "../../webview-ui/src/components/ControlPanelSettingsDialog";
 import { ModeButtons } from "../../webview-ui/src/components/ModeButtons";
 import { PermissionModeButton } from "../../webview-ui/src/components/PermissionModeButton";
+import { SkillPickerDialog, localizedSkillDescription } from "../../webview-ui/src/components/SkillPickerDialog";
 import { SubagentModelDialog } from "../../webview-ui/src/components/SubagentModelDialog";
 import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 import { DEFAULT_EXTENSION_CONFIG, useSettingsStore } from "../../webview-ui/src/stores/settings.store";
@@ -44,12 +49,16 @@ beforeEach(() => {
   });
   for (const mock of Object.values(boundary)) mock.mockReset();
   boundary.updateExtensionSetting.mockResolvedValue({ ok: true });
+  boundary.steerChat.mockResolvedValue({ ok: true, submission: { promptId: "skill-steer", createdAt: "2026-11-25T00:00:00.000Z", state: "running", turnId: 1, steered: true } });
+  boundary.getSessionBusy.mockResolvedValue({ busy: true });
   useSettingsStore.setState({
     extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, controlPanel: { ...DEFAULT_EXTENSION_CONFIG.controlPanel } },
     autoCompact: true,
     autoCompactPending: false,
+    currentModel: "main",
+    slashCommands: [],
   });
-  useChatStore.setState({ permissionMode: "auto", goal: null, goalArmed: false, swarmMode: false, sessionId: null });
+  useChatStore.setState({ permissionMode: "auto", goal: null, goalArmed: false, swarmMode: false, sessionId: null, messages: [], isStreaming: false, queue: [], draftMedia: [], pendingInput: null });
 });
 
 afterEach(() => {
@@ -84,7 +93,7 @@ describe("Control Panel settings", () => {
     useSettingsStore.setState({
       extensionConfig: {
         ...DEFAULT_EXTENSION_CONFIG,
-        controlPanel: { permission: true, compact: false, steer: false, control: false, plan: false, goal: false, swarm: false, secondaryModel: false },
+        controlPanel: { permission: true, compact: false, steer: false, control: false, skills: false, plan: false, goal: false, swarm: false, secondaryModel: false },
       },
     });
     render(
@@ -97,6 +106,7 @@ describe("Control Panel settings", () => {
     expect(screen.queryByTestId("mode-compact")).toBeNull();
     expect(screen.queryByTestId("mode-steer")).toBeNull();
     expect(screen.queryByTestId("mode-control")).toBeNull();
+    expect(screen.queryByTestId("skill-picker")).toBeNull();
     expect(screen.queryByTestId("mode-plan")).toBeNull();
     expect(screen.queryByTestId("mode-goal")).toBeNull();
     expect(screen.queryByTestId("mode-swarm")).toBeNull();
@@ -122,7 +132,7 @@ describe("Control Panel settings", () => {
     await user.click(await screen.findByText("Control Panel"));
 
     expect(await screen.findByText("Choose which buttons are visible. Hidden features keep working and remain available in General settings.")).not.toBeNull();
-    expect(screen.getAllByRole("checkbox")).toHaveLength(8);
+    expect(screen.getAllByRole("checkbox")).toHaveLength(9);
   });
 
   it("disables thresholds while Control is off and edits them while Control is on", async () => {
@@ -297,5 +307,53 @@ describe("Control Panel settings", () => {
     expect(screen.getByTestId("context-window-control-toggle").className).toContain("data-checked:bg-[#FF1A8C]");
     expect(screen.getByTestId("control-panel-option-plan").className).toContain("data-checked:bg-[#FF1A8C]");
     expect(screen.getByTestId("control-panel-option-plan").className).toContain("data-checked:border-[#FF1A8C]");
+  });
+
+  it("resolves localized skill descriptions and their fallbacks", () => {
+    const localized = { name: "skill:review", aliases: [], description: "English description", description_ru: "Русское описание", description_zh: "中文说明" };
+    expect(localizedSkillDescription(localized, "en")).toBe("English description");
+    expect(localizedSkillDescription(localized, "ru")).toBe("Русское описание");
+    expect(localizedSkillDescription(localized, "zh")).toBe("中文说明");
+    expect(localizedSkillDescription({ name: "skill:plain", aliases: [], description: "Fallback" }, "ru")).toBe("Fallback");
+    expect(localizedSkillDescription({ name: "skill:plain", aliases: [], description: "Fallback" }, "zh")).toBe("Fallback");
+  });
+
+  it("shows a two-line skill row and sends it through immediate Steer", async () => {
+    const user = userEvent.setup();
+    useSettingsStore.setState({
+      slashCommands: [{ name: "skill:review", aliases: [], description: "English description", description_ru: "Русское описание", description_zh: "中文说明" }],
+    });
+    useChatStore.setState({ isStreaming: true });
+    render(<SkillPickerDialog />);
+
+    await user.click(screen.getByTestId("skill-picker"));
+    const dialog = await screen.findByTestId("skill-picker-dialog");
+    const row = within(dialog).getByRole("button", { name: /review/ });
+    expect(within(row).getByTestId("skill-picker-name").textContent).toBe("review");
+    expect(within(row).getByTestId("skill-picker-name").className).toContain("font-semibold");
+    expect(within(row).getByTestId("skill-picker-description").textContent).toBe("English description");
+    expect(within(row).getByTestId("skill-picker-description").className).toContain("font-normal");
+
+    await user.click(row);
+    expect(boundary.steerChat).toHaveBeenCalledWith("/skill:review", expect.any(String));
+    expect(useChatStore.getState().queue).toHaveLength(0);
+    expect(screen.queryByTestId("skill-picker-dialog")).toBeNull();
+  });
+
+  it("queues a selected skill as one message while Steer is off", async () => {
+    const user = userEvent.setup();
+    useSettingsStore.setState({
+      extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, autoSteer: false, controlPanel: { ...DEFAULT_EXTENSION_CONFIG.controlPanel } },
+      slashCommands: [{ name: "skill:review", aliases: [], description: "English description" }],
+    });
+    useChatStore.setState({ isStreaming: true });
+    render(<SkillPickerDialog />);
+
+    await user.click(screen.getByTestId("skill-picker"));
+    await user.click(await screen.findByRole("button", { name: /review/ }));
+
+    expect(boundary.steerChat).not.toHaveBeenCalled();
+    expect(useChatStore.getState().queue).toHaveLength(1);
+    expect(useChatStore.getState().queue[0]?.content).toBe("/skill:review");
   });
 });
