@@ -273,5 +273,8 @@ describe("welcome screen", () => {
     expect(robot.nextElementSibling).toBe(wordmark);
     expect(robot.parentElement?.className).toContain("items-center");
     expect(robot.parentElement?.className).toContain("justify-center");
+    expect(robot.parentElement?.className).toContain("max-w-full");
+    expect(robot.className).toContain("w-14");
+    expect(wordmark.className).toContain("min-w-0");
   });
 });
