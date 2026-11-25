@@ -231,8 +231,11 @@ describe("steering presentation", () => {
     render(<ChatArea />);
 
     expect(screen.getAllByRole("img", { name: "KIMI KRINIK" })).toHaveLength(1);
-    expect(screen.getByRole("status").textContent).toBe("Working…");
-    expect(screen.getByRole("status").closest("[data-message-id]")?.getAttribute("data-message-id")).toBe("assistant-original");
+    const trailing = screen.getByTestId("trailing-working-indicator");
+    const steeringText = screen.getAllByText("steer").at(-1)!;
+    expect(trailing.textContent).toBe("Working…");
+    expect(trailing.closest("[data-message-id]")).toBeNull();
+    expect(steeringText.compareDocumentPosition(trailing) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     act(() => useChatStore.setState((state) => ({
       messages: state.messages.map((message) => message.id === "assistant-steered"
@@ -241,6 +244,7 @@ describe("steering presentation", () => {
     })));
 
     expect(screen.getAllByRole("img", { name: "KIMI KRINIK" })).toHaveLength(2);
+    expect(screen.queryByTestId("trailing-working-indicator")).toBeNull();
     expect(screen.getByRole("status").closest("[data-message-id]")?.getAttribute("data-message-id")).toBe("assistant-steered");
     document.body.removeAttribute("data-baseuri");
   });

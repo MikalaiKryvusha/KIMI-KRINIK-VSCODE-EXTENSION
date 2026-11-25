@@ -4,7 +4,9 @@ import { IconArrowDown } from "@tabler/icons-react";
 import { ChatMessage, hasMessageContent } from "./ChatMessage";
 import { getPromptKey, StickyUserPrompt, useActivePromptId } from "./StickyUserPrompt";
 import { WelcomeScreen } from "./WelcomeScreen";
+import { WorkingIndicator } from "./WorkingIndicator";
 import { useChatStore } from "@/stores";
+import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { getForkTurnIndex } from "shared/fork-turn-index";
 
@@ -27,6 +29,7 @@ function ScrollButton() {
 function MessageList() {
   const messages = useChatStore((s) => s.messages);
   const isStreaming = useChatStore((s) => s.isStreaming);
+  const t = useT();
   let streamingAssistantIndex = -1;
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index]!;
@@ -35,6 +38,8 @@ function MessageList() {
       break;
     }
   }
+  const showTrailingWorking = isStreaming && streamingAssistantIndex !== messages.length - 1;
+  const hasWorkingContent = streamingAssistantIndex >= 0 && hasMessageContent(messages[streamingAssistantIndex]!);
 
   return (
     <>
@@ -44,10 +49,15 @@ function MessageList() {
             key={message.id}
             message={message}
             turnIndex={getForkTurnIndex(messages, idx)}
-            isStreaming={isStreaming && idx === streamingAssistantIndex}
+            isStreaming={isStreaming && idx === streamingAssistantIndex && streamingAssistantIndex === messages.length - 1}
           />
         ))}
       </div>
+      {showTrailingWorking && (
+        <div data-testid="trailing-working-indicator" className="px-3 py-1">
+          <WorkingIndicator label={hasWorkingContent ? t("chat.working") : t("chat.requesting")} />
+        </div>
+      )}
       <ScrollButton />
     </>
   );

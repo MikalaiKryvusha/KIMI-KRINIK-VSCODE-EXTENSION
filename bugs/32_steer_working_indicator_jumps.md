@@ -10,6 +10,9 @@
 
 [OWNER] «когда я делаю досыл стиринг сообщения, вот это дёргается» · 2026-11-25 (чат, со скриншотом двух роботов и «Рассуждение» / «Работаю…»)
 [OWNER] «не нужно дергаться» · 2026-11-25 (чат)
+[OWNER] «а нужно просто добавлять пользовательское сообщение в чат над анимацией Работаю кими и его аватарокй» · 2026-11-25 (чат)
+
+The required immediate order is existing assistant content → steering user message → one trailing avatar/Working indicator. The steering message must be above the animation, with no second empty KIMI header.
 
 ## Repro
 
@@ -35,7 +38,7 @@ The optimistic steering lifecycle creates a second visible working region before
 
 ## Fix evidence — 2026-11-25 18:39 +03:00
 
-Steering-created assistants now carry `deferPresentation`. They retain their optimistic identity and receive the same engine events, but render only after real content exists. `ChatArea` keeps streaming on the latest presented assistant, while durable TurnBegin and idle fallback reveal the deferred record.
+Steering-created assistants now carry `deferPresentation`. They retain their optimistic identity and receive the same engine events, but render only after real content exists. Before content, `ChatArea` renders one trailing Working indicator after the steering user entry; durable TurnBegin and idle fallback reveal the deferred record.
 
 Hygiene: robot/indicator ownership and store reveal regressions were red before the change and green afterward; target suites are 42/42 and the full extension suite is 615 passed / 1 skipped / 0 failed. Typecheck and root lint exit 0.
 Functional run: NONE. Packaged VSIX and accumulated-profile steering acceptance remain pending.
@@ -45,9 +48,18 @@ TWINS-MECH: the jump can come from optimistic record creation, assistant visibil
 
 REAL WORLD: accumulated — the owner's build-22 active turn and steering screenshot; data and machine — his Windows VS Code; path — immediate Steer in Second Side Bar. The presentation state machine is verified locally, but the real steering view is not yet observed on a new VSIX.
 
+## Follow-up fix evidence — 2026-11-25 19:34 +03:00
+
+The owner clarified the required visual order. The first fix kept Working inside the original assistant, which put the steering user message below the animation. `ChatArea` now renders one trailing Working indicator after that user entry until real post-steer content arrives; no second empty KIMI header appears.
+
+Hygiene: the DOM-order regression was red before the follow-up and green afterward. Full extension remains 621 passed / 1 skipped; typecheck and root lint exit 0.
+Functional run: NONE on the follow-up. A new VSIX must be packaged and observed.
+
+corrected: `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`, `.changeset/kaif-chat-rendering-stability.md`, this bug and `testcases/reports/2026-11-25_steer_presentation.md` now describe the user-entry → trailing-Working order instead of retaining Working inside the original assistant.
+
 ## Decisions made without the owner
 
-Kept the empty steering assistant in the timeline for event compatibility and changed only its presentation boundary. Did not redesign steering delivery, optimistic user identity or queue behavior.
+Kept the empty steering assistant in the timeline for event compatibility and changed only its presentation boundary. Did not redesign steering delivery, optimistic user identity or queue behavior. The trailing indicator is presentation-only and disappears when real content arrives.
 
 ## Links
 
