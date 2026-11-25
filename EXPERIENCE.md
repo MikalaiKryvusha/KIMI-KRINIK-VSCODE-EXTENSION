@@ -89,11 +89,11 @@ class: guard-not-proven-against-threat
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/session-runtime.test.ts apps/vscode/test/kimi-harness.integration.test.ts -t "Context Window Control"
 **Context:** Context Window Control's unit test mocked `promptWithSkills` and accepted an empty skill list that the real engine rejects.
 **Tried / did:** inspected the overflowing wire, required red-before-fix assertions at the fake `steer()` boundary and the real SDK/provider boundary, then walked packaged builds 20 and 13 through large-context active turns.
-**Result:** ❌→✅ — the pre-fix provider received no control message; both fixed VSIX paths delivered the 80% soft-closure line at 84%.   → link: bugs/28_context_window_control_empty_skills_rejected.md
+**Result:** ❌→✅ — the pre-fix provider received no control message; both fixed VSIX paths delivered the 80% soft-closure line at 84%, and the accumulated main profile later delivered the 70% warning through `prompt.steered`.   → link: bugs/28_DONE_context_window_control_empty_skills_rejected.md
 **Lesson:** an adapter mock can certify a call the production API rejects; every cross-layer delivery path needs one unmocked public-API/provider observation.
 **Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/session-runtime.test.ts apps/vscode/test/kimi-harness.integration.test.ts -t "Context Window Control"`; live evidence is `testcases/reports/2026-11-25_context_window_steer_delivery.md`.
 **Trigger:** adding or changing an SDK/provider adapter call → pair the mocked contract with a real public-boundary request before trusting it.
-**Not for:** claiming an accumulated main-profile rollout or a million-token soak; those remain separate observations.
+**Not for:** claiming a full million-token soak; the accumulated main-profile observation is the 70% warning, not a complete soft→force sequence.
 
 ### EXP-0014 · 2026-11-25 · ❌→✅ · #windows #hooks #testing
 class: shell-lied

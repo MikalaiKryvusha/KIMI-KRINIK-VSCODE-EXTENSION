@@ -1,6 +1,6 @@
 # Bug 28 — Context Window Control never delivers its threshold prompts
 
-**Status:** 🔧 fix verified through real SDK and isolated VSIX builds 20, 13 and 14; owner's accumulated main profile pending
+**Status:** ✅ DONE — real SDK, isolated VSIX and accumulated main-profile threshold delivery verified
 **Version/build:** KIMI KRINIK 1.0.0 build 12 · `6fea8307b` · owner's accumulated VS Code profile · **When/context:** 2026-11-25 09:28 +03:00, after an autonomous session ended at the provider token limit
 **Severity:** S2 — the working run was lost at 100% context
 **Fixing:** this session
@@ -71,6 +71,16 @@ TWINS-MECH: using a skills-only boundary for skill-less delivery can appear as a
 BOTH-WAYS: source-level red/green regressions guard the code→SDK direction; installed-VSIX provider requests guard the package→runtime direction. Main-profile acceptance remains the outstanding reverse-world check.
 
 REAL WORLD: accumulated — the owner's build-12 main profile and overflowing session; data and machine — the owner's Windows machine; path — KIMI KRINIK in VS Code. Verified on isolated packaged builds with generated large context, not yet on the accumulated main profile. Therefore this bug remains 🔧 rather than DONE.
+
+## ✅ STATUS: DONE (2026-11-25 13:50 +03:00)
+
+Hygiene: both regressions were red before the `session.steer()` fix and green afterward. Main extension passed 598 checks and lint/typecheck; the release-candidate line later passed 607 checks. Six-target package verification passed.
+
+Functional run: isolated builds 20, 13 and 14 delivered the 80% soft-closure line at 84% during real active turns. On the owner's accumulated main profile running build 14, `agents/main/wire.jsonl:2974` recorded `prompt.steered` with the 70% warning at 625,186 / 891,289 tokens; line 2991 recorded a subsequent provider turn with the same control message. The owner was notified once at 70%.
+
+REAL WORLD: accumulated — the owner's actual long-running build-14 session; data and machine — his Windows main profile; path — active KIMI KRINIK turn. Verified on the real world through `prompt.steered` and the subsequent provider request.
+
+Report: `testcases/reports/2026-11-25_context_window_steer_delivery.md`.
 
 ## Decisions made without the owner
 
