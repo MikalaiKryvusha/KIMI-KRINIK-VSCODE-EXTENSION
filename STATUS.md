@@ -23,6 +23,11 @@
 
 ---
 
+### 2026-11-25 05:09 +03:00 — bugs/156 multiplexer deployed and field report delivered
+- `kimi-stop.mjs` is deployed. Source/dist selftests, M1–M5, fresh build (196 blocks/846 modules), s14 multiplexer assertions, deployed manifest (114 files + 38 artifacts) and root lint are green; `update-verify` passed.
+- `npm run test:core` still has unrelated S9 #146 and two context-window failures. No live owner Stop continuation ran, so bug 156 remains 🔧 rather than DONE.
+- Field report delivered: https://github.com/MikalaiKryvusha/KAIF/issues/205.
+
 ### 2026-11-25 04:45 +03:00 — B12 complete: planName and side panel/editor backgrounds
 - Managed userLevelName reaches `usage.planName` through the public auth facade; optional user-info failure does not hide real quota failures.
 - Real side panel and New Tab both compute `rgb(25, 26, 27)`; editor containers are transparent over the same body background, so no sideBar/editor mismatch was reproduced. WebP read.
@@ -112,48 +117,6 @@
 - Standing falsehood: apparent build 4–6 live failures were invalid because the isolated process stayed at PID 44644 → corrected in `bugs/20_queue_steer_duplicate_submission.md` and the fresh-process report. No uncorrected artifact is known.
 - KNOWLEDGE: the final build and acceptance limits are in this file and `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`; the CDP process lesson is `EXPERIENCE.md` EXP-0011; later owner-approved work is `ideas/02_control_panel_skill_picker.md` and `ideas/03_extension_general_settings.md`; root `AGENTS.md` English translation and nonblocking-subagent research remain recorded below.
 
-### 2026-11-24 23:15 +03:00 — build 12 packaged, isolated acceptance passed, installed on the main-profile disk
-- Fixed the duplicate optimistic fallback, stale/current composer restoration, selected-item queue race and Steer media renderer. Runtime/host now preserve `PromptSubmissionResult`; queued prompts correlate at later turn start. Fresh-process build 6 passed the OFF selected-item queue case and WebP 40 was read.
-- Packaged 12 prerecorded event MP3 files in EN/RU/ZH with localized project identity and no owner name. RU uses Eugene; ZH uses the phonetic «这是基米·克里尼克». Glass uses MP3 and logs playback rejection. The owner listened and accepted all three voice languages. `bugs/17` is DONE; `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` await main-profile build-12 acceptance.
-- RU copy now uses «Рассуждение», «При приближении к переполнению…», final full stops and `Glass / Стекло / 玻璃`; queue ping runs three iterations. New defaults are approval Glass, question Voice, error Alert, completion Chime; existing persisted choices remain preserved.
-- Control Panel places context controls after all visibility checkboxes (build 10 WebP 42). `bugs/15` replay no longer emits internal hook bodies as assistant text; real-profile confirmation pending.
-- Verification: affected contracts and typecheck green; final package/static audit green. Full extension suite 586 passed, 1 skipped, 1 pre-existing failure at `usage-status-bar.test.tsx:57`. Report: `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`.
-- Main-profile `package.json` reads build 12 and source/installed dist hashes match. Full VS Code restart is still required before any real-profile fix claim. NEXT: restart, read `v1.0.0 (11)` and repeat the owner ON/OFF queue/composer/media/hook smoke. Sticky last message is the next separate task after this acceptance.
-- Harness correction: Playwright `browser.close()` on a CDP connection only disconnected, so apparent build 4–6 failures were invalid. Raw CDP Browser.close plus PID/log-session verification is now required; details in `bugs/20`.
-- [OWNER] The changeset author-confirmation step is removed from `.agents/skills/gen-changesets/SKILL.md`; the inherited skill is from the upstream Kimi monorepo, not KAIF. Required changesets are still generated without that extra approval gate.
-
-## What's done (the short tail — older entries live in PROJECT_HISTORY.md)
-
-### 2026-11-24 17:45 +03:00 — lifecycle and UI fixes delivered; installation claim corrected at 18:07
-- `bugs/22`: first/queued/steered messages now create immediate optimistic entries with stable `clientId` through store, bridge, runtime and events; durable events reconcile without duplicates and host-idle dequeue needs no lightning. Isolated VSIX: first Send appears before acknowledgement and remains one user entry/one model request.
-- `bugs/20`: queue lightning removes immediately and restores exact index on failure; ten activations produce one `steerChat`. `bugs/17`: attention voice starts exactly once with «Николай, это Кими Криник» on Glass/browser routes. `bugs/19`: live tool events restore «Работаю…»; two-client replay is unverified.
-- `ideas/01`: language selection is a dialog with selected-first order (English before Russian, Chinese last); Action Menu shows only localized `Language` / `Язык` / `语言`. Delete is localized. Quota/context headings are bold with separator borders/gaps.
-- Lifecycle full suite: 48 files, 571 passed, 1 skipped; typecheck, lint, build and Extension Host smoke green. Final usage suite is 4/5: `usage-status-bar.test.tsx:57` reads the immediate parent instead of the separator wrapper; not called green.
-- The 17:35 `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` passed Extension Host smoke, but the owner's 18:07 restart showed that the expected current UI was not active. The earlier claim of a successful current installation is retracted; fresh packaging and installation are required.
-
-### 2026-11-24 13:51 +03:00 — owner findings filed; chat pipeline research and repair ladder ready
-- Real-profile acceptance found six open defects: `bugs/11` immediate/lost steering, `bugs/12` obsolete composer restoration, `bugs/13` steering attachments and thumbnails, `bugs/14` missing visible queue, `bugs/15` visible internal hook output and `bugs/16` assistant avatar above the user's steering bubble. No pipeline implementation changed.
-- `researches/54_chat_pipeline_reliability.md` synthesizes Claude documentation/bundle 2.1.331, local `app-client`, current SDK and the owner requirements. `plans/01_EPIC_chat_pipeline_reliability.md` defines the two-ID lifecycle and Phases 0–4; `plans/02_epic01_characterize_chat_pipeline.md` details only the red-contract phase. Requirements and attribution linters pass; scenario-lint is SKIPPED (no scenario blocks).
-- Context Window descriptions, header percentage, VS Code-derived dark cards and Russian labels were edited with red-to-green targeted checks and observed in the current isolated VSIX. Full extension: 558 passed, 1 skipped; lint, typecheck, build/package and voice-lint green. `HOUSE_RULES.md` R3 records the owner's user-facing explanation style.
-- [OWNER] «тогда работаем внутри KIMI KRINIK, а фиксы - запускай и тестируй в изолированном окружении VS Code» · 2026-11-24 13:06 +03:00 (чат). Future fixes are developed inside KIMI KRINIK and run in isolated VS Code.
-
-### 2026-11-24 12:33 +03:00 — responsive/brand UI, C17 and sound contour ✅ full suite / live VSIX
-- C17 is live-pass: workspace voice decline/allow, machine priority, phrase cleanup and ENOENT logging. C24–C26 cover the pink response robot, reference composer parity, wheel+fade, wide no-scroll, scrollable Action menu, About RPC, language order and checked-control colors. Bugs 08/09 are DONE.
-- Bug 10 is DONE: latest-write volume, serialized host updates, global Sound enabled, Triple 880/660/990, packaged glass.opus and Russian Eugeny. Live VSIX: latest volume 100, OFF creates no audio, neutral tracks. Full extension: 556 passed, 1 skipped; typecheck and lint green.
-- At the measured 80% context boundary no new heavy task starts. Remaining real-world rows: C08, C11–C12 and C18–C23, including real-event sound/replay, quotas, active compaction/closure, rejected media, effort/stop, extended status and rollback. The next session must run inside KIMI KRINIK on the owner's real profile.
-
-### 2026-11-24 07:32 +03:00 — B5/B6 and live K5 milestone ✅ hygiene / partial acceptance
-- `5c7b8ece5` secured attention voice commands with machine-only configuration, command-bound workspace approval, temp-file cleanup and logged failures; `695d3f51a` made the VSIX Extension Host smoke independent of inherited Electron Node mode; `87c26cf13` fixed the packaged header robot path. All three are pushed.
-- Bugs 01–03 are DONE after real VSIX acceptance; bugs 06/07 are DONE with red-to-green guards and live evidence. Languages, sound preview, Control Panel, ON/OFF steering and active-session Swarm controls were observed through CDP/WebP. K5 remains partial; see `testcases/TC_K5_live_acceptance.md` and `testcases/reports/2026-11-24_k5_live_acceptance.md`.
-
-### 2026-11-24 02:34 +03:00 — in-flight Auto Compact OFF ✅ engine integration and full hygiene
-- `AgentFullCompactionService` now subscribes to `loopControl` changes and aborts only an active automatic operation when `autoCompact` becomes false. Cancellation is observed before the deferred provider response; an active manual compaction completes and applies its summary. No new automatic starts or overflow recovery occur; manual `/compact` remains available.
-- K2.6 red-to-green: the immediate-cancellation assertion failed before the subscription, both mid-flight scenarios and agent-core typecheck pass. Root lint and extension 527/1 pass. The full engine file has 121/123 passes; the two unrelated failures (Windows path in the frozen prompt and an empty Pre/PostCompact hook log) reproduce identically with the new subscription removed. Report: `testcases/reports/2026-11-24_inflight_auto_compact_off.md`.
-
-### 2026-11-24 02:10 +03:00 — live status pills and session header ✅ full hygiene
-- `StatusPills` uses real queue/file-change stores, `session.listBackgroundTasks()` polling, the last `SetTodoList` display and the compaction viewer; polling errors are visible and old tasks clear on session change. `BottomToolbar` is fully replaced. The header shows `session_title` from summary/meta events and the KIMI KRINIK robot.
-- Two host expectations were red before implementation, then 73 host tests passed; 38 affected webview checks passed. Full suite 527 passed, 1 skipped; typecheck, lint and both builds green after replacing one new `sort()` with `toSorted()`. Live Second Side Bar acceptance remains K5. Report: `testcases/reports/2026-11-24_status_pills_header.md`.
-
 ## Where we are now
 
 The extension builds and typecheck is green; the latest full extension run has 597 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
@@ -178,7 +141,6 @@ A red test here is a signal again — there is no accepted baseline of failures.
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
 
 
-- [ ] `KAIF/framework/hooks` bugs/156 (one sequential Stop): commit, rebuild `dist`, then `node .kaif/kaif-core.mjs update --source D:/work/ai_sandbox/KAIF/dist` here.
 
 ## ❓ Awaiting human review (interviews / homework)
 

@@ -4,6 +4,8 @@ Reply in the same language as the user.
 
 This is a TypeScript monorepo for collaborative agent development. Root `AGENTS.md` holds only hot-path rules: project map, hard constraints and workflow requirements every task needs.
 
+A message that opens with the word `resume` (or the resume alias of your language) is an ORDER to run /resume in full before the rest of the message (`AGENT_GUIDE.md` → "A leading skill word is an order").
+
 ## Working principles
 
 - Think from first principles: start from real requirements, code facts and verification results; when the goal is unclear, discuss it with the user first.

@@ -21,6 +21,13 @@
       "{file}"
     ]
   },
-  "build": "a8297ab35775",
-  "projectName": "KIMI KRINIK"
+  "build": "40a046eebf68",
+  "projectName": "KIMI KRINIK",
+  "contextWindow": {
+    "warnPct": 70,
+    "cutPct": 75,
+    "closePct": 80,
+    "forcePct": 90,
+    "owner": "kimi-krinik"
+  }
 }

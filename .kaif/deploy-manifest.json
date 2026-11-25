@@ -94,6 +94,7 @@
     ".kaif/hooks/kimi-config-fragment.toml",
     ".kaif/hooks/kimi-hook.mjs",
     ".kaif/hooks/kimi-permission-call.mjs",
+    ".kaif/hooks/kimi-stop.mjs",
     ".kaif/hooks/knowledge-moment.mjs",
     ".kaif/hooks/prompt-refresh-timer.mjs",
     ".kaif/hooks/prompt-resume-word.mjs",
@@ -157,18 +158,18 @@
     ".kimi-code/skills/what-next/SKILL.md"
   ],
   "shas": {
-    "AGENT_GUIDE.md": "65630f0eef0cb735d842718eb5afa9e454e2eea4552da62cabea6a37dd0e23ba",
+    "AGENT_GUIDE.md": "24731b3e4a0b16cd955593fe0eae1f5964058bc8c70de9fac46ff9ca250c659d",
     "PHILOSOPHY.md": "e4e6be997c8dd9bb38a33e6d145d8d73b4a36fb570e2789d8958c7db204e9550",
     "BUG_FIXING_FRAMEWORK.md": "225d74b26033e03ba87759cf0978302790a57b1f94c610c215fe30bd2b3835fa",
     "TESTING_FRAMEWORK.md": "f6abc06def79269ff54c23a0ee31b25a21e8ccb3a7047a602e6f62cd80c27e1c",
     "REQUIREMENTS_FRAMEWORK.md": "d504c819657dbda045fe5c58f7398dfd2f831d4a3725c9e4a21326b4f713ee0a",
-    "STATUS.md": "083a7745d7def213371715971dba4d0d485155011ef3ef3ae72640e1e6185c52",
-    "PROJECT_HISTORY.md": "f048c91edee87befc18df4747475c530aaf8adb68f9b0fd71dccad65d6cc3415",
-    "EXPERIENCE.md": "a4c959e8b2c1d1c8d407d3ad96b14a1c5fe304a156adeca746a689025a078ead",
-    "GOAL.md": "f7bead20b830c9c27ee584ecc0a5e328836995c8a21d40a678ab031505db35a1",
-    "MASTER_PLAN.md": "673805b50cd2fbd8cbf1685f87d64afb8dd3ec002a408b7f1d99370061169ebc",
+    "STATUS.md": "1f78bc8faee2b2ca3f61cb7f4e19b51db0b8ec377d67bd3209b681ad0dde7119",
+    "PROJECT_HISTORY.md": "742eb40fdce8e6f04e3f72b125a24b5f5a8fbc48799b5672533293370b954477",
+    "EXPERIENCE.md": "87c0ecacd6d5675d46fbd037368b4573325b293e98bda1edec827480582ba778",
+    "GOAL.md": "7c75eef9486cc91254fc957560afe1ff6fb57ebda76daf41b86cab0c1f08bb78",
+    "MASTER_PLAN.md": "b13a3118aa4c02c2db6c15f1a3c14ebe670184875174cf6e3df9c25af65b5559",
     "PROJECT_STRUCTURE_EXTERNAL_MAP.md": "deb8a27cd2fb989198028b1c71945dad6d98dfd9e52ff959bf85d7b98d0bbc85",
-    "PROJECT_ARCHITECTURE_INTERNAL_MAP.md": "b900eac710581b073661d184a7d24301a8ed01f37f3f21260d27930d3271bbcf",
+    "PROJECT_ARCHITECTURE_INTERNAL_MAP.md": "879f446553d115738c7fd87f187debc6ad11bdafe96409d2ef8d3c9cc99d9a37",
     "KAIF_FRAMEWORK.md": "2587b7645eeb711eb1a0d21e77c4d113855c3218fad92065330931d5d7a8ddf0",
     ".kaif/KAIF_REFERENCE.md": "feed2039bdfd8247d5c1001b60273fde222f0f5cd9455d1442e69aace06eb4b9",
     "plans/README.md": "3762a91299483bab753477a78c3a1b06858a15ad59a416195dd33d4157b33093",
@@ -245,10 +246,11 @@
     ".kaif/tools/kaif-testrun-lint.mjs": "af1e1870a97a831aa78ecbdb5ff2786177c10b9ca840f2e2f3e4b14712788b69",
     ".kaif/tools/kaif-voice-lint.mjs": "8dd6e1cfbf9178db751b019733d8d4d3af032b83fe8b2643a27ff7871919b3e5",
     ".kaif/hooks/clock-now.mjs": "702e22a53ea137c395089d6b7f3aa83dc8a1045087f131045a2cd94c3763b081",
-    ".kaif/hooks/context-window.mjs": "000b292db6b76bd11cc14a43c539a28bc90b1b3b365c7f31be7665f5fba0e72a",
-    ".kaif/hooks/kimi-config-fragment.toml": "97cb6a5f772b469ce5fdbc092f288f7d5644fdafe79a0342a4bf406efce88955",
+    ".kaif/hooks/context-window.mjs": "b2240fb7ab0d3e0527329f7b03f78f9323cd76edd2bd8ceff4440fa1dc4db983",
+    ".kaif/hooks/kimi-config-fragment.toml": "4d9c6e6d949f362c5fd07b1d85c43289adfa17439646234d863b91aa5070b919",
     ".kaif/hooks/kimi-hook.mjs": "bf142fb8f17003b569948134aa4e3e922ff2a1bcce371aabb8d7fd0bc36f473a",
-    ".kaif/hooks/kimi-permission-call.mjs": "fe65cd2aa81509465271266d1728f3d3fa90b323dae485ff59a574e5d82ffdbb",
+    ".kaif/hooks/kimi-permission-call.mjs": "a6f1d0440e8da3dc0ddb9543ede67150fc3e876e5e90a7f0a87b9a990008295a",
+    ".kaif/hooks/kimi-stop.mjs": "c87f15e3203161265c2cd71a16f9957b14c5dc20db7d0f550693144996f8b2d1",
     ".kaif/hooks/knowledge-moment.mjs": "bf1ea9190dc9c2357fdc2d38667ece53c14fd0b49dbc5baa187b977a73dabdf3",
     ".kaif/hooks/prompt-refresh-timer.mjs": "d573267fab89d15dc71cc065fe9e5dfd3cbb1dd5598d9bdfdfec4d3181336570",
     ".kaif/hooks/prompt-resume-word.mjs": "4820ad771b268a03280063d6527681ae53ca30136012a92c52babcc4cc547aef",
@@ -262,15 +264,15 @@
     ".kaif/hooks/stop-farewell-capture.mjs": "81f37464ac90b6c6173cbe84a37e2a7f7a86deff70986df61c4243d5b348b564",
     ".kaif/hooks/stop-status-guard.mjs": "92879de65d5b1d05737f459999ba8e63dfa6856e54aefd1e40061c3464a509a9",
     ".kaif/hooks/subagent-preamble.mjs": "e9530d21a2aee7e4ccbd50756e6d6693ffe5ff8c2fd41fa4a2ad080dfc0c1b67",
-    ".kaif/hooks/test-after-code.mjs": "888fdf27e5815d69c1968a6755e0e7a8ad3d0cf5b1edcf2dbdae6ae4649ee4db",
-    ".kaif/_owner-voice-template.md": "386e7bfc58e9d9a8b02f9d4c6b6fd52596ae6f13a0dcbbc5b93f49750098fd34",
+    ".kaif/hooks/test-after-code.mjs": "b2dca2722bb2b911ce9b4c83c315b279da7225a3723c18794e27d60af5bb008b",
+    ".kaif/_owner-voice-template.md": "9159017f094c0c3145d93c63b4052325b142dec9f2d2c41812a46b9b7b7d5460",
     ".kaif/_testcases-template.md": "5dff0064a26ca6ab8e40bfd5c339a8ea5afd88c2ee1c0487d0e7f6b86d58edfe",
     ".kaif/_testrun-report-template.md": "b131750f981cf39bc12d745680fb3d6bd100dce0073c1015e276c60445269938",
     ".kaif/_house-rules-template.md": "fa53752f38c980f5f772ddb547a8dd5ffd247b21164ab5a650666b658b5e2f80",
     ".kaif/_subagent-brief-template.md": "4d6706d80e796076972f6f19544f25b287e77ccec5774c5f46718b40372f07c0",
     ".kaif/_explain-page-template.html": "39931ddce496641aba11a941df7ceb1d6c0ebf3f74d8ff2da8dfd3b2f8917678",
     ".kaif/INTERACTIVE_CONTOUR_SPEC.md": "c9896391a7b7d4129305e548ac5a6f6f4a786cf59f673ee10025e39ed76d1ebd",
-    "AGENTS.md": "62d29422ff92692bdd494d6dbe0f1935817ed83884202c061b61f0e0b212e27d",
+    "AGENTS.md": "df54d8be039def7a3d22fab8d05610c8ecfea1ca8e5c4183f134c0bb6bc05ce7",
     ".kimi-code/skills/autoloop/SKILL.md": "e2da10b9dc7d118bf359f9205bec4e113bb9e317d2aa8a72228f645a57b43773",
     ".kimi-code/skills/bug-research/SKILL.md": "1f8cac0d251da8025633870d76a81f1de60817f824e94ab1504f37af9c31f782",
     ".kimi-code/skills/check-backlog/SKILL.md": "ec0072f8a06e2bf280a3766b73f1c29626437ee21292f68de9977984a0606e48",
@@ -310,19 +312,19 @@
     ".kimi-code/skills/what-next/SKILL.md": "6c37b7eb6d0eca575f15fffc1f62f7f0d9f2ce2aefc0c813ddc70310d175afe4"
   },
   "templateShas": {
-    "AGENT_GUIDE.md": "c4673bd60bdab5423cf00478a6c3f748b2ef323099762722e03c372d30518372",
+    "AGENT_GUIDE.md": "7fecd7a9b74352d5c70425a4b3e9d1a7b7560ec10ca400a25e29e60b0d6a718d",
     "PHILOSOPHY.md": "e4e6be997c8dd9bb38a33e6d145d8d73b4a36fb570e2789d8958c7db204e9550",
     "BUG_FIXING_FRAMEWORK.md": "225d74b26033e03ba87759cf0978302790a57b1f94c610c215fe30bd2b3835fa",
     "TESTING_FRAMEWORK.md": "f6abc06def79269ff54c23a0ee31b25a21e8ccb3a7047a602e6f62cd80c27e1c",
     "REQUIREMENTS_FRAMEWORK.md": "d504c819657dbda045fe5c58f7398dfd2f831d4a3725c9e4a21326b4f713ee0a",
-    "STATUS.md": "277f793f0b1011c8a4cc07babe88cde3ac0117284bb34a7bfe7fc7eecd82a68c",
-    "PROJECT_HISTORY.md": "d20816f41b01752a64f1dfce5304f808d484675553b1aa618741edbc887e6b87",
+    "STATUS.md": "2abf06f9db1b96a70da61b05b8fec6f33d5e68b0b8b7b9fe49fde3efabb01ea9",
+    "PROJECT_HISTORY.md": "f048c91edee87befc18df4747475c530aaf8adb68f9b0fd71dccad65d6cc3415",
     "EXPERIENCE.md": "0d978257ab4316c47c68300662c477f36105a737f69fc0f365b21ffc613ae387",
-    "GOAL.md": "9b9555eeaeefd7dd3a9cb991fa6a77eb65a5c8037007154b66e98fbfabb73436",
-    "MASTER_PLAN.md": "0ec8c0c7832b06556a30915f434479b61f697aba15bc2ade491292bcddaceef6",
-    "PROJECT_STRUCTURE_EXTERNAL_MAP.md": "5e05536a586709246d6dac4577f8ebee42c237f9af71535e8bebacf1d4a763ec",
-    "PROJECT_ARCHITECTURE_INTERNAL_MAP.md": "7fffee3ebaf0b335afc71552c7f8d3f64909fc4de3d70b1a482e2383cfc8e628",
-    "KAIF_FRAMEWORK.md": "d753fc226d07ceed312d0022dbbdf64000c632f5741cf47dba695feeede7993f",
+    "GOAL.md": "ce2f435ff8e25d16f36d7fb68f8b796a4557efb0536297b1af40efeedc7b4ebb",
+    "MASTER_PLAN.md": "b769bcff246f19b000eb8ee99eb9f422f87fbcf360780a9a3df5ec3c8e11cc5b",
+    "PROJECT_STRUCTURE_EXTERNAL_MAP.md": "d6ecc24483252ee667eb05aea7bed02e9589ba00221418ee6510447782892dd1",
+    "PROJECT_ARCHITECTURE_INTERNAL_MAP.md": "8f8b373592ba93ff89eee7a6a95bd5c49430f1868e4ff57eb7fb101572121182",
+    "KAIF_FRAMEWORK.md": "0682ad35093a3fd9393b58295bcc8099f44cd5c071c66d428bc0059f2bee45e0",
     ".kaif/KAIF_REFERENCE.md": "feed2039bdfd8247d5c1001b60273fde222f0f5cd9455d1442e69aace06eb4b9",
     "plans/README.md": "3762a91299483bab753477a78c3a1b06858a15ad59a416195dd33d4157b33093",
     "ideas/README.md": "3b347bdae725aa12b8c6b7583a098a3f17086d09ad79575d6105eb72387d6298",
@@ -398,10 +400,11 @@
     ".kaif/tools/kaif-testrun-lint.mjs": "af1e1870a97a831aa78ecbdb5ff2786177c10b9ca840f2e2f3e4b14712788b69",
     ".kaif/tools/kaif-voice-lint.mjs": "8dd6e1cfbf9178db751b019733d8d4d3af032b83fe8b2643a27ff7871919b3e5",
     ".kaif/hooks/clock-now.mjs": "702e22a53ea137c395089d6b7f3aa83dc8a1045087f131045a2cd94c3763b081",
-    ".kaif/hooks/context-window.mjs": "000b292db6b76bd11cc14a43c539a28bc90b1b3b365c7f31be7665f5fba0e72a",
-    ".kaif/hooks/kimi-config-fragment.toml": "97cb6a5f772b469ce5fdbc092f288f7d5644fdafe79a0342a4bf406efce88955",
+    ".kaif/hooks/context-window.mjs": "61422ae9d4dc40ba572b1fd1375e4148865bd5b370e25bf2a5ac4804cbbd7fb2",
+    ".kaif/hooks/kimi-config-fragment.toml": "4d9c6e6d949f362c5fd07b1d85c43289adfa17439646234d863b91aa5070b919",
     ".kaif/hooks/kimi-hook.mjs": "bf142fb8f17003b569948134aa4e3e922ff2a1bcce371aabb8d7fd0bc36f473a",
     ".kaif/hooks/kimi-permission-call.mjs": "fe65cd2aa81509465271266d1728f3d3fa90b323dae485ff59a574e5d82ffdbb",
+    ".kaif/hooks/kimi-stop.mjs": "c87f15e3203161265c2cd71a16f9957b14c5dc20db7d0f550693144996f8b2d1",
     ".kaif/hooks/knowledge-moment.mjs": "bf1ea9190dc9c2357fdc2d38667ece53c14fd0b49dbc5baa187b977a73dabdf3",
     ".kaif/hooks/prompt-refresh-timer.mjs": "d573267fab89d15dc71cc065fe9e5dfd3cbb1dd5598d9bdfdfec4d3181336570",
     ".kaif/hooks/prompt-resume-word.mjs": "4820ad771b268a03280063d6527681ae53ca30136012a92c52babcc4cc547aef",
@@ -415,8 +418,8 @@
     ".kaif/hooks/stop-farewell-capture.mjs": "81f37464ac90b6c6173cbe84a37e2a7f7a86deff70986df61c4243d5b348b564",
     ".kaif/hooks/stop-status-guard.mjs": "92879de65d5b1d05737f459999ba8e63dfa6856e54aefd1e40061c3464a509a9",
     ".kaif/hooks/subagent-preamble.mjs": "e9530d21a2aee7e4ccbd50756e6d6693ffe5ff8c2fd41fa4a2ad080dfc0c1b67",
-    ".kaif/hooks/test-after-code.mjs": "888fdf27e5815d69c1968a6755e0e7a8ad3d0cf5b1edcf2dbdae6ae4649ee4db",
-    ".kaif/_owner-voice-template.md": "386e7bfc58e9d9a8b02f9d4c6b6fd52596ae6f13a0dcbbc5b93f49750098fd34",
+    ".kaif/hooks/test-after-code.mjs": "b2dca2722bb2b911ce9b4c83c315b279da7225a3723c18794e27d60af5bb008b",
+    ".kaif/_owner-voice-template.md": "9159017f094c0c3145d93c63b4052325b142dec9f2d2c41812a46b9b7b7d5460",
     ".kaif/_testcases-template.md": "5dff0064a26ca6ab8e40bfd5c339a8ea5afd88c2ee1c0487d0e7f6b86d58edfe",
     ".kaif/_testrun-report-template.md": "b131750f981cf39bc12d745680fb3d6bd100dce0073c1015e276c60445269938",
     ".kaif/_house-rules-template.md": "fa53752f38c980f5f772ddb547a8dd5ffd247b21164ab5a650666b658b5e2f80",
@@ -427,9 +430,9 @@
   "moduleShas": {
     "AGENT_GUIDE.md": [
       {
-        "signature": "# @moonshot-ai/monorepo — AI Agent Guide",
+        "signature": "# KIMI KRINIK — AI Agent Guide",
         "class": "static",
-        "sha256": "a9d55c5e7d5306dd4b6fe93d63eef0be00a9df40b59ce7d453bf9f3e7caacdaa"
+        "sha256": "39e2837c2d5cb7d61097016f8153e56d5b614113d0903d20ca2122fe562f0ed3"
       },
       {
         "signature": "## 🙏 THE PRAYER BEFORE WORK",
@@ -499,7 +502,7 @@
       {
         "signature": "## Project identity (CANON — use these, don't invent)",
         "class": "static",
-        "sha256": "fc15310be3c1c48011c3dbdc0ac84b9934f13d083e768fe3ff76163a8d96a413"
+        "sha256": "d1f0071c35f1b7aac25ac5758277db08ff4d9601be7b5749041b2800ceb80272"
       },
       {
         "signature": "## Goal of the project",
@@ -862,9 +865,9 @@
     ],
     "STATUS.md": [
       {
-        "signature": "# @moonshot-ai/monorepo — Current Status",
+        "signature": "# KIMI KRINIK — Current Status",
         "class": "owner",
-        "sha256": "c8c0900ff8fb1263769a3f61c4567613c0052bfc64b000b96e37b672410fa3be"
+        "sha256": "cc90dea559f43a3f412c9b54abcb166fdbe66de4c51f1453a9d5f49e1bcc14b0"
       },
       {
         "signature": "## What's done (the short tail — older entries live in PROJECT_HISTORY.md)",
@@ -904,9 +907,9 @@
     ],
     "PROJECT_HISTORY.md": [
       {
-        "signature": "# @moonshot-ai/monorepo — Project History (the chronicle)",
+        "signature": "# KIMI KRINIK — Project History (the chronicle)",
         "class": "owner",
-        "sha256": "a523376e5aa6854be4a4ff98bc98fd04b1394941a97cbb9a7cde2b3035e10d5e"
+        "sha256": "4d4556bc8f70be2a9411766b849667393aabfa0e415c2a6f4908afffe2a64e2a"
       },
       {
         "signature": "## Entries (newest first)",
@@ -938,9 +941,9 @@
     ],
     "GOAL.md": [
       {
-        "signature": "# @moonshot-ai/monorepo — GOAL (видение)",
+        "signature": "# KIMI KRINIK — GOAL (видение)",
         "class": "owner",
-        "sha256": "30bbc155e6fc3da07bc9b7b939fbecc8b3da4095d304d0dde717e7a85f79d5d4"
+        "sha256": "4a9e17d65fb14af883803c5a5f3cf704553fac0bf34862c2373806cede2eca35"
       },
       {
         "signature": "## Чего я хочу — одним абзацем",
@@ -970,9 +973,9 @@
     ],
     "MASTER_PLAN.md": [
       {
-        "signature": "# @moonshot-ai/monorepo — MASTER PLAN",
+        "signature": "# KIMI KRINIK — MASTER PLAN",
         "class": "owner",
-        "sha256": "a5ef3ef8df790a2836748c1b65a24f2102b5295ee6c6077cbaefada1e87dbe33"
+        "sha256": "f1f1213fec2052a971f3cb82fc62f66e88eea413b064179b226ae46577a131d6"
       },
       {
         "signature": "## Vision (one line)",
@@ -1012,9 +1015,9 @@
     ],
     "PROJECT_STRUCTURE_EXTERNAL_MAP.md": [
       {
-        "signature": "# @moonshot-ai/monorepo — External structure map",
+        "signature": "# KIMI KRINIK — External structure map",
         "class": "owner",
-        "sha256": "613b676feaf68dc9ea0f524ce4903a6cc370fca029d8d6a3b97b161decc7cc9a"
+        "sha256": "7c7a7fe4b15ab5ba63d5ca9c9e022ef5ef4609313b06a13fe4efbaa0a55018d6"
       },
       {
         "signature": "## The tree",
@@ -1039,9 +1042,9 @@
     ],
     "PROJECT_ARCHITECTURE_INTERNAL_MAP.md": [
       {
-        "signature": "# @moonshot-ai/monorepo — Internal architecture map",
+        "signature": "# KIMI KRINIK — Internal architecture map",
         "class": "owner",
-        "sha256": "7a6c9cb9c3a93e294e0aa5cb42d6a1fcaa7c2f5a90421504c029b5114a56b856"
+        "sha256": "b14593cf6cbd381ea9db77c60657168b4a78c19709c8f59ab49e94861d4664bf"
       },
       {
         "signature": "## The core abstractions",
@@ -1066,9 +1069,9 @@
     ],
     "KAIF_FRAMEWORK.md": [
       {
-        "signature": "# KAIF в @moonshot-ai/monorepo — развёрнутый фреймворк",
+        "signature": "# KAIF в KIMI KRINIK — развёрнутый фреймворк",
         "class": "owner",
-        "sha256": "91955ae053fcb120f6ef0a7eafbcc6ec215224bdcb634be9727910a6c9e1173a"
+        "sha256": "4a8cb2929f1b5e300208e55d75c1661697abc8c1d1fa5825f64cf7ead5c482f4"
       },
       {
         "signature": "## Что такое KAIF",
@@ -3690,9 +3693,9 @@
     ],
     ".kaif/_owner-voice-template.md": [
       {
-        "signature": "# The Owner's Voice Portrait — <OWNER> (\"the stylistic LoRA\" of @moonshot-ai/monorepo)",
+        "signature": "# The Owner's Voice Portrait — <OWNER> (\"the stylistic LoRA\" of KIMI KRINIK)",
         "class": "static",
-        "sha256": "3b382f45cd7ca71352d9c1685891347a2d4017a89a1446e70d79d528fe369505"
+        "sha256": "77289fb336d4aa92fee1548b7d24f8613366c2139cfeeafa53aab460f6adc649"
       },
       {
         "signature": "## Corpus registry",
@@ -3972,7 +3975,16 @@
     "MASTER_PLAN.md": 53,
     "PROJECT_STRUCTURE_EXTERNAL_MAP.md": 44
   },
-  "kept": [],
+  "kept": [
+    "AGENT_GUIDE.md",
+    ".kaif/skills-canonical/autoloop/SKILL.md",
+    ".kaif/skills-canonical/end-chat-force/SKILL.md",
+    ".kaif/skills-canonical/end-chat-soft/SKILL.md",
+    ".kaif/skills-canonical/pause/SKILL.md",
+    ".kaif/skills-canonical/release/SKILL.md",
+    ".kaif/hooks/context-window.mjs",
+    ".kaif/hooks/kimi-permission-call.mjs"
+  ],
   "values": {
     "<PROJECT_NAME>": "KIMI KRINIK",
     "<SHORT_NAME>": "KIMI KRINIK",
@@ -3992,13 +4004,31 @@
     "released": "2026-11-22",
     "origin": "https://github.com/MikalaiKryvusha/KAIF",
     "tracking": "origin",
-    "sphere": "TODO",
+    "sphere": "programming",
     "agents": [
       "kimi-code"
     ],
     "language": "ru",
     "canonArtifacts": [],
-    "build": "a8297ab35775",
-    "projectName": "KIMI KRINIK"
+    "contour": {
+      "callName": "Николай",
+      "spokenProjectName": "Кими Криник",
+      "voiceFileTool": [
+        "D:/work/ai_sandbox/tools/silero_tts/venv/Scripts/python.exe",
+        "-I",
+        "D:/work/ai_sandbox/tools/silero_tts/say.py",
+        "--file",
+        "{file}"
+      ]
+    },
+    "build": "40a046eebf68",
+    "projectName": "KIMI KRINIK",
+    "contextWindow": {
+      "warnPct": 70,
+      "cutPct": 75,
+      "closePct": 80,
+      "forcePct": 90,
+      "owner": "kimi-krinik"
+    }
   }
 }

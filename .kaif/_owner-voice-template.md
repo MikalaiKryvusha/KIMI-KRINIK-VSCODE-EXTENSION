@@ -1,4 +1,4 @@
-# The Owner's Voice Portrait — <OWNER> ("the stylistic LoRA" of @moonshot-ai/monorepo)
+# The Owner's Voice Portrait — <OWNER> ("the stylistic LoRA" of KIMI KRINIK)
 
 > **Canonical file: `AUTHOR_STYLOMETRY.md`, in the project root** — the DEFAULT name for a KAIF
 > deployment, so that every reference (router, checklist, pipeline prompt) points at ONE string and
