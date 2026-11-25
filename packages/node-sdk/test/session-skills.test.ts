@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
@@ -127,7 +127,7 @@ describe('Session skills', () => {
       const session = await harness.createSession({ id: 'ses_sdk_skill_variants', workDir });
       const variants = (await session.listSkills()).filter((skill) => skill.name === 'review');
       expect(variants).toHaveLength(2);
-      const secondary = variants.find((skill) => skill.path.includes(additionalDir))!;
+      const secondary = variants.find((skill) => resolve(skill.path).includes(resolve(additionalDir)))!;
       expect(secondary.workspaceDir).toContain('kimi-sdk-skills-additional-');
       const activated = waitForSDKEvent(session, (event) => event.type === 'skill.activated');
 

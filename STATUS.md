@@ -25,7 +25,7 @@
 
 ### 2026-11-25 20:11 +03:00 — build 25 passes the owner-requested isolated UI acceptance
 - Fixed welcome guide and centered robot/KIMI, localized Compact/Steer descriptions, `ideas/02` skill picker and `bugs/30`–`32` are implemented and verified on isolated packaged build 25. The skill dialog showed 47 rows; immediate skill delivery appeared once in the active model request, OFF showed `1 в очереди` with no queued skill in the request. Sticky was absent at `scrollTop = 0` and collapsed on wheel.
-- Full extension: 621 passed / 1 skipped / 0 failed; typecheck and root lint green. SDK has 13/14 in `session-skills`: the one old Windows path-comparison failure is `bugs/33`, unrelated to this build.
+- Full extension: 621 passed / 1 skipped / 0 failed; typecheck and root lint green. `session-skills` is 14/14 after the old Windows path-comparison test was fixed in `bugs/33_DONE_skill_variant_windows_path_separator_test.md`.
 - VSIX SHA-256 `5c493b98e4d56d4356315858aecee5573a05664ea2d4631d12f8fb0811ad9d04`. Build 25 is installed on the main profile with `buildNumber: 25` and exactly matching extension/webview hashes. Its running Extension Host has not been restarted, so accumulated-profile acceptance remains pending. Do not publish without separate owner `AUTH:`.
 - Evidence: `testcases/reports/2026-11-25_build_25_ui_acceptance.md`, `.tmp/k5-vscode/85-build25-welcome.webp`, `.tmp/k5-vscode/87-build25-skill-dialog.webp`, `.tmp/k5-vscode/89-build25-skill-queue.webp`.
 
@@ -54,13 +54,12 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 1. On the accumulated main profile restart VS Code to load build 25, then verify the owner scenarios in `testcases/reports/2026-11-25_build_25_ui_acceptance.md` and `testcases/reports/2026-11-25_chat_rendering_build_22.md`. Do not publish without separate owner `AUTH:`.
 2. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
-3. Next clear work is real VSIX preflight verification for `bugs/29`, then accumulated-profile acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` when the owner prioritizes it. `bugs/33` is the separate old Windows test-portability issue.
+3. Next clear work is real VSIX preflight verification for `bugs/29`, then accumulated-profile acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` when the owner prioritizes it. `bugs/33` is DONE.
 4. `bugs/11` stays parked by the owner's Pareto direction; resume only with new deterministic evidence. `ideas/02` is implemented and isolated-verified on build 25; main-profile acceptance is pending. `ideas/03` is the next development cut after the release path.
 
 ## Open bugs
 
 - 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/31_expanded_sticky_scroll_oscillation.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated packaged build-25 acceptance passes; accumulated main-profile running-build acceptance pending.
-- 🔴 `bugs/33_skill_variant_windows_path_separator_test.md` — pre-existing Windows `pathe` vs native-path assertion failure in the SDK suite; not a build-25 regression.
 - 🔧 `bugs/29_preflight_error_deletes_unrelated_history.md` — deterministic regressions and full suite pass; real VSIX preflight path pending.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — repeated owner symptom, three isolated non-reproductions; parked with evidence, not DONE.
 - 🔧 `bugs/19_tool_cards_hide_working_state.md`, `bugs/18_reentrant_prompt_internal_error.md`, `bugs/16_steer_avatar_precedes_user_bubble.md` — isolated paths pass; original main-profile paths pending.
@@ -71,6 +70,6 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 - 🔧 `bugs/KAIF/04` / upstream #204 and `bugs/KAIF/05` / upstream #206 — framework-local issues remain open until origin updates absorb them.
 - 🔴 `bugs/152` (KAIF origin) — «Starting Kimi Code…» not reproduced; 🟠 `bugs/151` — follow-up steer race, live acceptance left.
 
-KNOWLEDGE: build-25 isolated acceptance is in `testcases/reports/2026-11-25_build_25_ui_acceptance.md`; skill metadata projection is in `ideas/02_control_panel_skill_picker.md`; sticky requirements are in `plans/03_sticky_viewport_prompt.md`; steering order is in `bugs/32_steer_working_indicator_jumps.md`; preflight ownership is in `bugs/29_preflight_error_deletes_unrelated_history.md`; the old Windows SDK test issue is in `bugs/33_skill_variant_windows_path_separator_test.md`.
+KNOWLEDGE: build-25 isolated acceptance is in `testcases/reports/2026-11-25_build_25_ui_acceptance.md`; skill metadata projection is in `ideas/02_control_panel_skill_picker.md`; sticky requirements are in `plans/03_sticky_viewport_prompt.md`; steering order is in `bugs/32_steer_working_indicator_jumps.md`; preflight ownership is in `bugs/29_preflight_error_deletes_unrelated_history.md`; the old Windows SDK test issue is closed in `bugs/33_DONE_skill_variant_windows_path_separator_test.md`.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md`, `KIMI CODE LOGO/GPT ROBOT REFERENCES/` and `interviews/decisions/`; do not sweep them into a commit.

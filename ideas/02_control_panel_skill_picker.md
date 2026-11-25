@@ -52,7 +52,7 @@ Contract consumers: `packages/node-sdk/src/index.ts` gains one additive function
 - Used an additive SDK metadata reader instead of changing `SkillSummary`, KAP or adding a YAML dependency.
 - Placed Skill after Control in the existing K2 group; an empty inventory disables the button and shows the localized empty tooltip.
 - Limited metadata projection to the two requested optional fields and the base-description fallback.
-- `bugs/33` records a separate pre-existing Windows test-portability failure; it is not changed by this feature.
+- `bugs/33_DONE_skill_variant_windows_path_separator_test.md` records the separate pre-existing Windows test-portability failure; it was fixed independently of this feature.
 
 ## Open questions / what needs the human's answer
 
