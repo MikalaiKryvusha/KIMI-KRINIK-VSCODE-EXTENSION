@@ -25,6 +25,7 @@
 
 ### 2026-11-25 20:35 +03:00 — SOFT CLOSURE: build 25 verified; handover to the next chat
 - Build 25 is implemented, installed on the main profile and verified on isolated VS Code. Commits through `27ee17990` are pushed to `main`; `bugs/33` is DONE and SDK `session-skills` is 14/14. Extension suite is 621 passed / 1 skipped; typecheck, root lint, build, static audit and voice checks are green.
+- Post-closure verification: named chat/event-adapter suites passed 39/39, and a fresh build-25 prompt left `K25 final smoke answer` visible with invisible hook text and the same payload in model input. `test debt: none` after the documented direct-node waiver; evidence is appended to `testcases/reports/2026-11-25_build_25_ui_acceptance.md`.
 - Main-profile running-build acceptance is the first next step: restart VS Code to load build 25 and verify the accumulated world. `bugs/29` is the next clear technical verification after it. Publication remains unauthorized and requires separate owner `AUTH:`.
 
 ## Where we are now
