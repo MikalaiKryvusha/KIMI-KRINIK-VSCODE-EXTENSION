@@ -1,6 +1,6 @@
 # Bug 23 — Verify multiline payload integrity through queue and Steer
 
-**Status:** 🔬 research-only — preview flattening observed; payload loss not established
+**Status:** ✅ DONE — exact payload verified on isolated build 19 in AUTO STEER OFF queue/dequeue and ON running-turn Steer
 **Version/build:** owner's accumulated VS Code profile, main process created 2026-11-24 17:57:52 before build 1 · **When/context:** 2026-11-24 18:32 +03:00, owner screenshot tossed in during the trilingual Action Menu task
 **Severity:** S2 if the outgoing payload is altered; preview-only appearance is the previously accepted behavior
 **Fixing:** after the current trilingual-label VSIX is packaged and installed; reproduce before changing product code
@@ -22,7 +22,7 @@ The owner suspects that a follow-up lost line breaks when queued and sent as Ste
 
 ## Actual result
 
-Only the single-line queue preview is observed. Whether its underlying text or delivered payload lost newlines is unverified.
+The single-line appearance is only the intentional queue preview. On isolated build 19, both OFF queue/dequeue and ON running-turn Steer delivered the exact four-line sample including its blank line; provider payloads matched byte-for-byte and final bubbles retained the lines.
 
 ## Forensics
 
@@ -32,13 +32,18 @@ Only the single-line queue preview is observed. Whether its underlying text or d
 
 ## Root cause / Hypotheses
 
-1. Supported by current evidence: only the intentional preview is flattened; the payload remains intact.
-2. Unproven: the current queue/dequeue lifecycle alters the string before sending.
-3. Unproven: the current running-turn Steer path alters the string before sending.
+1. Confirmed: only the intentional preview is flattened; the payload remains intact.
+2. Refuted on build 19: OFF queue/dequeue preserved the exact sample.
+3. Refuted on build 19: ON running-turn Steer preserved the exact sample.
 
-## Fix plan
+## Resolution
 
-Run both deterministic modes on the current isolated VSIX and read the provider payload. If the payload is exact, record the not-a-defect result and leave the preview unchanged. If any boundary drops newlines, file the confirmed boundary here, add a red regression at that public boundary, fix it surgically and rerun both modes.
+Both deterministic modes passed on the current isolated VSIX; no product change was needed and the line-clamped preview remains unchanged.
+
+## ✅ STATUS: DONE (2026-11-25 02:58 +03:00)
+
+Hygiene: existing multiline store regressions remain green in the full extension suite (597 passed, 1 skipped, 0 failed); root lint exits 0. No source or test assertion was changed for this resolution.
+Functional run: fresh isolated build 19, exact owner sample. AUTO STEER OFF queue/dequeue produced `exact: true` in request 1; AUTO STEER ON running-turn Steer produced `exact: true` in request 2. Both actual strings equaled the UTF-8 sample including `\n\n`. Final user bubbles were read in the UI; WebP `.tmp/k5-vscode/52-k23-multiline-steer-exact.webp` was opened and read. Report: `testcases/reports/2026-11-25_multiline_queue_steer.md`.
 
 ## Decisions made without the owner
 

@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 02:58 +03:00 — multiline queue/Steer integrity confirmed; bugs/23 DONE
+- Exact owner sample passed AUTO STEER OFF queue/dequeue and ON running-turn Steer on isolated build 19. Both provider bodies matched the UTF-8 source including the blank line; final bubbles retained it. Only the intentional queue preview is compact; no product change was needed.
+- Report: `testcases/reports/2026-11-25_multiline_queue_steer.md`. `ideas/01` was also tagged DONE in this backlog revision; other partial bugs remain open.
+
 ### 2026-11-25 02:37 +03:00 — extension suite and root lint fully green
 - Corrected the `usage-status-bar` test to read the actual separator wrapper rather than the label's immediate parent; product behavior was already correct.
 - Full extension: 48 files, 597 passed, 1 skipped, 0 failed. `pnpm lint` exits 0. Historical reports retain their earlier counts/failures; current state has no accepted test failure.
@@ -166,7 +170,6 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔧 `bugs/27_effort_persistence_and_localization.md` — isolated build-18 restart/wire/labels pass; main-profile acceptance pending.
 - 🔧 `bugs/26_sound_off_disables_dropdown.md` — isolated build-18 Off → Glass pass; main-profile acceptance pending.
 - 🔧 `bugs/25_first_prompt_assistant_message_flicker.md` — replay flash reproduced/fixed on isolated build 19; original main-profile first-prompt variant remains unverified.
-- 🔬 `bugs/23_queued_multiline_steer_newlines.md` — owner screenshot shows the intentionally line-clamped queue preview; exact ON/OFF payload preservation still needs current-build verification, no payload loss is claimed yet.
 - 🔧 `bugs/22_first_send_stuck_in_steering_queue.md` — exactly-once/result contracts implemented; main-profile build-12 acceptance pending.
 - 🔧 `bugs/24_glass_preview_silent.md` — real packaged MP3 playback passed in isolation; main-profile build-12 acceptance pending.
 - 🔧 `bugs/20_queue_steer_duplicate_submission.md` — whole-batch delivery verified on fresh isolated build 17; main-profile acceptance pending.
