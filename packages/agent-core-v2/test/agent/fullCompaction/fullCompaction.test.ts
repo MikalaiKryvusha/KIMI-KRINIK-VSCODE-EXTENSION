@@ -1,4 +1,5 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { resolve as resolveHostPath } from 'node:path';
 import { appendContext } from '../contextMemory/stubs';
 import { tmpdir } from 'node:os';
 import { join } from 'pathe';
@@ -10,6 +11,7 @@ import {
 } from '@moonshot-ai/core/llm/message';
 import { resolveEndpoint } from '@moonshot-ai/core/llm/endpoint';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { say } from '@moonshot-ai/testkit/model';
 
 import {
   DefaultCompactionStrategy,
@@ -22,6 +24,7 @@ import { makeHookRunner } from '../../features/externalHooks/runner-stub';
 import type { IExternalHooksRunnerService } from '#/features/externalHooks/app/externalHooksRunner';
 import { MASTER_ENV } from '#/app/flag/flagService';
 import { estimateTokensForMessages } from '#/llm-adapter/contract/tokens';
+import { IConfigService } from '#/app/config/config';
 import { recordingTelemetry, type TelemetryRecord } from '../../app/telemetry/stubs';
 import {
   type TestAgentContext,
@@ -37,6 +40,7 @@ import {
   createMockProvider,
   providerHttpError,
   sessionServices,
+  testkitAgentFixtures,
   testAgent as createTestAgent,
   type MockProviderResponse,
 } from '../../harness';
@@ -290,7 +294,7 @@ describe('FullCompaction', () => {
       writeFileSync(join(workDir, 'AGENTS.md'), 'old project instructions', 'utf-8');
       const ctx = testAgent(
         execEnvServices({ hostFs: new HostFileSystem() }),
-        hostEnvironmentServices(homeDir),
+        hostEnvironmentServices(homeDir, process.platform === 'win32' ? 'win32' : 'posix'),
         { autoConfigure: false, cwd: workDir },
       );
       ctx.configureRuntimeModel(CATALOGUED_PROVIDER, CATALOGUED_MODEL_CAPABILITIES);
@@ -2884,6 +2888,207 @@ describe('FullCompaction', () => {
     await ctx.expectResumeMatches();
   });
 
+  it('does not auto compact before a step when autoCompact is false', async (context) => {
+    const fixtures = testkitAgentFixtures({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false, reservedContextSize: 500 },
+      },
+    });
+    await fixtures.model(context, async (model) => {
+      await fixtures.agent({ model }, async (ctx) => {
+        ctx.configure({
+          provider: CATALOGUED_PROVIDER,
+          modelCapabilities: {
+            ...CATALOGUED_MODEL_CAPABILITIES,
+            maxContextSize: 2_000,
+          },
+        });
+        ctx.appendExchange(1, 'old user one', 'old assistant one', 1_400);
+        model.script(say('Answer without compaction.'));
+
+        await ctx.rpc.prompt({ input: [{ type: 'text', text: 'x'.repeat(440) }] });
+        const events = await ctx.untilTurnEnd();
+
+        expect(model.requests('main')).toHaveLength(1);
+        expect(eventIndex(events, 'compaction.started')).toBe(-1);
+        expect(eventIndex(events, 'context.apply_compaction')).toBe(-1);
+        expect(ctx.compactHistory()).toEqual([
+          { role: 'user', text: 'old user one' },
+          { role: 'assistant', text: 'old assistant one' },
+          { role: 'user', text: 'x'.repeat(440) },
+          { role: 'assistant', text: 'Answer without compaction.' },
+        ]);
+        await ctx.expectResumeMatches();
+      });
+    });
+  });
+
+  it('refuses an after-step automatic begin when autoCompact is false', async (context) => {
+    const fixtures = testkitAgentFixtures({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false },
+      },
+    });
+    await fixtures.model(context, async (model) => {
+      await fixtures.agent({ model }, async (ctx) => {
+        ctx.configure({
+          provider: CATALOGUED_PROVIDER,
+          modelCapabilities: CATALOGUED_MODEL_CAPABILITIES,
+        });
+        ctx.appendExchange(1, 'old user one', 'old assistant one', 20);
+        ctx.appendExchange(2, 'recent user two', 'recent assistant two', 80);
+        model.script(say('Turn response.'));
+        const compacted = ctx.once('compaction.completed');
+        let automaticBegin: boolean | undefined;
+        ctx.get(IAgentLoopService).hooks.onDidFinishStep.register(
+          'test-auto-compaction-disabled',
+          async (_step, next) => {
+            automaticBegin ??= ctx.get(IAgentFullCompactionService).begin({ source: 'auto' });
+            await next();
+          },
+        );
+
+        await ctx.rpc.prompt({ input: [{ type: 'text', text: 'Start a turn' }] });
+        const events = await ctx.untilTurnEnd();
+        if (automaticBegin) await compacted;
+
+        expect(automaticBegin).toBe(false);
+        expect(model.requests('main')).toHaveLength(1);
+        expect(eventIndex(events, 'compaction.started')).toBe(-1);
+        expect(eventIndex(events, 'context.apply_compaction')).toBe(-1);
+        await ctx.expectResumeMatches();
+      });
+    });
+  });
+
+  it('returns provider overflow without compaction when autoCompact is false', async () => {
+    const generate: GenerateFn = createMockProvider(async () => {
+      return providerHttpError(413, 'Request Entity Too Large', { requestId: 'req-disabled-auto-compact' });
+    });
+    const ctx = testAgent({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false },
+      },
+      generate,
+    });
+    ctx.configure({
+      provider: CATALOGUED_PROVIDER,
+      modelCapabilities: {
+        ...CATALOGUED_MODEL_CAPABILITIES,
+        maxContextSize: 200_000,
+      },
+    });
+    ctx.appendExchange(1, 'old user one', `old assistant one ${'x'.repeat(600_000)}`, 150_000);
+    ctx.newEvents();
+
+    await ctx.rpc.prompt({ input: [{ type: 'text', text: 'Return the overflow' }] });
+    const events = await ctx.untilTurnEnd();
+
+    expect(eventIndex(events, 'compaction.started')).toBe(-1);
+    expect(eventIndex(events, 'context.apply_compaction')).toBe(-1);
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        event: 'turn.ended',
+        args: expect.objectContaining({ turnId: 0, reason: 'failed' }),
+      }),
+    );
+    await ctx.expectResumeMatches();
+  });
+
+  it('keeps manual compaction available when autoCompact is false', async (context) => {
+    const fixtures = testkitAgentFixtures({
+      initialConfig: {
+        providers: {},
+        loopControl: { autoCompact: false },
+      },
+    });
+    await fixtures.model(context, async (model) => {
+      await fixtures.agent({ model }, async (ctx) => {
+        ctx.configure({
+          provider: CATALOGUED_PROVIDER,
+          modelCapabilities: CATALOGUED_MODEL_CAPABILITIES,
+        });
+        ctx.appendExchange(1, 'old user one', 'old assistant one', 20);
+        ctx.appendExchange(2, 'recent user two', 'recent assistant two', 80);
+        const completed = ctx.once('compaction.completed');
+        model.lane('compaction').script(say('Manual summary with automatic compaction disabled.'));
+
+        await ctx.rpc.beginCompaction({});
+        await completed;
+
+        expect(model.requests('compaction')).toHaveLength(1);
+        expect(eventIndex(ctx.newEvents(), 'context.apply_compaction')).toBeGreaterThanOrEqual(0);
+        expect(ctx.compactHistory().some((message) => message.text.includes('Manual summary with automatic compaction disabled.'))).toBe(true);
+        await ctx.expectResumeMatches();
+      });
+    });
+  });
+
+  it('cancels an in-flight auto compaction when autoCompact becomes false', async () => {
+    const started = deferred<void>();
+    const release = deferred<void>();
+    const generate: GenerateFn = createMockProvider(async () => {
+      started.resolve();
+      await release.promise;
+      return { parts: [{ type: 'text', text: 'Stale automatic summary.' }] } as const;
+    });
+    const ctx = testAgent({ generate });
+    ctx.configure({
+      provider: CATALOGUED_PROVIDER,
+      modelCapabilities: CATALOGUED_MODEL_CAPABILITIES,
+    });
+    ctx.appendExchange(1, 'old user one', 'old assistant one', 20);
+    ctx.appendExchange(2, 'recent user two', 'recent assistant two', 80);
+    const fullCompaction = ctx.get(IAgentFullCompactionService);
+    await vi.waitFor(() => expect(ctx.context.history().length).toBeGreaterThan(0));
+
+    fullCompaction.begin({ source: 'auto' });
+    const task = fullCompaction.compacting;
+    await started.promise;
+    await ctx.get(IConfigService).set('loopControl', { autoCompact: false });
+    await vi.waitFor(() => expect(countEvents(ctx.newEvents(), 'full_compaction.cancel')).toBe(1));
+    release.resolve();
+    await task?.promise.catch(() => undefined);
+
+    const events = ctx.newEvents();
+    expect(countEvents(events, 'compaction.completed')).toBe(0);
+    expect(countEvents(events, 'context.apply_compaction')).toBe(0);
+  });
+
+  it('does not cancel an in-flight manual compaction when autoCompact becomes false', async () => {
+    const started = deferred<void>();
+    const release = deferred<void>();
+    const generate: GenerateFn = createMockProvider(async () => {
+      started.resolve();
+      await release.promise;
+      return { parts: [{ type: 'text', text: 'Manual summary survives the setting change.' }] } as const;
+    });
+    const ctx = testAgent({ generate });
+    ctx.configure({
+      provider: CATALOGUED_PROVIDER,
+      modelCapabilities: CATALOGUED_MODEL_CAPABILITIES,
+    });
+    ctx.appendExchange(1, 'old user one', 'old assistant one', 20);
+    ctx.appendExchange(2, 'recent user two', 'recent assistant two', 80);
+    const fullCompaction = ctx.get(IAgentFullCompactionService);
+    await vi.waitFor(() => expect(ctx.context.history().length).toBeGreaterThan(0));
+
+    fullCompaction.begin({ source: 'manual' });
+    const task = fullCompaction.compacting;
+    await started.promise;
+    await ctx.get(IConfigService).set('loopControl', { autoCompact: false });
+    release.resolve();
+    await task?.promise;
+
+    const events = ctx.newEvents();
+    expect(countEvents(events, 'full_compaction.cancel')).toBe(0);
+    expect(countEvents(events, 'compaction.completed')).toBe(1);
+    expect(countEvents(events, 'context.apply_compaction')).toBe(1);
+  });
+
   it('does not reset the step budget after provider context overflow compaction', async () => {
     let callCount = 0;
     const generate: GenerateFn = createMockProvider(async () => {
@@ -3736,7 +3941,7 @@ function countEvents(events: ReturnType<TestAgentContext['newEvents']>, type: st
 
 function exactCompactionPrompt(workDir: string, agentsMd: string): string {
   return [
-    `cwd:${workDir}`,
+    `cwd:${resolveHostPath(workDir)}`,
     'os:Linux',
     'shell:bash:/bin/bash',
     `agents:<!-- From: ${join(workDir, 'AGENTS.md')} -->\n${agentsMd}`,
@@ -3881,7 +4086,7 @@ function hookPayloadLoggerCommand(logPath: string): string {
     '});',
   ].join('');
   writeFileSync(scriptPath, script);
-  return `${process.execPath} ${scriptPath}`;
+  return `"${process.execPath}" "${scriptPath}"`;
 }
 
 function readHookPayloads(logPath: string): Array<Record<string, unknown>> {

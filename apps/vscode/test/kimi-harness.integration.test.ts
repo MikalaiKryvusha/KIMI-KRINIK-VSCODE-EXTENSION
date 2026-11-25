@@ -32,6 +32,7 @@ import {
 } from "../shared/legacy-sdk";
 import { configHandlers } from "../src/handlers/config.handler";
 import { chatHandlers } from "../src/handlers/chat.handler";
+import { modesHandlers } from "../src/handlers/modes.handler";
 import { mcpHandlers } from "../src/handlers/mcp.handler";
 import { parseHostSlashCommand, runHostSlashCommand } from "../src/handlers/slash-command";
 import type { HandlerContext } from "../src/handlers/types";
@@ -78,7 +79,14 @@ afterEach(async () => {
   }
 });
 
-async function createRuntimeRig(extraAliases: readonly string[] = []): Promise<RuntimeRig> {
+interface RuntimeRigOptions {
+  readonly contextWindowControl?: boolean;
+}
+
+async function createRuntimeRig(
+  extraAliases: readonly string[] = [],
+  options: RuntimeRigOptions = {},
+): Promise<RuntimeRig> {
   const rootDir = await mkdtemp(join(tmpdir(), "kimi-vscode-harness-"));
   const homeDir = join(rootDir, "home");
   const workDir = join(rootDir, "workspace");
@@ -92,7 +100,7 @@ async function createRuntimeRig(extraAliases: readonly string[] = []): Promise<R
     await provider.close();
   };
 
-  await writeProviderConfig(homeDir, `${provider.baseUrl}/v1`, extraAliases);
+  await writeProviderConfig(homeDir, `${provider.baseUrl}/v1`, extraAliases, options.contextWindowControl === true);
   const version = await readExtensionVersion();
   const broadcasts: BroadcastRecord[] = [];
   const logs: LogRecord[] = [];
@@ -106,6 +114,14 @@ async function createRuntimeRig(extraAliases: readonly string[] = []): Promise<R
     log: (message, error) => {
       logs.push({ message, error });
     },
+    ...(options.contextWindowControl === true
+      ? {
+        contextWindowSettings: () => ({
+          enabled: true,
+          thresholds: { warnPct: 70, cutPct: 75, closePct: 80, forcePct: 90 },
+        }),
+      }
+      : {}),
   });
 
   cleanups.push(async () => {
@@ -198,6 +214,7 @@ async function writeProviderConfig(
   homeDir: string,
   baseUrl: string,
   extraAliases: readonly string[] = [],
+  disableAutoCompact = false,
 ): Promise<void> {
   const extra = extraAliases
     .map(
@@ -226,6 +243,7 @@ model = "mock-model"
 max_context_size = 128000
 ${extra}
 [loop_control]
+${disableAutoCompact ? "auto_compact = false" : ""}
 # The v1 engine reads max_retries_per_step; v2 renamed it to max_attempts_per_step.
 max_retries_per_step = 1
 max_attempts_per_step = 1
@@ -425,6 +443,21 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
     );
   });
 
+  it("delivers Context Window Control through the real SDK without skills", async () => {
+    const rig = await createRuntimeRig([], { contextWindowControl: true });
+    routeSuccessfulPrompt(rig.provider);
+    const session = await openRuntimeSession(rig);
+    await session.session.importContext("context ".repeat(30_000), "file 'large-context.md'");
+
+    const completion = session.prompt("continue");
+    await vi.waitFor(() => {
+      expect(rig.provider.requests.some((request) => request.bodyText.includes("<system>KIMI KRINIK context:"))).toBe(true);
+    }, { timeout: 10_000, interval: 50 });
+
+    await expect(completion).resolves.toEqual({ status: "finished" });
+    expect(rig.logs.filter((entry) => entry.message === "Context Window Control observation failed")).toEqual([]);
+  });
+
   it("reloads sequential config writes from either harness sharing one home", async () => {
     const rig = await createRuntimeRig();
     const plain = await createPlainHarness(rig.homeDir);
@@ -436,6 +469,31 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
 
     await rig.runtime.harness.setConfig({ yolo: true });
     await expect(plain.getConfig({ reload: true })).resolves.toMatchObject({ yolo: true });
+  });
+
+  it("persists the permission default and applies it to a fresh real session", async () => {
+    const rig = await createRuntimeRig();
+
+    await modesHandlers[Methods.SetPermissionMode]!({ mode: "auto" }, {
+      webviewId: "view-1",
+      getSession: () => undefined,
+      harness: rig.runtime.harness,
+    } as unknown as HandlerContext);
+
+    const plain = await createPlainHarness(rig.homeDir);
+    await expect(plain.getConfig({ reload: true })).resolves.toMatchObject({ defaultPermissionMode: "auto" });
+    const config = await rig.runtime.harness.getConfig({ reload: true });
+    const session = await rig.runtime.openSession({
+      webviewId: "view-1",
+      workDir: rig.workDir,
+      model: MODEL_ALIAS,
+      effort: "off",
+      yoloMode: true,
+      defaultPermissionMode: config.defaultPermissionMode,
+    });
+
+    await expect(session.session.getStatus()).resolves.toMatchObject({ permission: "auto" });
+    expect(session.legacyApprovalFlags).toEqual({ yolo: false, afk: true });
   });
 
   it("masks credential-valued MCP fields at the Webview list boundary while leaving ordinary values visible", async () => {
@@ -504,7 +562,7 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
         transport: "http",
         url: "https://example.test/mcp",
         source: "global",
-        origin: join(rig.homeDir, "mcp.json"),
+        origin: join(rig.homeDir, "mcp.json").replaceAll("\\", "/"),
         mutable: true,
       },
     ]);

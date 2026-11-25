@@ -29,6 +29,7 @@ docker-compose.yml
 
 docs/superpowers/
 reports/
+!/reports/
 .superpowers/
 /plan/
 
@@ -51,3 +52,31 @@ mac_keys
 *.log
 test-results/
 playwright-report/
+.kaif/install/
+/KAIF.md
+/KAIF-LOADER.mjs
+/KAIF_ADAPTATION_TASK.md
+/KAIF_UPDATE_TASK.md
+/KAIF_UPDATE_TASK.superseded.md
+/KAIF_ADAPTATION_TASK.superseded.md
+.kaif/backup-*/
+.kaif/update-journal.json
+.kaif/heartbeat.log
+.kaif/guarded-loop.json
+.kaif/refresh-marker.json
+.kaif/voice-marker.json
+.kaif/subagent-preamble.jsonl
+/FAREWELL_MESSAGE_FROM_THE_PREVIOUS_CHAT.md
+.kaif/farewell-capture.json
+.kaif/knowledge-moment.json
+.kaif/owner-presence.json
+.kaif/context-window.json
+.kaif/test-debt.json
+.kaif/kimi-voice.log
+.kaif/contour-window/
+.kaif/.contour-tmp/
+interviews/decisions/*.lock
+.kaif/update-rehearsal.json
+
+# The owner voice portrait (public snapshot from KAIF) stays local: it may quote the owner's private writing.
+/AUTHOR_STYLOMETRY.md

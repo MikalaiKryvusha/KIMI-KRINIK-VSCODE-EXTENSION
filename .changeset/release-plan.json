@@ -1,0 +1,21 @@
+{
+  "branch": "release/2026-11-20-2",
+  "changesets": [
+    "fix-config-draft-thinking-cli.md",
+    "fix-config-draft-thinking.md"
+  ],
+  "packages": [
+    {
+      "name": "kimi-code-app",
+      "path": "apps/desktop",
+      "version": "1.4.2",
+      "private": true
+    },
+    {
+      "name": "@moonshot-ai/kimi-code",
+      "path": "apps/kimi-code",
+      "version": "2.7.2",
+      "private": false
+    }
+  ]
+}

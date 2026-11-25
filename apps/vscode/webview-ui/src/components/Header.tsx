@@ -8,12 +8,14 @@ import { KimiLogo } from "./KimiLogo";
 import { SessionList } from "./SessionList";
 import { useChatStore } from "@/stores";
 import { ChatStatus, TokenInfo } from "./ChatStatus";
+import { useT } from "@/i18n";
 
 export function Header() {
   const [showSessionList, setShowSessionList] = useState(false);
   const [showSessionInfo, setShowSessionInfo] = useState(false);
   const [showConfirmNew, setShowConfirmNew] = useState(false);
-  const { startNewConversation, sessionId, messages, isStreaming } = useChatStore();
+  const { startNewConversation, sessionId, sessionTitle, messages, isStreaming } = useChatStore();
+  const t = useT();
 
   const handleNewSession = async () => {
     if (isStreaming) {
@@ -32,9 +34,14 @@ export function Header() {
 
   return (
     <header className="flex items-center justify-between px-3 py-2 border-b border-border shrink-0 @container">
-      <div className="flex items-center gap-2 shrink-0">
-        <KimiLogo className="size-5 shrink-0" />
-        <span className="text-sm font-semibold whitespace-nowrap">Kimi Code</span>
+      <div className="flex items-center gap-2 min-w-0">
+        <KimiLogo className="size-6 shrink-0" />
+        <span className="text-sm font-semibold whitespace-nowrap shrink-0">KIMI KRINIK</span>
+        {sessionTitle && (
+          <span className="text-xs text-muted-foreground truncate min-w-0 @max-[430px]:hidden" title={sessionTitle}>
+            · {sessionTitle}
+          </span>
+        )}
       </div>
       <div className="flex items-center gap-1">
         {sessionId && (
@@ -44,7 +51,7 @@ export function Header() {
             className="gap-1 h-6 border-0! pl-px! pr-1! text-muted-foreground hover:text-foreground @max-[320px]:hidden"
             onClick={() => setShowSessionInfo(true)}
           >
-            <span className="text-[11px] @max-[500px]:hidden">Session</span>
+            <span className="text-[11px] @max-[500px]:hidden">{t("header.session")}</span>
             <IconInfoCircle className="size-3.5 hidden @max-[500px]:block" />
           </Button>
         )}
@@ -52,7 +59,7 @@ export function Header() {
         <Popover open={showSessionList} onOpenChange={setShowSessionList}>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="xs" className="gap-1 h-6">
-              <span className="text-xs @max-[280px]:hidden">History</span>
+              <span className="text-xs @max-[280px]:hidden">{t("header.history")}</span>
               <IconChevronDown className="size-3.5" />
             </Button>
           </PopoverTrigger>
@@ -74,16 +81,16 @@ export function Header() {
       <Dialog open={showSessionInfo} onOpenChange={setShowSessionInfo}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-sm">Session Details</DialogTitle>
-            <DialogDescription className="text-xs">Details for this conversation.</DialogDescription>
+            <DialogTitle className="text-sm">{t("header.sessionDetails")}</DialogTitle>
+            <DialogDescription className="text-xs">{t("header.sessionDetailsDesc")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Session ID</div>
+              <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("header.sessionId")}</div>
               <code className="text-xs font-mono text-foreground break-all select-all">{sessionId}</code>
             </div>
             <div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Messages</div>
+              <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("header.messages")}</div>
               <span className="text-xs text-foreground">{messages.length}</span>
             </div>
             <TokenInfo />
@@ -94,9 +101,9 @@ export function Header() {
       <StreamingConfirmDialog
         open={showConfirmNew}
         onOpenChange={(open) => !open && setShowConfirmNew(false)}
-        title="Start New Conversation?"
-        description="The current conversation is still generating a response. Starting a new one will truncate the output. Are you sure you want to continue?"
-        confirmLabel="New Conversation"
+        title={t("header.newTitle")}
+        description={t("header.newDesc")}
+        confirmLabel={t("header.newConversation")}
         onConfirm={() => {
           void doStartNewSession();
         }}

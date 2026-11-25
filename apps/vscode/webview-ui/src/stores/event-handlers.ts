@@ -4,8 +4,38 @@ import { useApprovalStore } from "./approval.store";
 import { useSettingsStore } from "./settings.store";
 import { isPreflightError, isUserInterrupt } from "shared/errors";
 import type { ChatMessage, UIStep, UIStepItem, ChatState, TokenUsage } from "./chat.store";
-import type { ContentPart, ToolCall, ToolResult, TurnBegin, SubagentEvent, ApprovalRequestPayload, DiffBlock, RunResult, QuestionRequest } from "shared/legacy-sdk";
+import type { ContentPart, ToolCall, ToolResult, TurnBegin, SubagentEvent, ApprovalRequestPayload, DiffBlock, RunResult, QuestionRequest, StatusUpdate } from "shared/legacy-sdk";
 import type { UIStreamEvent, StreamError } from "shared/types";
+
+function sameContent(left: string | ContentPart[], right: string | ContentPart[]): boolean {
+  return typeof left === "string" || typeof right === "string"
+    ? left === right
+    : JSON.stringify(left) === JSON.stringify(right);
+}
+
+function reconcileOptimisticTurn(
+  draft: ChatState,
+  content: string | ContentPart[],
+  clientId?: string,
+  turnIndex?: number,
+  forkable?: boolean,
+): boolean {
+  const user = draft.messages.find((message) => message.role === "user" && message.optimistic === true
+    && (clientId === undefined ? sameContent(message.content, content) : message.clientId === clientId));
+  if (user === undefined) return false;
+  user.optimistic = false;
+  user.content = content;
+  user.turnIndex = turnIndex;
+  user.forkable = forkable;
+  const assistant = draft.messages.find((message) => message.role === "assistant" && message.optimistic === true && message.clientId === user.clientId);
+  if (assistant !== undefined) {
+    assistant.optimistic = false;
+    assistant.turnIndex = turnIndex;
+    assistant.forkable = forkable;
+    assistant.steps ??= [];
+  }
+  return true;
+}
 
 type EventHandler = (draft: ChatState, payload: any) => void;
 
@@ -260,7 +290,11 @@ function handlePreflightError(draft: ChatState, _code: string, _message: string)
   if (lastUser?.role === "user") {
     const userContent = lastUser.content;
     draft.messages.pop();
-    draft.pendingInput = { content: userContent, model: "" };
+    draft.pendingInput = {
+      content: userContent,
+      model: draft.pendingInput?.model ?? "",
+      ...(draft.pendingInput?.clientId === undefined ? {} : { clientId: draft.pendingInput.clientId }),
+    };
   }
 }
 
@@ -287,6 +321,8 @@ const eventHandlers: Record<string, EventHandler> = {
       draft.sessionId = payload.sessionId;
     }
   },
+
+  QueueBatchReady: () => undefined,
 
   stream_complete: (draft, _payload: { result: RunResult }) => {
     addTokenUsage(draft.tokenUsage, draft.activeTokenUsage);
@@ -328,9 +364,17 @@ const eventHandlers: Record<string, EventHandler> = {
     }
   },
 
-  TurnBegin: (draft, payload: TurnBegin & { forkable?: boolean }) => {
+  TurnBegin: (draft, payload: TurnBegin & { forkable?: boolean; clientId?: string }) => {
     draft.tokenUsage = createEmptyTokenUsage();
     draft.activeTokenUsage = createEmptyTokenUsage();
+    if (payload.clientId !== undefined) {
+      draft.queue = draft.queue.filter((item) => item.id !== payload.clientId);
+      if (draft.queueSteerInFlight === payload.clientId) draft.queueSteerInFlight = null;
+    }
+    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId, payload.turnIndex, payload.forkable)) {
+      draft.isStreaming = true;
+      return;
+    }
 
     draft.messages.push({
       id: randomUUID(),
@@ -508,9 +552,12 @@ const eventHandlers: Record<string, EventHandler> = {
     draft.pendingQuestion = payload;
   },
 
-  StatusUpdate: (draft, payload) => {
-    const { context_usage, token_usage, plan_mode, model, thinking_effort, retrying } = payload;
+  StatusUpdate: (draft, payload: StatusUpdate) => {
+    const { context_usage, context_tokens, max_context_tokens, token_usage, plan_mode, swarm_mode, permission, goal, model, session_title, thinking_effort, retrying } = payload;
 
+    if (session_title !== undefined) {
+      draft.sessionTitle = session_title;
+    }
     if (typeof model === "string" && model.length > 0) {
       useSettingsStore.getState().setCurrentModel(model);
     }
@@ -520,6 +567,16 @@ const eventHandlers: Record<string, EventHandler> = {
 
     if (plan_mode !== undefined && plan_mode !== null) {
       draft.planMode = plan_mode;
+    }
+    if (swarm_mode !== undefined && swarm_mode !== null) {
+      draft.swarmMode = swarm_mode;
+    }
+    if (permission !== undefined && permission !== null) {
+      draft.permissionMode = permission;
+    }
+    if (goal !== undefined) {
+      draft.goal = goal;
+      if (goal !== null) draft.goalArmed = false;
     }
 
     if (token_usage) {
@@ -533,6 +590,8 @@ const eventHandlers: Record<string, EventHandler> = {
 
     draft.lastStatus = {
       context_usage: context_usage ?? draft.lastStatus?.context_usage,
+      context_tokens: context_tokens ?? draft.lastStatus?.context_tokens,
+      max_context_tokens: max_context_tokens ?? draft.lastStatus?.max_context_tokens,
       token_usage,
       retrying: retrying ?? draft.lastStatus?.retrying,
     };
@@ -544,7 +603,11 @@ const eventHandlers: Record<string, EventHandler> = {
     }
   },
 
-  SteerInput: (draft, payload: { user_input: string | ContentPart[] }) => {
+  SteerInput: (draft, payload: { user_input: string | ContentPart[]; clientId?: string }) => {
+    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId)) {
+      draft.isStreaming = true;
+      return;
+    }
     const last = getLastAssistant(draft);
     if (!last?.steps) return;
 

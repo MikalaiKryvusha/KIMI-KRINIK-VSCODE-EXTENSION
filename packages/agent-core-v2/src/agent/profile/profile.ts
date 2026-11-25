@@ -93,6 +93,7 @@ export interface ProfileModelContext {
   readonly maxOutputSize: number | undefined;
   readonly alwaysThinking: boolean | undefined;
   readonly thinkingLevel: ThinkingEffort;
+  readonly autoCompact: boolean | undefined;
   readonly reservedContextSize: number | undefined;
   readonly compactionTriggerRatio: number | undefined;
   readonly compactionMaxAttempts: number | undefined;

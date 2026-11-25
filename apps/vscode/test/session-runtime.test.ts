@@ -5,6 +5,7 @@ import type {
   JsonObject,
   PermissionMode,
   PromptInput,
+  PromptSubmissionResult,
   QuestionHandler,
   QuestionRequest,
   Session,
@@ -32,6 +33,14 @@ interface BaselineRecord {
   readonly webviewIds: readonly string[];
 }
 
+const RUNNING_STEER_RESULT: PromptSubmissionResult = {
+  promptId: "prompt-steer-1",
+  createdAt: "2026-11-24T00:00:00.000Z",
+  state: "running",
+  turnId: 7,
+  steered: true,
+};
+
 interface FakeSessionBoundary {
   readonly session: Session;
   readonly promptInputs: Array<string | PromptInput>;
@@ -44,6 +53,7 @@ interface FakeSessionBoundary {
   readonly cancelCompactionCount: () => number;
   readonly closeCount: () => number;
   emit(event: Event): void;
+  setSteerResult(result: PromptSubmissionResult): void;
   rejectNextPrompt(error: Error): void;
   rejectNextMetadataUpdate(error: Error): void;
   requestApproval(request: ApprovalRequest): Promise<Awaited<ReturnType<ApprovalHandler>>>;
@@ -68,6 +78,7 @@ function createFakeSession(): FakeSessionBoundary {
   let compactionCancellations = 0;
   let closes = 0;
   let permission: PermissionMode = "manual";
+  let steerResult = RUNNING_STEER_RESULT;
 
   const summary: SessionSummary = {
     id: "session-1",
@@ -105,6 +116,7 @@ function createFakeSession(): FakeSessionBoundary {
     },
     async steer(input: string | PromptInput) {
       steerInputs.push(input);
+      return steerResult;
     },
     async cancel() {
       cancellations += 1;
@@ -153,6 +165,9 @@ function createFakeSession(): FakeSessionBoundary {
     emit(event) {
       for (const listener of listeners) listener(event);
     },
+    setSteerResult(result) {
+      steerResult = result;
+    },
     rejectNextPrompt(error) {
       nextPromptError = error;
     },
@@ -191,13 +206,14 @@ function streamData(records: readonly BroadcastRecord[]): unknown[] {
   return records.filter((record) => record.event === Events.StreamEvent).map((record) => record.data);
 }
 
-function turnStarted(): Event {
+function turnStarted(promptId?: string): Event {
   return {
     type: "turn.started",
     sessionId: "session-1",
     agentId: "main",
     turnId: 7,
     origin: { kind: "user" },
+    ...(promptId === undefined ? {} : { promptId }),
   };
 }
 
@@ -216,6 +232,19 @@ function turnEnded(
 }
 
 describe("session runtime (adapts one SDK session for subscribed Webviews)", () => {
+  it("broadcasts session title updates and refreshes the summary", () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+
+    sdk.emit({ type: "session.meta.updated", sessionId: "session-1", agentId: "main", title: "Fix login" });
+
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "StatusUpdate",
+      payload: { session_title: "Fix login" },
+      _sessionId: "session-1",
+    });
+    expect(runtime.summary?.title).toBe("Fix login");
+  });
+
   it("announces the current context usage to a subscribed Webview", async () => {
     const { runtime, broadcasts } = createRuntime();
 
@@ -226,7 +255,12 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
       payload: {
         thinking_effort: "off",
         plan_mode: false,
+        swarm_mode: false,
+        permission: "manual",
         context_usage: 0,
+        context_tokens: 0,
+        max_context_tokens: 128000,
+        goal: null,
       },
       _sessionId: "session-1",
     });
@@ -332,6 +366,22 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
       payload: { user_input: "/skill:review carefully", turnIndex: 7 },
       _sessionId: "session-1",
     });
+  });
+
+  it("announces a ready queue batch as soon as its first prompt is accepted", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    runtime.subscribe("view-a");
+
+    const completion = runtime.prompt("first", "client-batch", true);
+    await vi.waitFor(() => expect(streamData(broadcasts)).toContainEqual({
+      type: "QueueBatchReady",
+      payload: { clientId: "client-batch" },
+      _sessionId: "session-1",
+    }));
+
+    sdk.emit(turnStarted());
+    sdk.emit(turnEnded("completed"));
+    await expect(completion).resolves.toEqual({ status: "finished" });
   });
 
   it("converts legacy media keys when a prompt crosses the SDK boundary", async () => {
@@ -442,6 +492,7 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
         {
           type: "stream_complete",
           result: { status: expectedStatus },
+          turnIndex: 7,
           _sessionId: "session-1",
         },
       ]);
@@ -547,17 +598,72 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     ]);
   });
 
-  it("echoes a successful steer into the subscribed Webview", async () => {
+  it("echoes a successful steer into the subscribed Webview with its clientId", async () => {
     const { runtime, broadcasts } = createRuntime();
     runtime.subscribe("view-a");
 
-    await runtime.steer("Use this instead");
+    await runtime.steer("Use this instead", "client-steer-1");
 
     expect(streamData(broadcasts)).toContainEqual({
       type: "SteerInput",
-      payload: { user_input: "Use this instead" },
+      payload: { user_input: "Use this instead", clientId: "client-steer-1" },
       _sessionId: "session-1",
     });
+  });
+
+  it("returns a new running steer as its own correlated turn", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    runtime.subscribe("view-a");
+    sdk.setSteerResult({ ...RUNNING_STEER_RESULT, steered: false });
+
+    await expect(runtime.steer("Use this instead", "client-steer-1")).resolves.toEqual({ ...RUNNING_STEER_RESULT, steered: false });
+
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "TurnBegin",
+      payload: { user_input: "Use this instead", turnIndex: 7, clientId: "client-steer-1" },
+      _sessionId: "session-1",
+    });
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "SteerInput" }));
+  });
+
+  it("keeps a queued steer correlated until its prompt starts", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const queued = { promptId: "prompt-queued", createdAt: "2026-11-24T00:00:00.000Z", state: "queued", steered: false } as const;
+    sdk.setSteerResult(queued);
+
+    await expect(runtime.steer("Queue this", "client-queued")).resolves.toEqual(queued);
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "SteerInput" }));
+
+    sdk.emit(turnStarted("prompt-queued"));
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "TurnBegin",
+      payload: { user_input: "Queue this", turnIndex: 7, clientId: "client-queued" },
+      _sessionId: "session-1",
+    });
+  });
+
+  it("returns a blocked steer without emitting a success echo", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const blocked = { promptId: "prompt-blocked", createdAt: "2026-11-24T00:00:00.000Z", state: "blocked", steered: false } as const;
+    sdk.setSteerResult(blocked);
+
+    await expect(runtime.steer("Blocked", "client-blocked")).resolves.toEqual(blocked);
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "SteerInput" }));
+  });
+
+  it("correlates an ordinary turn with the clientId from its prompt", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const completion = runtime.prompt("hello", "client-turn-1");
+
+    sdk.emit(turnStarted());
+
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "TurnBegin",
+      payload: { user_input: "hello", turnIndex: 7, clientId: "client-turn-1" },
+      _sessionId: "session-1",
+    });
+    sdk.emit(turnEnded("completed"));
+    await expect(completion).resolves.toEqual({ status: "finished" });
   });
 
   it.each([
@@ -810,5 +916,40 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     );
 
     expect(activateSkill).toHaveBeenCalledWith("review", undefined, { path: "/work/B/review/SKILL.md" });
+  });
+});
+
+describe("Context Window Control runtime delivery", () => {
+  it("turns an SDK status into one self-contained steer without requiring a skill", async () => {
+    const sdk = createFakeSession();
+    const log = vi.fn();
+    const runtime = new SessionRuntime({
+      session: sdk.session,
+      legacyApproval: DEFAULT_LEGACY_APPROVAL,
+      broadcast: vi.fn(),
+      captureBaseline: vi.fn(),
+      log,
+      contextWindowControl: async () => ({
+        enabled: true,
+        autoCompact: false,
+        thresholds: { warnPct: 70, cutPct: 75, closePct: 80, forcePct: 90 },
+      }),
+    });
+
+    sdk.emit({
+      type: "agent.status.updated",
+      sessionId: "session-1",
+      agentId: "main",
+      contextTokens: 623_903,
+      maxContextTokens: 1_048_576,
+    });
+
+    await vi.waitFor(() => expect(sdk.steerInputs).toHaveLength(1));
+    const line = sdk.steerInputs[0];
+    expect(line).toBeTypeOf("string");
+    expect(line).toContain("<system>KIMI KRINIK context:");
+    expect(line).not.toContain("KAIF");
+    expect(log).not.toHaveBeenCalled();
+    await runtime.close();
   });
 });

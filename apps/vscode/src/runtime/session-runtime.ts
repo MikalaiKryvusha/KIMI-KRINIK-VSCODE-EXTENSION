@@ -3,6 +3,7 @@ import {
   type ContentPart as SdkContentPart,
   type Event,
   type PromptInput,
+  type PromptSubmissionResult,
   type Session,
   type SessionSummary,
 } from "@moonshot-ai/kimi-code-sdk";
@@ -11,6 +12,7 @@ import type { ContentPart as LegacyContentPart, ApprovalResponse } from "../../s
 import { Events } from "../../shared/bridge";
 import { getUserMessage } from "../../shared/errors";
 import type { ErrorPhase, UIStreamEvent } from "../../shared/types";
+import { toGoalStateInfo, type PermissionModeName } from "../../shared/modes";
 import {
   adaptSdkEvent,
   createEventAdapterState,
@@ -23,6 +25,7 @@ import {
   type LegacyApprovalFlags,
 } from "./legacy-approval";
 import { ReverseRpcController } from "./reverse-rpc";
+import { ContextWindowController, type ContextWindowConfigProvider } from "./context-window-control";
 
 export type RuntimeBroadcast = (event: string, data: unknown, webviewId?: string) => void;
 
@@ -36,10 +39,12 @@ export interface SessionRuntimeOptions {
     webviewIds: readonly string[],
   ) => void;
   readonly log: (message: string, error?: unknown) => void;
+  readonly contextWindowControl?: ContextWindowConfigProvider;
 }
 
 interface ActivePrompt {
   readonly input: LegacyContentPart[] | string;
+  readonly clientId?: string;
   started: boolean;
   settled: boolean;
   resolve: (result: PromptResult) => void;
@@ -49,6 +54,11 @@ const ALREADY_GENERATING_MESSAGE = "A response is already being generated for th
 
 export interface PromptResult {
   readonly status: "finished" | "cancelled" | "failed";
+}
+
+interface PendingSteer {
+  readonly input: LegacyContentPart[] | string;
+  readonly clientId?: string;
 }
 
 interface SuppressedError {
@@ -70,9 +80,11 @@ export class SessionRuntime {
   private readonly log: SessionRuntimeOptions["log"];
   private readonly webviewIds = new Set<string>();
   private readonly reverseRpc: ReverseRpcController;
+  private readonly contextWindowController?: ContextWindowController;
   private readonly unsubscribe: () => void;
   private adapterState: EventAdapterState = createEventAdapterState();
   private activePrompt: ActivePrompt | undefined;
+  private readonly pendingSteers = new Map<string, PendingSteer>();
   private hostActionActive = false;
   private hostActionSequence = 0;
   private activeHostActionId: number | undefined;
@@ -92,6 +104,15 @@ export class SessionRuntime {
     this.log = options.log;
     this.legacyApproval = options.legacyApproval;
     this.reverseRpc = new ReverseRpcController((event) => this.emitStreamEvent(event));
+    if (options.contextWindowControl !== undefined) {
+      this.contextWindowController = new ContextWindowController(
+        options.contextWindowControl,
+        async (line) => {
+          if (!this.closed) await this.session.steer(line);
+        },
+        (message, error) => this.log(message, error),
+      );
+    }
 
     this.session.setApprovalHandler((request) => this.reverseRpc.requestApproval(request));
     this.session.setQuestionHandler((request) => this.reverseRpc.requestQuestion(request));
@@ -118,6 +139,15 @@ export class SessionRuntime {
     return this.legacyApproval;
   }
 
+  get permissionMode(): PermissionModeName {
+    return corePermissionForLegacyApproval(this.legacyApproval);
+  }
+
+  async setPermissionMode(mode: PermissionModeName): Promise<void> {
+    if (this.permissionMode === mode) return;
+    await this.applyLegacyApproval({ yolo: mode === "yolo", afk: mode === "auto" });
+  }
+
   async toggleLegacyApproval(kind: keyof LegacyApprovalFlags): Promise<LegacyApprovalFlags> {
     const next = { ...this.legacyApproval, [kind]: !this.legacyApproval[kind] };
     await this.applyLegacyApproval(next);
@@ -138,6 +168,8 @@ export class SessionRuntime {
     this.ensureOpen();
     const status = await this.session.getStatus();
     if (this.closed || !this.webviewIds.has(webviewId)) return;
+    const goalResult = await Promise.resolve().then(() => this.session.getGoal()).catch(() => null);
+    if (this.closed || !this.webviewIds.has(webviewId)) return;
     this.broadcast(
       Events.StreamEvent,
       {
@@ -146,7 +178,13 @@ export class SessionRuntime {
           model: status.model,
           thinking_effort: status.thinkingEffort,
           plan_mode: status.planMode,
+          swarm_mode: status.swarmMode ?? false,
+          ...(this.summary?.title === undefined ? {} : { session_title: this.summary.title }),
+          permission: this.permissionMode,
           context_usage: status.contextUsage,
+          context_tokens: status.contextTokens,
+          max_context_tokens: status.maxContextTokens,
+          goal: toGoalStateInfo(goalResult?.goal ?? null),
         },
         _sessionId: this.id,
       },
@@ -158,13 +196,23 @@ export class SessionRuntime {
     this.webviewIds.delete(webviewId);
   }
 
-  async prompt(input: string | LegacyContentPart[]): Promise<PromptResult> {
-    return this.runTurnAction(input, () => this.session.prompt(toSdkPromptInput(input)));
+  async prompt(input: string | LegacyContentPart[], clientId?: string, drainQueue = false): Promise<PromptResult> {
+    return this.runTurnAction(input, async () => {
+      await this.session.prompt(toSdkPromptInput(input));
+      if (drainQueue) {
+        this.emitStreamEvent({
+          type: "QueueBatchReady",
+          payload: clientId === undefined ? {} : { clientId },
+          _sessionId: this.id,
+        });
+      }
+    }, clientId);
   }
 
   async runTurnAction(
     input: string | LegacyContentPart[],
     action: () => Promise<void>,
+    clientId?: string,
   ): Promise<PromptResult> {
     this.ensureOpen();
     if (this.isBusy) {
@@ -182,6 +230,7 @@ export class SessionRuntime {
     });
     const active: ActivePrompt = {
       input,
+      clientId,
       started: false,
       settled: false,
       resolve: resolveCompletion,
@@ -339,14 +388,27 @@ export class SessionRuntime {
     }
   }
 
-  async steer(input: string | LegacyContentPart[]): Promise<void> {
+  async steer(input: string | LegacyContentPart[], clientId?: string): Promise<PromptSubmissionResult> {
     this.ensureOpen();
-    await this.session.steer(toSdkPromptInput(input));
-    this.emitStreamEvent({
-      type: "SteerInput",
-      payload: { user_input: input },
-      _sessionId: this.id,
-    });
+    const result = await this.session.steer(toSdkPromptInput(input));
+    if (result.state === "queued") {
+      this.pendingSteers.set(result.promptId, { input, ...(clientId === undefined ? {} : { clientId }) });
+    } else if (result.state === "running") {
+      this.emitStreamEvent(result.steered ? {
+        type: "SteerInput",
+        payload: { user_input: input, ...(clientId === undefined ? {} : { clientId }) },
+        _sessionId: this.id,
+      } : {
+        type: "TurnBegin",
+        payload: {
+          user_input: input,
+          ...(result.turnId === undefined ? {} : { turnIndex: result.turnId }),
+          ...(clientId === undefined ? {} : { clientId }),
+        },
+        _sessionId: this.id,
+      });
+    }
+    return result;
   }
 
   respondApproval(id: string, response: ApprovalResponse): boolean {
@@ -362,6 +424,7 @@ export class SessionRuntime {
     this.closed = true;
     this.pendingHostCompaction?.reject(new Error("Session closed during context compaction."));
     this.pendingHostCompaction = undefined;
+    this.pendingSteers.clear();
     this.reverseRpc.cancelAll("Session closed");
     this.unsubscribe();
     this.session.setApprovalHandler(undefined);
@@ -403,6 +466,30 @@ export class SessionRuntime {
 
   private onSdkEvent(event: Event): void {
     if (this.closed) return;
+    if (event.type === "compaction.completed") this.contextWindowController?.reset();
+    if (event.type === "agent.status.updated" && event.agentId === "main"
+      && event.contextTokens !== undefined && event.maxContextTokens !== undefined) {
+      void this.contextWindowController?.observe(event.contextTokens, event.maxContextTokens);
+    }
+    if (event.type === "session.meta.updated" && typeof event.title === "string") {
+      if (this.session.summary !== undefined) this.session.summary = { ...this.session.summary, title: event.title };
+      for (const webviewId of this.webviewIds) {
+        this.broadcast(
+          Events.StreamEvent,
+          { type: "StatusUpdate", payload: { session_title: event.title }, _sessionId: this.id },
+          webviewId,
+        );
+      }
+    }
+    if (event.type === "goal.updated") {
+      for (const webviewId of this.webviewIds) {
+        this.broadcast(
+          Events.StreamEvent,
+          { type: "StatusUpdate", payload: { goal: toGoalStateInfo(event.snapshot) }, _sessionId: this.id },
+          webviewId,
+        );
+      }
+    }
 
     if (event.type === "compaction.completed" || event.type === "compaction.cancelled") {
       const pending = this.pendingHostCompaction;
@@ -431,9 +518,13 @@ export class SessionRuntime {
       return;
     }
 
-    const pendingInput = this.activePrompt?.input;
+    const pendingSteer = event.type === "turn.started" && event.promptId !== undefined
+      ? this.pendingSteers.get(event.promptId)
+      : undefined;
+    if (event.type === "turn.started" && event.promptId !== undefined) this.pendingSteers.delete(event.promptId);
     const adapted = adaptSdkEvent(this.adapterState, event, {
-      pendingInput,
+      pendingInput: pendingSteer?.input ?? this.activePrompt?.input,
+      clientId: pendingSteer?.clientId ?? this.activePrompt?.clientId,
       errorPhase: this.activePrompt?.started === false ? "preflight" : "runtime",
     });
     this.adapterState = adapted.state;
@@ -481,6 +572,7 @@ export class SessionRuntime {
       this.emitStreamEvent({
         type: "stream_complete",
         result: { status: "finished" },
+        turnIndex: terminal.turnId,
         _sessionId: terminal.sessionId,
       });
       this.settlePrompt({ status: "finished" });
@@ -492,6 +584,7 @@ export class SessionRuntime {
       this.emitStreamEvent({
         type: "stream_complete",
         result: { status: "cancelled" },
+        turnIndex: terminal.turnId,
         _sessionId: terminal.sessionId,
       });
       this.settlePrompt({ status: "cancelled" });

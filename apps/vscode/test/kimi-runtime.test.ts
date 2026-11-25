@@ -544,6 +544,22 @@ describe("Kimi runtime (owns shared SDK sessions for Webviews)", () => {
     expect(opened.subscribers).toEqual(["view-1"]);
   });
 
+  it("uses the canonical default permission for a new session instead of legacy yolo", async () => {
+    const { runtime, sdk } = createRuntime();
+
+    await runtime.openSession(openOptions({ defaultPermissionMode: "auto", yoloMode: true }));
+
+    expect(sdk.createInputs).toEqual([
+      {
+        workDir: "/workspace",
+        model: "kimi-test",
+        thinking: "off",
+        permission: "auto",
+        metadata: { vscode_legacy_approval: { yolo: false, afk: true } },
+      },
+    ]);
+  });
+
   it("accepts the normalized SDK workDir when a Windows session is created", async () => {
     const { runtime } = createRuntime((workDir) => workDir.replaceAll("\\", "/"));
 
@@ -755,7 +771,12 @@ describe("Kimi runtime (owns shared SDK sessions for Webviews)", () => {
           model: "kimi-test",
           thinking_effort: "max",
           plan_mode: true,
+          swarm_mode: false,
+          permission: "manual",
           context_usage: 0,
+          context_tokens: 0,
+          max_context_tokens: 128000,
+          goal: null,
         },
         _sessionId: "saved-1",
       },

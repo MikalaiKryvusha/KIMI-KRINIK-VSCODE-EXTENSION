@@ -19,17 +19,7 @@ Kimi Code CLI 与桌面端内置了 **Kimi Agent Protocol (KAP)** 本地服务�
 
 直接用自然语言告诉你的 Agent 想做什么即可。
 
-可安装 `use-kimi-code` Skill：
-
-使用命令行安装：
-
-```sh
-npx skills add https://code.kimi.com/kimi-code/skills/use-kimi-code.md -g
-```
-
-使用 Agent 安装：
-
-> 请阅读 `https://code.kimi.com/kimi-code/skills/use-kimi-code.md` ，保存为本地 `use-kimi-code` skill。
+让你的 Agent 读取本机 Kimi Code 服务在 `/api/v1/kap.md` 提供的 KAP 指南。指南包含当前版本的连接流程和 API 用法，无需另行安装 Skill。
 
 ### 示例场景一：对话交接 / HandOff
 

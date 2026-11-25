@@ -1,0 +1,33 @@
+{
+  "framework": "KAIF",
+  "version": "2.10",
+  "released": "2026-11-22",
+  "origin": "https://github.com/MikalaiKryvusha/KAIF",
+  "tracking": "origin",
+  "sphere": "programming",
+  "agents": [
+    "kimi-code"
+  ],
+  "language": "ru",
+  "canonArtifacts": [],
+  "contour": {
+    "callName": "Николай",
+    "spokenProjectName": "Кими Криник",
+    "voiceFileTool": [
+      "D:/work/ai_sandbox/tools/silero_tts/venv/Scripts/python.exe",
+      "-I",
+      "D:/work/ai_sandbox/tools/silero_tts/say.py",
+      "--file",
+      "{file}"
+    ]
+  },
+  "build": "40a046eebf68",
+  "projectName": "KIMI KRINIK",
+  "contextWindow": {
+    "warnPct": 70,
+    "cutPct": 75,
+    "closePct": 80,
+    "forcePct": 90,
+    "owner": "kimi-krinik"
+  }
+}

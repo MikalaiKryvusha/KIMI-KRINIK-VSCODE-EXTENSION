@@ -1,3 +1,7 @@
+import { CONTEXT_WINDOW_THRESHOLD_SETTINGS, CONTROL_PANEL_BUTTONS, INTERFACE_LANGUAGES } from "./types";
+import { isSoundSettings } from "./sounds";
+import { GOAL_ACTIONS, isPermissionModeName } from "./modes";
+
 export const Methods = {
   CheckWorkspace: "checkWorkspace",
   GetInputHistory: "getInputHistory",
@@ -7,9 +11,18 @@ export const Methods = {
   CheckLoginStatus: "checkLoginStatus",
   Login: "login",
   Logout: "logout",
+  GetManagedUsage: "getManagedUsage",
+  NotifyAttention: "notifyAttention",
+  UpdateExtensionSetting: "updateExtensionSetting",
+  GetAutoCompact: "getAutoCompact",
+  SetAutoCompact: "setAutoCompact",
+  SetPermissionMode: "setPermissionMode",
+  SetSwarmMode: "setSwarmMode",
+  ControlGoal: "controlGoal",
   SaveConfig: "saveConfig",
   GetExtensionConfig: "getExtensionConfig",
   OpenSettings: "openSettings",
+  OpenProjectPage: "openProjectPage",
   OpenFolder: "openFolder",
   GetModels: "getModels",
 
@@ -24,6 +37,9 @@ export const Methods = {
   StreamChat: "streamChat",
   AbortChat: "abortChat",
   ResetSession: "resetSession",
+  GetSessionContext: "getSessionContext",
+  GetBackgroundTasks: "getBackgroundTasks",
+  GetSessionBusy: "getSessionBusy",
   SetPlanMode: "setPlanMode",
   SteerChat: "steerChat",
   RespondApproval: "respondApproval",
@@ -86,6 +102,7 @@ export const Events = {
   FileChangesUpdated: "fileChangesUpdated",
   RollbackInput: "rollbackInput",
   LoginUrl: "loginUrl",
+  AutoCompactChanged: "autoCompactChanged",
 } as const;
 
 const rpcMethods = new Set<string>(Object.values(Methods));
@@ -125,11 +142,15 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.Logout:
     case Methods.GetExtensionConfig:
     case Methods.OpenSettings:
+    case Methods.OpenProjectPage:
     case Methods.OpenFolder:
     case Methods.GetModels:
     case Methods.GetMCPServers:
     case Methods.AbortChat:
     case Methods.ResetSession:
+    case Methods.GetSessionContext:
+    case Methods.GetBackgroundTasks:
+    case Methods.GetSessionBusy:
     case Methods.GetKimiSessions:
     case Methods.GetAllKimiSessions:
     case Methods.GetRegisteredWorkDirs:
@@ -137,16 +158,45 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.ClearTrackedFiles:
     case Methods.ShowLogs:
     case Methods.ReloadWebview:
+    case Methods.GetAutoCompact:
       return params === undefined;
 
     case Methods.AddInputHistory:
       return hasString(params, "text");
+    case Methods.GetManagedUsage:
+      return params === undefined
+        || (isPlainObject(params) && isOptionalType(params["provider"], "string"));
+    case Methods.NotifyAttention:
+      return isPlainObject(params) && hasNonEmptyString(params, "message");
+    case Methods.UpdateExtensionSetting:
+      return isPlainObject(params) && (
+        (params["key"] === "autoSteer" && typeof params["value"] === "boolean")
+        || (params["key"] === "soundEnabled" && typeof params["value"] === "boolean")
+        || (params["key"] === "contextWindowControl" && typeof params["value"] === "boolean")
+        || ((Object.values(CONTEXT_WINDOW_THRESHOLD_SETTINGS) as readonly unknown[]).includes(params["key"])
+          && typeof params["value"] === "number" && Number.isFinite(params["value"]) && params["value"] >= 0 && params["value"] <= 100)
+        || (typeof params["value"] === "boolean" && CONTROL_PANEL_BUTTONS.some((button) => params["key"] === `controlPanel.${button}`))
+        || (params["key"] === "language" && (INTERFACE_LANGUAGES as readonly unknown[]).includes(params["value"]))
+        || (params["key"] === "sounds" && isSoundSettings(params["value"]))
+      );
+    case Methods.SetAutoCompact:
+    case Methods.SetSwarmMode:
+      return isPlainObject(params) && hasBoolean(params, "enabled");
+    case Methods.SetPermissionMode:
+      return isPlainObject(params) && isPermissionModeName(params["mode"]);
+    case Methods.ControlGoal:
+      return isPlainObject(params) && (GOAL_ACTIONS as readonly unknown[]).includes(params["action"]);
     case Methods.SaveConfig:
       return isPlainObject(params)
         && typeof params["model"] === "string"
         && isOptionalType(params["thinking"], "boolean")
         && isOptionalType(params["effort"], "string")
-        && isOptionalType(params["effortChanged"], "boolean");
+        && isOptionalType(params["effortChanged"], "boolean")
+        && (params["secondaryModel"] === undefined || params["secondaryModel"] === null || (
+          isPlainObject(params["secondaryModel"])
+          && hasNonEmptyString(params["secondaryModel"], "model")
+          && isOptionalType(params["secondaryModel"]["defaultEffort"], "string")
+        ));
     case Methods.AddMCPServer:
       return isMcpServerConfig(params);
     case Methods.UpdateMCPServer:
@@ -172,7 +222,8 @@ function validateParams(method: RpcMethod, params: unknown): boolean {
     case Methods.SetPlanMode:
       return hasBoolean(params, "enabled");
     case Methods.SteerChat:
-      return isPlainObject(params) && isContent(params["content"]);
+      return isPlainObject(params) && isContent(params["content"])
+        && (params["clientId"] === undefined || isNonEmptyString(params["clientId"]));
     case Methods.GetProjectFiles:
       return params === undefined || (
         isPlainObject(params)
@@ -216,7 +267,11 @@ function isStreamChatParams(value: unknown): boolean {
     && isOptionalType(value["effort"], "string")
     && isOptionalType(value["thinking"], "boolean")
     && isOptionalType(value["planMode"], "boolean")
-    && isOptionalType(value["sessionId"], "string");
+    && isOptionalType(value["sessionId"], "string")
+    && (value["permissionMode"] === undefined || isPermissionModeName(value["permissionMode"]))
+    && (value["goalObjective"] === undefined || isNonEmptyString(value["goalObjective"]))
+    && (value["clientId"] === undefined || isNonEmptyString(value["clientId"]))
+    && isOptionalType(value["drainQueue"], "boolean");
 }
 
 function isContent(value: unknown): boolean {

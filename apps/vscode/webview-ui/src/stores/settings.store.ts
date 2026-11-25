@@ -1,10 +1,20 @@
 import { create } from "zustand";
 import { bridge } from "@/services";
 import { toast } from "@/components/ui/sonner";
-import type { ExtensionConfig } from "shared/types";
-import type { ModelConfig, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
+import type { ContextWindowThresholds, ControlPanelButton, ExtensionConfig, InterfaceLanguage } from "shared/types";
+import { CONTEXT_WINDOW_THRESHOLD_SETTINGS } from "shared/types";
+import { DEFAULT_SOUND_SETTINGS, type SoundSettings } from "shared/sounds";
+import type { ModelConfig, SecondaryModelSelection, ThinkingMode, SlashCommandInfo } from "shared/legacy-sdk";
+import type { PermissionModeName } from "shared/modes";
+import { translate, type TranslateParams, type TranslationKey } from "@/i18n/translate";
 
 let settingsSaveRevision = 0;
+let soundSaveRevision = 0;
+let soundSavePending = false;
+
+function t(key: TranslationKey, params?: TranslateParams): string {
+  return translate(useSettingsStore.getState().extensionConfig.language, key, params);
+}
 const MANAGED_KIMI_CODE_PROVIDER = "managed:kimi-code";
 
 function saveConfigWithRollback(
@@ -16,7 +26,7 @@ function saveConfigWithRollback(
   void bridge.saveConfig(config).catch((error: unknown) => {
     if (revision !== settingsSaveRevision) return;
     set(rollback);
-    toast.error(`Failed to save model settings: ${error instanceof Error ? error.message : String(error)}`);
+    toast.error(t("toast.saveModelSettingsFailed", { error: error instanceof Error ? error.message : String(error) }));
   });
 }
 
@@ -27,7 +37,24 @@ export const DEFAULT_EXTENSION_CONFIG: ExtensionConfig = {
   enableNewConversationShortcut: false,
   showThinkingContent: true,
   showThinkingExpanded: true,
+  autoSteer: true,
+  contextWindowControl: false,
+  contextWindowThresholds: { warnPct: 70, cutPct: 75, closePct: 80, forcePct: 90 },
+  controlPanel: {
+    permission: true,
+    compact: true,
+    steer: true,
+    control: true,
+    plan: true,
+    goal: true,
+    swarm: true,
+    secondaryModel: true,
+  },
+  language: "en",
+  soundEnabled: true,
+  sounds: DEFAULT_SOUND_SETTINGS,
   version: "",
+  buildNumber: 0,
 };
 
 export function getModelThinkingMode(model: ModelConfig): ThinkingMode {
@@ -99,16 +126,6 @@ function defaultEffortForModel(model: ModelConfig, defaultThinking: boolean, con
   return defaultThinking ? "on" : "off";
 }
 
-function persistsAsDefaultEffort(model: ModelConfig, effort: string): boolean {
-  const efforts = model.support_efforts ?? [];
-  const declared = model.default_effort;
-  const ceiling =
-    declared !== undefined && efforts.includes(declared)
-      ? efforts.indexOf(declared)
-      : efforts.length - 2;
-  return efforts.indexOf(effort) <= ceiling;
-}
-
 export function isImageModel(model: ModelConfig): boolean {
   return model.capabilities.includes("image_in");
 }
@@ -151,6 +168,7 @@ interface SettingsState {
   thinkingEffort: string;
   extensionConfig: ExtensionConfig;
   mcpModalOpen: boolean;
+  soundModalOpen: boolean;
   workDirModalOpen: boolean;
   currentWorkDir: string | null;
   workspaceRoot: string | null;
@@ -158,26 +176,41 @@ interface SettingsState {
   defaultModel: string | null;
   defaultThinking: boolean;
   defaultThinkingEffort?: string;
+  defaultPermissionMode: PermissionModeName;
+  secondaryModel: SecondaryModelSelection | null;
   modelsLoaded: boolean;
   wireSlashCommands: SlashCommandInfo[];
   slashCommands: SlashCommandInfo[];
   isLoggedIn: boolean;
+  autoCompact: boolean | null;
+  autoCompactPending: boolean;
 
   setCurrentModel: (model: string) => void;
   setModels: (models: ModelConfig[]) => void;
   setThinkingEffort: (effort: string) => void;
   updateModel: (modelId: string) => void;
+  updateSecondaryModel: (selection: SecondaryModelSelection | null) => void;
   toggleThinking: () => void;
   selectThinkingEffort: (effort: string) => void;
   setExtensionConfig: (config: ExtensionConfig) => void;
   setMCPModalOpen: (open: boolean) => void;
+  setSoundModalOpen: (open: boolean) => void;
+  changeSounds: (sounds: SoundSettings) => Promise<void>;
+  changeSoundEnabled: (enabled: boolean) => Promise<void>;
   setWorkDirModalOpen: (open: boolean) => void;
   setCurrentWorkDir: (workDir: string | null) => void;
   setWorkspaceRoot: (root: string | null) => void;
-  initModels: (models: ModelConfig[], defaultModel: string | null, defaultThinking: boolean, defaultThinkingEffort?: string) => void;
+  initModels: (models: ModelConfig[], defaultModel: string | null, defaultThinking: boolean, defaultThinkingEffort?: string, secondaryModel?: SecondaryModelSelection | null, defaultPermissionMode?: PermissionModeName | null) => void;
   setWireSlashCommands: (commands: SlashCommandInfo[]) => void;
   setIsLoggedIn: (loggedIn: boolean) => void;
   getCurrentThinkingMode: () => ThinkingMode;
+  setAutoCompact: (enabled: boolean | null) => void;
+  changeAutoCompact: (enabled: boolean) => Promise<void>;
+  changeAutoSteer: (enabled: boolean) => Promise<void>;
+  changeContextWindowControl: (enabled: boolean) => Promise<void>;
+  changeContextWindowThreshold: (name: keyof ContextWindowThresholds, value: number) => Promise<void>;
+  changeControlPanelVisibility: (button: ControlPanelButton, visible: boolean) => Promise<void>;
+  changeLanguage: (language: InterfaceLanguage) => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -185,18 +218,114 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   thinkingEffort: "off",
   extensionConfig: DEFAULT_EXTENSION_CONFIG,
   mcpModalOpen: false,
+  soundModalOpen: false,
   workDirModalOpen: false,
   currentWorkDir: null,
   workspaceRoot: null,
   models: [],
   defaultModel: null,
   defaultThinking: false,
+  defaultPermissionMode: "manual",
+  secondaryModel: null,
   modelsLoaded: false,
   wireSlashCommands: [],
   slashCommands: [],
   isLoggedIn: false,
+  autoCompact: null,
+  autoCompactPending: false,
 
   setCurrentModel: (currentModel) => set({ currentModel }),
+
+  setAutoCompact: (autoCompact) => set({ autoCompact }),
+
+  changeAutoCompact: async (enabled) => {
+    set({ autoCompactPending: true });
+    try {
+      const result = await bridge.setAutoCompact(enabled);
+      set({ autoCompact: result.enabled });
+      if (!result.ok) {
+        toast.error(t(result.enabled ? "toast.autoCompactStayedOn" : "toast.autoCompactStayedOff", { error: result.error }));
+      } else if (!result.enabled && result.kaif === "absent") {
+        toast.warning(t("toast.autoCompactNoKaif"));
+      }
+    } catch (error) {
+      toast.error(t("toast.autoCompactNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    } finally {
+      set({ autoCompactPending: false });
+    }
+  },
+
+  changeLanguage: async (language) => {
+    const previous = get().extensionConfig.language;
+    set({ extensionConfig: { ...get().extensionConfig, language } });
+    try {
+      await bridge.updateExtensionSetting({ key: "language", value: language });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, language: previous } });
+      toast.error(t("toast.languageNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeAutoSteer: async (enabled) => {
+    try {
+      await bridge.updateExtensionSetting({ key: "autoSteer", value: enabled });
+    } catch (error) {
+      toast.error(t("toast.autoSteerNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeContextWindowControl: async (enabled) => {
+    const previous = get().extensionConfig.contextWindowControl;
+    set({ extensionConfig: { ...get().extensionConfig, contextWindowControl: enabled } });
+    try {
+      await bridge.updateExtensionSetting({ key: "contextWindowControl", value: enabled });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, contextWindowControl: previous } });
+      toast.error(t("toast.contextWindowNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeContextWindowThreshold: async (name, value) => {
+    const previous = get().extensionConfig.contextWindowThresholds[name];
+    set({
+      extensionConfig: {
+        ...get().extensionConfig,
+        contextWindowThresholds: { ...get().extensionConfig.contextWindowThresholds, [name]: value },
+      },
+    });
+    try {
+      await bridge.updateExtensionSetting({ key: CONTEXT_WINDOW_THRESHOLD_SETTINGS[name], value });
+    } catch (error) {
+      set({
+        extensionConfig: {
+          ...get().extensionConfig,
+          contextWindowThresholds: { ...get().extensionConfig.contextWindowThresholds, [name]: previous },
+        },
+      });
+      toast.error(t("toast.contextWindowNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
+
+  changeControlPanelVisibility: async (button, visible) => {
+    const previous = get().extensionConfig.controlPanel[button];
+    set({
+      extensionConfig: {
+        ...get().extensionConfig,
+        controlPanel: { ...get().extensionConfig.controlPanel, [button]: visible },
+      },
+    });
+    try {
+      await bridge.updateExtensionSetting({ key: `controlPanel.${button}`, value: visible });
+    } catch (error) {
+      set({
+        extensionConfig: {
+          ...get().extensionConfig,
+          controlPanel: { ...get().extensionConfig.controlPanel, [button]: previous },
+        },
+      });
+      toast.error(t("toast.controlPanelNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
 
   setModels: (models) => set({ models }),
 
@@ -217,8 +346,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       defaultThinkingEffort:
         effortChanged &&
         thinkingEffort !== "off" &&
-        thinkingEffort !== "on" &&
-        persistsAsDefaultEffort(model, thinkingEffort)
+        thinkingEffort !== "on"
           ? thinkingEffort
           : defaultThinkingEffort,
     });
@@ -230,6 +358,24 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         effortChanged,
       },
       { currentModel, thinkingEffort: previousEffort, defaultThinkingEffort },
+      set,
+    );
+  },
+
+  updateSecondaryModel: (selection) => {
+    const { models, secondaryModel: previous, currentModel, thinkingEffort } = get();
+    if (selection !== null && getModelById(models, selection.model) === undefined) return;
+    if (selection?.model === previous?.model && selection?.defaultEffort === previous?.defaultEffort) return;
+    set({ secondaryModel: selection });
+    saveConfigWithRollback(
+      {
+        model: currentModel,
+        thinking: thinkingEffort !== "off",
+        effort: thinkingEffort,
+        effortChanged: false,
+        secondaryModel: selection,
+      },
+      { secondaryModel: previous },
       set,
     );
   },
@@ -273,8 +419,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       defaultThinking: thinkingEffort !== "off",
       defaultThinkingEffort:
         thinkingEffort !== "off" &&
-        thinkingEffort !== "on" &&
-        persistsAsDefaultEffort(model, thinkingEffort)
+        thinkingEffort !== "on"
           ? thinkingEffort
           : defaultThinkingEffort,
     });
@@ -285,9 +430,45 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     );
   },
 
-  setExtensionConfig: (extensionConfig) => set({ extensionConfig }),
+  setExtensionConfig: (extensionConfig) => {
+    if (!soundSavePending) {
+      set({ extensionConfig });
+      return;
+    }
+    set({ extensionConfig: { ...extensionConfig, sounds: get().extensionConfig.sounds } });
+  },
 
   setMCPModalOpen: (mcpModalOpen) => set({ mcpModalOpen }),
+
+  setSoundModalOpen: (soundModalOpen) => set({ soundModalOpen }),
+
+  changeSounds: async (sounds) => {
+    const revision = ++soundSaveRevision;
+    const previous = get().extensionConfig.sounds;
+    soundSavePending = true;
+    set({ extensionConfig: { ...get().extensionConfig, sounds } });
+    try {
+      await bridge.updateExtensionSetting({ key: "sounds", value: sounds });
+    } catch (error) {
+      if (revision === soundSaveRevision) {
+        set({ extensionConfig: { ...get().extensionConfig, sounds: previous } });
+        toast.error(t("toast.soundsNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+      }
+    } finally {
+      if (revision === soundSaveRevision) soundSavePending = false;
+    }
+  },
+
+  changeSoundEnabled: async (enabled) => {
+    const previous = get().extensionConfig.soundEnabled;
+    set({ extensionConfig: { ...get().extensionConfig, soundEnabled: enabled } });
+    try {
+      await bridge.updateExtensionSetting({ key: "soundEnabled", value: enabled });
+    } catch (error) {
+      set({ extensionConfig: { ...get().extensionConfig, soundEnabled: previous } });
+      toast.error(t("toast.soundsNotChanged", { error: error instanceof Error ? error.message : String(error) }));
+    }
+  },
 
   setWorkDirModalOpen: (workDirModalOpen) => set({ workDirModalOpen }),
 
@@ -295,7 +476,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   setWorkspaceRoot: (workspaceRoot) => set({ workspaceRoot }),
 
-  initModels: (models, defaultModel, defaultThinking, defaultThinkingEffort) => {
+  initModels: (models, defaultModel, defaultThinking, defaultThinkingEffort, secondaryModel, defaultPermissionMode) => {
     settingsSaveRevision += 1;
     const initialModel = defaultModel || models[0]?.id || "";
     const model = getModelById(models, initialModel);
@@ -307,6 +488,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       defaultModel,
       defaultThinking,
       defaultThinkingEffort,
+      defaultPermissionMode: defaultPermissionMode ?? "manual",
+      secondaryModel: secondaryModel ?? null,
       modelsLoaded: true,
       currentModel: initialModel,
       thinkingEffort,

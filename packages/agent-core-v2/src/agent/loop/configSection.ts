@@ -14,6 +14,7 @@ export const LoopControlSchema = z.object({
   maxStepsPerTurn: z.number().int().min(0).optional(),
   maxAttemptsPerStep: z.number().int().min(0).optional(),
   maxRalphIterations: z.number().int().min(-1).optional(),
+  autoCompact: z.boolean().optional(),
   reservedContextSize: z.number().int().min(0).optional(),
   compactionTriggerRatio: z.number().min(0.5).max(0.99).optional(),
   compactionMaxAttempts: z.number().int().min(1).optional(),

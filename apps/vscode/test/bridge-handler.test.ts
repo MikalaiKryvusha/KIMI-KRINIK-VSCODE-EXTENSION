@@ -169,6 +169,29 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     expect(cancel).toHaveBeenCalledOnce();
   });
 
+  it("reports whether the current session is busy", async () => {
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ isBusy: true } as never);
+
+    const result = await bridge.handle({ id: "rpc-busy", method: Methods.GetSessionBusy }, "view-1");
+
+    expect(result).toEqual({ id: "rpc-busy", result: { busy: true } });
+  });
+
+  it("forwards steering content and clientId and returns the complete engine submission", async () => {
+    const submission = { promptId: "prompt-steer-1", createdAt: "2026-11-24T00:00:00.000Z", state: "running", turnId: 7, steered: true } as const;
+    const steer = vi.fn(async () => submission);
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ isBusy: true, steer } as never);
+
+    const result = await bridge.handle({
+      id: "rpc-steer",
+      method: Methods.SteerChat,
+      params: { content: "second", clientId: "client-steer-1" },
+    }, "view-1");
+
+    expect(result).toEqual({ id: "rpc-steer", result: { ok: true, submission } });
+    expect(steer).toHaveBeenCalledWith("second", "client-steer-1");
+  });
+
   it.each(["missingMethod", "toString", "constructor", "__proto__"])(
     "does not dispatch the unknown or prototype method %s",
     async (method) => {
@@ -228,6 +251,59 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     expect(host.harness.listWorkspaceSkills).toHaveBeenCalledOnce();
   });
 
+  it("returns the current session background tasks", async () => {
+    const listBackgroundTasks = vi.fn(async () => [{
+      taskId: "task-1",
+      kind: "process",
+      description: "pnpm build",
+      status: "running",
+      startedAt: 10,
+      endedAt: null,
+    }]);
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ session: { listBackgroundTasks } } as never);
+
+    const result = await bridge.handle({ id: "rpc-tasks", method: Methods.GetBackgroundTasks }, "view-1");
+
+    expect(listBackgroundTasks).toHaveBeenCalledWith();
+    expect(result).toMatchObject({
+      id: "rpc-tasks",
+      result: { tasks: [{ taskId: "task-1", kind: "process", description: "pnpm build", status: "running" }] },
+    });
+  });
+
+  it("returns the persisted default permission mode with the model config", async () => {
+    host.harness.getConfig.mockResolvedValueOnce({ defaultPermissionMode: "auto", models: {} });
+
+    const result = await bridge.handle({ id: "rpc-models", method: Methods.GetModels }, "view-1");
+
+    expect(result).toMatchObject({ id: "rpc-models", result: { defaultPermissionMode: "auto" } });
+  });
+
+  it("passes the engine default permission through streamChat to session creation", async () => {
+    host.harness.getConfig.mockResolvedValueOnce({ defaultPermissionMode: "auto", models: {} });
+    const openSession = vi.spyOn(bridge.runtime, "openSession").mockResolvedValue({
+      id: "session-1",
+      summary: undefined,
+      session: {
+        workDir: root,
+        getStatus: async () => ({ model: "kimi-test", thinkingEffort: "off", planMode: false }),
+      },
+      announceSessionStart: vi.fn(),
+      prompt: vi.fn(async () => ({ status: "finished" })),
+    } as never);
+
+    const result = await bridge.handle({
+      id: "rpc-chat",
+      method: Methods.StreamChat,
+      params: { content: "hello", model: "kimi-test", effort: "off", clientId: "client-turn-1" },
+    }, "view-1");
+
+    expect(result).toEqual({ id: "rpc-chat", result: { done: true } });
+    expect(openSession).toHaveBeenCalledWith(expect.objectContaining({ defaultPermissionMode: "auto" }));
+    const opened = await openSession.mock.results[0]!.value;
+    expect(opened.prompt).toHaveBeenCalledWith("hello", "client-turn-1");
+  });
+
   it("keeps provider identity when configured models share a display name", async () => {
     host.harness.getConfig.mockResolvedValueOnce({
       defaultModel: "openai/shared",
@@ -283,6 +359,7 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
           name: "claude-sonnet",
           provider: "anthropic",
           adaptive_thinking: true,
+          max_context_tokens: 200_000,
         }],
       },
     });
@@ -573,7 +650,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
     });
   });
 
-  it("keeps a pick above the model's delivered default session-only", async () => {
+  it("persists a pick above the model's delivered default as the global default", async () => {
     mockConfig();
 
     await bridge.handle(
@@ -583,7 +660,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
 
     expect(host.harness.setConfig).toHaveBeenCalledWith({
       defaultModel: "kimi/reasoning",
-      thinking: { enabled: true },
+      thinking: { enabled: true, effort: "max" },
     });
   });
 
@@ -604,7 +681,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
     });
   });
 
-  it("keeps an xhigh pick session-only when the default comes from the Anthropic profile inference", async () => {
+  it("persists an xhigh pick above the default from the Anthropic profile inference", async () => {
     host.harness.getConfig.mockResolvedValue({
       defaultModel: "custom/claude",
       models: { "custom/claude": { provider: "custom", model: "claude-opus-4-7" } },
@@ -617,7 +694,7 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
 
     expect(host.harness.setConfig).toHaveBeenCalledWith({
       defaultModel: "custom/claude",
-      thinking: { enabled: true },
+      thinking: { enabled: true, effort: "xhigh" },
     });
   });
 

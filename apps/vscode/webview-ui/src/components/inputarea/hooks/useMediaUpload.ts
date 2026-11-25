@@ -5,6 +5,7 @@ import { bridge } from "@/services";
 import { validateMediaFile, validateTotalSize, processMediaFile, getMediaType } from "@/lib/media-utils";
 import { useChatStore } from "@/stores";
 import { MEDIA_CONFIG } from "@/services/config";
+import { t } from "@/i18n";
 
 interface UseMediaUploadResult {
   canAddMedia: boolean;
@@ -45,7 +46,7 @@ export function useMediaUpload(): UseMediaUploadResult {
         updateDraftMedia(id, dataUri);
       } catch {
         removeDraftMedia(id);
-        toast.error("Failed to process media file");
+        toast.error(t("toast.processMediaFailed"));
       }
     },
     [draftMedia.length, addDraftMedia, updateDraftMedia, removeDraftMedia, getExistingDataUris],
@@ -103,7 +104,7 @@ export function useMediaUpload(): UseMediaUploadResult {
         addDraftMedia(randomUUID(), dataUri);
       }
     } catch {
-      toast.error("Failed to pick media");
+      toast.error(t("toast.pickMediaFailed"));
     }
   }, [hasProcessing, draftMedia.length, addDraftMedia, getExistingDataUris]);
 
@@ -130,7 +131,7 @@ export function useMediaUpload(): UseMediaUploadResult {
         return;
       }
       if (draftMedia.length >= MEDIA_CONFIG.maxCount) {
-        toast.error(`Maximum ${MEDIA_CONFIG.maxCount} media files allowed`);
+        toast.error(t("media.maxCount", { max: MEDIA_CONFIG.maxCount }));
         return;
       }
 

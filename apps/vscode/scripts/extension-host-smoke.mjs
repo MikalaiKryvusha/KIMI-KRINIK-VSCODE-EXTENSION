@@ -80,6 +80,7 @@ export async function runExtensionHostSmoke(options = {}) {
         "--skip-release-notes",
       ],
       extensionTestsEnv: {
+        ELECTRON_RUN_AS_NODE: undefined,
         KIMI_CODE_HOME: paths.kimiHome,
         KIMI_VSCODE_SMOKE_OS_HOME: paths.osHome,
         KIMI_VSCODE_SMOKE_REPORT: paths.report,

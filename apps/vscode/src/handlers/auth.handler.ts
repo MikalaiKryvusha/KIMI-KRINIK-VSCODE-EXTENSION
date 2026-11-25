@@ -11,6 +11,7 @@ import { resolveKimiHome } from "@moonshot-ai/kimi-code-sdk";
 
 import { Events, Methods } from "../../shared/bridge";
 import type { LoginResult } from "../../shared/legacy-sdk";
+import { toManagedUsageView, type ManagedUsageResult } from "../../shared/managed-usage";
 import type { LoginStatus } from "../../shared/types";
 import { updateLoginContext } from "../utils/context";
 import { readPersistedKimiOAuthRef, resolveExtensionRegion } from "../utils/region";
@@ -82,6 +83,29 @@ export const authHandlers: Record<string, Handler<any, any>> = {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       };
+    }
+  },
+
+  [Methods.GetManagedUsage]: async (params: { provider?: string } | undefined, ctx): Promise<ManagedUsageResult> => {
+    try {
+      const [result, userInfo] = await Promise.all([
+        ctx.harness.auth.getManagedUsage(params?.provider),
+        ctx.harness.auth.getManagedUserInfo().catch(() => undefined),
+      ]);
+      if (result.kind !== "ok") return { ok: false, error: result.message };
+      const planName = userInfo?.kind === "ok" && userInfo.userInfo.userLevelName.length > 0
+        ? userInfo.userInfo.userLevelName
+        : undefined;
+      return {
+        ok: true,
+        usage: {
+          ...toManagedUsageView(result.quota.usages),
+          ...(planName === undefined ? {} : { planName }),
+        },
+      };
+    } catch (error) {
+      ctx.logError("Failed to fetch managed usage", error);
+      return { ok: false, error: error instanceof Error ? error.message : String(error) };
     }
   },
 };

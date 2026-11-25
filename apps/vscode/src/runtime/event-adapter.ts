@@ -60,6 +60,7 @@ export interface EventAdapterResult {
 
 export interface AdaptSdkEventOptions {
   readonly pendingInput?: TurnBegin['user_input'];
+  readonly clientId?: string;
   readonly mainAgentId?: string;
   readonly errorPhase?: ErrorPhase;
 }
@@ -109,7 +110,11 @@ export function adaptSdkEvent(
       event: withSessionId(
         {
           type: 'TurnBegin',
-          payload: { user_input: options.pendingInput, turnIndex: sdkEvent.turnId },
+          payload: {
+            user_input: options.pendingInput,
+            turnIndex: sdkEvent.turnId,
+            ...(options.clientId === undefined ? {} : { clientId: options.clientId }),
+          },
         },
         sdkEvent.sessionId,
       ),
@@ -324,6 +329,8 @@ function mapStatusUpdate(
   const payload: StatusUpdate = {};
   const contextUsage = contextUsageRatio(sdkEvent);
   if (contextUsage !== undefined) payload.context_usage = contextUsage;
+  if (sdkEvent.contextTokens !== undefined) payload.context_tokens = sdkEvent.contextTokens;
+  if (sdkEvent.maxContextTokens !== undefined) payload.max_context_tokens = sdkEvent.maxContextTokens;
   if (sdkEvent.planMode !== undefined) payload.plan_mode = sdkEvent.planMode;
   if (sdkEvent.model !== undefined) payload.model = sdkEvent.model;
   if (sdkEvent.thinkingEffort !== undefined) payload.thinking_effort = sdkEvent.thinkingEffort;

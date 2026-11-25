@@ -19,7 +19,7 @@ export function KimiMascot({ className }: { className?: string }) {
   }, []);
 
   const imageName = isDark ? "kimi-banner-dark.svg" : "kimi-banner-light.svg";
-  const logoUrl = useExtensionImageUrl(imageName);
+  const logoUrl = useExtensionImageUrl(`dist/${imageName}`);
 
   if (!logoUrl) {
     return null;

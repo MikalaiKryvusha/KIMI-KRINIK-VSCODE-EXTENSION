@@ -317,6 +317,7 @@ k3-max = "同一模型的 max Thinking 档位。适合最难的子任务。"
 | --- | --- | --- | --- |
 | `max_steps_per_turn` | `integer` | — | 单轮最大步数；不设或设为 `0` 则无上限 |
 | `max_attempts_per_step` | `integer` | `10` | 单步失败后的最大总尝试次数（含首次尝试） |
+| `auto_compact` | `boolean` | `true` | 设为 `false` 可禁用自动压缩，包括溢出恢复和已在进行的自动压缩；手动 `/compact` 仍可使用且不会被取消。上下文窗口填满后会返回供应商错误 |
 | `reserved_context_size` | `integer` | — | 预留给模型输出的 token 数；上下文窗口剩余量低于此值时触发自动压缩 |
 | `compaction_max_attempts` | `integer` | `5` | 压缩请求失败后的最大总尝试次数（含首次尝试） |
 

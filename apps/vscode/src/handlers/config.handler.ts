@@ -11,10 +11,12 @@ import { Methods } from "../../shared/bridge";
 import type {
   KimiConfig as WebviewKimiConfig,
   ModelConfig,
+  SecondaryModelSelection,
   SlashCommandInfo,
 } from "../../shared/legacy-sdk";
 import type { ExtensionConfig, SessionConfig } from "../../shared/types";
 import { VSCodeSettings } from "../config/vscode-settings";
+import { persistSecondaryModelSelection } from "../config/secondary-model";
 import type { Handler } from "./types";
 
 const SLASH_COMMANDS: SlashCommandInfo[] = [
@@ -41,13 +43,7 @@ const saveConfig: Handler<SessionConfig, { ok: boolean }> = async (params, ctx) 
   const effort = sessionConfigEffort(params);
   const effortChanged = params.effortChanged !== false;
   const config = await ctx.harness.getConfig({ reload: true });
-  const model = config.models?.[params.model];
-  const providerType =
-    model === undefined ? undefined : (config.providers?.[model.provider]?.type ?? model.protocol);
-  const full = thinkingConfig(
-    effort,
-    model === undefined ? undefined : effectiveModelAlias(model, providerType),
-  );
+  const full = thinkingConfig(effort);
   const patch = effortChanged ? full : { enabled: full.enabled };
   if (
     config.defaultModel !== params.model
@@ -66,6 +62,14 @@ const saveConfig: Handler<SessionConfig, { ok: boolean }> = async (params, ctx) 
     if (status.model !== params.model) await runtime.session.setModel(params.model);
     if (status.thinkingEffort !== effort) await runtime.session.setThinking(effort);
   }
+  if (params.secondaryModel !== undefined) {
+    const selection = params.secondaryModel;
+    if (selection !== null && config.models?.[selection.model] === undefined) {
+      throw new Error(`Unknown secondary model: ${selection.model}`);
+    }
+    await persistSecondaryModelSelection(ctx.harness.configPath, selection);
+    await ctx.harness.getConfig({ reload: true });
+  }
   return { ok: true };
 };
 
@@ -75,6 +79,11 @@ const getExtensionConfig: Handler<void, ExtensionConfig> = async () => {
 
 const openSettings: Handler<void, { ok: boolean }> = async () => {
   await vscode.commands.executeCommand("workbench.action.openSettings", "kimi");
+  return { ok: true };
+};
+
+const openProjectPage: Handler<void, { ok: boolean }> = async () => {
+  await vscode.env.openExternal(vscode.Uri.parse("https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION"));
   return { ok: true };
 };
 
@@ -125,6 +134,7 @@ export const configHandlers = {
   [Methods.SaveConfig]: saveConfig,
   [Methods.GetExtensionConfig]: getExtensionConfig,
   [Methods.OpenSettings]: openSettings,
+  [Methods.OpenProjectPage]: openProjectPage,
   [Methods.GetModels]: getModels,
   [Methods.GetSlashCommands]: getSlashCommands,
   [Methods.ShowLogs]: showLogs,
@@ -141,7 +151,20 @@ export function toWebviewConfig(config: SdkKimiConfig): WebviewKimiConfig {
     defaultModel: config.defaultModel ?? models[0]?.id ?? null,
     defaultThinking: config.thinking?.enabled !== false,
     defaultThinkingEffort: config.thinking?.effort,
+    defaultPermissionMode: config.defaultPermissionMode ?? null,
+    secondaryModel: toWebviewSecondaryModel(config.secondaryModel),
     models,
+  };
+}
+
+function toWebviewSecondaryModel(
+  secondary: SdkKimiConfig["secondaryModel"],
+): SecondaryModelSelection | null {
+  const model = secondary?.model ?? secondary?.defaultModel;
+  if (model === undefined) return null;
+  return {
+    model,
+    ...(secondary?.defaultEffort === undefined ? {} : { defaultEffort: secondary.defaultEffort }),
   };
 }
 
@@ -156,6 +179,7 @@ function toWebviewModel(id: string, model: ModelAlias, providerType?: ProviderTy
     support_efforts:
       effective.supportEfforts === undefined ? undefined : [...effective.supportEfforts],
     default_effort: effective.defaultEffort,
+    max_context_tokens: effective.maxContextSize,
   };
 }
 
@@ -164,21 +188,9 @@ function sessionConfigEffort(config: SessionConfig): ThinkingEffort {
   return config.thinking === true ? "on" : "off";
 }
 
-function thinkingConfig(
-  effort: ThinkingEffort,
-  model?: Pick<ModelAlias, "supportEfforts" | "defaultEffort">,
-): { enabled: boolean; effort?: string } {
+function thinkingConfig(effort: ThinkingEffort): { enabled: boolean; effort?: string } {
   if (effort === "off") return { enabled: false };
   if (effort === "on") return { enabled: true };
-  const efforts = model?.supportEfforts;
-  if (efforts !== undefined && efforts.includes(effort)) {
-    const declared = model?.defaultEffort;
-    const ceiling =
-      declared !== undefined && efforts.includes(declared)
-        ? efforts.indexOf(declared)
-        : efforts.length - 2;
-    if (efforts.indexOf(effort) > ceiling) return { enabled: true };
-  }
   return { enabled: true, effort };
 }
 

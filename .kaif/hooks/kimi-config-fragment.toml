@@ -1,0 +1,108 @@
+# Kimi Code user-level config.toml fragment — the table `node .kaif/kaif-core.mjs wire-hooks --kimi` wires: it routes every command
+# through ONE dispatcher (<Kimi home>/kaif/kimi-hook.mjs) that runs the session's KAIF project's own script from any subfolder and stays
+# silent outside KAIF. Commands run from Kimi's session folder, so this table merged by hand works only at a project root.
+# Kimi's `matcher` is an UNANCHORED regular expression and an invalid one (such as "*") matches nothing, silently — an entry meant for every
+# tool has NO matcher; a named tool is anchored (^Agent$). One entry with an unknown key drops the whole hooks section (bugs/145).
+
+[[hooks]]
+event = "SessionStart"
+command = "node .kaif/hooks/session-start-refresh.mjs --emit kimi"
+timeout = 5
+
+[[hooks]]
+event = "PostCompact"
+command = "node .kaif/hooks/session-start-refresh.mjs --emit kimi"
+timeout = 5
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = "node .kaif/hooks/session-start-refresh.mjs --emit kimi"
+timeout = 5
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = "node .kaif/hooks/prompt-resume-word.mjs --emit kimi"
+timeout = 5
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = "node .kaif/hooks/prompt-refresh-timer.mjs --emit kimi"
+timeout = 5
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = "node .kaif/hooks/clock-now.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = "node .kaif/hooks/knowledge-moment.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "PreToolUse"
+matcher = "^(Write|Edit)$"
+command = "node .kaif/hooks/clock-now.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "PreToolUse"
+matcher = "^Agent$"
+command = "node .kaif/hooks/subagent-preamble.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "UserPromptSubmit"
+command = "node .kaif/hooks/context-window.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "PostToolUse"
+command = "node .kaif/hooks/context-window.mjs --kimi"
+timeout = 5
+
+# Every tool: the closing gate on Skill, and the one-time block that carries a window step into the running turn (only UserPromptSubmit
+# text and a PreToolUse / Stop block reach the model in Kimi).
+[[hooks]]
+event = "PreToolUse"
+command = "node .kaif/hooks/context-window.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "PostToolUse"
+command = "node .kaif/hooks/knowledge-moment.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "PostToolUse"
+command = "node .kaif/hooks/test-after-code.mjs --kimi"
+timeout = 5
+
+[[hooks]]
+event = "PostToolUseFailure"
+command = "node .kaif/hooks/knowledge-moment.mjs --kimi"
+timeout = 5
+
+# ONE sequential Stop entry: Kimi otherwise runs these producers in parallel and delivers only the first exit-2 reason in config order.
+# The multiplexer runs STATUS → farewell → testing → context-window with the same event and returns every block reason together (bugs/156).
+[[hooks]]
+event = "Stop"
+command = "node .kaif/hooks/kimi-stop.mjs --kimi"
+timeout = 40
+
+# A turn that dies of a provider error (the 5-hour quota) runs no closing ritual: the farewell file names the error and the last words.
+[[hooks]]
+event = "StopFailure"
+command = "node .kaif/hooks/stop-farewell-capture.mjs --kimi"
+timeout = 10
+
+[[hooks]]
+event = "PostCompact"
+command = "node .kaif/hooks/context-window.mjs --kimi"
+timeout = 5
+
+# PermissionRequest fires before Kimi waits for approval; the hook starts the voice in the background.
+[[hooks]]
+event = "PermissionRequest"
+command = "node .kaif/hooks/kimi-permission-call.mjs"
+timeout = 5

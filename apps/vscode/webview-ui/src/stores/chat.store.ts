@@ -5,13 +5,17 @@ import { bridge } from "@/services";
 import { Content } from "@/lib/content";
 import { useApprovalStore } from "./approval.store";
 import { toast } from "@/components/ui/sonner";
+import { notifyAttention } from "@/lib/attention";
+import { t } from "@/i18n";
 
 import { useSettingsStore } from "./settings.store";
 import { processEvent } from "./event-handlers";
-import type { StatusUpdate, ContentPart, QuestionRequest, ToolResult } from "shared/legacy-sdk";
-import type { UIStreamEvent } from "shared/types";
+import type { RunResult, StatusUpdate, ContentPart, QuestionRequest, ToolResult } from "shared/legacy-sdk";
+import type { StreamError, UIStreamEvent } from "shared/types";
+import type { GoalStateInfo, PermissionModeName } from "shared/modes";
 
 const HANDSHAKE_TIMEOUT_MS = 30_000;
+const ACTIVE_WORK_EVENT_TYPES = new Set(["StepBegin", "ContentPart", "ToolCall", "ToolCallPart", "ToolResult"]);
 
 export interface UIToolCall {
   id: string;
@@ -54,6 +58,8 @@ export interface ChatMessage {
   inlineError?: InlineError;
   turnIndex?: number;
   forkable?: boolean;
+  clientId?: string;
+  optimistic?: boolean;
 }
 
 export interface TokenUsage {
@@ -75,11 +81,14 @@ export interface MediaInConversation {
 export interface DraftMediaItem {
   id: string;
   dataUri?: string;
+  steering?: boolean;
 }
 
 export interface PendingInput {
   content: string | ContentPart[];
   model: string;
+  clientId?: string;
+  drainQueue?: boolean;
 }
 
 export interface QueuedItem {
@@ -90,6 +99,7 @@ export interface QueuedItem {
 
 export interface ChatState {
   sessionId: string | null;
+  sessionTitle: string | null;
   messages: ChatMessage[];
   isStreaming: boolean;
   isCompacting: boolean;
@@ -99,11 +109,18 @@ export interface ChatState {
   tokenUsage: TokenUsage;
   activeTokenUsage: TokenUsage;
   pendingInput: PendingInput | null;
+  composerRestore: string | null;
   queue: QueuedItem[];
+  queueSteerInFlight: string | null;
   pendingQuestion: QuestionRequest | null;
   planMode: boolean;
+  swarmMode: boolean;
+  permissionMode: PermissionModeName | null;
+  goal: GoalStateInfo | null;
+  goalArmed: boolean;
 
   sendMessage: (text: string) => void;
+  steerNow: (text: string) => void;
   retryLastMessage: () => void;
   processEvent: (event: UIStreamEvent) => void;
   loadSession: (sessionId: string, events: UIStreamEvent[]) => Promise<void>;
@@ -119,6 +136,7 @@ export interface ChatState {
   respondQuestion: (answers: Record<string, string>) => Promise<void>;
 
   enqueue: (content: string | ContentPart[], model: string) => void;
+  steerQueueItem: (id: string) => void;
   removeFromQueue: (id: string) => void;
   editQueueItem: (id: string, content: string | ContentPart[]) => void;
   moveQueueItemUp: (id: string) => void;
@@ -126,6 +144,47 @@ export interface ChatState {
 }
 
 let handshakeTimer: ReturnType<typeof setTimeout> | null = null;
+let latestOutboundClientId: string | undefined;
+
+function notifyEventAttention(event: UIStreamEvent): void {
+  const { sounds } = useSettingsStore.getState().extensionConfig;
+  if (event.type === "error") {
+    const error = event as StreamError;
+    if (error.terminal === false) return;
+    notifyAttention("error", sounds.error);
+  } else if (event.type === "ApprovalRequest") {
+    notifyAttention("approval", sounds.approval);
+  } else if (event.type === "QuestionRequest") {
+    notifyAttention("question", sounds.question);
+  } else if (event.type === "stream_complete" && (event as { result: RunResult }).result.status === "finished") {
+    notifyAttention("turnComplete", sounds.turnComplete);
+  }
+}
+
+function sendableDraftMedia(draftMedia: readonly DraftMediaItem[]): DraftMediaItem[] {
+  return draftMedia.filter((item) => item.dataUri && item.steering !== true);
+}
+
+function buildDraftContent(text: string, media: readonly DraftMediaItem[]): string | ContentPart[] {
+  const dataUris = media.map((item) => item.dataUri!);
+  return dataUris.length > 0 ? Content.build(text, dataUris) : text;
+}
+
+function appendOptimisticTurn(clientId: string, content: string | ContentPart[]): void {
+  latestOutboundClientId = clientId;
+  useChatStore.setState(
+    produce((draft: ChatState) => {
+      if (draft.messages.some((message) => message.clientId === clientId)) return;
+      const timestamp = Date.now();
+      draft.messages.push({ id: clientId, role: "user", content, timestamp, clientId, optimistic: true });
+      draft.messages.push({ id: randomUUID(), role: "assistant", content: "", timestamp, steps: [], clientId, optimistic: true });
+    }),
+  );
+}
+
+function discardOptimisticTurn(clientId: string): void {
+  useChatStore.setState((state) => ({ messages: state.messages.filter((message) => message.clientId !== clientId) }));
+}
 
 function clearHandshakeTimer() {
   if (handshakeTimer) {
@@ -142,7 +201,7 @@ function clearAllInlineErrors(draft: ChatState): void {
   }
 }
 
-function doSend(state: ChatState, content: string | ContentPart[], model: string) {
+function doSend(state: ChatState, content: string | ContentPart[], model: string, goalObjective: string | undefined, clientId: string) {
   const { sessionId, planMode } = state;
   const { thinkingEffort } = useSettingsStore.getState();
 
@@ -154,28 +213,57 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
       s.processEvent({
         type: "error",
         code: "HANDSHAKE_TIMEOUT",
-        message: "Connection timed out.",
+        message: t("chat.connectionTimedOut"),
         phase: "runtime",
       });
     }
   }, HANDSHAKE_TIMEOUT_MS);
 
   void bridge
-    .streamChat(content, model, thinkingEffort, planMode, sessionId ?? undefined)
+    .streamChat(content, model, thinkingEffort, planMode, sessionId ?? undefined, {
+      ...(state.permissionMode === null ? {} : { permissionMode: state.permissionMode }),
+      ...(goalObjective === undefined ? {} : { goalObjective }),
+      ...(state.pendingInput?.drainQueue === true && state.pendingInput.clientId === clientId ? { drainQueue: true } : {}),
+      clientId,
+    })
     .catch((error: unknown) => {
       const detail = error instanceof Error ? error.message : String(error);
       useChatStore.getState().processEvent({
         type: "error",
         code: "internal",
-        message: "Unable to send the message.",
+        message: t("chat.unableToSend"),
         detail,
         phase: "preflight",
       });
     });
 }
 
+function drainNextQueuedItem(): void {
+  const next = useChatStore.getState().queue[0];
+  if (next !== undefined) useChatStore.getState().steerQueueItem(next.id);
+}
+
+function sendIdle(content: string | ContentPart[], model: string, sentMediaIds?: ReadonlySet<string>, goalObjective?: string, existingClientId?: string) {
+  const clientId = existingClientId ?? randomUUID();
+  useChatStore.setState(
+    produce((draft: ChatState) => {
+      clearAllInlineErrors(draft);
+      draft.draftMedia = sentMediaIds === undefined
+        ? []
+        : draft.draftMedia.filter((item) => !sentMediaIds.has(item.id));
+      draft.isStreaming = true;
+      draft.handshakeReceived = false;
+      draft.pendingInput = { content, model, clientId };
+    }),
+  );
+  appendOptimisticTurn(clientId, content);
+  useApprovalStore.getState().clearRequests();
+  doSend(useChatStore.getState(), content, model, goalObjective, clientId);
+}
+
 export const useChatStore = create<ChatState>((set, get) => ({
   sessionId: null,
+  sessionTitle: null,
   messages: [],
   isStreaming: false,
   isCompacting: false,
@@ -185,39 +273,91 @@ export const useChatStore = create<ChatState>((set, get) => ({
   tokenUsage: createEmptyTokenUsage(),
   activeTokenUsage: createEmptyTokenUsage(),
   pendingInput: null,
+  composerRestore: null,
   queue: [],
+  queueSteerInFlight: null,
   pendingQuestion: null,
   planMode: false,
+  swarmMode: false,
+  permissionMode: null,
+  goal: null,
+  goalArmed: false,
 
   sendMessage: (text) => {
-    const { draftMedia, isStreaming } = get();
+    if (get().isStreaming) {
+      if (useSettingsStore.getState().extensionConfig.autoSteer) {
+        get().steerNow(text);
+        return;
+      }
+      const media = sendableDraftMedia(get().draftMedia);
+      const content = buildDraftContent(text, media);
+      if (Content.isEmpty(content)) return;
+      const queuedMediaIds = new Set(media.map((item) => item.id));
+      get().enqueue(content, useSettingsStore.getState().currentModel);
+      set((state) => ({ draftMedia: state.draftMedia.filter((item) => !queuedMediaIds.has(item.id)) }));
+      setTimeout(() => get().sendNextQueued(), 0);
+      return;
+    }
     const { currentModel } = useSettingsStore.getState();
+    const content = buildDraftContent(text, sendableDraftMedia(get().draftMedia));
+    if (Content.isEmpty(content)) return;
+    const goalObjective = get().goalArmed && text.trim() ? text.trim() : undefined;
+    if (goalObjective !== undefined) set({ goalArmed: false });
+    sendIdle(content, currentModel, undefined, goalObjective);
+  },
 
-    const readyMedia = draftMedia.filter((m) => m.dataUri).map((m) => m.dataUri!);
-    const content = readyMedia.length > 0 ? Content.build(text, readyMedia) : text;
-
-    if (Content.isEmpty(content)) {
+  steerNow: (text) => {
+    if (!get().isStreaming) {
+      get().sendMessage(text);
       return;
     }
+    const { currentModel } = useSettingsStore.getState();
+    const media = sendableDraftMedia(get().draftMedia);
+    const content = buildDraftContent(text, media);
+    if (Content.isEmpty(content)) return;
+    const sentMediaIds = new Set(media.map((item) => item.id));
+    const clientId = randomUUID();
+    set((state) => ({
+      draftMedia: state.draftMedia.map((item) => (sentMediaIds.has(item.id) ? { ...item, steering: true } : item)),
+    }));
+    appendOptimisticTurn(clientId, content);
 
-    if (isStreaming) {
-      get().enqueue(content, currentModel);
-      set({ draftMedia: [] });
-      return;
-    }
-
-    set(
-      produce((draft: ChatState) => {
-        clearAllInlineErrors(draft);
-        draft.draftMedia = [];
-        draft.isStreaming = true;
-        draft.handshakeReceived = false;
-        draft.pendingInput = { content, model: currentModel };
-      }),
-    );
-    useApprovalStore.getState().clearRequests();
-
-    doSend(get(), content, currentModel);
+    void bridge.steerChat(content, clientId)
+      .then((response) => {
+        if (!response.ok) {
+          sendIdle(content, currentModel, sentMediaIds, undefined, clientId);
+          return;
+        }
+        if (response.submission.state === "blocked") {
+          discardOptimisticTurn(clientId);
+          if (latestOutboundClientId === clientId) {
+            set((state) => ({
+              draftMedia: state.draftMedia.map((item) => (
+                sentMediaIds.has(item.id) ? { id: item.id, dataUri: item.dataUri } : item
+              )),
+            }));
+            get().rollbackInput(content);
+          }
+          toast.error(t("chat.unableToSend"));
+          return;
+        }
+        set((state) => ({
+          isStreaming: true,
+          draftMedia: state.draftMedia.filter((item) => !sentMediaIds.has(item.id)),
+        }));
+      })
+      .catch((error: unknown) => {
+        discardOptimisticTurn(clientId);
+        if (latestOutboundClientId === clientId) {
+          set((state) => ({
+            draftMedia: state.draftMedia.map((item) => (
+              sentMediaIds.has(item.id) ? { id: item.id, dataUri: item.dataUri } : item
+            )),
+          }));
+          get().rollbackInput(content);
+        }
+        toast.error(error instanceof Error ? error.message : String(error));
+      });
   },
 
   retryLastMessage: () => {
@@ -243,10 +383,21 @@ export const useChatStore = create<ChatState>((set, get) => ({
     );
     useApprovalStore.getState().clearRequests();
 
-    doSend(get(), pendingInput.content, pendingInput.model);
+    const clientId = pendingInput.clientId ?? randomUUID();
+    appendOptimisticTurn(clientId, pendingInput.content);
+    doSend(get(), pendingInput.content, pendingInput.model, undefined, clientId);
   },
 
   processEvent: (event) => {
+    if (event.type === "stream_complete" && "turnIndex" in event && event.turnIndex !== undefined) {
+      const latestTurnIndex = get().messages.reduce(
+        (latest, message) => Math.max(latest, message.turnIndex ?? -1),
+        -1,
+      );
+      if (event.turnIndex < latestTurnIndex) return;
+    }
+    const completesQueueSteer = event.type === "stream_complete" && get().queueSteerInFlight !== null;
+    notifyEventAttention(event);
     if (event.type === "error" && "terminal" in event && event.terminal === false) {
       clearHandshakeTimer();
       toast.warning(event.message);
@@ -259,11 +410,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
       clearHandshakeTimer();
     }
 
+    if (ACTIVE_WORK_EVENT_TYPES.has(event.type)) set({ isStreaming: true });
+
     set(
       produce((draft: ChatState) => {
         processEvent(draft, event);
       }),
     );
+    if (completesQueueSteer) set({ queueSteerInFlight: null });
+    if (event.type === "QueueBatchReady" && get().pendingInput?.drainQueue === true
+      && (event.payload as { clientId?: string }).clientId === get().pendingInput?.clientId) {
+      drainNextQueuedItem();
+    }
 
     if (event.type === "stream_complete" || event.type === "error") {
       const { queue, isStreaming: stillStreaming } = get();
@@ -281,29 +439,31 @@ export const useChatStore = create<ChatState>((set, get) => ({
       await bridge.abortChat();
     }
 
-    set({
-      sessionId,
-      messages: [],
-      isStreaming: false,
-      isCompacting: false,
-      handshakeReceived: false,
-      draftMedia: [],
-      lastStatus: null,
-      tokenUsage: createEmptyTokenUsage(),
-      activeTokenUsage: createEmptyTokenUsage(),
-      pendingInput: null,
-      queue: [],
-      pendingQuestion: null,
-      planMode: false,
-    });
     useApprovalStore.getState().clearRequests();
-
-    for (const event of events) {
-      get().processEvent(event);
-    }
-
     set(
       produce((draft: ChatState) => {
+        draft.sessionId = sessionId;
+        draft.sessionTitle = null;
+        draft.messages = [];
+        draft.isStreaming = false;
+        draft.isCompacting = false;
+        draft.handshakeReceived = false;
+        draft.draftMedia = [];
+        draft.lastStatus = null;
+        draft.tokenUsage = createEmptyTokenUsage();
+        draft.activeTokenUsage = createEmptyTokenUsage();
+        draft.pendingInput = null;
+        draft.composerRestore = null;
+        draft.queue = [];
+        draft.queueSteerInFlight = null;
+        draft.pendingQuestion = null;
+        draft.planMode = false;
+        draft.swarmMode = false;
+        draft.goal = null;
+        draft.goalArmed = false;
+
+        for (const event of events) processEvent(draft, event);
+
         for (const msg of draft.messages) {
           if (msg.steps) {
             for (const step of msg.steps) {
@@ -335,6 +495,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     await bridge.clearTrackedFiles();
     set({
       sessionId: null,
+  sessionTitle: null,
       messages: [],
       isStreaming: false,
       isCompacting: false,
@@ -344,9 +505,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       tokenUsage: createEmptyTokenUsage(),
       activeTokenUsage: createEmptyTokenUsage(),
       pendingInput: null,
+      composerRestore: null,
       queue: [],
+      queueSteerInFlight: null,
       pendingQuestion: null,
       planMode: false,
+      swarmMode: false,
+      permissionMode: null,
+      goal: null,
+      goalArmed: false,
     });
     useApprovalStore.getState().clearRequests();
   },
@@ -413,8 +580,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   rollbackInput: (content) => {
-    const { currentModel } = useSettingsStore.getState();
-    set({ pendingInput: { content, model: currentModel } });
+    set({ composerRestore: Content.getText(content) });
   },
 
   respondQuestion: async (answers) => {
@@ -428,6 +594,49 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set((s) => ({
       queue: [...s.queue, { id: randomUUID(), content, model }],
     }));
+  },
+
+  steerQueueItem: (id) => {
+    const { queue, queueSteerInFlight } = get();
+    if (queueSteerInFlight !== null) return;
+    const index = queue.findIndex((item) => item.id === id);
+    const item = queue[index];
+    if (item === undefined) return;
+
+    set({ queueSteerInFlight: id });
+    get().removeFromQueue(id);
+    appendOptimisticTurn(id, item.content);
+    const restore = () => {
+      set((state) => ({
+        queue: state.queue.some((queued) => queued.id === id)
+          ? state.queue
+          : [...state.queue.slice(0, index), item, ...state.queue.slice(index)],
+      }));
+    };
+
+    void bridge.steerChat(item.content, id).then((response) => {
+      if (!response.ok || response.submission.state === "blocked") {
+        discardOptimisticTurn(id);
+        restore();
+        set({ queueSteerInFlight: null });
+        if (response.ok) toast.error(t("chat.unableToSend"));
+        return;
+      }
+      const draining = get().pendingInput?.drainQueue === true;
+      if (response.submission.state === "queued" && !draining) {
+        discardOptimisticTurn(id);
+        restore();
+        set({ isStreaming: true });
+        return;
+      }
+      set({ isStreaming: true, ...(draining ? { queueSteerInFlight: null } : {}) });
+      if (draining) drainNextQueuedItem();
+    }).catch((error: unknown) => {
+      discardOptimisticTurn(id);
+      restore();
+      set({ queueSteerInFlight: null });
+      toast.error(error instanceof Error ? error.message : String(error));
+    });
   },
 
   removeFromQueue: (id) => {
@@ -453,12 +662,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   sendNextQueued: () => {
-    const { queue, isStreaming } = get();
-    if (isStreaming || queue.length === 0) {
+    const { queue, isStreaming, queueSteerInFlight } = get();
+    if (queueSteerInFlight !== null || queue.length === 0) return;
+    if (isStreaming) {
+      void bridge.getSessionBusy().then(({ busy }) => {
+        if (busy) return;
+        set({ isStreaming: false });
+        get().sendNextQueued();
+      }).catch(() => undefined);
       return;
     }
 
     const [next, ...rest] = queue;
+    const clientId = randomUUID();
 
     set(
       produce((draft: ChatState) => {
@@ -466,12 +682,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
         draft.queue = rest;
         draft.isStreaming = true;
         draft.handshakeReceived = false;
-        draft.pendingInput = { content: next.content, model: next.model };
+        draft.pendingInput = { content: next.content, model: next.model, clientId, drainQueue: true };
         draft.draftMedia = [];
       }),
     );
+    appendOptimisticTurn(clientId, next.content);
     useApprovalStore.getState().clearRequests();
 
-    doSend(get(), next.content, next.model);
+    doSend(get(), next.content, next.model, undefined, clientId);
   },
 }));

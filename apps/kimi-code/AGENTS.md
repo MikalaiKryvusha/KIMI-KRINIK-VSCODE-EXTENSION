@@ -2,8 +2,6 @@
 
 本文件只包含 `apps/kimi-code` 局部的规则。全仓库通用的规则见根目录的 `AGENTS.md`。
 
-> **要编写或修改 TUI？** 使用 `write-tui` 技能（`.agents/skills/write-tui/SKILL.md`）。它涵盖架构导览、新功能放在哪里、测试放在哪里、主题机制，以及对话框的交互和视觉规范（`DESIGN.md`）。本文件只保留地图、边界和硬约束。
-
 ## TUI 文件布局
 
 `apps/kimi-code` 是终端界面 / CLI 应用。入口链路是：
@@ -52,7 +50,7 @@
 
 ## 颜色规则（规范性）
 
-主题的应用/切换机制写在 `write-tui` 技能里。下面这些规则是硬性规则。第一条和最后一条由 `test/tui/chalk-named-color-guard.test.ts` 在 CI 中检查，但它只查直接调用（`chalk.red(` 这种写法），不查 `chalk.dim` 和链式调用；其余几条没有检查：
+主题的应用/切换机制由 `src/tui/theme/` 和组件渲染路径实现。下面这些规则是硬性规则。第一条和最后一条由 `test/tui/chalk-named-color-guard.test.ts` 在 CI 中检查，但它只查直接调用（`chalk.red(` 这种写法），不查 `chalk.dim` 和链式调用；其余几条没有检查：
 
 - 不要直接使用 `chalk.red`、`chalk.cyan`、`chalk.white`、`chalk.gray`、`chalk.dim` 或 `chalk.yellow` 这类 chalk 命名颜色。
 - 组件里已经有 `colors` 时，用 `chalk.hex(colors.<token>)(text)`。

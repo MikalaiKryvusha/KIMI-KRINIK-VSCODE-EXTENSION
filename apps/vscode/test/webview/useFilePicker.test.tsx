@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFilePicker } from '@/components/inputarea/hooks/useFilePicker';
 import { useChatStore } from '@/stores';
@@ -72,6 +72,26 @@ describe('search', () => {
 
     await waitFor(() => { expect(getProjectFiles).toHaveBeenCalledTimes(1); });
     expect(getProjectFiles).toHaveBeenCalledWith({ query: 'app' });
+  });
+
+  it('does not replay the previous search when reopened with an empty query', async () => {
+    getProjectFiles.mockImplementation(async (params?: { query?: string }) => [{
+      name: params?.query ?? 'root.ts',
+      path: params?.query ?? 'root.ts',
+      isDirectory: false,
+    }]);
+    const { result, rerender } = renderHook(({ token }) => useFilePicker(token, noop, noop, noop), {
+      initialProps: { token: at('old') as Token },
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => { expect(result.current.fileItems[0]?.name).toBe('old'); });
+
+    rerender({ token: null });
+    rerender({ token: at('') });
+
+    expect(result.current.fileItems).toHaveLength(0);
+    await waitFor(() => { expect(getProjectFiles).toHaveBeenLastCalledWith({ query: undefined }); });
+    await waitFor(() => { expect(result.current.fileItems[0]?.name).toBe('root.ts'); });
   });
 });
 
@@ -152,6 +172,32 @@ describe('keyboard navigation', () => {
     act(() => { result.current.setSelectedIndex(1); });
     await waitFor(() => { expect(result.current.fileItems).toHaveLength(1); });
     expect(result.current.selectedIndex).toBe(0);
+  });
+
+  it('never commits a selection past the end of a list that shrank', async () => {
+    getProjectFiles.mockResolvedValue([
+      { name: 'a.ts', path: 'a.ts', isDirectory: false },
+      { name: 'b.ts', path: 'b.ts', isDirectory: false },
+    ]);
+    const commits: Array<{ selectedIndex: number; rows: number }> = [];
+    const { result, rerender } = renderHook(({ token }) => {
+      const picker = useFilePicker(token, noop, noop, noop);
+      useEffect(() => {
+        commits.push({ selectedIndex: picker.selectedIndex, rows: picker.fileMenuHeaderCount + picker.fileItems.length });
+      });
+      return picker;
+    }, {
+      initialProps: { token: at('a') as Token },
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => { expect(result.current.fileItems).toHaveLength(2); });
+
+    getProjectFiles.mockResolvedValue([{ name: 'app.ts', path: 'app.ts', isDirectory: false }]);
+    rerender({ token: at('ap') });
+    act(() => { result.current.setSelectedIndex(1); });
+    await waitFor(() => { expect(result.current.fileItems).toHaveLength(1); });
+
+    expect(commits.filter((commit) => commit.selectedIndex > Math.max(0, commit.rows - 1))).toEqual([]);
   });
 
   it('calls onPickMedia when Enter selects the media option', async () => {

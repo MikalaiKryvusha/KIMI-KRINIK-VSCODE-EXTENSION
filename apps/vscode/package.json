@@ -1,15 +1,16 @@
 {
-  "name": "kimi-code",
-  "publisher": "moonshot-ai",
-  "displayName": "Kimi Code",
-  "description": "Official Kimi Code plugin for VS Code",
-  "version": "0.9.0",
+  "name": "kimi-code-kaif",
+  "publisher": "mikalai-kryvusha",
+  "displayName": "KIMI KRINIK",
+  "description": "An improved and advanced Kimi Code extension for VS Code based on vanilla Kimi Code and Kimi Fork",
+  "version": "1.0.0",
+  "buildNumber": 14,
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MoonshotAI/kimi-code.git",
+    "url": "git+https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION.git",
     "directory": "apps/vscode"
   },
   "engines": {
@@ -49,7 +50,7 @@
   "icon": "resources/kimi-icon-storefront.png",
   "contributes": {
     "configuration": {
-      "title": "Kimi Code",
+      "title": "KIMI KRINIK",
       "properties": {
         "kimi.yoloMode": {
           "type": "boolean",
@@ -70,6 +71,132 @@
           "type": "boolean",
           "default": false,
           "description": "Use Ctrl/Cmd+Enter to send prompts instead of Enter"
+        },
+        "kimi.language": {
+          "type": "string",
+          "enum": [
+            "en",
+            "zh",
+            "ru"
+          ],
+          "enumDescriptions": [
+            "English",
+            "中文",
+            "Русский"
+          ],
+          "default": "en",
+          "description": "Interface language of KIMI KRINIK."
+        },
+        "kimi.soundEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable all KIMI KRINIK attention sounds. Per-event sound and volume choices are preserved while this is off."
+        },
+        "kimi.sounds": {
+          "type": "object",
+          "default": {
+            "approval": {
+              "sound": "voice",
+              "volume": 80
+            },
+            "question": {
+              "sound": "voice",
+              "volume": 80
+            },
+            "error": {
+              "sound": "voice",
+              "volume": 80
+            },
+            "turnComplete": {
+              "sound": "off",
+              "volume": 60
+            }
+          },
+          "description": "Sound and volume (0-100) for each attention event: approval, question, error and turnComplete. A sound is voice, chime, bell, pop, alert or off. Change it in the Sound Settings window of the settings menu."
+        },
+        "kimi.autoSteer": {
+          "type": "boolean",
+          "default": true,
+          "description": "Steer: a message sent during a running turn joins that turn at once. Off: the message waits in the queue until the turn ends."
+        },
+        "kimi.contextWindowControl": {
+          "type": "boolean",
+          "default": false,
+          "description": "Notify the agent when context window usage reaches the configured thresholds. This works with or without automatic compaction; turn Compact off for fully manual context management."
+        },
+        "kimi.controlPanel.permission": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the permission-mode button in Control Panel. Hiding the button does not change the permission mode."
+        },
+        "kimi.controlPanel.compact": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Compact button in Control Panel. Hiding the button does not change Auto Compact."
+        },
+        "kimi.controlPanel.steer": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Steer button in Control Panel. Hiding the button does not change Steer."
+        },
+        "kimi.controlPanel.control": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Control button in Control Panel. Hiding the button does not change Context Window Control."
+        },
+        "kimi.controlPanel.plan": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Plan button in Control Panel. Hiding the button does not change Plan mode."
+        },
+        "kimi.controlPanel.goal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Goal button in Control Panel. Hiding the button does not change the current goal."
+        },
+        "kimi.controlPanel.swarm": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Swarm button in Control Panel. Hiding the button does not change Swarm mode."
+        },
+        "kimi.controlPanel.secondaryModel": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the secondary-model robot in Control Panel. Hiding the button does not change the selected secondary model."
+        },
+        "kimi.kaif.warnPercent": {
+          "type": "number",
+          "default": 70,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Context Window Control warning threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
+        "kimi.kaif.cutPercent": {
+          "type": "number",
+          "default": 75,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Context Window Control logical-cut threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
+        "kimi.kaif.closePercent": {
+          "type": "number",
+          "default": 80,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Context Window Control soft-closure threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
+        "kimi.kaif.forcePercent": {
+          "type": "number",
+          "default": 90,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Context Window Control forced-closure threshold, in percent of Kimi's compaction point. Only the defaults 70 / 75 / 80 / 90 are guaranteed."
+        },
+        "kimi.attentionVoiceCommand": {
+          "type": "array",
+          "scope": "machine",
+          "default": [],
+          "description": "Command used to play attention messages; {file} is replaced with the phrase file"
         },
         "kimi.showThinkingContent": {
           "type": "boolean",
@@ -100,62 +227,62 @@
     },
     "commands": [
       {
-        "command": "kimi.clearAllState",
-        "title": "Kimi Code: [DEBUG] Clear All State"
+        "command": "kimiKaif.clearAllState",
+        "title": "KIMI KRINIK: [DEBUG] Clear All State"
       },
       {
-        "command": "kimi.openInTab",
-        "title": "Kimi Code: Open in New Tab",
+        "command": "kimiKaif.openInTab",
+        "title": "KIMI KRINIK: Open in New Tab",
         "icon": "$(link-external)"
       },
       {
-        "command": "kimi.openInSideBar",
-        "title": "Kimi Code: Open in Side Panel",
+        "command": "kimiKaif.openInSideBar",
+        "title": "KIMI KRINIK: Open in Side Panel",
         "icon": "$(layout-sidebar-left)"
       },
       {
-        "command": "kimi.focusInput",
-        "title": "Kimi Code: Focus Input",
+        "command": "kimiKaif.focusInput",
+        "title": "KIMI KRINIK: Focus Input",
         "icon": "$(edit)"
       },
       {
-        "command": "kimi.insertMention",
-        "title": "Kimi Code: Insert Current File",
+        "command": "kimiKaif.insertMention",
+        "title": "KIMI KRINIK: Insert Current File",
         "icon": "$(mention)"
       },
       {
-        "command": "kimi.newConversation",
-        "title": "Kimi Code: New Conversation",
+        "command": "kimiKaif.newConversation",
+        "title": "KIMI KRINIK: New Conversation",
         "icon": "$(add)"
       },
       {
-        "command": "kimi.showLogs",
-        "title": "Kimi Code: Show Logs",
+        "command": "kimiKaif.showLogs",
+        "title": "KIMI KRINIK: Show Logs",
         "icon": "$(output)"
       },
       {
-        "command": "kimi.resetKimi",
-        "title": "Kimi Code: Reset Kimi (in case of any issues/no response)",
+        "command": "kimiKaif.resetKimi",
+        "title": "KIMI KRINIK: Reset Kimi (in case of any issues/no response)",
         "icon": "$(refresh)"
       },
       {
-        "command": "kimi.logout",
-        "title": "Kimi Code: Logout",
+        "command": "kimiKaif.logout",
+        "title": "KIMI KRINIK: Logout",
         "icon": "$(sign-out)"
       },
       {
-        "command": "kimi.migrateLegacyData",
-        "title": "Kimi Code: Migrate Legacy Data"
+        "command": "kimiKaif.migrateLegacyData",
+        "title": "KIMI KRINIK: Migrate Legacy Data"
       }
     ],
     "keybindings": [
       {
-        "command": "kimi.focusInput",
+        "command": "kimiKaif.focusInput",
         "key": "ctrl+shift+k",
         "mac": "cmd+shift+k"
       },
       {
-        "command": "kimi.insertMention",
+        "command": "kimiKaif.insertMention",
         "key": "alt+k",
         "mac": "alt+k",
         "when": "editorTextFocus"
@@ -164,79 +291,79 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "kimi-sidebar",
-          "title": "Kimi Code",
+          "id": "kimi-kaif-sidebar",
+          "title": "KIMI KRINIK",
           "icon": "resources/kimi-icon.svg"
         }
       ]
     },
     "views": {
-      "kimi-sidebar": [
+      "kimi-kaif-sidebar": [
         {
           "type": "webview",
-          "id": "kimi.webview",
-          "name": "Kimi Code"
+          "id": "kimiKaif.webview",
+          "name": "KIMI KRINIK"
         }
       ]
     },
     "menus": {
       "view/title": [
         {
-          "command": "kimi.openInTab",
-          "when": "view == kimi.webview",
+          "command": "kimiKaif.openInTab",
+          "when": "view == kimiKaif.webview",
           "group": "navigation"
         },
         {
-          "command": "kimi.newConversation",
-          "when": "view == kimi.webview",
+          "command": "kimiKaif.newConversation",
+          "when": "view == kimiKaif.webview",
           "group": "navigation"
         }
       ],
       "commandPalette": [
         {
-          "command": "kimi.clearAllState",
+          "command": "kimiKaif.clearAllState",
           "when": "isDevelopment"
         },
         {
-          "command": "kimi.openInTab",
+          "command": "kimiKaif.openInTab",
           "when": "true"
         },
         {
-          "command": "kimi.openInSideBar",
+          "command": "kimiKaif.openInSideBar",
           "when": "true"
         },
         {
-          "command": "kimi.focusInput",
+          "command": "kimiKaif.focusInput",
           "when": "true"
         },
         {
-          "command": "kimi.insertMention",
+          "command": "kimiKaif.insertMention",
           "when": "true"
         },
         {
-          "command": "kimi.newConversation",
+          "command": "kimiKaif.newConversation",
           "when": "true"
         },
         {
-          "command": "kimi.showLogs",
+          "command": "kimiKaif.showLogs",
           "when": "true"
         },
         {
-          "command": "kimi.resetKimi",
+          "command": "kimiKaif.resetKimi",
           "when": "true"
         },
         {
-          "command": "kimi.logout",
+          "command": "kimiKaif.logout",
           "when": "kimi.isLoggedIn"
         },
         {
-          "command": "kimi.migrateLegacyData",
+          "command": "kimiKaif.migrateLegacyData",
           "when": "true"
         }
       ],
       "editor/context": [
         {
-          "command": "kimi.insertMention",
+          "command": "kimiKaif.insertMention",
           "group": "moonshot-ai",
           "when": "editorTextFocus"
         }

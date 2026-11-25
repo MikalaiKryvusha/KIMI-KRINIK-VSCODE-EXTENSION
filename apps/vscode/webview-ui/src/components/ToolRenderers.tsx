@@ -21,6 +21,7 @@ import { cleanSystemTags } from "shared/utils";
 import { ThinkingBlock } from "./ThinkingBlock";
 import type { UIToolCall, UIStep, UIStepItem } from "@/stores/chat.store";
 import type { ToolResult, DisplayBlock, TodoBlock } from "shared/legacy-sdk";
+import { t, useT } from "@/i18n";
 
 type ToolResultValue = ToolResult["return_value"];
 
@@ -46,7 +47,7 @@ function formatOutput(output: string | object | object[]): string {
   return cleanSystemTags(raw);
 }
 
-function getTodoBlock(display?: DisplayBlock[]): TodoBlock | null {
+export function getTodoBlock(display?: DisplayBlock[]): TodoBlock | null {
   if (!display) {
     return null;
   }
@@ -77,7 +78,7 @@ function CodeBlock({ content, maxLines = 10 }: { content: string; maxLines?: num
           onClick={() => setExpanded(!expanded)}
           className="absolute bottom-1.5 right-1.5 text-[11px] px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 opacity-0 group-hover/codeblock:opacity-100 transition-opacity cursor-pointer"
         >
-          {expanded ? "Less" : `Expand +${lines.length - maxLines}`}
+          {expanded ? t("tools.less") : t("tools.expand", { count: lines.length - maxLines })}
         </button>
       )}
     </div>
@@ -127,7 +128,7 @@ function IORow({ label, children }: { label: "IN" | "OUT"; children: React.React
   );
 }
 
-function TodoStatusIcon({ status }: { status: string }) {
+export function TodoStatusIcon({ status }: { status: string }) {
   if (status === "done") {
     return (
       <div className="size-4 rounded flex items-center justify-center">
@@ -398,13 +399,14 @@ function getToolLabel(call: UIToolCall): string {
     case "Task":
       return (args.description as string) || "subagent task";
     case "SetTodoList":
-      return "Update Todos";
+      return t("tools.updateTodos");
     default:
       return "";
   }
 }
 
 export function ToolCallCard({ call, result, subagentSteps }: ToolRendererProps) {
+  useT();
   const [expanded, setExpanded] = useState(false);
   const status = !result ? "pending" : !result.is_error ? "success" : "error";
 

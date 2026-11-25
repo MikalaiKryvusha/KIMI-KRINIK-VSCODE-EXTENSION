@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { useSettingsStore, useChatStore } from "@/stores";
 import { bridge } from "@/services";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 export function WorkDirModal() {
   const { workDirModalOpen, setWorkDirModalOpen, currentWorkDir, workspaceRoot, setCurrentWorkDir } = useSettingsStore();
   const { startNewConversation } = useChatStore();
+  const t = useT();
   const [loading, setLoading] = useState(false);
 
   const { data: workDirs = [], isPending, isError } = useQuery({
@@ -61,7 +63,7 @@ export function WorkDirModal() {
     <Dialog open={workDirModalOpen} onOpenChange={setWorkDirModalOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Select Working Directory</DialogTitle>
+          <DialogTitle>{t("workdir.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-1 max-h-64 overflow-y-auto -mx-1 px-1">
@@ -90,7 +92,7 @@ export function WorkDirModal() {
               )}
               <span className="flex-1 truncate">{displayPath(dir)}</span>
               {isSelected(dir) && <IconCheck className="size-4 text-blue-500 shrink-0" />}
-              {dir === workspaceRoot && <span className="text-xs text-muted-foreground">(root)</span>}
+              {dir === workspaceRoot && <span className="text-xs text-muted-foreground">{t("workdir.root")}</span>}
             </button>
             ))
           )}

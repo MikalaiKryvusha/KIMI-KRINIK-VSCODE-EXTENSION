@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
-export function useExtensionImageUrl(imageName: string): string {
+export function useExtensionImageUrl(imagePath: string): string {
   const [url, setUrl] = useState("");
 
   useEffect(() => {
     const baseUri = document.body.getAttribute("data-baseuri");
     if (baseUri) {
-      setUrl(`${baseUri}/dist/${imageName}`);
+      setUrl(`${baseUri}/${imagePath}`);
     }
-  }, [imageName]);
+  }, [imagePath]);
 
   return url;
 }

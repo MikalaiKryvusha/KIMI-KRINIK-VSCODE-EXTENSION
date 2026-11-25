@@ -10,13 +10,18 @@ import type {
   UpdateMCPServerRequest,
 } from "shared/legacy-sdk";
 import type {
+  AutoCompactResult,
+  ExtensionSettingUpdate,
   FileChange,
   SessionConfig,
   ExtensionConfig,
   WorkspaceStatus,
   LoginStatus,
+  SteerChatResult,
   UIStreamEvent,
 } from "shared/types";
+import type { ManagedUsageResult } from "shared/managed-usage";
+import type { GoalAction, PermissionModeName } from "shared/modes";
 
 interface PendingRequest {
   resolve: (value: unknown) => void;
@@ -134,6 +139,14 @@ class Bridge {
     return this.call<LoginResult>(Methods.Logout);
   }
 
+  getManagedUsage(provider?: string) {
+    return this.call<ManagedUsageResult>(Methods.GetManagedUsage, provider === undefined ? undefined : { provider });
+  }
+
+  notifyAttention(message: string) {
+    return this.call<{ ok: boolean }>(Methods.NotifyAttention, { message });
+  }
+
   saveConfig(sessionConfig: SessionConfig) {
     return this.call<{ ok: boolean }>(Methods.SaveConfig, sessionConfig);
   }
@@ -142,8 +155,24 @@ class Bridge {
     return this.call<ExtensionConfig>(Methods.GetExtensionConfig);
   }
 
+  updateExtensionSetting(update: ExtensionSettingUpdate) {
+    return this.call<{ ok: boolean }>(Methods.UpdateExtensionSetting, update);
+  }
+
+  getAutoCompact() {
+    return this.call<AutoCompactResult>(Methods.GetAutoCompact);
+  }
+
+  setAutoCompact(enabled: boolean) {
+    return this.call<AutoCompactResult>(Methods.SetAutoCompact, { enabled });
+  }
+
   openSettings() {
     return this.call<{ ok: boolean }>(Methods.OpenSettings);
+  }
+
+  openProjectPage() {
+    return this.call<{ ok: boolean }>(Methods.OpenProjectPage);
   }
 
   openFolder() {
@@ -183,8 +212,27 @@ class Bridge {
     return this.call<MCPTestResult>(Methods.TestMCP, { name });
   }
 
-  streamChat(content: string | ContentPart[], model: string, effort: string, planMode: boolean, sessionId?: string) {
-    return this.call<{ done: boolean }>(Methods.StreamChat, { content, model, effort, planMode, sessionId });
+  streamChat(
+    content: string | ContentPart[],
+    model: string,
+    effort: string,
+    planMode: boolean,
+    sessionId?: string,
+    extras: { permissionMode?: PermissionModeName; goalObjective?: string; clientId?: string; drainQueue?: boolean } = {},
+  ) {
+    return this.call<{ done: boolean }>(Methods.StreamChat, { content, model, effort, planMode, sessionId, ...extras });
+  }
+
+  setPermissionMode(mode: PermissionModeName) {
+    return this.call<{ ok: boolean; mode: PermissionModeName | null }>(Methods.SetPermissionMode, { mode });
+  }
+
+  setSwarmMode(enabled: boolean) {
+    return this.call<{ ok: boolean; swarmMode: boolean }>(Methods.SetSwarmMode, { enabled });
+  }
+
+  controlGoal(action: GoalAction) {
+    return this.call<{ ok: boolean }>(Methods.ControlGoal, { action });
   }
 
   abortChat() {
@@ -193,6 +241,14 @@ class Bridge {
 
   resetSession() {
     return this.call<{ ok: boolean }>(Methods.ResetSession);
+  }
+
+  getSessionContext() {
+    return this.call<{ ok: boolean; snapshot: import("shared/legacy-sdk").SessionContextSnapshot | null }>(Methods.GetSessionContext);
+  }
+
+  getBackgroundTasks() {
+    return this.call<{ tasks: import("shared/legacy-sdk").BackgroundTaskItem[] }>(Methods.GetBackgroundTasks);
   }
 
   getProjectFiles(params?: { query?: string; directory?: string }) {
@@ -283,8 +339,12 @@ class Bridge {
     return this.call<{ ok: boolean; planMode: boolean }>(Methods.SetPlanMode, { enabled });
   }
 
-  steerChat(content: string | ContentPart[]) {
-    return this.call<{ ok: boolean }>(Methods.SteerChat, { content });
+  steerChat(content: string | ContentPart[], clientId?: string) {
+    return this.call<SteerChatResult>(Methods.SteerChat, { content, clientId });
+  }
+
+  getSessionBusy() {
+    return this.call<{ busy: boolean }>(Methods.GetSessionBusy);
   }
 
   showLogs() {

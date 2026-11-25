@@ -58,7 +58,7 @@ export class KimiWebviewProvider implements vscode.WebviewViewProvider {
   createPanel(): vscode.WebviewPanel {
     const webviewId = `panel_${randomUUID()}`;
 
-    const panel = vscode.window.createWebviewPanel("kimiPanel", "Kimi Code", vscode.ViewColumn.One, {
+    const panel = vscode.window.createWebviewPanel("kimiKaifPanel", "KIMI KRINIK", vscode.ViewColumn.One, {
       enableScripts: true,
       retainContextWhenHidden: true,
       localResourceRoots: [this.extensionUri],
@@ -144,6 +144,10 @@ export class KimiWebviewProvider implements vscode.WebviewViewProvider {
 
   async setYoloModeForActiveSessions(enabled: boolean): Promise<void> {
     await this.bridgeHandler.runtime.setYoloModeForActiveSessions(enabled);
+  }
+
+  async syncContextWindowOwnership(): Promise<void> {
+    await this.bridgeHandler.syncContextWindowOwnership();
   }
 
   private getHtml(webviewId: string, webview: vscode.Webview): string {

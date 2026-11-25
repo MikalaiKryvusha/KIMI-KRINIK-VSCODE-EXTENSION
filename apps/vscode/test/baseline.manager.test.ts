@@ -2,12 +2,25 @@ import { existsSync, writeFileSync } from 'node:fs';
 import { chmod, mkdir, mkdtemp, readFile, rm, symlink, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   BaselineManager,
   type BaselineSession,
 } from '../src/managers/baseline.manager';
+
+const missingPaths = vi.hoisted(() => new Set<string>());
+
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:fs')>();
+  const statSync = ((target: Parameters<typeof actual.statSync>[0], options?: Parameters<typeof actual.statSync>[1]) => {
+    if (typeof target === 'string' && missingPaths.has(target)) {
+      throw Object.assign(new Error(`ENOENT: no such file or directory, stat '${target}'`), { code: 'ENOENT' });
+    }
+    return actual.statSync(target, options);
+  }) as typeof actual.statSync;
+  return { ...actual, statSync };
+});
 
 let root: string;
 let workDir: string;
@@ -23,6 +36,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  missingPaths.clear();
   await rm(root, { recursive: true, force: true });
 });
 
@@ -351,6 +365,7 @@ describe('baseline boundaries (errors, cleanup, and platform paths)', () => {
       id: 'ses-unc',
       workDir: '\\\\Server\\Share\\Workspace',
     };
+    missingPaths.add('\\\\server\\share\\workspace\\src\\new.ts');
     await manager.capture(session, '\\\\server\\share\\workspace\\src\\new.ts');
 
     await expect(manager.getContent(session, 'src\\new.ts')).resolves.toBe('');

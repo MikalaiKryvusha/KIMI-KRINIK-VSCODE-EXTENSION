@@ -8,12 +8,15 @@
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(1 0 0);
+  --background: var(--vscode-sideBar-background, var(--vscode-editor-background));
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
+  --popover: var(--vscode-menu-background, var(--vscode-editorWidget-background, oklch(1 0 0)));
+  --popover-foreground: var(--vscode-menu-foreground, var(--vscode-editorWidget-foreground, oklch(0.141 0.005 285.823)));
+  --tooltip: var(--vscode-editorHoverWidget-background, oklch(1 0 0));
+  --tooltip-foreground: var(--vscode-editorHoverWidget-foreground, oklch(0.141 0.005 285.823));
+  --tooltip-border: var(--vscode-editorHoverWidget-border, oklch(0.92 0.004 286.32));
   --primary: oklch(0.21 0.006 285.885);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.967 0.001 286.375);
@@ -25,16 +28,19 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.552 0.016 285.938);
+  --ring: #FF1A8C;
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
+  --background: var(--vscode-sideBar-background, var(--vscode-editor-background));
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.18 0.005 285.823);
+  --card: color-mix(in srgb, var(--background) 92%, black);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.18 0.005 285.823);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: var(--vscode-menu-background, var(--vscode-editorWidget-background, oklch(0.18 0.005 285.823)));
+  --popover-foreground: var(--vscode-menu-foreground, var(--vscode-editorWidget-foreground, oklch(0.985 0 0)));
+  --tooltip: var(--vscode-editorHoverWidget-background, oklch(0.18 0.005 285.823));
+  --tooltip-foreground: var(--vscode-editorHoverWidget-foreground, oklch(0.985 0 0));
+  --tooltip-border: var(--vscode-editorHoverWidget-border, oklch(0.274 0.006 286.033));
   --primary: oklch(0.21 0.006 285.885);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.274 0.006 286.033);
@@ -46,7 +52,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.274 0.006 286.033);
   --input: oklch(0.274 0.006 286.033);
-  --ring: oklch(0.552 0.016 285.938);
+  --ring: #FF1A8C;
 }
 
 * {
@@ -73,6 +79,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: var(--background);
 }
 
 @theme inline {
@@ -83,6 +90,9 @@ body {
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-tooltip: var(--tooltip);
+  --color-tooltip-foreground: var(--tooltip-foreground);
+  --color-tooltip-border: var(--tooltip-border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -197,4 +207,101 @@ body {
   background: var(--muted);
   border-radius: 3px;
   text-align: center;
+}
+
+.kimi-working-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  color: var(--muted-foreground);
+}
+
+.kimi-wi-face {
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 16.125px;
+  overflow: hidden;
+  background: #FF1A8C;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px, 100% 100%, 0 100%, 0 2px);
+}
+
+.kimi-wi-eyes {
+  position: absolute;
+  inset: 0;
+  animation: kimi-wi-glance 2.4s ease-in-out infinite;
+}
+
+.kimi-wi-eye {
+  position: absolute;
+  top: calc(50% - 2.81px);
+  width: 3px;
+  height: 4.5px;
+  background: #fff;
+  transform: translate(-50%, -50%);
+  animation: kimi-wi-blink 2.4s ease-in-out infinite;
+}
+
+.kimi-wi-eye--left {
+  left: calc(50% - 1.8px);
+}
+
+.kimi-wi-eye--right {
+  left: calc(50% + 7.2px);
+}
+
+.kimi-wi-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  animation: kimi-wi-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes kimi-wi-glance {
+  0%,
+  30% {
+    transform: translate(0);
+  }
+  40%,
+  55% {
+    transform: translate(-1px);
+  }
+  65%,
+  80% {
+    transform: translate(1px);
+  }
+  90%,
+  100% {
+    transform: translate(0);
+  }
+}
+
+@keyframes kimi-wi-blink {
+  0%,
+  88%,
+  100% {
+    transform: translate(-50%, -50%) scaleY(1);
+  }
+  92% {
+    transform: translate(-50%, -50%) scaleY(0.15);
+  }
+}
+
+@keyframes kimi-wi-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kimi-wi-eyes,
+  .kimi-wi-eye,
+  .kimi-wi-label {
+    animation: none;
+  }
 }

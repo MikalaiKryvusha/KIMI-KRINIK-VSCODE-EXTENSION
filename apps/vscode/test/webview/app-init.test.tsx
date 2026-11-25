@@ -53,6 +53,7 @@ beforeEach(() => {
     showThinkingContent: true,
     showThinkingExpanded: false,
     version: "test",
+    buildNumber: 0,
   });
   bridge.getSlashCommands.mockResolvedValue([]);
   bridge.checkLoginStatus.mockResolvedValue({ loggedIn: true, siteBase: "https://example.com" });
@@ -147,5 +148,30 @@ describe("useAppInit model catalog events", () => {
     await waitFor(() => expect(result.current.status).toBe("ready"));
 
     expect(useSettingsStore.getState().models).toHaveLength(2);
+  });
+
+  it("restores model, effort and default permission from the engine config", async () => {
+    bridge.getModels.mockResolvedValue({
+      models: [{
+        id: "reasoning",
+        name: "Reasoning",
+        provider: "managed:kimi-code",
+        capabilities: ["thinking"],
+        support_efforts: ["low", "high"],
+      }],
+      defaultModel: "reasoning",
+      defaultThinking: true,
+      defaultThinkingEffort: "high",
+      defaultPermissionMode: "auto",
+    });
+
+    const { result } = renderHook(() => useAppInit());
+    await waitFor(() => expect(result.current.status).toBe("ready"));
+
+    expect(useSettingsStore.getState()).toMatchObject({
+      currentModel: "reasoning",
+      thinkingEffort: "high",
+      defaultPermissionMode: "auto",
+    });
   });
 });

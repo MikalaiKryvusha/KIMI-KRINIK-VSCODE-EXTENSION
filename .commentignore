@@ -3,6 +3,9 @@
 # Vendored upstream code that carries license headers.
 packages/pi-tui/
 
+# Vendored KAIF framework machinery, managed by .kaif/kaif-core.mjs.
+.kaif/
+
 packages/minidb/
 
 # Doc comments define the public SDK API.

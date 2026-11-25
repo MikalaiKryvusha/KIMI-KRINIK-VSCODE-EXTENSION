@@ -3,10 +3,12 @@ import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { useApprovalStore } from "@/stores";
 import { DisplayBlocks } from "./DisplayBlocks";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 import type { ApprovalResponse } from "shared/legacy-sdk";
 
 export function ApprovalDialog() {
   const { pending, respondToRequest } = useApprovalStore();
+  const t = useT();
   const [selectedIndex, setSelectedIndex] = useState(1);
   const [expanded, setExpanded] = useState(false);
 
@@ -29,16 +31,16 @@ export function ApprovalDialog() {
   };
 
   const options = [
-    { key: "approve", label: "Yes", index: 1 },
-    { key: "approve_for_session", label: "Yes, for this session", index: 2 },
-    { key: "reject", label: "No", index: 3 },
+    { key: "approve", label: t("approval.yes"), index: 1 },
+    { key: "approve_for_session", label: t("approval.yesForSession"), index: 2 },
+    { key: "reject", label: t("approval.no"), index: 3 },
   ] as const;
 
   return (
     <div className={cn("mb-0.5 border border-blue-200 dark:border-blue-800 rounded-lg overflow-hidden bg-background flex flex-col shrink")}>
       <div className="p-2 space-y-2 flex-1 min-h-0 overflow-hidden flex flex-col">
         <div className="flex items-center justify-between shrink-0">
-          <div className="text-xs font-semibold text-foreground">Allow this {req.action.toLowerCase()}?</div>
+          <div className="text-xs font-semibold text-foreground">{t("approval.allowThis", { action: req.action.toLowerCase() })}</div>
           {hasDisplay && (
             <button onClick={() => setExpanded(!expanded)} className="p-1 hover:bg-muted rounded transition-colors">
               {expanded ? <IconChevronDown className="size-4 text-muted-foreground" /> : <IconChevronUp className="size-4 text-muted-foreground" />}

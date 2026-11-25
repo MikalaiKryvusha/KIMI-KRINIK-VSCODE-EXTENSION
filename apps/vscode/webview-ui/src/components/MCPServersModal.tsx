@@ -31,6 +31,7 @@ import { useSettingsStore } from "@/stores";
 import { bridge } from "@/services";
 import { RECOMMENDED_MCP_SERVERS, recommendedToConfig, type RecommendedMCPServer } from "@/services/recommended-mcp";
 import { cn } from "@/lib/utils";
+import { t, useT } from "@/i18n";
 import { MCP_SECRET_MASK, type MCPServerConfig } from "shared/legacy-sdk";
 
 const MCP_SERVERS_KEY = ["mcpServers"] as const;
@@ -110,9 +111,9 @@ function formToConfig(f: FormData): MCPServerConfig {
 }
 
 function validateForm(f: FormData): string | null {
-  if (!f.name.trim()) return "Name required";
-  if (f.transport === "http" && !f.url.trim()) return "URL required";
-  if (f.transport === "stdio" && !f.command.trim()) return "Command required";
+  if (!f.name.trim()) return t("mcp.nameRequired");
+  if (f.transport === "http" && !f.url.trim()) return t("mcp.urlRequired");
+  if (f.transport === "stdio" && !f.command.trim()) return t("mcp.commandRequired");
   return null;
 }
 
@@ -199,11 +200,11 @@ function ServerForm({
     <div className="space-y-3 pt-2 border-t border-border/50">
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <Label className="text-[10px] text-muted-foreground">Name</Label>
+          <Label className="text-[10px] text-muted-foreground">{t("mcp.name")}</Label>
           <Input value={data.name} onChange={(e) => set("name", e.target.value)} className="h-7 text-xs" />
         </div>
         <div>
-          <Label className="text-[10px] text-muted-foreground">Transport</Label>
+          <Label className="text-[10px] text-muted-foreground">{t("mcp.transport")}</Label>
           <div className="flex gap-1">
             {(["stdio", "http"] as const).map((t) => (
               <button
@@ -225,20 +226,20 @@ function ServerForm({
       {data.transport === "http" ? (
         <>
           <div>
-            <Label className="text-[10px] text-muted-foreground">URL</Label>
+            <Label className="text-[10px] text-muted-foreground">{t("mcp.url")}</Label>
             <Input value={data.url} onChange={(e) => set("url", e.target.value)} placeholder="https://…" className="h-7 text-xs font-mono" />
             <label className="flex items-center gap-1.5 mt-1.5 cursor-pointer">
               <input type="checkbox" checked={data.requiresAuth} onChange={(e) => set("requiresAuth", e.target.checked)} className="rounded size-3" />
-              <span className="text-xs text-muted-foreground">Requires OAuth</span>
+              <span className="text-xs text-muted-foreground">{t("mcp.requiresOAuth")}</span>
             </label>
           </div>
           <KeyValueFields
-            label="Headers"
+            label={t("mcp.headers")}
             fields={data.headerVars}
             onChange={(headerVars) => set("headerVars", headerVars)}
           />
           <div>
-            <Label className="text-[10px] text-muted-foreground">Bearer Token Environment Variable</Label>
+            <Label className="text-[10px] text-muted-foreground">{t("mcp.bearerToken")}</Label>
             <Input
               value={data.bearerTokenEnvVar}
               onChange={(e) => set("bearerTokenEnvVar", e.target.value)}
@@ -250,12 +251,12 @@ function ServerForm({
       ) : (
         <div className="space-y-2">
           <div>
-            <Label className="text-[10px] text-muted-foreground">Command</Label>
+            <Label className="text-[10px] text-muted-foreground">{t("mcp.command")}</Label>
             <Input value={data.command} onChange={(e) => set("command", e.target.value)} placeholder="npx" className="h-7 text-xs font-mono" />
           </div>
           <div>
             <div className="flex items-center justify-between">
-              <Label className="text-[10px] text-muted-foreground">Arguments</Label>
+              <Label className="text-[10px] text-muted-foreground">{t("mcp.arguments")}</Label>
               <button
                 onClick={() => set("args", [...data.args, ""])}
                 className="text-xs text-muted-foreground hover:text-foreground"
@@ -287,7 +288,7 @@ function ServerForm({
 
       {data.transport === "stdio" && (
         <KeyValueFields
-          label="Environment Variables"
+          label={t("mcp.envVars")}
           fields={data.envVars}
           onChange={(envVars) => set("envVars", envVars)}
         />
@@ -322,7 +323,7 @@ function ServerItem({ server, onDelete }: { server: MCPServerConfig; onDelete: (
       queryClient.setQueryData(MCP_SERVERS_KEY, servers);
       setExpanded(false);
     } catch (error) {
-      setTestOutput(`Update failed: ${error instanceof Error ? error.message : String(error)}`);
+      setTestOutput(t("mcp.updateFailed", { error: error instanceof Error ? error.message : String(error) }));
     }
   };
 
@@ -333,7 +334,7 @@ function ServerItem({ server, onDelete }: { server: MCPServerConfig; onDelete: (
       await action();
     } catch (error) {
       setExpanded(true);
-      setTestOutput(`Error: ${error instanceof Error ? error.message : String(error)}`);
+      setTestOutput(t("mcp.error", { error: error instanceof Error ? error.message : String(error) }));
     } finally {
       setIsLoading(false);
     }
@@ -406,11 +407,11 @@ function ServerItem({ server, onDelete }: { server: MCPServerConfig; onDelete: (
           {server.mutable === false ? (
             <p className="text-[10px] text-muted-foreground">
               {server.source === "plugin"
-                ? `Contributed by plugin "${server.origin ?? ""}" — update the plugin manifest instead`
-                : `Defined in ${server.origin ?? "a project config file"} — edit that file instead`}
+                ? t("mcp.pluginOwned", { origin: server.origin ?? "" })
+                : t("mcp.fileOwned", { origin: server.origin ?? t("mcp.projectConfigFile") })}
             </p>
           ) : (
-            <ServerForm data={form} onChange={setForm} onSubmit={() => { void handleUpdate(); }} onCancel={() => setExpanded(false)} submitLabel="Update" />
+            <ServerForm data={form} onChange={setForm} onSubmit={() => { void handleUpdate(); }} onCancel={() => setExpanded(false)} submitLabel={t("common.update")} />
           )}
         </div>
       )}
@@ -439,10 +440,10 @@ function RecommendedItem({ server, onInstall, isInstalling }: { server: Recommen
         {isInstalling ? (
           <>
             <IconLoader2 className="size-3 mr-1 animate-spin" />
-            Adding
+            {t("mcp.adding")}
           </>
         ) : (
-          "Add"
+          t("common.add")
         )}
       </Button>
     </div>
@@ -451,6 +452,7 @@ function RecommendedItem({ server, onInstall, isInstalling }: { server: Recommen
 
 export function MCPServersModal() {
   const { mcpModalOpen, setMCPModalOpen } = useSettingsStore();
+  useT();
   const queryClient = useQueryClient();
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState<FormData>(() => emptyForm());
@@ -519,7 +521,7 @@ export function MCPServersModal() {
         <div className="flex items-center justify-between px-3 py-2 border-b">
           <div className="flex items-center gap-2">
             <IconServer className="size-4 text-blue-500" />
-            <h2 className="text-xs font-medium">MCP Servers</h2>
+            <h2 className="text-xs font-medium">{t("menu.mcpServers")}</h2>
           </div>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="sm" className="h-6 text-xs" onClick={() => setShowAdd(true)}>
@@ -542,9 +544,9 @@ export function MCPServersModal() {
               <div className="rounded-md border border-blue-500/5 p-2.5">
                 <div className="flex items-center gap-2 mb-2">
                   <IconPlus className="size-3.5 text-blue-500" />
-                  <span className="text-xs font-medium">Add MCP Server</span>
+                  <span className="text-xs font-medium">{t("mcp.addServer")}</span>
                 </div>
-                <ServerForm data={addForm} onChange={setAddForm} onSubmit={() => { void handleAdd(); }} onCancel={() => setShowAdd(false)} submitLabel="Add Server" />
+                <ServerForm data={addForm} onChange={setAddForm} onSubmit={() => { void handleAdd(); }} onCancel={() => setShowAdd(false)} submitLabel={t("mcp.addServerSubmit")} />
               </div>
             )}
 
@@ -559,17 +561,17 @@ export function MCPServersModal() {
             {mcpServers.length === 0 && !showAdd && (
               <div className="py-6 text-center">
                 <IconServer className="size-6 mx-auto text-muted-foreground/30 mb-1" />
-                <p className="text-xs text-muted-foreground">No MCP servers configured</p>
+                <p className="text-xs text-muted-foreground">{t("mcp.none")}</p>
               </div>
             )}
 
             <div className="space-y-1.5">
-              <h3 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Recommended</h3>
+              <h3 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t("mcp.recommended")}</h3>
               {RECOMMENDED_MCP_SERVERS.filter((s) => !installedNames.has(s.id)).map((server) => (
                 <RecommendedItem key={server.id} server={server} onInstall={() => { void handleInstallRecommended(server); }} isInstalling={installingRecommended === server.id} />
               ))}
               {RECOMMENDED_MCP_SERVERS.every((s) => installedNames.has(s.id)) && (
-                <p className="text-[10px] text-muted-foreground text-center py-2">All recommended servers installed</p>
+                <p className="text-[10px] text-muted-foreground text-center py-2">{t("mcp.allInstalled")}</p>
               )}
             </div>
           </div>
@@ -579,13 +581,13 @@ export function MCPServersModal() {
       <AlertDialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete MCP Server?</AlertDialogTitle>
-            <AlertDialogDescription>This will remove "{deleteTarget}" from your configuration. This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>{t("mcp.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("mcp.deleteDesc", { name: deleteTarget ?? "" })}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={() => { void handleDelete(); }} disabled={isDeleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              {isDeleting ? "Deleting…" : "Delete"}
+              {isDeleting ? t("common.deleting") : t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

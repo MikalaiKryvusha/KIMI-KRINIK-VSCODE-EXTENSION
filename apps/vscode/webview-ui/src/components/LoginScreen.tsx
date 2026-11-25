@@ -13,6 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useT } from "@/i18n";
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -33,6 +34,7 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
   const [copied, setCopied] = useState(false);
   const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
   const [siteBase, setSiteBase] = useState("https://www.kimi.com");
+  const t = useT();
 
   useEffect(() => {
     return bridge.on<{ url: string }>(Events.LoginUrl, ({ url }) => {
@@ -59,7 +61,7 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
       if (result.success) {
         onLoginSuccess();
       } else {
-        const errorMessage = result.error || "Login failed";
+        const errorMessage = result.error || t("login.failed");
         if (isPaymentRequiredError(errorMessage)) {
           setShowSubscribeDialog(true);
           setState("idle");
@@ -100,13 +102,13 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-blue-500">
               <IconLoader2 className="size-5 animate-spin" />
-              <span className="text-sm font-medium">Waiting for authentication…</span>
+              <span className="text-sm font-medium">{t("login.waiting")}</span>
             </div>
-            <p className="text-xs leading-5 text-muted-foreground text-left">A browser window should open automatically. Complete the sign-in process there.</p>
+            <p className="text-xs leading-5 text-muted-foreground text-left">{t("login.browserHint")}</p>
           </div>
           {url && (
             <div className="bg-muted/50 rounded-lg p-2 text-left space-y-3">
-              <p className="text-xs text-muted-foreground">If the browser didn&apos;t open, visit this URL:</p>
+              <p className="text-xs text-muted-foreground">{t("login.browserNotOpened")}</p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 text-xs bg-background rounded px-2 py-1.5 font-mono break-all select-all">{url}</code>
                 <Button
@@ -122,7 +124,7 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
               </div>
               <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-blue-500 hover:underline">
                 <IconExternalLink className="size-3.5" />
-                Open in browser
+                {t("login.openInBrowser")}
               </a>
             </div>
           )}
@@ -137,9 +139,9 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
         <div className="max-w-sm w-full text-center space-y-6">
           <KimiMascot className="h-12 mx-auto" />
           <div className="space-y-2">
-            <h1 className="text-lg font-semibold">Welcome to Kimi Code</h1>
+            <h1 className="text-lg font-semibold">{t("login.welcomeTitle")}</h1>
             <div className="text-left space-y-2">
-              <p className="text-xs leading-5">Use Kimi Code with your Kimi account subscription or your existing API setup.</p>
+              <p className="text-xs leading-5">{t("login.welcomeDesc")}</p>
             </div>
           </div>
 
@@ -157,17 +159,17 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
                 }}
                 className="w-full justify-center gap-2"
               >
-                Sign in with Kimi Account
+                {t("login.signInWithKimi")}
               </Button>
-              <p className="text-[11px] text-muted-foreground leading-4">Use your Kimi account and Kimi Code subscription.</p>
+              <p className="text-[11px] text-muted-foreground leading-4">{t("login.signInHint")}</p>
             </div>
 
             <div className="text-left space-y-1">
               <Button type="button" variant="outline" onClick={onSkip} className="w-full relative justify-center font-normal">
-                <span>Skip</span>
+                <span>{t("common.skip")}</span>
                 <IconArrowRight className="size-4 text-muted-foreground absolute right-3" />
               </Button>
-              <p className="text-[11px] text-muted-foreground leading-4">Use your existing API key configuration.</p>
+              <p className="text-[11px] text-muted-foreground leading-4">{t("login.skipHint")}</p>
             </div>
           </div>
         </div>
@@ -176,14 +178,14 @@ export function LoginScreen({ onLoginSuccess, onSkip }: LoginScreenProps) {
       <AlertDialog open={showSubscribeDialog} onOpenChange={setShowSubscribeDialog}>
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>Subscription Required</AlertDialogTitle>
+            <AlertDialogTitle>{t("login.subscriptionRequired")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Your account does not have an active Kimi Code subscription. Please subscribe to continue using Kimi Code with your account.
+              {t("login.subscriptionDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowSubscribeDialog(false)}>Skip</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubscribe}>Subscribe</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setShowSubscribeDialog(false)}>{t("common.skip")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSubscribe}>{t("login.subscribe")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

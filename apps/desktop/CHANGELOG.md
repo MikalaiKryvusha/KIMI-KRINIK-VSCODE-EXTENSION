@@ -20,6 +20,9 @@
 
 ## 1.4.0
 
+### Minor Changes
+
+- [#5079](https://github.com/MoonshotAI/kimi-code/pull/5079) [`5db75e0`](https://github.com/MoonshotAI/kimi-code/commit/5db75e0c20dd74fa92225f26c95116fcc4594cb1) Thanks [@liruifengv](https://github.com/liruifengv)! - Connect external agents such as Claude Code, Codex, and Cursor to this desktop app to hand off sessions, review history, and collaborate across turns.
 ### Patch Changes
 
 - [#5079](https://github.com/MoonshotAI/kimi-code/pull/5079) [`5db75e0`](https://github.com/MoonshotAI/kimi-code/commit/5db75e0c20dd74fa92225f26c95116fcc4594cb1) Thanks [@liruifengv](https://github.com/liruifengv)! - Show background task notifications as collapsible rows styled like tool calls, with correct task duration and status.
@@ -38,6 +41,7 @@
 
 - [#5079](https://github.com/MoonshotAI/kimi-code/pull/5079) [`5db75e0`](https://github.com/MoonshotAI/kimi-code/commit/5db75e0c20dd74fa92225f26c95116fcc4594cb1) Thanks [@liruifengv](https://github.com/liruifengv)! - Shrink the screenshot magnifier and color picker so they cover less of the screen.
 
+- [#5079](https://github.com/MoonshotAI/kimi-code/pull/5079) [`5db75e0`](https://github.com/MoonshotAI/kimi-code/commit/5db75e0c20dd74fa92225f26c95116fcc4594cb1) Thanks [@liruifengv](https://github.com/liruifengv)! - Add Qwen Coding Plan (global and China sites) as selectable providers.
 - [#5079](https://github.com/MoonshotAI/kimi-code/pull/5079) [`5db75e0`](https://github.com/MoonshotAI/kimi-code/commit/5db75e0c20dd74fa92225f26c95116fcc4594cb1) Thanks [@liruifengv](https://github.com/liruifengv)! - Fix image load failures potentially triggering auth rate limits.
 
 - [#5079](https://github.com/MoonshotAI/kimi-code/pull/5079) [`5db75e0`](https://github.com/MoonshotAI/kimi-code/commit/5db75e0c20dd74fa92225f26c95116fcc4594cb1) Thanks [@liruifengv](https://github.com/liruifengv)! - Fix the model and permission popups overflowing the screen on narrow and mobile layouts.

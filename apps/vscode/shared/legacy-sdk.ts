@@ -1,3 +1,4 @@
+import type { GoalStateInfo, PermissionModeName } from "./modes";
 export type ApprovalResponse = 'approve' | 'approve_for_session' | 'reject';
 
 export type ContentPart =
@@ -61,6 +62,7 @@ export interface ToolResult {
 export interface TurnBegin {
   user_input: string | ContentPart[];
   turnIndex?: number;
+  clientId?: string;
 }
 
 export interface TokenUsage {
@@ -72,10 +74,16 @@ export interface TokenUsage {
 
 export interface StatusUpdate {
   context_usage?: number | null;
+  context_tokens?: number | null;
+  max_context_tokens?: number | null;
+  swarm_mode?: boolean | null;
+  permission?: PermissionModeName | null;
+  goal?: GoalStateInfo | null;
   token_usage?: TokenUsage | null;
   message_id?: string | null;
   plan_mode?: boolean | null;
   model?: string | null;
+  session_title?: string | null;
   thinking_effort?: string | null;
   retrying?: {
     next_attempt: number;
@@ -83,6 +91,27 @@ export interface StatusUpdate {
     delay_ms: number;
     message: string;
   } | null;
+}
+
+export interface BackgroundTaskItem {
+  taskId: string;
+  kind: string;
+  description: string;
+  status: string;
+  startedAt: number;
+  endedAt: number | null;
+}
+
+export interface SessionContextMessageView {
+  role: "system" | "user" | "assistant" | "tool";
+  text: string;
+  isError?: boolean;
+  kind?: "compaction_summary";
+}
+
+export interface SessionContextSnapshot {
+  tokenCount: number;
+  messages: SessionContextMessageView[];
 }
 
 export interface ApprovalRequestPayload {
@@ -134,7 +163,7 @@ export type LegacyWireEvent =
   | { type: 'ToolCall'; payload: ToolCall }
   | { type: 'ToolCallPart'; payload: { tool_call_id?: string; arguments_part?: string | null } }
   | { type: 'ToolResult'; payload: ToolResult }
-  | { type: 'SteerInput'; payload: { user_input: string | ContentPart[] } }
+  | { type: 'SteerInput'; payload: { user_input: string | ContentPart[]; clientId?: string } }
   | { type: 'SubagentEvent'; payload: SubagentEvent }
   | { type: string; payload: unknown };
 
@@ -163,12 +192,20 @@ export interface ModelConfig {
   adaptive_thinking?: boolean;
   support_efforts?: string[];
   default_effort?: string;
+  max_context_tokens?: number;
+}
+
+export interface SecondaryModelSelection {
+  model: string;
+  defaultEffort?: string;
 }
 
 export interface KimiConfig {
   defaultModel: string | null;
   defaultThinking: boolean;
   defaultThinkingEffort?: string;
+  defaultPermissionMode?: import("./modes").PermissionModeName | null;
+  secondaryModel?: SecondaryModelSelection | null;
   models: ModelConfig[];
 }
 

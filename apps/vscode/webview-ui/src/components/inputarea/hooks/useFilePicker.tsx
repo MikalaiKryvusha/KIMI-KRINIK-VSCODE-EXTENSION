@@ -45,15 +45,16 @@ export function useFilePicker(activeToken: ActiveToken | null, onInsertFile: (pa
   const query = activeToken?.query || "";
 
   const debouncedQuery = useDebouncedValue(query, 100);
+  const effectiveQuery = query === "" ? "" : debouncedQuery;
   const searchQuery = useQuery({
-    queryKey: ["projectFiles", "search", debouncedQuery],
-    queryFn: () => bridge.getProjectFiles({ query: debouncedQuery || undefined }),
+    queryKey: ["projectFiles", "search", effectiveQuery],
+    queryFn: () => bridge.getProjectFiles({ query: effectiveQuery || undefined }),
     enabled: showFileMenu,
-    placeholderData: keepPreviousData,
+    placeholderData: query === "" ? undefined : keepPreviousData,
   });
   const searchResults = searchQuery.data ?? NO_FILES;
   const isLoading = searchQuery.isLoading;
-  const isStale = debouncedQuery !== query || searchQuery.isPlaceholderData;
+  const isStale = effectiveQuery !== query || searchQuery.isPlaceholderData;
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -71,9 +72,8 @@ export function useFilePicker(activeToken: ActiveToken | null, onInsertFile: (pa
   const showMediaOption = canAddMedia && query === "";
   const fileMenuHeaderCount = showMediaOption ? 1 : 0;
 
-  useEffect(() => {
-    setSelectedIndex((i) => Math.min(i, Math.max(0, fileMenuHeaderCount + fileItems.length - 1)));
-  }, [fileMenuHeaderCount, fileItems.length]);
+  const lastRowIndex = Math.max(0, fileMenuHeaderCount + fileItems.length - 1);
+  if (selectedIndex > lastRowIndex) setSelectedIndex(lastRowIndex);
 
   const resetFilePicker = useCallback(() => {
     setSelectedIndex(0);

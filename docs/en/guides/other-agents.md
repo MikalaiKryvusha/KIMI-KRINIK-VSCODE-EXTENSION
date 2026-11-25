@@ -19,17 +19,7 @@ Kimi Code CLI and the Kimi Code desktop app include a built-in **Kimi Agent Prot
 
 Tell your agent what you want in plain language.
 
-You can install the `use-kimi-code` Skill:
-
-Install via CLI:
-
-```sh
-npx skills add https://code.kimi.com/kimi-code/skills/use-kimi-code.md -g
-```
-
-Install via your agent:
-
-> Read `https://code.kimi.com/kimi-code/skills/use-kimi-code.md` and save it as a local `use-kimi-code` skill.
+Ask your agent to read the KAP guide from your running local Kimi Code service at `/api/v1/kap.md`. The guide describes the current connection flow and API usage without requiring a separately installed Skill.
 
 ### Example 1: Session Handoff
 
@@ -51,7 +41,7 @@ Review recent sessions across workspaces, replace vague titles, and batch-archiv
 
 A minimal example — combine and adapt freely for your workflow:
 
-> Use the `use-kimi-code` skill to discuss this plan with Kimi K3.1 Pro for up to 5 rounds, then bring me the conclusion.
+> Use the local Kimi Agent Protocol to discuss this plan with Kimi K3.1 Pro for up to 5 rounds, then bring me the conclusion.
 
 ## Related docs
 

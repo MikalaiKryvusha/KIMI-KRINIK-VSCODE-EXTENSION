@@ -5,18 +5,26 @@ import { MCP_SECRET_MASK } from "../shared/legacy-sdk";
 const boundary = vi.hoisted(() => ({
   saveConfig: vi.fn(),
   streamChat: vi.fn(),
+  steerChat: vi.fn(),
   abortChat: vi.fn(),
   trackFiles: vi.fn(),
   toastError: vi.fn(),
   toastWarning: vi.fn(),
+  notifyAttention: vi.fn(),
+  setAutoCompact: vi.fn(),
+  updateExtensionSetting: vi.fn(),
 }));
 
 vi.mock("@/services", () => ({
   bridge: {
     saveConfig: boundary.saveConfig,
     streamChat: boundary.streamChat,
+    steerChat: boundary.steerChat,
     abortChat: boundary.abortChat,
     trackFiles: boundary.trackFiles,
+    notifyAttention: boundary.notifyAttention,
+    setAutoCompact: boundary.setAutoCompact,
+    updateExtensionSetting: boundary.updateExtensionSetting,
   },
 }));
 vi.mock("@/components/ui/sonner", () => ({
@@ -24,6 +32,7 @@ vi.mock("@/components/ui/sonner", () => ({
 }));
 
 import {
+  DEFAULT_EXTENSION_CONFIG,
   getMediaFallbackModel,
   getModelThinkingMode,
   groupModelsByProvider,
@@ -49,11 +58,23 @@ beforeEach(() => {
   boundary.saveConfig.mockReset();
   boundary.streamChat.mockReset();
   boundary.streamChat.mockResolvedValue({ done: false });
+  boundary.steerChat.mockReset();
+  boundary.steerChat.mockResolvedValue({
+    ok: true,
+    submission: { promptId: "prompt-steer", createdAt: "2026-11-24T00:00:00.000Z", state: "running", turnId: 7, steered: true },
+  });
   boundary.abortChat.mockReset();
   boundary.abortChat.mockResolvedValue({ aborted: true });
   boundary.trackFiles.mockReset();
   boundary.toastError.mockReset();
   boundary.toastWarning.mockReset();
+  boundary.notifyAttention.mockReset();
+  boundary.notifyAttention.mockResolvedValue({ ok: true });
+  boundary.updateExtensionSetting.mockReset();
+  boundary.updateExtensionSetting.mockResolvedValue({ ok: true });
+  useSettingsStore.setState({
+    extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, controlPanel: { ...DEFAULT_EXTENSION_CONFIG.controlPanel } },
+  });
   useSettingsStore.getState().initModels(MODELS, "plain", false);
   useChatStore.setState({
     sessionId: null,
@@ -415,7 +436,7 @@ describe("Webview thinking effort parity with the TUI", () => {
     expect(useSettingsStore.getState().defaultThinkingEffort).toBe("high");
   });
 
-  it("does not seed a pick above the model's delivered default", () => {
+  it("seeds a pick above the model's delivered default for future sessions", () => {
     boundary.saveConfig.mockResolvedValue({ ok: true });
     useSettingsStore.getState().initModels([
       {
@@ -432,10 +453,10 @@ describe("Webview thinking effort parity with the TUI", () => {
 
     expect(useSettingsStore.getState().thinkingEffort).toBe("high");
     expect(boundary.saveConfig).toHaveBeenCalledWith({ model: "reasoning", thinking: true, effort: "high" });
-    expect(useSettingsStore.getState().defaultThinkingEffort).toBeUndefined();
+    expect(useSettingsStore.getState().defaultThinkingEffort).toBe("high");
   });
 
-  it("does not seed the top tier when the model declares no default", () => {
+  it("seeds the top tier for future sessions when the model declares no default", () => {
     boundary.saveConfig.mockResolvedValue({ ok: true });
     useSettingsStore.getState().initModels([
       {
@@ -451,7 +472,27 @@ describe("Webview thinking effort parity with the TUI", () => {
 
     expect(useSettingsStore.getState().thinkingEffort).toBe("high");
     expect(boundary.saveConfig).toHaveBeenCalledWith({ model: "reasoning", thinking: true, effort: "high" });
-    expect(useSettingsStore.getState().defaultThinkingEffort).toBeUndefined();
+    expect(useSettingsStore.getState().defaultThinkingEffort).toBe("high");
+  });
+
+  it("restores MAX for future sessions after the persisted selection is reloaded", () => {
+    boundary.saveConfig.mockResolvedValue({ ok: true });
+    const models = [{
+      id: "reasoning",
+      name: "Reasoning",
+      provider: "managed:kimi-code",
+      capabilities: ["thinking"],
+      support_efforts: ["low", "high", "max"],
+      default_effort: "high",
+    }];
+    useSettingsStore.getState().initModels(models, "reasoning", true, "high");
+
+    useSettingsStore.getState().selectThinkingEffort("max");
+
+    expect(useSettingsStore.getState().defaultThinkingEffort).toBe("max");
+    expect(boundary.saveConfig).toHaveBeenCalledWith({ model: "reasoning", thinking: true, effort: "max" });
+    useSettingsStore.getState().initModels(models, "reasoning", true, "max");
+    expect(useSettingsStore.getState().thinkingEffort).toBe("max");
   });
 
   const SWITCH_MODELS = [
@@ -556,9 +597,10 @@ describe("Webview thinking effort parity with the TUI", () => {
 describe("Webview mid-turn warnings", () => {
   it("shows a non-terminal error as a toast without unlocking the composer", async () => {
     useChatStore.getState().sendMessage("first message");
-    useChatStore.getState().sendMessage("queued follow-up");
+    useChatStore.getState().sendMessage("steered follow-up");
     expect(useChatStore.getState().isStreaming).toBe(true);
-    expect(useChatStore.getState().queue).toHaveLength(1);
+    expect(boundary.steerChat).toHaveBeenCalledWith("steered follow-up", expect.any(String));
+    expect(useChatStore.getState().queue).toHaveLength(0);
 
     useChatStore.getState().processEvent({
       type: "error",
@@ -572,14 +614,102 @@ describe("Webview mid-turn warnings", () => {
     expect(boundary.toastWarning).toHaveBeenCalledWith("Internal error occurred.");
     const state = useChatStore.getState();
     expect(state.isStreaming).toBe(true);
-    expect(state.queue).toHaveLength(1);
+    expect(state.queue).toHaveLength(0);
     expect(state.pendingInput).not.toBeNull();
     expect(state.messages.at(-1)?.inlineError).toBeUndefined();
 
     useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" } });
     expect(useChatStore.getState().isStreaming).toBe(false);
-    await vi.waitFor(() => {
-      expect(boundary.streamChat).toHaveBeenCalledTimes(2);
+    expect(boundary.streamChat).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Webview Auto Compact switch", () => {
+  it("shows the value the host confirmed after the engine took the change", async () => {
+    boundary.setAutoCompact.mockReset();
+    boundary.setAutoCompact.mockResolvedValue({ ok: true, enabled: false, kaif: "projected" });
+    useSettingsStore.setState({ autoCompact: true, autoCompactPending: false });
+
+    const change = useSettingsStore.getState().changeAutoCompact(false);
+    expect(useSettingsStore.getState().autoCompactPending).toBe(true);
+    await change;
+
+    expect(boundary.setAutoCompact).toHaveBeenCalledWith(false);
+    expect(useSettingsStore.getState()).toMatchObject({ autoCompact: false, autoCompactPending: false });
+    expect(boundary.toastError).not.toHaveBeenCalled();
+  });
+
+  it("keeps the engine value and shows the reason when the host refused", async () => {
+    boundary.setAutoCompact.mockReset();
+    boundary.setAutoCompact.mockResolvedValue({ ok: false, enabled: true, error: "marker is not JSON" });
+    useSettingsStore.setState({ autoCompact: true, autoCompactPending: false });
+
+    await useSettingsStore.getState().changeAutoCompact(false);
+
+    expect(useSettingsStore.getState()).toMatchObject({ autoCompact: true, autoCompactPending: false });
+    expect(boundary.toastError).toHaveBeenCalledWith("Auto Compact stayed on: marker is not JSON");
+  });
+
+  it("warns that no KAIF closure guards a project without a marker", async () => {
+    boundary.setAutoCompact.mockReset();
+    boundary.setAutoCompact.mockResolvedValue({ ok: true, enabled: false, kaif: "absent" });
+
+    await useSettingsStore.getState().changeAutoCompact(false);
+
+    expect(boundary.toastWarning).toHaveBeenCalledWith(expect.stringContaining("no KAIF marker"));
+  });
+});
+
+describe("Control Panel visibility", () => {
+  it("updates visibility immediately and persists it without changing feature values", async () => {
+    const previousConfig = useSettingsStore.getState().extensionConfig;
+    const change = useSettingsStore.getState().changeControlPanelVisibility("plan", false);
+
+    expect(useSettingsStore.getState().extensionConfig.controlPanel.plan).toBe(false);
+    expect(useSettingsStore.getState().extensionConfig.autoSteer).toBe(previousConfig.autoSteer);
+    expect(useSettingsStore.getState().extensionConfig.yoloMode).toBe(previousConfig.yoloMode);
+    await change;
+    expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "controlPanel.plan", value: false });
+  });
+
+  it("restores visibility and reports the error when persistence fails", async () => {
+    boundary.updateExtensionSetting.mockRejectedValueOnce(new Error("settings are read-only"));
+
+    await useSettingsStore.getState().changeControlPanelVisibility("goal", false);
+
+    expect(useSettingsStore.getState().extensionConfig.controlPanel.goal).toBe(true);
+    expect(useSettingsStore.getState().extensionConfig.autoSteer).toBe(DEFAULT_EXTENSION_CONFIG.autoSteer);
+    expect(boundary.toastError).toHaveBeenCalledWith("Control Panel visibility was not changed: settings are read-only");
+  });
+});
+
+describe("sound persistence", () => {
+  it("keeps the latest volume through stale events and an older failed write", async () => {
+    const pending: Array<{ resolve: (value: { ok: boolean }) => void; reject: (error: Error) => void }> = [];
+    boundary.updateExtensionSetting.mockImplementation(() => new Promise((resolve, reject) => {
+      pending.push({ resolve, reject });
+    }));
+    const sounds = (volume: number) => ({
+      ...DEFAULT_EXTENSION_CONFIG.sounds,
+      approval: { sound: "chime" as const, volume },
     });
+    const writes = [10, 20, 40, 80, 100].map((volume) => useSettingsStore.getState().changeSounds(sounds(volume)));
+
+    useSettingsStore.getState().setExtensionConfig({ ...DEFAULT_EXTENSION_CONFIG, sounds: sounds(10) });
+    expect(useSettingsStore.getState().extensionConfig.sounds.approval.volume).toBe(100);
+
+    pending[0]!.reject(new Error("older write failed"));
+    for (let index = 1; index < pending.length; index += 1) pending[index]!.resolve({ ok: true });
+    await Promise.all(writes);
+
+    expect(useSettingsStore.getState().extensionConfig.sounds.approval.volume).toBe(100);
+    expect(boundary.toastError).not.toHaveBeenCalled();
+  });
+
+  it("persists the global sound-enabled switch", async () => {
+    await useSettingsStore.getState().changeSoundEnabled(false);
+
+    expect(useSettingsStore.getState().extensionConfig.soundEnabled).toBe(false);
+    expect(boundary.updateExtensionSetting).toHaveBeenCalledWith({ key: "soundEnabled", value: false });
   });
 });

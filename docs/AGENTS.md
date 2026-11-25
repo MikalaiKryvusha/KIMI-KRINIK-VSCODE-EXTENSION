@@ -4,7 +4,7 @@
 
 本仓库用 VitePress 构建文档站。`docs/en/` 和 `docs/zh/` 下大多数面向用户的页面都已写完；新增或更新的内容要让两个语言版本保持同步。
 
-编写、翻译和评审页面时，按 [文档写作指南](../.agents/skills/gen-docs/references/writing-guide.md) 核对格式、页面结构和示例，交付前过一遍其中的检查清单。
+编写、翻译和评审页面时，按本文件的格式、页面结构、术语和示例规则核对，交付前检查双语镜像与链接。
 
 ## 结构
 
@@ -16,11 +16,11 @@
   - Reference: kimi-command, tools, slash-commands, keyboard
   - Release notes: changelog
 - 导航栏和侧边栏定义在 `docs/.vitepress/config.ts` 里。新增或重命名的页面，必须在这里为两个语言版本都配置好。
-- 外部 agent 接入 Kimi Code 的中英文用户指南放在 `docs/{en,zh}/guides/other-agents.md`。`skills/use-kimi-code/SKILL.md` 是跨版本的公开技能，构建时复制到 `/skills/use-kimi-code.md`。`packages/kap-server/docs/kap.md` 是与运行版本匹配的 KAP 协议指南，由服务通过 `GET /api/v1/kap.md` 提供。公开技能里不要写具体端点的载荷，让 agent 从运行中的服务读取 API 用法（`GET /api/v1/kap.md`）和字段定义（`GET /openapi.json`）。
+- 外部 agent 接入 Kimi Code 的中英文用户指南放在 `docs/{en,zh}/guides/other-agents.md`。`packages/kap-server/docs/kap.md` 是与运行版本匹配的 KAP 协议指南，由服务通过 `GET /api/v1/kap.md` 提供。指南里不要写具体端点的载荷，让 agent 从运行中的服务读取 API 用法（`GET /api/v1/kap.md`）和字段定义（`GET /openapi.json`）。
 
 ## 唯一依据
 
-- **变更记录页面**：英文版（`docs/en/release-notes/changelog.md`）是唯一依据，中文变更记录应从它翻译。目前变更记录是每次发布后手动运行一个技能生成的，这个技能从 CLI 包的 `CHANGELOG.md` 同步内容。
+- **变更记录页面**：英文版（`docs/en/release-notes/changelog.md`）是唯一依据，中文变更记录应从它翻译。同步时以 CLI 包的 `CHANGELOG.md` 为来源。
 - **其他所有页面**：`docs/en/` 和 `docs/zh/` 下的页面两两互为镜像，路径、标题和章节结构都相同。在哪个语言版本上工作就改哪个，并在同一个改动里更新另一个语言版本。
 
 发布前让两个语言版本保持同步。可以借助机器翻译；但要检查你改过的语言版本和它的镜像，确认内容准确、术语正确、没有失效链接。
@@ -145,4 +145,4 @@ Kimi Code 文档面向两类有重叠的读者。写作时要同时照顾这两�
 
 ## 变更记录同步
 
-变更记录的生成流程见 `sync-changelog` 技能。
+变更记录以英文页面为唯一依据，并从 CLI 包的 `CHANGELOG.md` 同步；中文页面随英文镜像更新。

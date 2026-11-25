@@ -84,6 +84,20 @@ describe('installed VSIX Extension Host smoke', () => {
       cachePath: fixture.cachePath,
     })).rejects.toThrow('Extension Host ran VS Code 1.99.3, expected requested version 1.100.0');
   });
+
+  it('clears inherited Electron Node mode for the test host', async () => {
+    const fixture = await makeFixture();
+
+    await runExtensionHostSmoke({
+      version: '1.100.0',
+      vsixPath: fixture.vsixPath,
+      cachePath: fixture.cachePath,
+    });
+
+    const env = vscodeTest.runTests.mock.calls[0]?.[0].extensionTestsEnv;
+    expect(Object.hasOwn(env, 'ELECTRON_RUN_AS_NODE')).toBe(true);
+    expect(env.ELECTRON_RUN_AS_NODE).toBeUndefined();
+  });
 });
 
 async function makeFixture(): Promise<{ vsixPath: string; cachePath: string }> {

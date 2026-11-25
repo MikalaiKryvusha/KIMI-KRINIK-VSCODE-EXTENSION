@@ -6,7 +6,7 @@ import { defineConfig } from 'tsdown';
 import { rawTextPlugin } from '../../build/raw-text-plugin.mjs';
 
 const require = createRequire(import.meta.url);
-const pkg = require('./package.json') as { version: string };
+const pkg = require('./package.json') as { version: string; buildNumber: number };
 const root = import.meta.dirname;
 
 export default defineConfig({
@@ -30,6 +30,7 @@ export default defineConfig({
   },
   define: {
     __EXTENSION_VERSION__: JSON.stringify(pkg.version),
+    __EXTENSION_BUILD_NUMBER__: JSON.stringify(pkg.buildNumber),
   },
   banner: {
     js: [
@@ -41,7 +42,7 @@ export default defineConfig({
   },
   deps: {
     onlyBundle: false,
-    alwaysBundle: [/^@moonshot-ai\//, 'immer', 'zod'],
+    alwaysBundle: [/^@moonshot-ai\//, 'immer', 'zod', 'uuid'],
     neverBundle: ['vscode'],
   },
   outputOptions: {

@@ -4,18 +4,18 @@ const os = require("node:os");
 const path = require("node:path");
 const vscode = require("vscode");
 
-const EXTENSION_ID = "moonshot-ai.kimi-code";
+const EXTENSION_ID = "mikalai-kryvusha.kimi-code-kaif";
 const EXPECTED_COMMANDS = [
-  "kimi.clearAllState",
-  "kimi.focusInput",
-  "kimi.insertMention",
-  "kimi.logout",
-  "kimi.migrateLegacyData",
-  "kimi.newConversation",
-  "kimi.openInSideBar",
-  "kimi.openInTab",
-  "kimi.resetKimi",
-  "kimi.showLogs",
+  "kimiKaif.clearAllState",
+  "kimiKaif.focusInput",
+  "kimiKaif.insertMention",
+  "kimiKaif.logout",
+  "kimiKaif.migrateLegacyData",
+  "kimiKaif.newConversation",
+  "kimiKaif.openInSideBar",
+  "kimiKaif.openInTab",
+  "kimiKaif.resetKimi",
+  "kimiKaif.showLogs",
 ];
 
 exports.run = async function run() {
@@ -54,15 +54,15 @@ exports.run = async function run() {
   assert.equal(config.get("executablePath"), undefined, "removed Python CLI setting is still contributed");
   assert.equal(config.get("environmentVariables"), undefined, "removed global CLI env setting is still contributed");
 
-  await vscode.commands.executeCommand("kimi.openInTab");
+  await vscode.commands.executeCommand("kimiKaif.openInTab");
   await waitFor(() => {
     return vscode.window.tabGroups.all.some((group) =>
       group.tabs.some((tab) =>
         tab.input instanceof vscode.TabInputWebview && isKimiPanelViewType(tab.input.viewType)));
   }, 5_000, () => `Kimi Webview tab did not open; tabs=${describeTabs()}`);
 
-  await vscode.commands.executeCommand("kimi.showLogs");
-  await vscode.commands.executeCommand("kimi.resetKimi");
+  await vscode.commands.executeCommand("kimiKaif.showLogs");
+  await vscode.commands.executeCommand("kimiKaif.resetKimi");
   await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 
   console.log(
@@ -103,5 +103,5 @@ function describeTabs() {
 }
 
 function isKimiPanelViewType(viewType) {
-  return viewType === "kimiPanel" || viewType.endsWith("-kimiPanel");
+  return viewType === "kimiKaifPanel" || viewType.endsWith("-kimiKaifPanel");
 }
