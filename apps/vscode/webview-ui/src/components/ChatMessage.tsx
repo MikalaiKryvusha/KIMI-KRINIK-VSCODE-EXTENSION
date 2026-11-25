@@ -13,6 +13,7 @@ import { InlineError } from "./InlineError";
 import { PlanCard } from "./PlanCard";
 import { StreamingConfirmDialog } from "./StreamingConfirmDialog";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/sonner";
 import { useChatStore, useSettingsStore } from "@/stores";
 import { bridge } from "@/services";
@@ -47,12 +48,33 @@ function SteerBubble({ content }: { content: string | ContentPart[] }) {
   );
 }
 
-function StepItemRenderer({ item }: { item: UIStepItem }) {
+interface AssistantTextActionsProps {
+  content: string;
+  turnIndex?: number;
+  forkable?: boolean;
+}
+
+function AssistantTextActions({ content, turnIndex, forkable }: AssistantTextActionsProps) {
+  if (content.trim().length === 0) return null;
+  return (
+    <div data-testid="assistant-text-actions" className="flex justify-end pt-1 gap-1 opacity-0 group-hover/message:opacity-100 transition-opacity duration-100">
+      <CopyButton content={content} customTooltip />
+      {forkable !== false && turnIndex !== undefined && turnIndex >= 0 && <ForkButton turnIndex={turnIndex} />}
+    </div>
+  );
+}
+
+function StepItemRenderer({ item, turnIndex, forkable, isStreaming }: { item: UIStepItem; turnIndex?: number; forkable?: boolean; isStreaming?: boolean }) {
   switch (item.type) {
     case "thinking":
       return <ThinkingBlock content={item.content} finished={item.finished} />;
     case "text":
-      return <Markdown content={item.content} className="text-xs leading-relaxed" enableEnrichment={item.finished === true} />;
+      return (
+        <div data-testid="assistant-text-item">
+          <Markdown content={item.content} className="text-xs leading-relaxed" enableEnrichment={item.finished === true} />
+          {(item.finished === true || isStreaming !== true) && <AssistantTextActions content={item.content} turnIndex={turnIndex} forkable={forkable} />}
+        </div>
+      );
     case "tool_use":
       return <ToolCallCard call={item.call} result={item.result} subagentSteps={item.subagent_steps} />;
     case "compaction":
@@ -64,7 +86,7 @@ function StepItemRenderer({ item }: { item: UIStepItem }) {
   }
 }
 
-function StepContent({ step, showConnector }: { step: UIStep; showConnector?: boolean }) {
+function StepContent({ step, showConnector, turnIndex, forkable, isStreaming }: { step: UIStep; showConnector?: boolean; turnIndex?: number; forkable?: boolean; isStreaming?: boolean }) {
   const hasItems = step.items.length > 0;
   const hasToolOrThinking = step.items.some((item) => item.type === "tool_use" || item.type === "thinking" || item.type === "compaction");
   const showIndicator = hasToolOrThinking;
@@ -96,7 +118,7 @@ function StepContent({ step, showConnector }: { step: UIStep; showConnector?: bo
       )}
       <div className="flex-1 min-w-0 space-y-2">
         {step.items.map((item, idx) => (
-          <StepItemRenderer key={`${step.n}-${idx}`} item={item} />
+          <StepItemRenderer key={`${step.n}-${idx}`} item={item} turnIndex={turnIndex} forkable={forkable} isStreaming={isStreaming} />
         ))}
       </div>
     </div>
@@ -177,20 +199,25 @@ function ForkButton({ turnIndex, className }: ForkButtonProps) {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon-xs"
-        className={cn(
-          "h-5 w-5 text-muted-foreground hover:text-foreground transition-all border-0! hover:bg-zinc-200 dark:hover:bg-zinc-800 cursor-pointer",
-          isForking && "opacity-50 pointer-events-none",
-          className,
-        )}
-        onClick={handleFork}
-        disabled={isForking || !sessionId}
-        title={t("chat.forkTooltip")}
-      >
-        <IconGitFork className="size-3.5" />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className={cn(
+              "h-5 w-5 text-muted-foreground hover:text-foreground transition-all border-0! hover:bg-zinc-200 dark:hover:bg-zinc-800 cursor-pointer",
+              isForking && "opacity-50 pointer-events-none",
+              className,
+            )}
+            onClick={handleFork}
+            disabled={isForking || !sessionId}
+            aria-label={t("chat.forkTooltip")}
+          >
+            <IconGitFork className="size-3.5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{t("chat.forkTooltip")}</TooltipContent>
+      </Tooltip>
 
       <StreamingConfirmDialog
         open={showConfirm}
@@ -252,18 +279,6 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
 
   const stepHasIndicator = steps.map((step) => step.items.some((item) => item.type === "tool_use" || item.type === "thinking" || item.type === "compaction"));
 
-  const contentToCopy = (() => {
-    if (!hasSteps) {
-      return typeof message.content === "string" ? message.content : "";
-    }
-    const lastStep = steps[steps.length - 1];
-    const textItems = lastStep.items.filter((item) => item.type === "text");
-    if (textItems.length > 0) {
-      return textItems.map((item) => (item as { type: "text"; content: string }).content).join("\n");
-    }
-    return typeof message.content === "string" ? message.content : "";
-  })();
-
   if (message.deferPresentation && !hasMessageContent(message)) {
     return null;
   }
@@ -296,7 +311,7 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
                     const hasIndicator = stepHasIndicator[globalIndex];
                     const hasNextIndicator = stepHasIndicator.slice(globalIndex + 1).some(Boolean);
                     const showConnector = hasIndicator && hasNextIndicator && !isLastInGroup && !isLastOverall;
-                    return <StepContent key={step.n} step={step} showConnector={showConnector} />;
+                    return <StepContent key={step.n} step={step} showConnector={showConnector} turnIndex={turnIndex} forkable={message.forkable} isStreaming={isStreaming} />;
                   });
 
                   if (group.planMode) {
@@ -304,7 +319,12 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
                   }
                   return <Fragment key={`normal-${gi}`}>{stepsContent}</Fragment>;
                 })}
-              {!hasSteps && displayContent && <Markdown content={displayContent} className="text-xs leading-relaxed @[420px]:pl-5" enableEnrichment={!isStreaming} />}
+              {!hasSteps && displayContent && (
+                <div data-testid="assistant-text-item" className="@[420px]:pl-5">
+                  <Markdown content={displayContent} className="text-xs leading-relaxed" enableEnrichment={!isStreaming} />
+                  {isStreaming !== true && <AssistantTextActions content={displayContent} turnIndex={turnIndex} forkable={message.forkable} />}
+                </div>
+              )}
               {(images.length > 0 || videos.length > 0) && (
                 <div className="@[420px]:pl-5">
                   <MessageMedia images={images} videos={videos} onPreview={setPreviewMedia} />
@@ -327,12 +347,6 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
                 )}
               </div>
               <div className="inline-flex flex-1" />
-              {!isStreaming && contentToCopy.trim().length > 0 && (
-                <div className="flex justify-start pt-1 gap-1 opacity-0 group-hover/message:opacity-100 transition-opacity duration-100">
-                  <CopyButton content={contentToCopy} />
-                  {message.forkable !== false && turnIndex !== undefined && turnIndex >= 0 && <ForkButton turnIndex={turnIndex} />}
-                </div>
-              )}
             </div>
           </div>
         </div>

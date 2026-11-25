@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n";
 
 interface CopyButtonProps {
   content: string;
   className?: string;
+  customTooltip?: boolean;
 }
 
-export function CopyButton({ content, className }: CopyButtonProps) {
+export function CopyButton({ content, className, customTooltip = false }: CopyButtonProps) {
   const t = useT();
   const [isCopied, setIsCopied] = useState(false);
 
@@ -27,7 +29,7 @@ export function CopyButton({ content, className }: CopyButtonProps) {
 
   if (!content) return null;
 
-  return (
+  const button = (
     <Button
       variant="ghost"
       size="icon-xs"
@@ -39,9 +41,18 @@ export function CopyButton({ content, className }: CopyButtonProps) {
       onClick={() => {
         void handleCopy();
       }}
-      title={t("copy.message")}
+      aria-label={t("copy.message")}
+      title={customTooltip ? undefined : t("copy.message")}
     >
       {isCopied ? <IconCheck className="size-3.5" /> : <IconCopy className="size-3.5" />}
     </Button>
+  );
+
+  if (!customTooltip) return button;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent>{t("copy.message")}</TooltipContent>
+    </Tooltip>
   );
 }

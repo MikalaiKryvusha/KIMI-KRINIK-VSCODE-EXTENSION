@@ -26,14 +26,14 @@
 | AC6 | Repeatedly cross a turn boundary and send steering messages | no sticky flicker, duplicate section or assistant avatar above the corresponding user prompt |
 | AC7 | Conversation contains KAIF hook output | hook text never becomes a sticky candidate and remains invisible in the conversation |
 | AC8 | Reload the session and expand a prompt | replay selects the same prompt by ID; expanded state is per prompt, not global |
-| AC9 | Read the sticky prompt beside an assistant response | sticky spans the chat width as a rounded user-message bubble; a prompt that already fits one line shows no Expand button |
+| AC9 | Read the sticky prompt beside an assistant response | sticky spans the chat width as a rounded user-message bubble; a prompt that already fits one line is fully visible with no expand/collapse control or fade |
 | AC10 | Expand a prompt and read an ordinary user message | the existing chevron rotates with reduced-motion-safe animation; the ordinary user bubble shows localized `HH:MM` send time to the left of the bubble |
 | AC11 | Expand a sticky prompt | the collapse chevron sits in its top-right corner without a separate full-width control row; prompt text starts at the top content row and does not overlap the chevron |
 | AC12 | Read a collapsed sticky prompt | the summary is raised and optically centered vertically inside the bubble rather than sitting low |
 | AC13 | Open or return to the very beginning of the conversation | no sticky prompt is rendered at `scrollTop = 0`; scrolling into an assistant turn can activate it again |
 | AC14 | Scroll with an expanded sticky prompt, then pin another prompt and return | wheel/touch scrolling preserves the expansion; only manual collapse or a different prompt becoming sticky closes it, and a replaced prompt's expansion does not reappear on return; height grows downward with text fade-in and collapses upward with fade-out |
 | AC15 | Read the sticky bubble inside its container | small top/left/right padding leaves visible space around the bubble |
-| AC16 | Expand and collapse a long sticky prompt | collapsed preview shows one clear line and part of the second under a bubble-colored fade; max-height animates smoothly in both directions with reduced-motion support |
+| AC16 | Expand and collapse a prompt that overflows one line | only an overflowing prompt gets a collapsed preview with one clear line and part of the second under a bubble-colored fade; max-height animates smoothly in both directions with reduced-motion support |
 
 ## 3. Reference findings
 

@@ -23,15 +23,15 @@
 
 ---
 
-### 2026-11-26 01:18 +03:00 — BUILD 34 PACKAGED; per-message assistant actions are next
-- Session, tokens, History and new-chat now share one opaque 8px-radius contour; Session has 8px side padding. The Russian Compact On text now names 85% of the model's nominal context window.
-- Build 34 SHA-256: `36a964774a474b70abfb369cd0371e853e5de6b9021ce6b22c65cb8e59f851b3`; installed on main and isolated profiles. Full extension: 643 passed / 1 skipped; lint, typecheck, build and VSIX audit are green.
-- Restarted isolated build 34 passed computed-style and WebP readback plus the live Compact tooltip. Main-window UI Automation did not execute Reload Window; the running accumulated main build is not claimed verified. Evidence: `testcases/reports/2026-11-26_build_34_session_header_compact.md`.
-- The owner reported a new attachment/composer timing race, recorded as `bugs/35`; he also requires Copy/Branch actions directly under every assistant text message, custom shared tooltips and copying only the adjacent text. Dayloop is active; no release publication is authorized.
+### 2026-11-26 02:05 +03:00 — BUILD 36 VERIFIED ON ISOLATED VS CODE
+- Every assistant text item now has its own directly adjacent Copy/Fork block; Copy receives only that item's text. Both actions use localized custom tooltips and no native `title`.
+- Build 36 SHA-256: `056843dde6bfa315a5295a517c049b2d37f6b7bfa8ba9e3556974d45b8ecf8a4`; installed on main and isolated profiles. Full extension: 646 passed / 1 skipped; lint, typecheck, build and VSIX audit are green.
+- A real packaged text → ReadFile → held-text run showed both action blocks in the right positions, including the first block during the held turn. The inner Clipboard API received exactly `K35 second answer`; Copy/Fork WebP tooltips were read. Evidence: `testcases/reports/2026-11-26_build_36_assistant_text_actions.md`.
+- Build 34 header/Compact polish is committed in `cd4cbd87b`. Main-window Reload Window automation failed earlier; the running accumulated main profile remains unverified. New sticky boundary: a one-line prompt must have no fade or collapse control. Dayloop is active; no release publication is authorized.
 
 ## Where we are now
 
-The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `36a964774a474b70abfb369cd0371e853e5de6b9021ce6b22c65cb8e59f851b3`. The extension has 643 passed / 1 skipped and 0 failures. Build 34 is installed on main and isolated profiles; isolated visual acceptance passed, while main running-profile acceptance is pending. No GitHub Release exists.
+The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `056843dde6bfa315a5295a517c049b2d37f6b7bfa8ba9e3556974d45b8ecf8a4`. The extension has 646 passed / 1 skipped and 0 failures. Build 36 is installed on main and isolated profiles; isolated functional acceptance passed, while main running-profile acceptance is pending. No GitHub Release exists.
 
 ## ❓ Awaiting human review
 
@@ -40,8 +40,8 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 ## Where to continue next session
 
-1. Put Copy/Branch actions directly under every assistant text message, use the shared custom tooltip, and copy only the adjacent text rather than the whole step; add red-first coverage and real VSIX observation.
-2. Reproduce and fix `bugs/35_attachment_composer_chat_race.md` from the owner's real symptom, with frame-level composer/chat evidence.
+1. Reproduce and fix `bugs/35_attachment_composer_chat_race.md` from the owner's real symptom, with frame-level composer/chat evidence.
+2. Implement the new sticky boundary in `bugs/31` / `plans/03`: a prompt that already fits one line is fully visible without fade or expand/collapse controls.
 3. Reload the accumulated main profile onto the newest verified build and observe the pending header, skill, General Settings, sticky and chat acceptance paths. Record results in a new run report.
 4. Apply the remaining refinements from `ideas/02` and `ideas/03`: 48px skill-dialog margins, larger robot/text spacing in welcome and header, and separate «Вкл» / «Выкл» description lines.
 5. Investigate `bugs/34_refresh_marker_write_lost.md`, then run real VSIX preflight verification for `bugs/29`.
@@ -49,9 +49,10 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 ## Open bugs
 
+- 🔧 `bugs/36_assistant_text_action_scope.md` — per-text Copy/Fork placement, adjacent-only copying and custom message tooltips verified on isolated build 36; accumulated main-profile acceptance pending.
 - 🔴 `bugs/35_attachment_composer_chat_race.md` — owner observed the text bubble before its image while the image remained in the composer for several seconds; live race capture and root-cause assignment are pending.
 - 🔴 `bugs/34_refresh_marker_write_lost.md` — owner-priority investigation into the lost refresh-marker update; timer matches the stale file, culprit not yet assigned.
-- 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated build-25 acceptance passed; `bugs/31_expanded_sticky_scroll_oscillation.md` has the revised scroll-preservation and animation contract, component-verified with build-33 real observation pending.
+- 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated build-25 acceptance passed; `bugs/31_expanded_sticky_scroll_oscillation.md` has the revised scroll-preservation contract and a new owner boundary requiring no fade or collapse control for a one-line prompt, not yet implemented.
 - 🔧 `bugs/29_preflight_error_deletes_unrelated_history.md` — deterministic regressions and full suite pass; real VSIX preflight path pending.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — repeated owner symptom, three isolated non-reproductions; parked with evidence, not DONE.
 - 🔧 `bugs/19_tool_cards_hide_working_state.md`, `bugs/18_reentrant_prompt_internal_error.md`, `bugs/16_steer_avatar_precedes_user_bubble.md` — isolated paths pass; original main-profile paths pending.

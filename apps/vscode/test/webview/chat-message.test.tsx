@@ -1,5 +1,6 @@
-import { cleanup, fireEvent, render } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/services", () => ({
   bridge: {
@@ -10,8 +11,31 @@ vi.mock("@/services", () => ({
 }));
 
 import { ChatMessage } from "../../webview-ui/src/components/ChatMessage";
+import { useChatStore } from "../../webview-ui/src/stores/chat.store";
 
-afterEach(cleanup);
+const writeText = vi.fn(async () => undefined);
+const clipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+
+beforeEach(() => {
+  vi.stubGlobal("ResizeObserver", class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  });
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+  writeText.mockClear();
+  useChatStore.setState({ sessionId: "session-1", isStreaming: false });
+});
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+  if (clipboardDescriptor) {
+    Object.defineProperty(navigator, "clipboard", clipboardDescriptor);
+  } else {
+    Reflect.deleteProperty(navigator, "clipboard");
+  }
+});
 
 describe("user message rendering", () => {
   it("preserves manual line breaks without adding paragraph spacing", () => {
@@ -84,6 +108,112 @@ describe("steering media", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     fireEvent.click(videoThumbnail!);
     expect(document.querySelector(".fixed video")?.getAttribute("src")).toBe(video);
+  });
+});
+
+describe("assistant text actions", () => {
+  it("places custom-tooltip Copy and Fork actions under each text item and copies only the adjacent text", async () => {
+    const user = userEvent.setup();
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    render(
+      <ChatMessage
+        turnIndex={4}
+        message={{
+          id: "assistant-actions",
+          role: "assistant",
+          content: "",
+          steps: [{
+            n: 1,
+            items: [
+              { type: "text", content: "first answer", finished: true },
+              { type: "tool_use", id: "tool-1", call: { id: "tool-1", name: "WriteFile", arguments: null } },
+              { type: "text", content: "second answer", finished: true },
+            ],
+          }],
+          timestamp: 0,
+        }}
+      />,
+    );
+
+    const items = screen.getAllByTestId("assistant-text-item");
+    const actions = screen.getAllByTestId("assistant-text-actions");
+    expect(items).toHaveLength(2);
+    expect(actions).toHaveLength(2);
+    expect(items[0]?.textContent).toContain("first answer");
+    expect(items[1]?.textContent).toContain("second answer");
+    expect(items[0]?.lastElementChild).toBe(actions[0]);
+    expect(items[1]?.lastElementChild).toBe(actions[1]);
+    expect(items[0]?.parentElement?.children[1]?.textContent).toContain("WriteFile");
+
+    const copies = screen.getAllByRole("button", { name: "Copy message" });
+    const forks = screen.getAllByRole("button", { name: "Fork conversation from this point" });
+    expect(copies).toHaveLength(2);
+    expect(forks).toHaveLength(2);
+    for (const button of [...copies, ...forks]) expect(button.getAttribute("title")).toBeNull();
+
+    await user.hover(copies[0]!);
+    const copyTooltip = await screen.findByRole("tooltip", { name: "Copy message" });
+    expect(copyTooltip.closest('[data-slot="tooltip-content"]')?.className).toContain("bg-tooltip");
+    await user.hover(forks[1]!);
+    const forkTooltip = await screen.findByRole("tooltip", { name: "Fork conversation from this point" });
+    expect(forkTooltip.closest('[data-slot="tooltip-content"]')?.className).toContain("bg-tooltip");
+
+    await user.click(copies[1]!);
+    expect(writeText).toHaveBeenCalledTimes(1);
+    expect(writeText).toHaveBeenCalledWith("second answer");
+  });
+
+  it("keeps actions on fallback text and on finished text while a later text item streams", () => {
+    const { rerender } = render(
+      <ChatMessage
+        message={{ id: "assistant-fallback-actions", role: "assistant", content: "fallback answer", steps: [], timestamp: 0 }}
+      />,
+    );
+    expect(screen.getAllByTestId("assistant-text-actions")).toHaveLength(1);
+    expect(screen.getByTestId("assistant-text-item").textContent).toContain("fallback answer");
+
+    rerender(
+      <ChatMessage
+        turnIndex={0}
+        message={{
+          id: "assistant-fallback-actions",
+          role: "assistant",
+          content: "",
+          steps: [{
+            n: 1,
+            items: [
+              { type: "text", content: "completed answer", finished: true },
+              { type: "text", content: "partial answer", finished: false },
+            ],
+          }],
+          timestamp: 0,
+        }}
+        isStreaming
+      />,
+    );
+
+    const items = screen.getAllByTestId("assistant-text-item");
+    const actions = screen.getAllByTestId("assistant-text-actions");
+    expect(items).toHaveLength(2);
+    expect(actions).toHaveLength(1);
+    expect(items[0]?.lastElementChild).toBe(actions[0]);
+    expect(items[1]?.textContent).toContain("partial answer");
+    expect(items[1]?.contains(actions[0]!)).toBe(false);
+  });
+
+  it("keeps the existing native title on code copying while message actions use custom tooltips", () => {
+    render(
+      <ChatMessage
+        message={{ id: "assistant-code-copy", role: "assistant", content: "```ts\nconst answer = 1;\n```", steps: [], timestamp: 0 }}
+      />,
+    );
+
+    const buttons = screen.getAllByRole("button", { name: "Copy message" });
+    const codeCopy = buttons.find((button) => button.className.includes("group-hover/code"));
+    const messageCopy = screen.getByTestId("assistant-text-actions").querySelector("button");
+    expect(buttons).toHaveLength(2);
+    expect(codeCopy?.getAttribute("title")).toBe("Copy message");
+    expect(messageCopy?.getAttribute("title")).toBeNull();
   });
 });
 

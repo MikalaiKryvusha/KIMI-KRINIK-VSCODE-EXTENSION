@@ -21,6 +21,12 @@ Component evidence for the revised contract: the updated sticky suite is 11/11, 
 
 2026-11-26 00:36 +03:00 — packaged build 33 real isolated sticky run: collapsed preview `32px` with bubble-colored fade, expanded height `827px`, wheel preserved `aria-expanded=true`, and manual collapse returned to `32px`. This satisfies the revised isolated contract; accumulated main-profile observation remains open.
 
+## Owner refinement — 2026-11-26 01:45 +03:00
+
+[OWNER] «бак со стики сообщением, что оно дает фейд и свернутое состояние даже только при одной строке. При одной не надо» · 2026-11-26 01:45 +03:00 (chat)
+
+A prompt that already fits on one line must render in full without collapse state, an expand/collapse control or fade. The two-line faded preview applies only to a prompt that actually overflows one line. This is a new acceptance boundary, not yet implemented or verified.
+
 ## Repro
 
 [OWNER] «лучше не восроизводить, а читать код и искать в коде, чем они вызваны и как чинить.» · 2026-11-25 (чат)
