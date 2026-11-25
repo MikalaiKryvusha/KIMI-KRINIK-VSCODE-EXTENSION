@@ -1,6 +1,6 @@
 # Bug 14 — A follow-up is not added to the visible queue
 
-**Status:** 🔧 immediate text+image queue, dequeue delivery and replay verified on isolated build 19; video and main-profile acceptance pending
+**Status:** 🔧 immediate text+image/video and media-only queue, dequeue delivery and replay verified on isolated build 19; main-profile acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment
@@ -41,7 +41,11 @@ Reproduce text and media cases in the isolated installed VSIX, printing the stan
 
 With AUTO STEER OFF and a held running turn, pasting PNG and sending `steer media` immediately produced one visible queue row with the exact text and «+ медиа». After release, the raw provider request contained one text part and exactly one PNG data URL. Replay restored the media entry and clickable thumbnail with the same URI. Report: `testcases/reports/2026-11-25_media_queue_steer.md`.
 
-Video-only, additional race combinations and the owner's accumulated main profile remain open; no DONE claim.
+## Isolated media-only video evidence — 2026-11-25 04:18 +03:00
+
+A pasted valid MP4 with an empty composer produced an immediate media queue row. Dequeue delivered one video data URL with zero text characters. Replay restored the video thumbnail and the preview reused its URI. Report: `testcases/reports/2026-11-25_media_only_video.md`.
+
+Only accumulated main-profile acceptance remains open.
 
 ## Decisions made without the owner
 
