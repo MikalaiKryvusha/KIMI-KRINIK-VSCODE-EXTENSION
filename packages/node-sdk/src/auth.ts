@@ -139,6 +139,14 @@ export class KimiAuthFacade {
     });
   }
 
+  async getManagedUserInfo(providerName?: string) {
+    const auth = this.resolveRuntimeManagedAuth(providerName);
+    return this.toolkit.getManagedUserInfo(providerName, {
+      oauthRef: auth.oauthRef,
+      baseUrl: auth.baseUrl,
+    });
+  }
+
   async getCachedAccessToken(
     providerName?: string,
     oauthRef?: OAuthRef,

@@ -32,6 +32,7 @@ describe("managed usage handler", () => {
       usage: {
         fiveHour: { usedRatio: 0.25 },
         monthCode: { usedRatio: 0.5 },
+        planName: "Pro",
       },
     });
   });
@@ -39,7 +40,7 @@ describe("managed usage handler", () => {
   it("returns request failure without a synthetic zero", async () => {
     const ctx = context({
       getManagedUsage: vi.fn(async () => ({ kind: "error", message: "unauthorized" })),
-      getManagedUserInfo: vi.fn(),
+      getManagedUserInfo: vi.fn(async () => undefined),
     });
     await expect(handler(undefined, ctx)).resolves.toEqual({ ok: false, error: "unauthorized" });
   });

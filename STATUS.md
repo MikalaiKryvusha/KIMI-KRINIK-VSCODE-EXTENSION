@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 04:39 +03:00 — managed plan names reach the usage tooltip
+- `KimiAuthFacade` now exposes the toolkit's managed user-info path with the same runtime auth resolution as quota. The extension fills `planName` from `userLevelName`; user-info failure is optional and does not hide quota data or its real errors.
+- Affected handler tests, SDK/extension typechecks and full suite 597 passed, 1 skipped, 0 failed; root lint 0. B12 editor-background verification remains separate; B9/B10 stay with the owner.
+
 ### 2026-11-25 04:30 +03:00 — nonblocking subagent boundary confirmed
 - Official docs and local contracts prove `Agent(run_in_background=true)` returns a task ID immediately, supports concurrent background subagents and delivers results automatically. `AgentSwarm` runs concurrently but waits for its aggregated report, so it is parallel-but-blocking, not nonblocking.
 - Nested tasks must settle, task-management tools are required, and completion arrives as a notification/steered turn. No live subagent was launched because the project forbids unauthorized launches. Evidence: `researches/56_nonblocking_subagents.md`.
@@ -168,7 +172,7 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
 
-- [ ] B5–B12 of `Claude_Help_for_Kimi.md` that no phase owns yet.
+- [ ] B12 editor-background verification only. B5–B8/B11 and the `planName` gap are complete; B9/B10 remain owner decisions.
 - [ ] `KAIF/framework/hooks` bugs/156 (one sequential Stop): commit, rebuild `dist`, then `node .kaif/kaif-core.mjs update --source D:/work/ai_sandbox/KAIF/dist` here.
 
 ## ❓ Awaiting human review (interviews / homework)

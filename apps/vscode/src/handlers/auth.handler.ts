@@ -88,9 +88,21 @@ export const authHandlers: Record<string, Handler<any, any>> = {
 
   [Methods.GetManagedUsage]: async (params: { provider?: string } | undefined, ctx): Promise<ManagedUsageResult> => {
     try {
-      const result = await ctx.harness.auth.getManagedUsage(params?.provider);
+      const [result, userInfo] = await Promise.all([
+        ctx.harness.auth.getManagedUsage(params?.provider),
+        ctx.harness.auth.getManagedUserInfo().catch(() => undefined),
+      ]);
       if (result.kind !== "ok") return { ok: false, error: result.message };
-      return { ok: true, usage: toManagedUsageView(result.quota.usages) };
+      const planName = userInfo?.kind === "ok" && userInfo.userInfo.userLevelName.length > 0
+        ? userInfo.userInfo.userLevelName
+        : undefined;
+      return {
+        ok: true,
+        usage: {
+          ...toManagedUsageView(result.quota.usages),
+          ...(planName === undefined ? {} : { planName }),
+        },
+      };
     } catch (error) {
       ctx.logError("Failed to fetch managed usage", error);
       return { ok: false, error: error instanceof Error ? error.message : String(error) };
