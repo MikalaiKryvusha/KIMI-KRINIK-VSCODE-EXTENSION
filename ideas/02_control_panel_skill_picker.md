@@ -58,6 +58,11 @@ Contract consumers: `packages/node-sdk/src/index.ts` gains one additive function
 - Limited metadata projection to the two requested optional fields and the base-description fallback.
 - `bugs/33_DONE_skill_variant_windows_path_separator_test.md` records the separate pre-existing Windows test-portability failure; it was fixed independently of this feature.
 
+## Next-chat owner refinements — 2026-11-26 00:36 +03:00
+
+- Increase the skill dialog's outer margin from 32px to 48px on every side.
+- Increase the welcome robot ↔ KIMI gap beyond the current 16px and align the header robot ↔ KIMI KRINIK spacing with that direction; the header currently has an 8px gap.
+
 ## Open questions / what needs the human's answer
 
 None. The button, row layout, scrolling, routing, fallback rules and release dependency were decided by the owner. <!-- attribution-ok: the owner's verbatim requests are quoted in the next section -->

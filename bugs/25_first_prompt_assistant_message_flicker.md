@@ -21,6 +21,8 @@ The whole chat feed flickered immediately after the first prompt. The owner perc
 
 2026-11-25 23:34 +03:00 — the owner's steering-race hypothesis reproduced deterministically at the public store boundary. With an original turn 0 and an optimistic steering assistant already appended, a late turn-0 ContentPart was written into the steering assistant; turn-0 completion also finalized that wrong assistant. The SDK had supplied turnId all along, but the event adapter discarded it. ContentPart now carries optional additive turnIndex metadata, and ContentPart/stream completion select the owning assistant with legacy fallback for events without an index. Adapter and store regressions were red before and green afterward: 65/65. This is the confirmed routing race, but the owner's rendered disappearance is not called verified-fixed until the packaged held-response → steer DOM run.
 
+2026-11-26 00:36 +03:00 — packaged build 33 real isolated run: a fresh fake model emitted `K5 first chunk`, the user steered while the original turn was held, and MutationObserver kept that first chunk in the same assistant ID before and after steer; the late response remained visible with no disappearance frame. No original-text loss reproduced on the real packaged path. Accumulated main-profile observation remains open.
+
 ## Repro
 
 1. Open a new KIMI KRINIK session on the owner's accumulated profile.

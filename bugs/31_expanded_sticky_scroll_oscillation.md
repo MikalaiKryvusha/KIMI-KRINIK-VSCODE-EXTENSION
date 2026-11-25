@@ -19,6 +19,8 @@ This supersedes the earlier automatic wheel/touch-collapse requirement and its b
 
 Component evidence for the revised contract: the updated sticky suite is 11/11, covering wheel/touch preservation, manual collapse, active-prompt replacement, two-way grid/fade classes and top/side padding. Packaged visual observation remains pending.
 
+2026-11-26 00:36 +03:00 — packaged build 33 real isolated sticky run: collapsed preview `32px` with bubble-colored fade, expanded height `827px`, wheel preserved `aria-expanded=true`, and manual collapse returned to `32px`. This satisfies the revised isolated contract; accumulated main-profile observation remains open.
+
 ## Repro
 
 [OWNER] «лучше не восроизводить, а читать код и искать в коде, чем они вызваны и как чинить.» · 2026-11-25 (чат)

@@ -58,3 +58,15 @@ Functional run: packaged build 32 was driven through welcome and skill-dialog us
 ## 7. Verdict
 
 partial — implementation and all hygiene are green; build 32 visual smoke passed and build 33 is installed, but build 33 sticky, the accumulated running profile, and the held-response VSIX race still require observation.
+
+## 8. Post-closure functional verification — 2026-11-26 00:36 +03:00
+
+A fresh fake model and packaged build 33 completed the missing real paths. The base response first showed `K5 first chunk`; the user sent a steering message while the turn was held. MutationObserver frames kept the first chunk in the same assistant ID before and after steer, and the late response remained visible. No disappearance frame was observed.
+
+The long-prompt sticky path was then driven through the real composer and viewport. Collapsed preview was `32px` with the zinc bubble-colored fade; expansion reached `827px`; wheel left `aria-expanded=true`; manual collapse returned to `32px`.
+
+The test-debt waiver records these actual VSIX observations and the default hook's inability to detect Vitest/TSX wrappers. `node .kaif/hooks/test-after-code.mjs --status` now prints `test debt: none`.
+
+New owner refinements for the next chat are recorded in `ideas/02` and `ideas/03`: 48px skill-dialog margins, larger robot/text spacing in welcome and header, and separate On/Off description lines in General Settings.
+
+The verdict remains `partial` only because the accumulated main running profile has not been restarted and observed.

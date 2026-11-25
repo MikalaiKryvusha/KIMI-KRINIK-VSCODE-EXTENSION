@@ -14,6 +14,7 @@
 - Context Window Control and all four thresholds move from Control Panel settings into this General Settings page; no copy remains in Control Panel settings.
 - Every migrated setting retains its current persisted key, validation, host action and existing user value.
 - Existing dedicated screens remain for their own domains; General Settings does not duplicate their controls.
+- For two-state descriptions, render «Вкл: …» and «Выкл: …» on separate lines so the second state never trails as a fragment on the first state's line; apply the same layout to English and 中文.
 - Component tests cover language switching, migration ownership and persistence; the installed VSIX path is read after implementation.
 - Work is scheduled after the current closure; no release is authorized by this document.
 
