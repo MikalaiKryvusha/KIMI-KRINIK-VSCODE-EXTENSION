@@ -23,6 +23,9 @@
 
 ---
 
+### 2026-11-25 21:26 +03:00 — OWNER PRIORITY: investigate the lost refresh-marker write first
+- `bugs/34_refresh_marker_write_lost.md` records the proven stale marker and mtime, the successful second write and the ranked culprit layers. The timer matched the stale file, so the update was lost rather than the interval being miscalculated. Next chat starts with the controlled reproduction and layer assignment, then the smallest fix and guard, before returning to build-25 acceptance.
+
 ### 2026-11-25 20:35 +03:00 — SOFT CLOSURE: build 25 verified; handover to the next chat
 - Build 25 is implemented, installed on the main profile and verified on isolated VS Code. Commits through `27ee17990` are pushed to `main`; `bugs/33` is DONE and SDK `session-skills` is 14/14. Extension suite is 621 passed / 1 skipped; typecheck, root lint, build, static audit and voice checks are green.
 - Post-closure verification: named chat/event-adapter suites passed 39/39, and a fresh build-25 prompt left `K25 final smoke answer` visible with invisible hook text and the same payload in model input. `test debt: none` after the documented direct-node waiver; evidence is appended to `testcases/reports/2026-11-25_build_25_ui_acceptance.md`.
@@ -39,13 +42,14 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 ## Where to continue next session
 
-1. On the accumulated main profile restart VS Code to load build 25, then verify the owner scenarios in `testcases/reports/2026-11-25_build_25_ui_acceptance.md` and `testcases/reports/2026-11-25_chat_rendering_build_22.md`. Do not publish without separate owner `AUTH:`.
-2. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
-3. Next clear work is real VSIX preflight verification for `bugs/29`, then accumulated-profile acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` when the owner prioritizes it. `bugs/33` is DONE.
-4. `bugs/11` stays parked by the owner's Pareto direction; resume only with new deterministic evidence. `ideas/02` is implemented and isolated-verified on build 25; main-profile acceptance is pending. `ideas/03` is the next development cut after the release path.
+1. First investigate `bugs/34_refresh_marker_write_lost.md`: controlled write/readback, identify the responsible layer, apply the smallest fix and a mutation-proved guard. Do not start release work before this owner-priority investigation is closed.
+2. On the accumulated main profile restart VS Code to load build 25, then verify the owner scenarios in `testcases/reports/2026-11-25_build_25_ui_acceptance.md` and `testcases/reports/2026-11-25_chat_rendering_build_22.md`. Do not publish without separate owner `AUTH:`.
+3. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
+4. Next clear work is real VSIX preflight verification for `bugs/29`, then accumulated-profile acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` when the owner prioritizes it. `bugs/33` is DONE. `bugs/11` stays parked by the owner's Pareto direction; resume only with new deterministic evidence. `ideas/02` is implemented and isolated-verified on build 25; main-profile acceptance is pending. `ideas/03` is the next development cut after the release path.
 
 ## Open bugs
 
+- 🔴 `bugs/34_refresh_marker_write_lost.md` — owner-priority investigation into the lost refresh-marker update; timer matches the stale file, culprit not yet assigned.
 - 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/31_expanded_sticky_scroll_oscillation.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated packaged build-25 acceptance passes; accumulated main-profile running-build acceptance pending.
 - 🔧 `bugs/29_preflight_error_deletes_unrelated_history.md` — deterministic regressions and full suite pass; real VSIX preflight path pending.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — repeated owner symptom, three isolated non-reproductions; parked with evidence, not DONE.
