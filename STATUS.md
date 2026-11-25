@@ -23,20 +23,24 @@
 
 ---
 
-### 2026-11-25 03:51 +03:00 — active-response user sends verified; bugs/18 DONE
+### 2026-11-25 03:58 +03:00 — status correction: isolated evidence is not main-profile DONE
+- Corrected premature DONE tags for `bugs/16`, `bugs/18` and `bugs/19`; all three are 🔧 isolated-verified with their original main-profile paths pending. Their scoped run reports remain valid, while completion claims and filenames were corrected everywhere they stood.
+- `bugs/23` stays DONE as a research-only payload-integrity question; `bugs/05` stays DONE as a harness defect. Production chat fixes require the accumulated-profile acceptance boundary.
+
+### 2026-11-25 03:51 +03:00 — active-response user sends verified on isolated build 19; main profile pending
 - 106 runtime/settings/chat-store contracts pass. Current isolated ON steering, OFF queue/dequeue and running→idle batch paths show no `Internal error occurred.`; direct invalid reentrant prompt remains guarded and the first turn continues.
-- Historical owner log is preserved in `bugs/18_DONE_reentrant_prompt_internal_error.md`; official extension unchanged. Report: `testcases/reports/2026-11-25_reentrant_send_contract.md`.
+- Historical owner log is preserved in `bugs/18_reentrant_prompt_internal_error.md`; official extension unchanged. Report: `testcases/reports/2026-11-25_reentrant_send_contract.md`.
 
 ### 2026-11-25 03:45 +03:00 — Windows compaction harness repaired; bugs/05 DONE
 - `bugs/04`: real Windows temp paths now select win32 path mapping and host-native expected resolution; cwd/listing case passes. Linux row remains unrun because WSL is not installed and Docker is unavailable, so bug 04 stays open.
 - `bugs/05`: both hooks were already invoked; unquoted Node path under Program Files emptied the logger output. Quoting executable/script produced ordered PreCompact/PostCompact payloads. DONE.
 - Full compaction 123/123, agent-core typecheck and root lint green. No production source changed. Report: `testcases/reports/2026-11-25_windows_compaction_harness.md`.
 
-### 2026-11-25 03:26 +03:00 — steering avatar/user order verified; bugs/16 DONE
+### 2026-11-25 03:26 +03:00 — steering avatar/user order verified on isolated build 19; main profile pending
 - Immediate, two-consecutive and replayed steering on isolated build 19 preserve base → steer one → steer two → assistant response. Clean replay offsets were 14/61/71/87 with no avatar inversion, error or Retry; three WebP frames were read.
 - Report: `testcases/reports/2026-11-25_steer_avatar_order.md`. Current lifecycle already had the fix; no product change was needed.
 
-### 2026-11-25 03:11 +03:00 — tool-card Working state verified; bugs/19 DONE
+### 2026-11-25 03:11 +03:00 — tool-card Working state verified on isolated build 19; main profile pending
 - Isolated build 19 showed «Работаю…» below ReadFile while the next model step was held, within visible bounds. It disappeared on genuine completion and stayed absent after history replay. No additional product change was needed.
 - Report: `testcases/reports/2026-11-25_tool_working_build_19.md`. Two-client replay remains in the broader lifecycle matrix.
 
@@ -183,6 +187,10 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - ✅ `ideas/02_control_panel_skill_picker.md` — owner approved a scrollable skill picker with bold name / normal description, existing queue/Steer routing and localized metadata fallback. Deliberately deferred until KIMI KRINIK 1.0.0 is completed and released; KAIF translations remain in the linked upstream idea 39.
 - ✅ `ideas/03_extension_general_settings.md` — owner approved an extension-localized General Settings page with no duplicate owners; Context Window Control and thresholds move there from Control Panel. Planned for the next development cut, not started during closure.
 ## Open bugs
+
+- 🔧 `bugs/19_tool_cards_hide_working_state.md` — active/completion/replay pass on isolated build 19; original main-profile path pending.
+- 🔧 `bugs/18_reentrant_prompt_internal_error.md` — ON/OFF/fallback contracts and isolated paths pass; original main-profile path pending.
+- 🔧 `bugs/16_steer_avatar_precedes_user_bubble.md` — immediate/consecutive/replay order passes on isolated build 19; original main-profile path pending.
 
 - 🔧 `bugs/27_effort_persistence_and_localization.md` — isolated build-18 restart/wire/labels pass; main-profile acceptance pending.
 - 🔧 `bugs/26_sound_off_disables_dropdown.md` — isolated build-18 Off → Glass pass; main-profile acceptance pending.

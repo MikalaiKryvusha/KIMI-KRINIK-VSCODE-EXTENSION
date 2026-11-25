@@ -50,7 +50,7 @@ Chose immediate queue removal as the optimistic response, with restoration on fa
 
 - `bugs/11_steer_delivery_and_immediate_display.md`
 - `bugs/14_steer_queue_not_added.md`
-- `bugs/19_DONE_tool_cards_hide_working_state.md`
+- `bugs/19_tool_cards_hide_working_state.md`
 - `apps/vscode/webview-ui/src/components/QueuedMessagesPanel.tsx`
 - `apps/vscode/test/webview/status-pills.test.tsx`
 

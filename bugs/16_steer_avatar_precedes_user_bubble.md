@@ -1,6 +1,6 @@
 # Bug 16 — Assistant avatar appears above the user's steering bubble
 
-**Status:** ✅ DONE — immediate, consecutive steering and replay order verified on isolated build 19
+**Status:** 🔧 immediate/consecutive/replay order verified on isolated build 19; original main-profile path pending
 **Version/build:** KIMI KRINIK 1.0.0 · current working tree after `8ac5df733` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:33 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** as part of the chat-pipeline research and redesign; verify in isolated VS Code
@@ -33,7 +33,7 @@ The current lifecycle creates separate user entries for immediate and consecutiv
 
 The current optimistic `clientId` lifecycle and atomic replay already provide the required separate user sections. The original defect did not reproduce on the current build; no additional product change was needed.
 
-## ✅ STATUS: DONE (2026-11-25 03:26 +03:00)
+## STATUS: ISOLATED VERIFIED (2026-11-25 03:26 +03:00) — main-profile acceptance pending
 
 Hygiene: existing optimistic reconciliation and chat component checks remain green in the full extension suite (597 passed, 1 skipped, 0 failed); root lint exits 0.
 Functional run: fresh isolated build 19, two consecutive steering messages. Immediate WebP `.tmp/k5-vscode/54-k16-two-steers.webp` showed base/one/two before KIMI. A clean second series and real replay returned text offsets base=14, one=61, two=71, response=87, with no active indicator, error or Retry. WebP `.tmp/k5-vscode/55-k16b-clean-order.webp` and `.tmp/k5-vscode/56-k16b-replay-order.webp` were opened and read. Report: `testcases/reports/2026-11-25_steer_avatar_order.md`.

@@ -1,6 +1,6 @@
 # Bug 18 — Sending during an active response surfaces a generic internal error
 
-**Status:** ✅ DONE — current ON/OFF/fallback contracts and clean isolated build-19 user paths show no generic reentrant-send error
+**Status:** 🔧 current ON/OFF/fallback contracts and isolated build-19 paths pass; original main-profile path pending
 **Version/build:** KIMI KRINIK 1.0.0 and official `moonshot-ai.kimi-code-0.9.0` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 15:24:10 +03:00, owner chat sends; reported during chat-pipeline characterization
 **Severity:** S2
 **Fixing:** this session as owner debt; include the contract in the chat-pipeline characterization before implementation
@@ -53,7 +53,7 @@ The UI mapped that event to `Internal error occurred.` while the earlier `stream
 
 The optimistic lifecycle, full `PromptSubmissionResult` propagation, stale-state fallback and visible queue now cover the valid user routes that previously reached the reentrant guard. The low-level guard and its non-terminal warning test remain intact.
 
-## ✅ STATUS: DONE (2026-11-25 03:51 +03:00)
+## STATUS: ISOLATED VERIFIED (2026-11-25 03:51 +03:00) — main-profile acceptance pending
 
 Hygiene: 106 runtime/settings/chat-store checks pass, including the low-level active-response guard, unchanged streaming state, ON/OFF routing and exactly-once fallback. Full extension suite remains 597 passed, 1 skipped, 0 failed; root lint exits 0.
 Functional run: current isolated build 19 ON consecutive steering and OFF queue/dequeue paths completed without `Internal error occurred.`; build 17 genuine running→idle batch also delivered without the generic error. Evidence: `testcases/reports/2026-11-25_steer_avatar_order.md`, `testcases/reports/2026-11-25_multiline_queue_steer.md`, `testcases/reports/2026-11-25_queue_batch_build_17.md`, and `testcases/reports/2026-11-25_reentrant_send_contract.md`.

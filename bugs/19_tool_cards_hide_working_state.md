@@ -1,6 +1,6 @@
 # Bug 19 — Tool cards leave no visible working state
 
-**Status:** ✅ DONE — current isolated build 19 passes active tool, completion and replay observations
+**Status:** 🔧 current isolated build 19 passes active tool, completion and replay; original main-profile path pending
 **Version/build:** KIMI KRINIK 1.0.0 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 16:02 +03:00, recurring owner observation during active agent turns
 **Severity:** S2
 **Fixing:** after the immediate duplicate-steer fix in `bugs/20`; verify in isolated VS Code
@@ -37,7 +37,7 @@ Current build 19 shows «Работаю…» after the completed ReadFile card w
 
 The current lifecycle already preserves global streaming after ToolResult and passes it to the last assistant message. The original defect did not reproduce on the current build; no additional product change was needed.
 
-## ✅ STATUS: DONE (2026-11-25 03:11 +03:00)
+## STATUS: ISOLATED VERIFIED (2026-11-25 03:11 +03:00) — main-profile acceptance pending
 
 Hygiene: existing WorkingIndicator and chat lifecycle checks remain green in the full extension suite (597 passed, 1 skipped, 0 failed); root lint exits 0.
 Functional run: fresh isolated build 19, scripted ToolCall → ToolResult → held next step. «Работаю…» was present with visible bounds top 169.58 / bottom 194.08 in a 522 px viewport and WebP `.tmp/k5-vscode/53-k19-tool-working.webp`. After release `statusText=null`; after real history replay `statusText=null` with the same tool card/response present. Report: `testcases/reports/2026-11-25_tool_working_build_19.md`.

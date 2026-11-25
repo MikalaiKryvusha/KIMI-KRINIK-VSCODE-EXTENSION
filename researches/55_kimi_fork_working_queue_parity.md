@@ -1,7 +1,7 @@
 # Research 55 — KIMI FORK working indicator and queue steering parity
 
 > **Created:** 2026-11-24
-> **Parent:** `bugs/19_DONE_tool_cards_hide_working_state.md`; `bugs/20_queue_steer_duplicate_submission.md`; `researches/54_chat_pipeline_reliability.md`
+> **Parent:** `bugs/19_tool_cards_hide_working_state.md`; `bugs/20_queue_steer_duplicate_submission.md`; `researches/54_chat_pipeline_reliability.md`
 > **Status:** reference inventory complete; implementation and functional reproduction not complete
 > **Outbound:** targeted fixes in `ChatArea`/working-state flow and `QueuedMessagesPanel`; no wholesale component port
 > **Verification:** [TESTED: 2026-11-24 · installed KIMI FORK manifest and local reference source read; no functional comparison run yet]
