@@ -23,27 +23,25 @@
 
 ---
 
-### 2026-11-25 05:09 +03:00 — bugs/156 multiplexer deployed and field report delivered
-- `kimi-stop.mjs` is deployed. Source/dist selftests, M1–M5, fresh build (196 blocks/846 modules), s14 multiplexer assertions, deployed manifest (114 files + 38 artifacts) and root lint are green; `update-verify` passed.
-- `npm run test:core` still has unrelated S9 #146 and two context-window failures. No live owner Stop continuation ran, so bug 156 remains 🔧 rather than DONE.
-- Field report delivered: https://github.com/MikalaiKryvusha/KAIF/issues/205.
+### 2026-11-25 10:50 +03:00 — CLOSING to full-work build 14 and a fresh chat
+- [OWNER] «давай билд 14 установим, и этот чат закроем с передачей дел в новый чат… я буду знать, что Контроль работает» · 2026-11-25 10:48 +03:00 (чат). This chat fixed and packaged the Context Window Control delivery defect, produced full-work build 14, verified it twice in isolated VS Code, and filed the test-debt false positive as KAIF #206. Main-profile build-14 installation is the remaining action before farewell.
+- [OWNER] «ты только что писал ответ, а затем он исчез - похоже на баг», «вероятно, стиринг сообщения пользователя могут как-то "ломать" ответы КИМИ в чате» · 2026-11-25 10:48 +03:00 (чат). Recorded in `bugs/11`: assistant-entry stability after steering is now an explicit acceptance requirement; cause is unproven. Next chat must compare DOM removals with steer/turn/replay events before editing the store.
+- KNOWLEDGE: the fixed control delivery path is `session.steer()` in `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`; adapter-boundary lesson is `EXPERIENCE.md` EXP-0015; the new steering symptom is in `bugs/11`; full run evidence is `testcases/reports/2026-11-25_context_window_steer_delivery.md`; old completed 04:27–05:09 entries moved verbatim to `PROJECT_HISTORY.md`.
 
-### 2026-11-25 04:45 +03:00 — B12 complete: planName and side panel/editor backgrounds
-- Managed userLevelName reaches `usage.planName` through the public auth facade; optional user-info failure does not hide real quota failures.
-- Real side panel and New Tab both compute `rgb(25, 26, 27)`; editor containers are transparent over the same body background, so no sideBar/editor mismatch was reproduced. WebP read.
-- B5–B8/B11 and B12 are complete; B9/B10 remain owner decisions. Report: `testcases/reports/2026-11-25_b12_backgrounds.md`.
+### 2026-11-25 10:25 +03:00 — owner ordered full-work build 14; packaged and live-verified
+- [OWNER] «Собери билд 14 СО ВСЕМИ НАРАБОТКАМИ ЗА ВЧЕРА и С СЕГОДНЯШНИМ ФИКСОМ КОНТРОЛЯ!!!!» · 2026-11-25 10:18 +03:00 (чат). Build 14 contains all current main-tree work through post-build-19 plus the bug-28 `session.steer()` fix; it supersedes minimal build 13 as the recommended artifact.
+- Six-target VSIX static audit, 598 passed / 1 skipped, typecheck and root lint are green. Fresh isolated VS Code installed manifest 14 and delivered the 80% soft-closure prompt at 84% through the real active-turn provider path, with no controller errors. Artifact: `apps/vscode/artifacts/vsix/kimi-code-win32-x64-build14.vsix`; SHA-256 `a0813b1072b2e90e671438675877ad0a21d40769b7af8bfef3a6f00ca4c8e3cc`. Report updated: `testcases/reports/2026-11-25_context_window_steer_delivery.md`.
+- The main profile is still on build 12 and has not been modified. Next acceptance is build 14 installation, a full VS Code restart and a fresh chat; `bugs/28` stays 🔧 until that accumulated-profile observation.
+- Follow-up runs at 10:32–10:38 repeated extension 598 / compaction 123 / OAuth 44 and the build-14 functional path, all green. `test-after-code` still falsely reported 162 files as not run because its direct-interpreter heuristic does not recognize Vitest; `bugs/KAIF/05` / upstream #206 filed with `cleared: []` reproduction. At 10:46 the hook's own waiver recorded that direct standalone execution is invalid for these TS/Vitest modules and historical scratch harnesses; `test debt: none`. No manual state edit.
 
-### 2026-11-25 04:39 +03:00 — managed plan names reach the usage tooltip
-- `KimiAuthFacade` now exposes the toolkit's managed user-info path with the same runtime auth resolution as quota. The extension fills `planName` from `userLevelName`; user-info failure is optional and does not hide quota data or its real errors.
-- Affected handler tests, SDK/extension typechecks and full suite 597 passed, 1 skipped, 0 failed; root lint 0. B12 editor-background verification remains separate; B9/B10 stay with the owner.
+### 2026-11-25 10:07 +03:00 — bug 28 fixed on isolated build 13; main profile still on build 12
+- [OWNER] «Я нашел тебя утром с на 100% щзаполненным окном контекста чата.... Не сработала фича контроля. Баг в core функционале.» · 2026-11-25 09:28 +03:00 (чат). The real wire had no control prompt: build 12 called the skills-only API with an empty skill list, which the engine rejects. KAIF was intentionally dormant under built-in ownership, not a second active guard.
+- The runtime now uses public `session.steer()`. Both regressions were red before and green after; main has 598 passed / 1 skipped, typecheck and lint green. Packaged builds 20 and 13 each delivered the 80% soft-closure prompt at 84% through a real active-turn provider request in isolated VS Code. Report: `testcases/reports/2026-11-25_context_window_steer_delivery.md`.
+- Owner-requested minimal artifact: `apps/vscode/artifacts/vsix/kimi-code-win32-x64-build13.vsix` = build 12 + only this fix and build number 13; SHA-256 `7610a4c6d2251a272046f3cb4036ed58a4e5e15fa401a0e2c9a428a5e67abbb1`. It is not installed on the main profile; the current loaded build 12 remains unprotected until a full VS Code restart with the fixed VSIX.
+- Build-13 caveats: its inherited build-12 `usage-status-bar` assertion remains red (587 passed, 1 skipped, 1 failed), and its nested-worktree lint stops only at `jsPlugins` ordering after clean oxlint. No unrelated source, test or baseline was changed. `bugs/28` stays 🔧 pending accumulated main-profile acceptance.
 
-### 2026-11-25 04:30 +03:00 — nonblocking subagent boundary confirmed
-- Official docs and local contracts prove `Agent(run_in_background=true)` returns a task ID immediately, supports concurrent background subagents and delivers results automatically. `AgentSwarm` runs concurrently but waits for its aggregated report, so it is parallel-but-blocking, not nonblocking.
-- Nested tasks must settle, task-management tools are required, and completion arrives as a notification/steered turn. No live subagent was launched because the project forbids unauthorized launches. Evidence: `researches/56_nonblocking_subagents.md`.
-
-### 2026-11-25 04:27 +03:00 — root AGENTS.md translated to English without rule changes
-- Translated all project principles, maps, verification, testing, workflow and review contracts into English; no Han-script prose remains. Condensed wording only to satisfy the existing size guard, without raising the limit.
-- `pnpm lint` exits 0: root `AGENTS.md` is 22986/23200 bytes and all 174 references resolve. Full extension suite remains 597 passed, 1 skipped, 0 failed.
+### 2026-11-25 05:15 +03:00 — held first prompt also stable on build 19
+- A delayed first prompt produced no assistant removals and final `K23 multiline response` remained visible; `.tmp/k5-vscode/60-k25-delayed-first.webp` was read. Original main-profile variant remains the only unobserved path, so `bugs/25` stays 🔧.
 
 ### 2026-11-25 04:18 +03:00 — full isolated media matrix passes
 - ON image-only delivered one PNG with zero text; OFF video-only queued and delivered one MP4 with zero text. Thumbnail/viewer and replayed video use identical URIs. `bugs/13` and `bugs/14` now have image/video, text+media and media-only evidence.
@@ -113,13 +111,12 @@
 - 2026-11-24 23:50 +03:00 — [OWNER] «сборка 12 вроде работает стабильнее по чату», «тебе быстро мои стиринг сообщения доходят» (чат). Recorded as positive main-profile steering evidence in `bugs/11` and `bugs/22`; the remaining acceptance matrix stays open. The owner also reported a first-prompt chat-feed flash and disappearing assistant message, filed as `bugs/25_first_prompt_assistant_message_flicker.md`.
 - Owner ordered all non-KAIF skills removed. `.agents/skills/` and `skills/use-kimi-code/` are deleted; stale AGENTS/PR/docs workflow references were cleaned on 2026-11-25 and `pnpm lint` now exits 0. Generic user-level `.agents/skills` documentation remains because the engine supports those directories.
 - NEXT FIRST: main-profile acceptance of the current isolated fixes; the separate `usage-status-bar` selector remains the last known full-suite failure. Do not start the later ideas before this integrity cut.
-- ⚠️ Force-closed 2026-11-24 23:39 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first /skill:end-chat-soft pays this debt.
 - Standing falsehood: apparent build 4–6 live failures were invalid because the isolated process stayed at PID 44644 → corrected in `bugs/20_queue_steer_duplicate_submission.md` and the fresh-process report. No uncorrected artifact is known.
 - KNOWLEDGE: the final build and acceptance limits are in this file and `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`; the CDP process lesson is `EXPERIENCE.md` EXP-0011; later owner-approved work is `ideas/02_control_panel_skill_picker.md` and `ideas/03_extension_general_settings.md`; root `AGENTS.md` English translation and nonblocking-subagent research remain recorded below.
 
 ## Where we are now
 
-The extension builds and typecheck is green; the latest full extension run has 597 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
+The extension builds and typecheck is green; the latest full extension run has 598 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
 acceptance live in the KAIF origin repository: `D:/work/ai_sandbox/KAIF/plans/147_EPIC_kimi_krinik_1_0_0.md` and `plans/148`–`154`.
 Routine pushes of this branch go under the standing authorization of `AGENT_GUIDE.md` → Git workflow; a release, a rename and any
 external publication wait for the owner's `AUTH:`.
@@ -135,7 +132,7 @@ external publication wait for the owner's `AUTH:`.
 | K6 README | 🔧 started | the new pink robot is in EN/RU/ZH README; feature tables still contain 🚧 rows that must close before release |
 
 Verification commands (root `AGENTS.md`): `pnpm lint` · `pnpm --filter kimi-code-kaif run typecheck` ·
-`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-25 02:36 +03:00, Windows): 597 passed, 1 skipped, 0 failures; root lint, typecheck and build-19 package/static audit green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine compaction file is 123/123 on Windows; `bugs/05` is DONE and `bugs/04` awaits only its unrun Linux row. Context-window evidence is in `testcases/reports/2026-11-24_kaif_kimi_context_alive.md`; experience, attribution, testrun and KAIF budget checks are green.
+`pnpm exec vitest run --reporter=agent apps/vscode/test`. Last full run (2026-11-25 10:20 +03:00, Windows): 598 passed, 1 skipped, 0 failures; root lint, typecheck and build-14 package/static audit green. K2.6 has 2/2 mid-flight scenarios and agent-core typecheck green. The full engine compaction file is 123/123 on Windows; `bugs/05` is DONE and `bugs/04` awaits only its unrun Linux row. Current context-window evidence is in `testcases/reports/2026-11-25_context_window_steer_delivery.md`; experience, attribution, testrun and KAIF budget checks are green.
 A red test here is a signal again — there is no accepted baseline of failures.
 
 ## 🤖 Autonomous backlog pool (no human / no special hardware needed)
@@ -150,7 +147,7 @@ A red test here is a signal again — there is no accepted baseline of failures.
 
 ## Where to continue next session
 
-CURRENT: build 12 is installed on the main-profile disk and byte-identical to its final dist; builds 17–19 are isolated-only. Fully restart VS Code, read `v1.0.0 (12)`, then repeat ON/OFF queue, duplicate, composer, media and hook-output checks before marking `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` or `bugs/24` DONE. `bugs/17` is DONE after the owner's three-language listening verdict. The full extension suite and root lint are green; `bugs/19` two-client replay, original first-prompt `bugs/25`, broader lifecycle matrix, sticky last message and release/publication remain later work. No release/publication without separate owner `AUTH:`.
+CURRENT: start with `/skill:resume` in the fresh chat on main-profile build 14. First confirm the loaded build and Context Window Control ON, then reproduce the owner-reported assistant-response disappearance during steering in `bugs/11` with DOM and turn/replay evidence. Verify a real threshold closure on the accumulated profile before marking `bugs/28` DONE. After those owner-flagged paths, resume ON/OFF queue, duplicate, composer, media and hook-output acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24`. Builds 17–20 remain isolated-only. Main source has 598 passed / 1 skipped and root lint green; `bugs/19` two-client replay, original first-prompt `bugs/25`, broader lifecycle matrix, sticky last message and release/publication remain later work. No release/publication without separate owner `AUTH:`.
 
 Standing falsehood: the claims that builds 4–6 had failed live were false because the old isolated process never restarted → corrected in `bugs/20_queue_steer_duplicate_submission.md` and the fresh-process result in `testcases/reports/2026-11-24_chat_lifecycle_audio_build_12.md`.
 
@@ -175,6 +172,7 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - ✅ `ideas/03_extension_general_settings.md` — owner approved an extension-localized General Settings page with no duplicate owners; Context Window Control and thresholds move there from Control Panel. Planned for the next development cut, not started during closure.
 ## Open bugs
 
+- 🔧 `bugs/28_context_window_control_empty_skills_rejected.md` — root cause fixed and real active-turn control observed on isolated builds 20, 13 and full-work 14; main-profile build-14 acceptance pending.
 - 🔧 `bugs/19_tool_cards_hide_working_state.md` — active/completion/replay pass on isolated build 19; original main-profile path pending.
 - 🔧 `bugs/18_reentrant_prompt_internal_error.md` — ON/OFF/fallback contracts and isolated paths pass; original main-profile path pending.
 - 🔧 `bugs/16_steer_avatar_precedes_user_bubble.md` — immediate/consecutive/replay order passes on isolated build 19; original main-profile path pending.
@@ -185,13 +183,14 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔧 `bugs/22_first_send_stuck_in_steering_queue.md` — exactly-once/result contracts implemented; main-profile build-12 acceptance pending.
 - 🔧 `bugs/24_glass_preview_silent.md` — real packaged MP3 playback passed in isolation; main-profile build-12 acceptance pending.
 - 🔧 `bugs/20_queue_steer_duplicate_submission.md` — whole-batch delivery verified on fresh isolated build 17; main-profile acceptance pending.
-- 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — steering bubbles wait for acknowledgement and some sends are lost at a state transition.
+- 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — steering bubbles wait for acknowledgement and some sends are lost at a state transition; owner now also reports an assistant answer disappearing after steering on 2026-11-25. Reproduce first in the fresh build-14 chat.
 - 🔧 `bugs/12_steer_composer_restores_previous_text.md` — stale/latest composer contracts fixed; main-profile build-12 acceptance pending.
 - 🔧 `bugs/13_steer_attachments_and_thumbnails.md` — isolated build-19 full image/video and media-only delivery/viewer/replay pass; main-profile acceptance pending.
 - 🔧 `bugs/14_steer_queue_not_added.md` — isolated text+image/video and media-only immediate queue/dequeue/replay passes; main-profile acceptance pending.
 - 🔧 `bugs/15_hook_results_visible_in_chat.md` — replay hook rendering fixed; main-profile build-12 confirmation pending.
 - 🔧 `bugs/04_frozen_prompt_windows_path.md` — Windows harness fixed and full file 123/123; Linux CI row remains unrun (WSL not installed, Docker unavailable).
 - 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.
+- 🔧 `bugs/KAIF/05` / upstream #206 — Vitest runs pass but the default test-after-code heuristic returns `cleared: []` and falsely preserves debt; evidence and upstream report filed. The hook's documented waiver now records why direct standalone execution is invalid here; status is `test debt: none`, with no manual state edit.
 - 🔴 `bugs/152` (KAIF origin) — the extension can stay on «Starting Kimi Code…»; not reproduced; check B10 when it recurs.
 - 🟠 `bugs/151` (KAIF origin) — follow-up steer race; store-level fixes in place, live acceptance left.
 

@@ -79,7 +79,14 @@ afterEach(async () => {
   }
 });
 
-async function createRuntimeRig(extraAliases: readonly string[] = []): Promise<RuntimeRig> {
+interface RuntimeRigOptions {
+  readonly contextWindowControl?: boolean;
+}
+
+async function createRuntimeRig(
+  extraAliases: readonly string[] = [],
+  options: RuntimeRigOptions = {},
+): Promise<RuntimeRig> {
   const rootDir = await mkdtemp(join(tmpdir(), "kimi-vscode-harness-"));
   const homeDir = join(rootDir, "home");
   const workDir = join(rootDir, "workspace");
@@ -93,7 +100,7 @@ async function createRuntimeRig(extraAliases: readonly string[] = []): Promise<R
     await provider.close();
   };
 
-  await writeProviderConfig(homeDir, `${provider.baseUrl}/v1`, extraAliases);
+  await writeProviderConfig(homeDir, `${provider.baseUrl}/v1`, extraAliases, options.contextWindowControl === true);
   const version = await readExtensionVersion();
   const broadcasts: BroadcastRecord[] = [];
   const logs: LogRecord[] = [];
@@ -107,6 +114,14 @@ async function createRuntimeRig(extraAliases: readonly string[] = []): Promise<R
     log: (message, error) => {
       logs.push({ message, error });
     },
+    ...(options.contextWindowControl === true
+      ? {
+        contextWindowSettings: () => ({
+          enabled: true,
+          thresholds: { warnPct: 70, cutPct: 75, closePct: 80, forcePct: 90 },
+        }),
+      }
+      : {}),
   });
 
   cleanups.push(async () => {
@@ -199,6 +214,7 @@ async function writeProviderConfig(
   homeDir: string,
   baseUrl: string,
   extraAliases: readonly string[] = [],
+  disableAutoCompact = false,
 ): Promise<void> {
   const extra = extraAliases
     .map(
@@ -227,6 +243,7 @@ model = "mock-model"
 max_context_size = 128000
 ${extra}
 [loop_control]
+${disableAutoCompact ? "auto_compact = false" : ""}
 # The v1 engine reads max_retries_per_step; v2 renamed it to max_attempts_per_step.
 max_retries_per_step = 1
 max_attempts_per_step = 1
@@ -424,6 +441,21 @@ describe("VS Code Kimi harness integration (shares one in-process SDK home)", ()
     expect(rig.provider.requests[0]?.headers["user-agent"]).toBe(
       `kimi-code-vscode/${rig.version}`,
     );
+  });
+
+  it("delivers Context Window Control through the real SDK without skills", async () => {
+    const rig = await createRuntimeRig([], { contextWindowControl: true });
+    routeSuccessfulPrompt(rig.provider);
+    const session = await openRuntimeSession(rig);
+    await session.session.importContext("context ".repeat(30_000), "file 'large-context.md'");
+
+    const completion = session.prompt("continue");
+    await vi.waitFor(() => {
+      expect(rig.provider.requests.some((request) => request.bodyText.includes("<system>KIMI KRINIK context:"))).toBe(true);
+    }, { timeout: 10_000, interval: 50 });
+
+    await expect(completion).resolves.toEqual({ status: "finished" });
+    expect(rig.logs.filter((entry) => entry.message === "Context Window Control observation failed")).toEqual([]);
   });
 
   it("reloads sequential config writes from either harness sharing one home", async () => {

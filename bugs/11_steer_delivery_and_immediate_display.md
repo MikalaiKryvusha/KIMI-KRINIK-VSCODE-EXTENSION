@@ -45,6 +45,14 @@ Grouped immediate display and boundary delivery because they share one steering 
 
 2026-11-24 23:50 +03:00 — [OWNER] «сборка 12 вроде работает стабильнее по чату», «тебе быстро мои стиринг сообщения доходят» (чат). This is positive main-profile evidence for steering delivery, not yet proof of the complete running→idle exactly-once acceptance criterion.
 
+## Owner observation — assistant response disappeared after steering
+
+2026-11-25 10:48 +03:00 — [OWNER] «ты только что писал ответ, а затем он исчез - похоже на баг», «вероятно, стиринг сообщения пользователя могут как-то "ломать" ответы КИМИ в чате» (чат).
+
+This is a new related symptom on the owner's accumulated build-12 path: a visible assistant answer disappeared after a user steering message. The cause is not proven and must not be inferred from the steering timing alone. The acceptance boundary now explicitly includes assistant entries remaining present after steering, completion and reload, in addition to the user's own bubbles.
+
+Next-session reproduction: hold an assistant response, send a user steer, and compare a DOM MutationObserver trace with `SteerInput`, `TurnBegin`, history replay and completion events. Record whether the assistant container is removed, replaced, duplicated, or merely scrolled out of view. Link the exact event/state transition before editing the shared chat store.
+
 ## Links
 
 - `testcases/TC_K5_live_acceptance.md` C09 and C19

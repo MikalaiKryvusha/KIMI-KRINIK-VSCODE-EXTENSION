@@ -108,7 +108,7 @@ export class SessionRuntime {
       this.contextWindowController = new ContextWindowController(
         options.contextWindowControl,
         async (line) => {
-          if (!this.closed) await this.session.promptWithSkills(line, [], { steerIfActive: true });
+          if (!this.closed) await this.session.steer(line);
         },
         (message, error) => this.log(message, error),
       );

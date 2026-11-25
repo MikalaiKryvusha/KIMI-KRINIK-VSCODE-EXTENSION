@@ -27,6 +27,28 @@
 
 ## Entries (newest first)
 
+### 2026-11-25 05:09 +03:00 — bugs/156 multiplexer deployed and field report delivered
+- `kimi-stop.mjs` is deployed. Source/dist selftests, M1–M5, fresh build (196 blocks/846 modules), s14 multiplexer assertions, deployed manifest (114 files + 38 artifacts) and root lint are green; `update-verify` passed.
+- `npm run test:core` still has unrelated S9 #146 and two context-window failures. No live owner Stop continuation ran, so bug 156 remains 🔧 rather than DONE.
+- Field report delivered: https://github.com/MikalaiKryvusha/KAIF/issues/205.
+
+### 2026-11-25 04:45 +03:00 — B12 complete: planName and side panel/editor backgrounds
+- Managed userLevelName reaches `usage.planName` through the public auth facade; optional user-info failure does not hide real quota failures.
+- Real side panel and New Tab both compute `rgb(25, 26, 27)`; editor containers are transparent over the same body background, so no sideBar/editor mismatch was reproduced. WebP read.
+- B5–B8/B11 and B12 are complete; B9/B10 remain owner decisions. Report: `testcases/reports/2026-11-25_b12_backgrounds.md`.
+
+### 2026-11-25 04:39 +03:00 — managed plan names reach the usage tooltip
+- `KimiAuthFacade` now exposes the toolkit's managed user-info path with the same runtime auth resolution as quota. The extension fills `planName` from `userLevelName`; user-info failure is optional and does not hide quota data or its real errors.
+- Affected handler tests, SDK/extension typechecks and full suite 597 passed, 1 skipped, 0 failed; root lint 0. B12 editor-background verification remains separate; B9/B10 stay with the owner.
+
+### 2026-11-25 04:30 +03:00 — nonblocking subagent boundary confirmed
+- Official docs and local contracts prove `Agent(run_in_background=true)` returns a task ID immediately, supports concurrent background subagents and delivers results automatically. `AgentSwarm` runs concurrently but waits for its aggregated report, so it is parallel-but-blocking, not nonblocking.
+- Nested tasks must settle, task-management tools are required, and completion arrives as a notification/steered turn. No live subagent was launched because the project forbids unauthorized launches. Evidence: `researches/56_nonblocking_subagents.md`.
+
+### 2026-11-25 04:27 +03:00 — root AGENTS.md translated to English without rule changes
+- Translated all project principles, maps, verification, testing, workflow and review contracts into English; no Han-script prose remains. Condensed wording only to satisfy the existing size guard, without raising the limit.
+- `pnpm lint` exits 0: root `AGENTS.md` is 22986/23200 bytes and all 174 references resolve. Full extension suite remains 597 passed, 1 skipped, 0 failed.
+
 ### 2026-11-24 17:45 +03:00 — previous handover record
 ⚠️ Force-closed 2026-11-24 17:45 +03:00: ceremonies skipped (judge pass, bonsai trim, README, showcase linters) — the first /skill:end-chat-soft pays this debt. The follow-up test-after-code waiver was also refused by the active closure hook, so the final selector fix and its real-product verification were NOT run in this chat; do not call them done.
 

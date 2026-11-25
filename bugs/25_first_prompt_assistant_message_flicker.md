@@ -27,6 +27,8 @@ The symptom is owner-observed once; deterministic reproduction and frame-level e
 
 Session replay on build 18 did reproduce the visual class: one frame had `assistants=0` and no `K25 response`, followed by `assistants=1` about 21 ms later. `loadSession` published `messages: []` and then issued a separate store update for every replay event. This confirms a replay/loading blank frame, not the original first-prompt route.
 
+2026-11-25 05:15 +03:00 — build-19 held first prompt also completed without assistant removal: the observer's removal list is empty, and final `K23 multiline response` remains visible. WebP `.tmp/k5-vscode/60-k25-delayed-first.webp` was opened and read.
+
 ## Root cause / Hypotheses
 
 1. Not reproduced on isolated instant first prompt: optimistic assistant entry remained stable through durable reconciliation.

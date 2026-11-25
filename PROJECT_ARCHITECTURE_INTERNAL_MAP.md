@@ -46,7 +46,7 @@
    three starts, manual `/compact` stays. A live flip to OFF also aborts the active automatic operation through the
    `loopControl` section subscription before its provider response, without cancelling an active manual compaction.
 6. **Context Window Control.** `agent.status.updated` → `ContextWindowController` reads the current VS Code thresholds and engine
-   loop config → one highest newly reached stage → `session.promptWithSkills(..., steerIfActive: true)`. A compaction re-arms the
+   loop config → one highest newly reached stage → `session.steer(...)`, which joins a running turn or starts a fresh idle turn without requiring a skill. A compaction re-arms the
    stages. With a valid KAIF marker, `contextWindow.owner = "kimi-krinik"` makes the KAIF context hook dormant; removing the owner
    hands the contour back. The KAIF hook is also dormant while stock Auto Compact is ON.
 7. **Permission defaults.** `PermissionModeButton` → `modes.handler` changes the live session and persists `defaultPermissionMode`

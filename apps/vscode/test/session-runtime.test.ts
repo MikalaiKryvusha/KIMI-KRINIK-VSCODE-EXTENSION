@@ -920,16 +920,15 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
 });
 
 describe("Context Window Control runtime delivery", () => {
-  it("turns an SDK status into one self-contained steer-capable prompt", async () => {
+  it("turns an SDK status into one self-contained steer without requiring a skill", async () => {
     const sdk = createFakeSession();
-    const promptWithSkills = vi.fn(async (_line: string, _skills: readonly unknown[], _options: { steerIfActive?: boolean }) => ({}));
-    Object.assign(sdk.session, { promptWithSkills });
+    const log = vi.fn();
     const runtime = new SessionRuntime({
       session: sdk.session,
       legacyApproval: DEFAULT_LEGACY_APPROVAL,
       broadcast: vi.fn(),
       captureBaseline: vi.fn(),
-      log: vi.fn(),
+      log,
       contextWindowControl: async () => ({
         enabled: true,
         autoCompact: false,
@@ -945,12 +944,12 @@ describe("Context Window Control runtime delivery", () => {
       maxContextTokens: 1_048_576,
     });
 
-    await vi.waitFor(() => expect(promptWithSkills).toHaveBeenCalledTimes(1));
-    const [line, skills, options] = promptWithSkills.mock.calls[0]!;
+    await vi.waitFor(() => expect(sdk.steerInputs).toHaveLength(1));
+    const line = sdk.steerInputs[0];
+    expect(line).toBeTypeOf("string");
     expect(line).toContain("<system>KIMI KRINIK context:");
     expect(line).not.toContain("KAIF");
-    expect(skills).toEqual([]);
-    expect(options).toEqual({ steerIfActive: true });
+    expect(log).not.toHaveBeenCalled();
     await runtime.close();
   });
 });
