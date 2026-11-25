@@ -2,9 +2,9 @@
 
 > **Created:** 2026-11-24
 > **Parent:** owner's sticky-message request and `researches/54_chat_pipeline_reliability.md`
-> **Status:** revised scroll-preservation and max-height/fade animation implemented; full extension 643/1 green; build 33 installed, real accumulated acceptance pending
+> **Status:** revised scroll-preservation, animation and the one-line no-fade/no-collapse boundary implemented; full extension 647/1 green; build 38 installed, real accumulated acceptance pending
 > **Outbound:** final main-profile acceptance and release
-> **Verification:** [TESTED: 2026-11-26 00:15 +03:00 · component boundaries and build-32 packaged UI smoke — `testcases/reports/2026-11-26_build_33_release_polish.md`; build-33 sticky observation pending]
+> **Verification:** [TESTED: 2026-11-26 02:52 +03:00 · isolated build-38 one-line horizontal-overflow and multiline expand/wheel/collapse paths — `testcases/reports/2026-11-26_build_38_sticky_single_line.md`; accumulated main profile pending]
 
 ## 1. Goal vector
 
@@ -63,6 +63,7 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 - [x] Raise the collapsed summary and center it optically within the sticky bubble; verify with computed geometry and a WebP screenshot.
 - [x] Hide the sticky prompt at the top of the conversation and suppress its initial-render flash.
 - [x] Preserve expanded sticky state during user wheel/touch scrolling; clear it only on manual collapse or active-prompt replacement, animate height downward/upward with text fade, and add small top/side padding around the bubble.
+- [x] Keep one-line prompts free of expansion controls, fade and collapsed ARIA state, including horizontal truncation; retain the multiline/media path.
 
 ## 5. Verification by observation
 

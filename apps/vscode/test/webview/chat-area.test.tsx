@@ -145,6 +145,28 @@ describe("sticky user prompt", () => {
     expect(screen.queryByRole("button", { name: /Expand/ })).toBeNull();
   });
 
+  it("keeps a horizontally truncated single-line prompt free of collapse state and fade", () => {
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(500);
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(100);
+    const singleLine = "one line that exceeds the available sticky width";
+    useChatStore.setState({
+      messages: [
+        { id: "user-one-line", role: "user", content: singleLine, timestamp: 1, turnIndex: 0 },
+        { id: "assistant-one-line", role: "assistant", content: "answer", timestamp: 2, steps: [], turnIndex: 0 },
+      ],
+      isStreaming: false,
+    });
+    render(<ChatArea />);
+
+    const sticky = screen.getByTestId("sticky-user-prompt");
+    expect(sticky.textContent).toContain(singleLine);
+    expect(sticky.querySelector("button")?.getAttribute("aria-expanded")).toBeNull();
+    expect(sticky.querySelector("button")?.getAttribute("aria-controls")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Expand/ })).toBeNull();
+    expect(screen.queryByTestId("sticky-prompt-expansion")).toBeNull();
+    expect(screen.queryByTestId("sticky-prompt-fade")).toBeNull();
+  });
+
   it("shows a media-only summary without inventing prompt text", () => {
     const image = "data:image/png;base64,AAAA";
     useChatStore.setState({

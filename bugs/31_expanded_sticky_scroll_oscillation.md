@@ -1,10 +1,10 @@
 # Bug 31 — Expanded sticky prompt oscillates during scrolling
 
-**Status:** 🔧 owner revised the collapse contract on 2026-11-25 23:18 +03:00; new preservation/animation refinement in progress
+**Status:** 🔧 revised scroll/animation contract and one-line boundary verified on isolated build 38; accumulated main-profile acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:12–23:18 +03:00, owner visual review
 **Severity:** S2
 **Fixing:** this session, with the revised sticky behavior and animation
-**Fix accepted when (observable):** an expanded sticky prompt remains expanded during wheel/touch scrolling and collapses only manually or when another prompt becomes sticky; expansion no longer feeds repeated geometry changes back into active-prompt selection; height and text fade animate in both directions.
+**Fix accepted when (observable):** an expanded sticky prompt remains expanded during wheel/touch scrolling and collapses only manually or when another prompt becomes sticky; expansion no longer feeds repeated geometry changes back into active-prompt selection; height and text fade animate in both directions. A one-line prompt has no fade, expand/collapse control or collapsed ARIA state, including under horizontal truncation.
 
 ## Symptom
 
@@ -25,7 +25,15 @@ Component evidence for the revised contract: the updated sticky suite is 11/11, 
 
 [OWNER] «бак со стики сообщением, что оно дает фейд и свернутое состояние даже только при одной строке. При одной не надо» · 2026-11-26 01:45 +03:00 (chat)
 
-A prompt that already fits on one line must render in full without collapse state, an expand/collapse control or fade. The two-line faded preview applies only to a prompt that actually overflows one line. This is a new acceptance boundary, not yet implemented or verified.
+A prompt that already contains only one line must not get collapse state, an expand/collapse control or fade, including when its text is horizontally truncated. The two-line faded preview applies only to multiline/media prompts.
+
+Implemented in build 38: the horizontal `truncated` state, its observer and its effect on `canExpand` were removed. Expansion is owned by newline/media presence; a non-expandable button no longer emits `aria-expanded` or `aria-controls`.
+
+Red first: forcing `scrollWidth=500` and `clientWidth=100` on a one-line prompt failed before the fix (`aria-expanded="false"` and expansion/fade existed) and passed afterward. Existing multiline/media checks stayed green. Full extension: 647 passed / 1 skipped.
+
+Functional run: on isolated build 38, the active one-line prompt had real geometry `scrollWidth=498`, `clientWidth=149`, no expansion/fade/chevron and no collapsed ARIA. The saved multiline control kept Expand/fade, expanded `32→165px`, remained expanded through wheel and collapsed manually to `32px`. WebP `.tmp/k5-vscode/106-build38-one-line-sticky.webp` was opened and read. Report: `testcases/reports/2026-11-26_build_38_sticky_single_line.md`.
+
+REAL WORLD: accumulated — the owner's main profile has build 38 installed but not reloaded/observed; data and machine — his Windows VS Code; path — Second Side Bar. The isolated real paths pass, but this bug is not DONE.
 
 ## Repro
 

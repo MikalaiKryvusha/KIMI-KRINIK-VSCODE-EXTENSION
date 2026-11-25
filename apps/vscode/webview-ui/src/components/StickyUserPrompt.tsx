@@ -114,26 +114,11 @@ interface StickyUserPromptProps {
 export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserPromptProps) {
   const t = useT();
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
-  const summaryRef = useRef<HTMLSpanElement>(null);
   const fullRef = useRef<HTMLDivElement>(null);
-  const [truncated, setTruncated] = useState(false);
   const [fullHeight, setFullHeight] = useState(COLLAPSED_STICKY_PREVIEW_HEIGHT);
   const text = message ? Content.getText(message.content) : "";
   const images = message ? Content.getImages(message.content) : [];
   const videos = message ? Content.getVideos(message.content) : [];
-
-  useLayoutEffect(() => {
-    const summary = summaryRef.current;
-    if (!summary) {
-      setTruncated(false);
-      return;
-    }
-    const update = () => setTruncated(summary.scrollWidth > summary.clientWidth);
-    update();
-    const resizeObserver = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update);
-    resizeObserver?.observe(summary);
-    return () => resizeObserver?.disconnect();
-  }, [text, expanded]);
 
   useLayoutEffect(() => {
     const full = fullRef.current;
@@ -147,7 +132,7 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
 
   if (!message) return null;
 
-  const canExpand = text.includes("\n") || images.length > 0 || videos.length > 0 || truncated;
+  const canExpand = text.includes("\n") || images.length > 0 || videos.length > 0;
   const action = expanded ? t("sticky.collapse") : t("sticky.expand");
 
   return (
@@ -158,13 +143,13 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
           onClick={onToggle}
           disabled={!expanded && !canExpand}
           aria-label={expanded || canExpand ? action : undefined}
-          aria-expanded={expanded}
-          aria-controls="sticky-prompt-full"
+          aria-expanded={expanded || canExpand ? expanded : undefined}
+          aria-controls={expanded || canExpand ? "sticky-prompt-full" : undefined}
           className={expanded || canExpand
             ? "absolute right-2 top-1.5 z-10 flex size-5 items-center justify-center rounded-md text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
             : "flex w-full min-w-0 items-center gap-3 text-left"}
         >
-          {!expanded && <span ref={summaryRef} className={canExpand ? "sr-only" : "min-w-0 flex-1 truncate text-xs leading-none"}>{text || t("queue.mediaOnly")}</span>}
+          {!expanded && <span className={canExpand ? "sr-only" : "min-w-0 flex-1 truncate text-xs leading-none"}>{text || t("queue.mediaOnly")}</span>}
           {(expanded || canExpand) && <IconChevronDown className={`ml-auto size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`} />}
         </button>
         {(canExpand || expanded) && (
