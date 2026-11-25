@@ -37,24 +37,26 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | Engine | official 2.7.2 | older 2.2.0 | ✅ official 2.7.2, kept current with upstream |
 | Automatic compaction and overflow recovery can be turned off, including an automatic compaction already in progress; manual `/compact` stays and is not cancelled | — | — | ✅ `[loop_control] auto_compact = false` and a switch in the settings menu |
 | Context Window Control with configurable thresholds | — | — | ✅ with one active control path and a handover to a new chat |
-| A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ immediate AUTO STEER with one visible entry and one engine submission; OFF restores the ordinary queue |
+| A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ immediate AUTO STEER; OFF restores the ordinary queue |
+| Follow-up visible in chat | — | — | ✅ one visible entry per message |
+| Follow-up engine submission | — | — | ✅ one engine submission per message |
 | Queue actions and failures | ordinary queue | forced steering can repeat or skip items | ✅ the whole batch joins once in order; rejected items return to their original positions |
 | Attachments in chat and steering | — | can lose attachments | ✅ image, video and media-only prompts, clickable thumbnails, the same viewer after replay |
 | Multiline prompts | standard Markdown whitespace | standard Markdown whitespace | ✅ manual line breaks and blank lines reach the model unchanged |
-| Sticky user prompt while reading a long conversation | — | — | ✅ hidden at chat start and collapsed on user scrolling or ownership change; expand/collapse uses a chevron and the existing media viewer |
+| Sticky user prompt while reading a long conversation | — | — | ✅ no extra strip at chat start; an expanded prompt collapses when the user scrolls or another prompt becomes sticky; the chevron opens full text and media in the existing viewer |
 | User message send time | — | — | ✅ localized `HH:MM` send time to the left of the user bubble |
 | Managed quota: 5-hour ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: 7-day ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: monthly ring with a reset countdown | — | ✅ | ✅ |
 | Sound and voice for approval requests, questions and errors | — | — | ✅ a sound and a volume for each event, prerecorded clips in three languages; Off never locks the selector |
-| Interface languages | English | English, 中文 | ✅ English, 中文, Русский, with a selected-first language dialog |
+| Interface languages | English | English, 中文 | ✅ English, 中文, Русский, with a language dialog that puts the selected language first |
 | Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection |
 | Model and reasoning effort between sessions | — | — | ✅ explicit MAX/XHigh choices persist; a resumed session keeps its own effort |
 | Live status and session header | — | ✅ | ✅ queued/changed panels, background tasks, todos, compaction viewer, session title, Working indicator and KIMI KRINIK robot |
 | History replay and internal events | — | — | ✅ atomic replay without blank frames; internal hook results never become assistant text |
 | Context ring and queue feedback | — | ✅ | ✅ blue → yellow → red-orange ring interpolation and one pulse when an item joins the queue |
 | Control Panel at narrow widths | — | ✅ | ✅ horizontal scrolling only on real overflow, with fading edges and one-click actions |
-| Control Panel skill picker | — | — | ✅ scrollable two-line rows with localized descriptions; selection uses immediate Steer or the ordinary queue |
+| Control Panel skill picker | — | — | ✅ a scrollable list with bold skill names and plain localized descriptions; the selected skill joins the running turn with Steer ON or waits in the queue with Steer OFF |
 | Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (25)` |
 | Late preflight errors | can surface a generic internal error | can surface a generic internal error | ✅ unrelated and newer chat turns stay intact; only the send that actually failed is rolled back |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
@@ -116,24 +118,26 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Движок | официальный 2.7.2 | старый 2.2.0 | ✅ официальный 2.7.2, обновляется вслед за официальным Kimi Code |
 | Автоматический compaction выключается вместе с восстановлением при переполнении и уже идущим автоматическим сжатием; ручной `/compact` работает и не отменяется | — | — | ✅ `[loop_control] auto_compact = false` и переключатель в меню настроек |
 | Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ использует один активный механизм контроля и передаёт работу в новый чат |
-| Сообщение, отправленное во время работы агента | ждёт в очереди | обрабатывается в текущем ходе, вложения могут теряться | ✅ сразу попадает в текущий ход, создаёт одну запись в чате и одну отправку в движок; OFF возвращает обычную очередь |
+| Сообщение, отправленное во время работы агента | ждёт в очереди | обрабатывается в текущем ходе, вложения могут теряться | ✅ сразу попадает в текущий ход; OFF возвращает обычную очередь |
+| Досланное сообщение в чате | — | — | ✅ одна видимая запись на сообщение |
+| Досланное сообщение в движке | — | — | ✅ одна отправка на сообщение |
 | Действия с очередью и ошибки отправки | обычная очередь | принудительный steering может повторить или пропустить сообщения | ✅ вся пачка отправляется один раз по порядку; отклонённые сообщения возвращаются на исходные места |
 | Вложения в чате и steering | — | вложения могут теряться | ✅ изображения, видео и сообщения без текста, кликабельные миниатюры и существующий просмотрщик после восстановления истории |
 | Многострочные сообщения | обычное Markdown-разбиение строк | обычное Markdown-разбиение строк | ✅ ручные переносы строк и пустые строки доходят до модели без изменений |
-| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ скрывается в начале чата и сворачивается при прокрутке или смене запроса; шеврон раскрывает текст и медиа в существующем просмотрщике |
+| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ в начале чата лишней полосы нет; развёрнутый запрос сворачивается при прокрутке или закреплении другого запроса; шеврон открывает полный текст и медиа в существующем просмотрщике |
 | Время отправки сообщения пользователя | — | — | ✅ локализованное время `HH:MM` слева от пузыря сообщения |
 | Квота на 5 часов: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Квота на 7 дней: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Месячная квота: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Звук и голос для запросов одобрения, вопросов и ошибок | — | — | ✅ свой звук и громкость для каждого события, готовые записи на трёх языках; «Выкл» не блокирует выбор |
-| Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, окно выбора с активным языком первым |
+| Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, диалог выбора языка, где активный язык стоит первым |
 | Панель ввода: режим разрешений, Plan, Goal, Swarm, дополнительная модель, кольцо контекста и просмотр контекста | — | ✅ | ✅ общий выбор модели и уровня рассуждений, поиск, избранное и дополнительная модель |
 | Модель и уровень рассуждений между сессиями | — | — | ✅ явный выбор MAX/XHigh сохраняется; восстановленная сессия хранит собственный уровень |
 | Текущий статус и заголовок сессии | — | ✅ | ✅ очередь и изменения, фоновые задачи, список задач, просмотр контекста, название сессии, индикатор «Работаю…» и робот KIMI KRINIK |
 | История и внутренние события | — | — | ✅ восстановление истории без пустых кадров; внутренние служебные инструкции не отображаются как ответ агента |
 | Кольцо контекста и отклик очереди | — | ✅ | ✅ плавный переход синего в жёлтый и красно-оранжевый, один импульс при добавлении сообщения |
 | Панель управления на узком экране | — | ✅ | ✅ горизонтальная прокрутка только при реальном переполнении, затухание краёв и действия одним кликом |
-| Кнопка «Навык» в Control Panel | — | — | ✅ прокручиваемый список из двух строк с локализованными описаниями; выбор сразу отправляется через Steer или встаёт в очередь |
+| Кнопка «Навык» в Control Panel | — | — | ✅ открывает прокручиваемый список с именем навыка жирным шрифтом и описанием обычным; при включённом Стиринге выбранный навык сразу идёт в текущий ход, при выключенном — в очередь |
 | Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (25)` |
 | Запоздавшие ошибки подготовки запроса | общая ошибка без подробностей | общая ошибка без подробностей | ✅ не связанные с ошибкой и более новые ходы чата сохраняются; откатывается только текущая неудачная отправка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
@@ -194,11 +198,13 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 引擎 | 官方 2.7.2 | 较旧的 2.2.0 | ✅ 官方 2.7.2，跟随上游 |
 | 自动上下文压缩（compaction）可以关闭，包括上下文溢出恢复和已在进行的自动压缩；手动 `/compact` 照常可用且不会被取消 | — | — | ✅ `[loop_control] auto_compact = false` 及设置菜单中的开关 |
 | 上下文窗口控制与可配置阈值 | — | — | ✅ 仅运行一个活动控制路径，并将工作交接到新聊天 |
-| 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即并入当前轮次，聊天中仅一条记录、引擎中仅一次提交；OFF 恢复普通队列 |
+| 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即并入当前轮次；OFF 恢复普通队列 |
+| 追加消息在聊天中的记录 | — | — | ✅ 每条消息仅一条可见记录 |
+| 追加消息在引擎中的提交 | — | — | ✅ 每条消息仅一次提交 |
 | 队列操作与发送失败 | 普通队列 | 强制 steering 可能重复或跳过消息 | ✅ 整批消息按顺序仅发送一次；被拒绝的消息回到原位置 |
 | 聊天和 steering 中的附件 | — | 可能丢失附件 | ✅ 图片、视频及纯媒体消息，可点击缩略图，replay 后使用同一查看器 |
 | 多行消息 | 标准 Markdown 空白处理 | 标准 Markdown 空白处理 | ✅ 手动换行和空行原样传递给模型 |
-| 长聊天中置顶的用户消息 | — | — | ✅ 聊天开始时自动隐藏，用户滚动或切换请求时自动折叠；通过 chevron 展开或折叠，并使用现有媒体查看器 |
+| 长聊天中置顶的用户消息 | — | — | ✅ 聊天开始时不显示多余横条；滚动或切换置顶请求时，展开的请求自动折叠；chevron 在现有查看器中打开全文与媒体 |
 | 用户消息发送时间 | — | — | ✅ 用户气泡左侧显示本地化的 `HH:MM` 发送时间 |
 | 5 小时配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 7 天配额：带重置倒计时的圆环 | — | ✅ | ✅ |
@@ -211,7 +217,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 历史 replay 与内部事件 | — | — | ✅ 原子 replay 不出现空白帧；内部 hook 结果不会成为助手文本 |
 | 上下文圆环与队列反馈 | — | ✅ | ✅ 蓝色 → 黄色 → 红橙色平滑渐变，消息入队时仅脉冲一次 |
 | 窄宽度下的 Control Panel | — | ✅ | ✅ 仅在实际溢出时横向滚动，边缘渐隐，单击执行操作 |
-| Control Panel Skill 选择器 | — | — | ✅ 可滚动的双行本地化描述列表；选择后立即通过 Steer 发送或进入普通队列 |
+| Control Panel Skill 选择器 | — | — | ✅ 可滚动列表以粗体显示技能名称，以常规字体显示本地化描述；Steer 开启时立即发送，关闭时进入普通队列 |
 | Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (25)` |
 | 延迟到达的 preflight 错误 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 无关及更新的聊天消息保持不变，仅回滚当前失败的发送 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |

@@ -23,23 +23,9 @@
 
 ---
 
-### 2026-11-25 20:11 +03:00 — build 25 passes the owner-requested isolated UI acceptance
-- Fixed welcome guide and centered robot/KIMI, localized Compact/Steer descriptions, `ideas/02` skill picker and `bugs/30`–`32` are implemented and verified on isolated packaged build 25. The skill dialog showed 47 rows; immediate skill delivery appeared once in the active model request, OFF showed `1 в очереди` with no queued skill in the request. Sticky was absent at `scrollTop = 0` and collapsed on wheel.
-- Full extension: 621 passed / 1 skipped / 0 failed; typecheck and root lint green. `session-skills` is 14/14 after the old Windows path-comparison test was fixed in `bugs/33_DONE_skill_variant_windows_path_separator_test.md`.
-- VSIX SHA-256 `5c493b98e4d56d4356315858aecee5573a05664ea2d4631d12f8fb0811ad9d04`. Build 25 is installed on the main profile with `buildNumber: 25` and exactly matching extension/webview hashes. Its running Extension Host has not been restarted, so accumulated-profile acceptance remains pending. Do not publish without separate owner `AUTH:`.
-- Evidence: `testcases/reports/2026-11-25_build_25_ui_acceptance.md`, `.tmp/k5-vscode/85-build25-welcome.webp`, `.tmp/k5-vscode/87-build25-skill-dialog.webp`, `.tmp/k5-vscode/89-build25-skill-queue.webp`.
-
-### 2026-11-25 18:10 +03:00 — owner confirms the remaining 1.0.0 UI scope
-- [OWNER] «пусть наш экстеншен всегда в таком виде стартует. А слева от KIMI добавь нашего розового робота. Пару "РОБОТ KIMI" центрируй»: the empty-chat shortcut guide is always shown, with the pink robot beside KIMI.
-- [OWNER] «Текста: Сжатие…», «Текста: Стиринг…»: use the supplied RU descriptions, including the corrected single «Вкл:» prefix, with EN/ZH equivalents.
-- [OWNER] «кнопку навыков на панели управления я заказывал. Это делаем в 1.0.0!!!»: `ideas/02` is now active release work; the previous post-release deferral is revoked.
-
-### 2026-11-25 17:16 +03:00 — build 22 fixes live chat rendering; main-profile restart pending
-- [OWNER] «сразу как я тебе первое сообщение resume отправил - в полотне чата твоё какое-то сообщение появилось и мгновенно исчезло. Баг присутвтствует.», «опять ты высрал какой-то технический теккст в чат» (чат). `bugs/25` now also covers live Markdown remounts, and `bugs/15` covers the previously unverified live `hook.result` projection. Both are verified on isolated build 22, not yet on the restarted main profile.
-- [OWNER] «давай время сообщений пользователя писать слева от них, вот тут», «а в стики сообщении вверху не делать пустое место на всю ширину пузыря только ради кнопки сворачинвания», «в стики пузыре нужно текст выше поднять, по оптическому центру тяжести чтобы вертикально текст был в пузыре выровнен» (чат). `plans/03` records and implements all three.
-- Verification: component regressions red before and green after; full extension 610 passed / 1 skipped, typecheck and root lint green. Real VSIX control build 20 showed hook text; builds 21/22 kept it in model input but out of every observed UI snapshot. Build-22 DOM trace has no response removals; sticky geometry and WebP pass.
-- Build 22 is installed on the main profile through direct VS Code CLI: manifest `buildNumber: 22`. [OWNER] «всё, давай, завершай, я иду в 22ю сборку, там продолжим» · 2026-11-25 17:38 +03:00 (чат). The next chat starts on that running build for accumulated-profile acceptance. Do not publish.
-- Voice: the owner confirmed the direct Glass call sounded good. `HOUSE_RULES.md` R1 now explicitly forbids the generic beep/system-voice shortcut and records the pronunciation «Ви Эс Код»; the lesson is `EXPERIENCE.md` EXP-0017.
+### 2026-11-25 20:35 +03:00 — SOFT CLOSURE: build 25 verified; handover to the next chat
+- Build 25 is implemented, installed on the main profile and verified on isolated VS Code. Commits through `27ee17990` are pushed to `main`; `bugs/33` is DONE and SDK `session-skills` is 14/14. Extension suite is 621 passed / 1 skipped; typecheck, root lint, build, static audit and voice checks are green.
+- Main-profile running-build acceptance is the first next step: restart VS Code to load build 25 and verify the accumulated world. `bugs/29` is the next clear technical verification after it. Publication remains unauthorized and requires separate owner `AUTH:`.
 
 ## Where we are now
 

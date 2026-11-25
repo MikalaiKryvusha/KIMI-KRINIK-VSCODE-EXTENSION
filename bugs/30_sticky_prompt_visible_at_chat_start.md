@@ -14,6 +14,8 @@ The sticky copy of the latest prompt appears above the conversation even though 
 
 ## Repro
 
+[OWNER] «лучше не восроизводить, а читать код и искать в коде, чем они вызваны и как чинить.» · 2026-11-25 (чат)
+
 The owner asked for a code-path diagnosis rather than a live reproduction. The deterministic component check will set the real scroll container to its top and read whether the sticky element exists, then scroll down and read it again.
 
 ## Forensics

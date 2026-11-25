@@ -27,6 +27,34 @@
 
 ## Entries (newest first)
 
+### 2026-11-25 20:11 +03:00 — build 25 passes the owner-requested isolated UI acceptance
+- Fixed welcome guide and centered robot/KIMI, localized Compact/Steer descriptions, `ideas/02` skill picker and `bugs/30`–`32` are implemented and verified on isolated packaged build 25. The skill dialog showed 47 rows; immediate skill delivery appeared once in the active model request, OFF showed `1 в очереди` with no queued skill in the request. Sticky was absent at `scrollTop = 0` and collapsed on wheel.
+- Full extension: 621 passed / 1 skipped / 0 failed; typecheck and root lint green. `session-skills` is 14/14 after the old Windows path-comparison test was fixed in `bugs/33_DONE_skill_variant_windows_path_separator_test.md`.
+- VSIX SHA-256 `5c493b98e4d56d4356315858aecee5573a05664ea2d4631d12f8fb0811ad9d04`. Build 25 is installed on the main profile with `buildNumber: 25` and exactly matching extension/webview hashes. Its running Extension Host has not been restarted, so accumulated-profile acceptance remains pending. Do not publish without separate owner `AUTH:`.
+- Evidence: `testcases/reports/2026-11-25_build_25_ui_acceptance.md`, `.tmp/k5-vscode/85-build25-welcome.webp`, `.tmp/k5-vscode/87-build25-skill-dialog.webp`, `.tmp/k5-vscode/89-build25-skill-queue.webp`.
+
+### 2026-11-25 18:10 +03:00 — owner confirms the remaining 1.0.0 UI scope
+- [OWNER] «пусть наш экстеншен всегда в таком виде стартует. А слева от KIMI добавь нашего розового робота. Пару "РОБОТ KIMI" центрируй»: the empty-chat shortcut guide is always shown, with the pink robot beside KIMI.
+- [OWNER] «Текста: Сжатие…», «Текста: Стиринг…»: use the supplied RU descriptions, including the corrected single «Вкл:» prefix, with EN/ZH equivalents.
+- [OWNER] «кнопку навыков на панели управления я заказывал. Это делаем в 1.0.0!!!»: `ideas/02` is now active release work; the previous post-release deferral is revoked.
+
+### 2026-11-25 17:16 +03:00 — build 22 fixes live chat rendering; main-profile restart pending
+- [OWNER] «сразу как я тебе первое сообщение resume отправил - в полотне чата твоё какое-то сообщение появилось и мгновенно исчезло. Баг присутвтствует.», «опять ты высрал какой-то технический теккст в чат» (чат). `bugs/25` now also covers live Markdown remounts, and `bugs/15` covers the previously unverified live `hook.result` projection. Both are verified on isolated build 22, not yet on the restarted main profile.
+- [OWNER] «давай время сообщений пользователя писать слева от них, вот тут», «а в стики сообщении вверху не делать пустое место на всю ширину пузыря только ради кнопки сворачинвания», «в стики пузыре нужно текст выше поднять, по оптическому центру тяжести чтобы вертикально текст был в пузыре выровнен» (чат). `plans/03` records and implements all three.
+- Verification: component regressions red before and green after; full extension 610 passed / 1 skipped, typecheck and root lint green. Real VSIX control build 20 showed hook text; builds 21/22 kept it in model input but out of every observed UI snapshot. Build-22 DOM trace has no response removals; sticky geometry and WebP pass.
+- Build 22 is installed on the main profile through direct VS Code CLI: manifest `buildNumber: 22`. [OWNER] «всё, давай, завершай, я иду в 22ю сборку, там продолжим» · 2026-11-25 17:38 +03:00 (чат). The next chat starts on that running build for accumulated-profile acceptance. Do not publish.
+- Voice: the owner confirmed the direct Glass call sounded good. `HOUSE_RULES.md` R1 now explicitly forbids the generic beep/system-voice shortcut and records the pronunciation «Ви Эс Код»; the lesson is `EXPERIENCE.md` EXP-0017.
+
+### 2026-11-25 16:08 +03:00 — SOFT CLOSURE: build 19 ready; owner authorization pending
+- Done: `bugs/29` preflight ownership guard; `bugs/28` is DONE after the real 70% warning on the accumulated main profile; `plans/03` sticky prompt with animated chevron, expand/collapse, media and localized send time. Build 19 is the release candidate with the complete packaged changelog.
+- Verification: full extension 607 passed / 1 skipped, typecheck and root lint green, six-target static/import verification passed. README covers all delivered differences in EN/RU/ZH. Main-profile 70% and 75% context warnings are observed. `bugs/11` is parked after three non-reproductions; no DONE claim.
+- [OWNER] «вот это в ДИДМИ продукта зачем? ... ЗАЧЕМ МНЕ ЭТа ИНФОРМАЦИЯ? ... ✅ работает без KAIF», «вот это тоже нахуй все такое поудаляй из ридми · 🚧 приёмка на основном профиле» (чат). Removed KAIF badges/integration/credits and every 🚧 acceptance marker from README in all three languages. Product documentation now describes only KIMI KRINIK behavior.
+- `release-notes/1.0.0/changelog.{en,ru,zh}.md` is ready with the neutral factual title `KIMI KRINIK 1.0.0`. Independent semantic review is resolved and voice/link checks are green.
+- [OWNER] «разрешаю установить» · 2026-11-25 16:33 +03:00 (chat). Option B is selected: build-19 installation on the main profile is authorized; publication is not authorized. Install and verify the running build before any further acceptance.
+- Process correction: the owner requires the newest fixed builds on his working profile by default, not only on isolated stands. This is now standing authorization in `HOUSE_RULES.md` R5; release publication remains separately gated.
+- Closure debt: final Desktop E2E smoke passed 1/1 (`core-turn.spec.ts`, 46.3s), full extension 607/1, typecheck/lint/build and voice/link checks green. Final judge and final commit/push are recorded below after execution. The earlier force-closed README/judge debts were paid in this chat.
+- [OWNER] challenged an unsupported multiline dash: the comparison cells now say `standard Markdown whitespace` instead of claiming the feature is absent. KAIF and all acceptance markers were removed by the owner's direct instruction. <!-- attribution-ok: pre-existing entry from HEAD; this change does not alter its claim -->
+
 ### 2026-11-25 12:32 +03:00 — sticky prompt re-prioritized; README scope review
 - [OWNER] «прочти README репозитория этого проекта - КИМИ КРИНИК - все ли заявления мы сделали. и может мы сделали даже больше?», «липкое последнее сообщение нужно сделать» (чат). README claims are being compared with code and live-acceptance evidence. `plans/03_sticky_viewport_prompt.md` is implemented and verified on isolated packaged build 18; accumulated main-profile acceptance remains pending.
 - Implementation anchor: one sticky prompt row above the transcript, visible-turn identity rather than newest-message identity, per-prompt expand/collapse with existing media rendering, EN/RU/ZH and isolated VSIX acceptance. Engine, bridge and outbound contracts stay unchanged.

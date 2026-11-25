@@ -13,6 +13,8 @@
 
 ## Repro
 
+[OWNER] «лучше не восроизводить, а читать код и искать в коде, чем они вызваны и как чинить.» · 2026-11-25 (чат)
+
 The owner asked for a code-path diagnosis rather than a live reproduction. Component checks will expand the real sticky component, emit user scrolling, change the active prompt and read the expanded element's presence and scroll-anchor behavior.
 
 ## Forensics
