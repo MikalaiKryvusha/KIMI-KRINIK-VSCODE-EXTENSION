@@ -51,6 +51,8 @@ export const zh: Record<TranslationKey, string> = {
   "header.newTitle": "开始新对话？",
   "header.newDesc": "当前对话仍在生成回复。开始新对话会截断输出。确定要继续吗？",
   "header.newConversation": "新对话",
+  "sticky.expand": "展开",
+  "sticky.collapse": "收起",
 
   "login.waiting": "等待认证…",
   "login.browserHint": "浏览器窗口应会自动打开，请在其中完成登录。",

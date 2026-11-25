@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState } from "react";
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom";
 import { IconArrowDown } from "@tabler/icons-react";
 import { ChatMessage } from "./ChatMessage";
+import { getPromptKey, StickyUserPrompt, useActivePromptId } from "./StickyUserPrompt";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { useChatStore } from "@/stores";
 import { cn } from "@/lib/utils";
@@ -44,9 +46,29 @@ function MessageList() {
 }
 
 export function ChatArea() {
-  const messageCount = useChatStore((s) => s.messages.length);
+  const messages = useChatStore((s) => s.messages);
+  const hostRef = useRef<HTMLDivElement>(null);
+  const activePromptId = useActivePromptId(messages, hostRef);
+  const sessionId = useChatStore((s) => s.sessionId);
+  const [expandedPromptId, setExpandedPromptId] = useState<string>();
+  useEffect(() => { setExpandedPromptId(undefined); }, [sessionId]);
+  const activePromptIndex = messages.findIndex((message, index) => message.role === "user" && getPromptKey(message, index) === activePromptId);
+  const activePrompt = activePromptIndex < 0 ? undefined : messages[activePromptIndex];
 
-  if (messageCount === 0) {
+  const toggleExpandedPrompt = () => {
+    const scroll = hostRef.current?.querySelector<HTMLElement>(".chat-scroll-view");
+    const assistant = activePromptIndex < 0 ? undefined : messages.slice(activePromptIndex + 1).find((message) => message.role === "assistant");
+    const findAssistant = () => assistant === undefined || !scroll ? undefined : Array.from(scroll.querySelectorAll("[data-message-role=assistant]")).find((element) => element.getAttribute("data-message-id") === assistant.id);
+    const beforeTop = findAssistant()?.getBoundingClientRect().top;
+    setExpandedPromptId((current) => current === activePromptId ? undefined : activePromptId);
+    requestAnimationFrame(() => {
+      if (!scroll || beforeTop === undefined) return;
+      const afterTop = findAssistant()?.getBoundingClientRect().top;
+      if (afterTop !== undefined) scroll.scrollTop += afterTop - beforeTop;
+    });
+  };
+
+  if (messages.length === 0) {
     return (
       <div className="h-full flex items-center justify-center relative">
         <WelcomeScreen />
@@ -55,8 +77,9 @@ export function ChatArea() {
   }
 
   return (
-    <div className="h-full relative">
-      <ScrollToBottom className="h-full" scrollViewClassName="h-full overflow-y-auto overflow-x-hidden" followButtonClassName="hidden" initialScrollBehavior="auto">
+    <div ref={hostRef} className="h-full relative">
+      <ScrollToBottom className="h-full" scrollViewClassName="chat-scroll-view h-full overflow-y-auto overflow-x-hidden" followButtonClassName="hidden" initialScrollBehavior="auto">
+        <StickyUserPrompt message={activePrompt} expanded={expandedPromptId === activePromptId} onToggle={toggleExpandedPrompt} />
         <MessageList />
       </ScrollToBottom>
     </div>

@@ -50,6 +50,8 @@ export const en = {
   "header.newDesc":
     "The current conversation is still generating a response. Starting a new one will truncate the output. Are you sure you want to continue?",
   "header.newConversation": "New Conversation",
+  "sticky.expand": "Expand",
+  "sticky.collapse": "Collapse",
 
   "login.waiting": "Waiting for authentication…",
   "login.browserHint": "A browser window should open automatically. Complete the sign-in process there.",

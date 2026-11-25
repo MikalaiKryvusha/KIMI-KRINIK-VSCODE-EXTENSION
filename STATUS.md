@@ -23,6 +23,15 @@
 
 ---
 
+### 2026-11-25 12:32 +03:00 — sticky prompt re-prioritized; README scope review
+- [OWNER] «прочти README репозитория этого проекта - КИМИ КРИНИК - все ли заявления мы сделали. и может мы сделали даже больше?», «липкое последнее сообщение нужно сделать» (чат). README claims are being compared with code and live-acceptance evidence. `plans/03_sticky_viewport_prompt.md` is implemented and verified on isolated packaged build 18; accumulated main-profile acceptance remains pending.
+- Implementation anchor: one sticky prompt row above the transcript, visible-turn identity rather than newest-message identity, per-prompt expand/collapse with existing media rendering, EN/RU/ZH and isolated VSIX acceptance. Engine, bridge and outbound contracts stay unchanged.
+- [OWNER] «и нужно будет обновить РИДМИ, и вести КИМИ КРИНИК 1.0.0 к релиу уже, а то три дня блять работаем над ним, затянулось это как-то», «и смотрю картинка робота кими у ридми старая - высокая. мы сделали его ниже» (чат). After sticky, update README including the already-accepted shorter robot asset and move into the final release contour; no new optional feature scope.
+- Build 18 is the release candidate: sticky prompt, chevron animation and localized user-message time are verified on the isolated packaged VSIX. Full extension is 607 passed / 1 skipped, typecheck and root lint are green, six-target package verification passed. README covers the complete EN/RU/ZH difference table, independent semantic review is resolved, and all 28 local/external links open. Publication still requires separate owner `AUTH:`.
+- [OWNER] «все, что реализовано, и чем мы выгодно отличаемся от официального экстеншена и от кими форк - все это можешь писать в ридми, там уже есть очень наглядная таблица для этого», «ну сообщения юзера А) справа, б) фон имеют другой» (чат). README's comparison table will cover all delivered differences; the sticky prompt uses a right-aligned user bubble with the distinct user-message background (`plans/03` AC9).
+- [OWNER] «не нужна ему кнопка развернуть, если он в одну строку», «и всю верхнюю панель можешь в цвет сообщения юзера превращать, такого цвета - на всю ширину чата такой пузырь сообщени юзера вверху» (чат). Final sticky presentation: full-width rounded user-message bubble; Expand only for truncated, multiline or media prompts.
+- [OWNER] «анимаций каких-то добавить», «кнопку свернуть развернуть можно было бы переиспользовать ту, которая есть в экстеншене в виде шевронов», «иди в интернет в разведку, как такое красиво сделать. И нужно время отправки пользовательских сообщений в чате» (чат). `researches/57_sticky_prompt_presentation.md` records the sources; use the existing chevron, reduced-motion-safe expansion and localized `HH:MM` in ordinary user bubbles.
+
 ### 2026-11-25 12:11 +03:00 — PARKED: difficult bug reproduction; deterministic high-value fixes first
 - [OWNER] «давай не будем ловить сложновоспроизводимые баги, а будет чинить то, что однозначно понятно, как чинить», «и у тебя под руками код - его анализ может тебе показать, где есть баги однозначно», «давай в первую очередь делать и чинить то, что А) аонятно как делать или как чинить) Б) дает 80% пользы при 20% усилий» (чат). This applies the existing Pareto principle in `PHILOSOPHY.md:68-72`; no duplicate house rule is kept.
 - Main-profile build 14 and Context Window Control ON are confirmed by the real Action Menu (`v1.0.0 (14)`), visible enabled control, setting and Extension Host activation. `bugs/11` received three isolated non-reproductions and is PARKED, not DONE: single steer, consecutive steers, running→idle and replay preserved assistant containers. Report: `testcases/reports/2026-11-25_steer_response_stability.md`.
@@ -123,7 +132,7 @@
 
 ## Where we are now
 
-The extension builds and typecheck is green; the latest full extension run has 601 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
+The extension builds and typecheck is green; the latest full extension run has 607 passed, 1 skipped and 0 failures. The 1.0.0 scope, phases and
 acceptance live in the KAIF origin repository: `D:/work/ai_sandbox/KAIF/plans/147_EPIC_kimi_krinik_1_0_0.md` and `plans/148`–`154`.
 Routine pushes of this branch go under the standing authorization of `AGENT_GUIDE.md` → Git workflow; a release, a rename and any
 external publication wait for the owner's `AUTH:`.

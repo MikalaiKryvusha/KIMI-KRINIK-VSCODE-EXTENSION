@@ -14,13 +14,14 @@ import { PlanCard } from "./PlanCard";
 import { StreamingConfirmDialog } from "./StreamingConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
-import { useChatStore } from "@/stores";
+import { useChatStore, useSettingsStore } from "@/stores";
 import { bridge } from "@/services";
 import { useT } from "@/i18n";
 import { WorkingIndicator } from "./WorkingIndicator";
 import { KimiLogo } from "./KimiLogo";
 import type { ChatMessage as ChatMessageType, UIStep, UIStepItem } from "@/stores/chat.store";
 import type { ContentPart } from "shared/legacy-sdk";
+import type { InterfaceLanguage } from "shared/types";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -102,7 +103,7 @@ function StepContent({ step, showConnector }: { step: UIStep; showConnector?: bo
   );
 }
 
-function MessageMedia({ images, videos, onPreview }: { images: string[]; videos: string[]; onPreview: (src: string) => void }) {
+export function MessageMedia({ images, videos, onPreview }: { images: string[]; videos: string[]; onPreview: (src: string) => void }) {
   if (images.length === 0 && videos.length === 0) {
     return null;
   }
@@ -210,11 +211,18 @@ function ForkButton({ turnIndex, className }: ForkButtonProps) {
   );
 }
 
+export function formatMessageTime(timestamp: number, language: InterfaceLanguage): string {
+  const locale = language === "ru" ? "ru-RU" : language === "zh" ? "zh-CN" : "en-US";
+  return new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(timestamp);
+}
+
 function UserMessage({ message }: { message: ChatMessageType }) {
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
+  const language = useSettingsStore((state) => state.extensionConfig.language);
   const displayContent = Content.getText(message.content);
   const images = Content.getImages(message.content);
   const videos = Content.getVideos(message.content);
+  const sentAt = Number.isFinite(message.timestamp) ? new Date(message.timestamp) : undefined;
 
   return (
     <div className="px-3 pt-3 pb-1 flex justify-end">
@@ -225,6 +233,7 @@ function UserMessage({ message }: { message: ChatMessageType }) {
           </div>
         )}
         <MessageMedia images={images} videos={videos} onPreview={setPreviewMedia} />
+        {sentAt && <time dateTime={sentAt.toISOString()} className="mt-1 block text-right text-[10px] text-muted-foreground">{formatMessageTime(message.timestamp, language)}</time>}
       </div>
       <MediaPreviewModal src={previewMedia} onClose={() => setPreviewMedia(null)} />
     </div>
@@ -263,7 +272,7 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
   const isShowingInlineError = message.inlineError && !isStreaming;
 
   return (
-    <div className="@container px-3 py-3 group/message">
+    <div data-message-id={message.id} data-message-role="assistant" className="@container px-3 py-3 group/message">
       <div className="flex gap-3 flex-col">
         <div className="flex flex-row items-center justify-start gap-2">
           <KimiLogo className="size-6 shrink-0" />

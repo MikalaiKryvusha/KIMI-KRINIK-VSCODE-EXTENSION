@@ -51,6 +51,8 @@ export const ru: Record<TranslationKey, string> = {
   "header.newTitle": "Начать новый диалог?",
   "header.newDesc": "Текущий диалог ещё генерирует ответ. Новый диалог оборвёт этот ответ. Продолжить?",
   "header.newConversation": "Новый диалог",
+  "sticky.expand": "Развернуть",
+  "sticky.collapse": "Свернуть",
 
   "login.waiting": "Ожидание авторизации…",
   "login.browserHint": "Окно браузера откроется само. Завершите вход в нём.",

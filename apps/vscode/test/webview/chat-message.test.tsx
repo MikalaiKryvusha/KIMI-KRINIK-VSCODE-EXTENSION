@@ -33,6 +33,15 @@ describe("user message rendering", () => {
     expect(paragraphs[0]?.parentElement?.className).toContain("[&_p]:whitespace-pre-wrap");
     expect(paragraphs[1]?.textContent).toBe("third paragraph");
   });
+
+  it("shows the localized send time inside the user bubble", () => {
+    const timestamp = Date.UTC(2026, 0, 2, 3, 4);
+    const { container } = render(<ChatMessage message={{ id: "user-time", role: "user", content: "hello", timestamp }} />);
+
+    const time = container.querySelector("time");
+    expect(time?.textContent).toBe(new Intl.DateTimeFormat("en-US", { hour: "2-digit", minute: "2-digit" }).format(timestamp));
+    expect(time?.getAttribute("dateTime")).toBe(new Date(timestamp).toISOString());
+  });
 });
 
 describe("steering media", () => {

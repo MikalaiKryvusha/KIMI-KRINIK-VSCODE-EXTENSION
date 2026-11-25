@@ -2,9 +2,9 @@
 
 > **Created:** 2026-11-24
 > **Parent:** owner's sticky-message request and `researches/54_chat_pipeline_reliability.md`
-> **Status:** approved by the owner; research accepted, implementation not started
-> **Outbound:** implementation and isolated VS Code acceptance in a new chat; no production code changed in this closing chat
-> **Verification:** [TESTED: 2026-11-24 · owner requirement and reference review; requirements/attribution lint green — implementation not run]
+> **Status:** implemented and verified on isolated packaged build 18; accumulated main-profile acceptance pending
+> **Outbound:** final main-profile acceptance and release
+> **Verification:** [TESTED: 2026-11-25 13:36 +03:00 · isolated build-18 scrolling/replay/media with DOM, computed styles and WebP readback — `testcases/reports/2026-11-25_sticky_viewport_prompt.md`]
 
 ## 1. Goal vector
 
@@ -26,6 +26,8 @@
 | AC6 | Repeatedly cross a turn boundary and send steering messages | no sticky flicker, duplicate section or assistant avatar above the corresponding user prompt |
 | AC7 | Conversation contains KAIF hook output | hook text never becomes a sticky candidate and remains invisible in the conversation |
 | AC8 | Reload the session and expand a prompt | replay selects the same prompt by ID; expanded state is per prompt, not global |
+| AC9 | Read the sticky prompt beside an assistant response | sticky spans the chat width as a rounded user-message bubble; a prompt that already fits one line shows no Expand button |
+| AC10 | Expand a prompt and read an ordinary user message | the existing chevron rotates with reduced-motion-safe animation; the ordinary user bubble shows localized `HH:MM` send time |
 
 ## 3. Reference findings
 
@@ -40,16 +42,16 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 
 ## 4. Implementation steps
 
-- [ ] Add a component test for sticky identity: two user prompts with assistant sections, scroll the second into view, verify the second prompt is sticky while the first is not active.
-- [ ] Add a stable prompt identity to the timeline: prefer `promptId`, then local `clientId`, then the old replay content/order fallback. Steering gets its own user section.
-- [ ] Compute the active prompt from the assistant section nearest the reading viewport. Use one boundary rule and a small threshold/hysteresis so tiny scroll deltas do not flip the selection.
-- [ ] Render one sticky row above the transcript. Use `position: sticky; top: 0` with a background derived from VS Code and a bounded one-line text ellipsis.
-- [ ] Add per-prompt `expanded` state. Expanded content reuses existing text and `MessageMedia`/`MediaPreviewModal` rendering; collapsed content keeps only the one-line summary.
+- [x] Add a component test for sticky identity: two user prompts with assistant sections, scroll the second into view, verify the second prompt is sticky while the first is not active.
+- [x] Add a stable prompt identity to the timeline: prefer `promptId`, then local `clientId`, then the old replay content/order fallback. Steering gets its own user section.
+- [x] Compute the active prompt from the assistant section nearest the reading viewport. Use one boundary rule and a small threshold/hysteresis so tiny scroll deltas do not flip the selection.
+- [x] Render one sticky row above the transcript. Use `position: sticky; top: 0` with a background derived from VS Code and a bounded one-line text ellipsis.
+- [x] Add per-prompt `expanded` state. Expanded content reuses existing text and `MessageMedia`/`MediaPreviewModal` rendering; collapsed content keeps only the one-line summary.
 - [ ] Add optional click-to-jump to the beginning of the active turn without changing the current expanded state.
-- [ ] On new input, preserve the active prompt unless the viewport is at the bottom or the user scrolls to the new turn. Do not use the newest message ID as the sticky selector.
-- [ ] Localize «Развернуть» and «Свернуть» in EN/RU/ZH and ensure keyboard access, focus behavior and no horizontal overflow at the narrow Second Side Bar width.
-- [ ] Add regression tests for boundary flicker, media-only prompts, multiple steering messages, replay without IDs and hidden hook text.
-- [ ] Run `pnpm lint`, typecheck and the affected suites, then package and exercise the real isolated VSIX with mouse scrolling, expand/collapse, media viewer and WebP screenshots.
+- [x] On new input, preserve the active prompt unless the viewport is at the bottom or the user scrolls to the new turn. Do not use the newest message ID as the sticky selector.
+- [x] Localize «Развернуть» and «Свернуть» in EN/RU/ZH and ensure keyboard access, focus behavior and no horizontal overflow at the narrow Second Side Bar width.
+- [x] Add regression tests for boundary flicker, media-only prompts, multiple steering messages, replay without IDs and hidden hook text.
+- [x] Run `pnpm lint`, typecheck and the affected suites, then package and exercise the real isolated VSIX with mouse scrolling, expand/collapse, media viewer and WebP screenshots.
 
 ## 5. Verification by observation
 
@@ -76,4 +78,6 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 - Expanded state is per prompt; no global expand-all toggle is introduced.
 - Sticky has no automatic jump to a new prompt while the user reads an older turn.
 - Steering is eligible as a separate user prompt; internal hook output is excluded.
-- The work is planned for a new chat and remains unimplemented in this closing chat.
+- Implemented in build 18; optional click-to-jump remains deliberately unimplemented. Accumulated main-profile acceptance is a separate open step.
+- [OWNER] «ну сообщения юзера А) справа, б) фон имеют другой» · 2026-11-25 (чат): the sticky prompt uses the user-message visual identity.
+- [OWNER] «так что стики нужно делать по аналогии с тем, как он в чате выглядит, чтобы сохранялась у юзера ассоциация», «не нужна ему кнопка развернуть, если он в одну строку», «и всю верхнюю панель можешь в цвет сообщения юзера превращать, такого цвета - на всю ширину чата такой пузырь сообщени юзера вверху» · 2026-11-25 (чат): sticky spans the chat with the user-message background; expansion is available only for truncated, multiline or media prompts.
