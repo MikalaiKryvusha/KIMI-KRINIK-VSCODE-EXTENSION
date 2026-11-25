@@ -227,10 +227,7 @@ function mapLegacyWireEvent(
         event: { type: 'ContentPart', payload: { type: 'text', text: sdkEvent.delta } },
       };
     case 'hook.result':
-      return {
-        state,
-        event: { type: 'ContentPart', payload: { type: 'text', text: sdkEvent.content } },
-      };
+      return { state };
     case 'thinking.delta':
       return {
         state,

@@ -2,9 +2,9 @@
 
 > **Created:** 2026-11-24
 > **Parent:** owner's sticky-message request and `researches/54_chat_pipeline_reliability.md`
-> **Status:** implemented and verified on isolated packaged build 18; accumulated main-profile acceptance pending
+> **Status:** implemented and verified on isolated packaged build 22; accumulated main-profile running-build acceptance pending
 > **Outbound:** final main-profile acceptance and release
-> **Verification:** [TESTED: 2026-11-25 13:36 +03:00 · isolated build-18 scrolling/replay/media with DOM, computed styles and WebP readback — `testcases/reports/2026-11-25_sticky_viewport_prompt.md`]
+> **Verification:** [TESTED: 2026-11-25 17:16 +03:00 · isolated build-22 collapsed/expanded sticky, left timestamps and small viewport with DOM, computed geometry and WebP readback — `testcases/reports/2026-11-25_chat_rendering_build_22.md`]
 
 ## 1. Goal vector
 
@@ -27,7 +27,9 @@
 | AC7 | Conversation contains KAIF hook output | hook text never becomes a sticky candidate and remains invisible in the conversation |
 | AC8 | Reload the session and expand a prompt | replay selects the same prompt by ID; expanded state is per prompt, not global |
 | AC9 | Read the sticky prompt beside an assistant response | sticky spans the chat width as a rounded user-message bubble; a prompt that already fits one line shows no Expand button |
-| AC10 | Expand a prompt and read an ordinary user message | the existing chevron rotates with reduced-motion-safe animation; the ordinary user bubble shows localized `HH:MM` send time |
+| AC10 | Expand a prompt and read an ordinary user message | the existing chevron rotates with reduced-motion-safe animation; the ordinary user bubble shows localized `HH:MM` send time to the left of the bubble |
+| AC11 | Expand a sticky prompt | the collapse chevron sits in its top-right corner without a separate full-width control row; prompt text starts at the top content row and does not overlap the chevron |
+| AC12 | Read a collapsed sticky prompt | the summary is raised and optically centered vertically inside the bubble rather than sitting low |
 
 ## 3. Reference findings
 
@@ -52,6 +54,9 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 - [x] Localize «Развернуть» and «Свернуть» in EN/RU/ZH and ensure keyboard access, focus behavior and no horizontal overflow at the narrow Second Side Bar width.
 - [x] Add regression tests for boundary flicker, media-only prompts, multiple steering messages, replay without IDs and hidden hook text.
 - [x] Run `pnpm lint`, typecheck and the affected suites, then package and exercise the real isolated VSIX with mouse scrolling, expand/collapse, media viewer and WebP screenshots.
+- [x] Move the ordinary user-message timestamp to the left side of its bubble and cover narrow-width rendering.
+- [x] Overlay the expanded sticky chevron in the top-right corner, remove the empty full-width control row and verify that the first text line starts at the top without overlapping the button.
+- [x] Raise the collapsed summary and center it optically within the sticky bubble; verify with computed geometry and a WebP screenshot.
 
 ## 5. Verification by observation
 
@@ -81,3 +86,6 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 - Implemented in build 18; optional click-to-jump remains deliberately unimplemented. Accumulated main-profile acceptance is a separate open step.
 - [OWNER] «ну сообщения юзера А) справа, б) фон имеют другой» · 2026-11-25 (чат): the sticky prompt uses the user-message visual identity.
 - [OWNER] «так что стики нужно делать по аналогии с тем, как он в чате выглядит, чтобы сохранялась у юзера ассоциация», «не нужна ему кнопка развернуть, если он в одну строку», «и всю верхнюю панель можешь в цвет сообщения юзера превращать, такого цвета - на всю ширину чата такой пузырь сообщени юзера вверху» · 2026-11-25 (чат): sticky spans the chat with the user-message background; expansion is available only for truncated, multiline or media prompts.
+- [OWNER] «давай время сообщений пользователя писать слева от них, вот тут» · 2026-11-25 16:46 +03:00 (чат): ordinary user-message send time belongs to the left of the bubble.
+- [OWNER] «а в стики сообщении вверху не делать пустое место на всю ширину пузыря только ради кнопки сворачинвания - её можно как-то аккуратно в уголке вверху справа поместить так, чтобы тексту не мешала, но текст поднять вверх пузыря» · 2026-11-25 16:46 +03:00 (чат): the expanded sticky chevron overlays the top-right corner and the text moves up into the former control-row space.
+- [OWNER] «в стики пузыре нужно текст выше поднять, по оптическому центру тяжести чтобы вертикально текст был в пузыре выровнен» · 2026-11-25 16:55 +03:00 (чат): the collapsed summary is optically centered vertically rather than sitting low.

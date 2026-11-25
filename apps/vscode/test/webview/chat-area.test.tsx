@@ -92,12 +92,18 @@ describe("sticky user prompt", () => {
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("bg-zinc-100");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("rounded-2xl");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("rounded-br-md");
+    expect(sticky.querySelector("button span")?.className).toContain("leading-none");
+    expect(sticky.querySelector("button")?.className).toContain("items-center");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("transition-transform");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("motion-reduce:transition-none");
 
     fireEvent.click(within(sticky).getByRole("button", { name: /Expand/ }));
     expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).toContain("animate-in");
     expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).toContain("motion-reduce:animate-none");
+    expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).toContain("pr-6");
+    expect(sticky.querySelector("[data-testid=sticky-prompt-full]")?.className).not.toContain("mt-2");
+    expect(within(sticky).getByRole("button", { name: /Collapse/ }).className).toContain("absolute");
+    expect(within(sticky).getByRole("button", { name: /Collapse/ }).className).toContain("right-2");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("rotate-180");
     expect(sticky.querySelector("[data-testid=sticky-prompt-full]")).not.toBeNull();
     const thumbnail = sticky.querySelector('img[alt="Media"]');

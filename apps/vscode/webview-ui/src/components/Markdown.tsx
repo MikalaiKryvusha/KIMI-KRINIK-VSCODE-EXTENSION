@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState, useEffect, useCallback } from "react";
+import React, { memo, useMemo, useState, useEffect, useCallback, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -175,6 +175,8 @@ export const Markdown = memo(function Markdown({ content, className, enableEnric
   const isDark = useIsDark();
   const [fileMap, setFileMap] = useState<Record<string, boolean>>({});
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const enrichmentRef = useRef({ enableEnrichment, fileMap });
+  enrichmentRef.current = { enableEnrichment, fileMap };
 
   useEffect(() => {
     if (!enableEnrichment || !content) {
@@ -200,7 +202,7 @@ export const Markdown = memo(function Markdown({ content, className, enableEnric
   const codeStyle = isDark ? (oneDark as any) : (oneLight as any);
 
   const components: Components = useMemo(() => {
-    const enrich = (children: React.ReactNode) => (enableEnrichment ? enrichChildren(children, fileMap) : children);
+    const enrich = (children: React.ReactNode) => (enrichmentRef.current.enableEnrichment ? enrichChildren(children, enrichmentRef.current.fileMap) : children);
     return {
       p: ({ children }) => <p className="mb-2 last:mb-0">{enrich(children)}</p>,
       li: ({ children }) => <li>{enrich(unwrapParagraphs(children))}</li>,
@@ -243,17 +245,17 @@ export const Markdown = memo(function Markdown({ content, className, enableEnric
         const isInline = !code.includes("\n") && !match;
 
         if (isInline) {
-          const showColor = enableEnrichment && hasColors(code);
+          const showColor = enrichmentRef.current.enableEnrichment && hasColors(code);
           return (
             <code className="bg-muted px-1 py-0.5 rounded text-[11px]" {...props}>
               {showColor ? <ColorEnrichedText text={code} /> : children}
             </code>
           );
         }
-        return <CodeBlock code={code} language={match?.[1]} enableHighlight={enableEnrichment && !!match} style={codeStyle} />;
+        return <CodeBlock code={code} language={match?.[1]} enableHighlight={enrichmentRef.current.enableEnrichment && !!match} style={codeStyle} />;
       },
     };
-  }, [enableEnrichment, enableLocalImageRender, fileMap, codeStyle]);
+  }, [enableLocalImageRender, codeStyle]);
 
   if (!content) return null;
 

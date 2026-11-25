@@ -34,13 +34,17 @@ describe("user message rendering", () => {
     expect(paragraphs[1]?.textContent).toBe("third paragraph");
   });
 
-  it("shows the localized send time inside the user bubble", () => {
+  it("shows the localized send time to the left of the user bubble", () => {
     const timestamp = Date.UTC(2026, 0, 2, 3, 4);
     const { container } = render(<ChatMessage message={{ id: "user-time", role: "user", content: "hello", timestamp }} />);
 
     const time = container.querySelector("time");
+    const bubble = container.querySelector(".rounded-2xl");
     expect(time?.textContent).toBe(new Intl.DateTimeFormat("en-US", { hour: "2-digit", minute: "2-digit" }).format(timestamp));
     expect(time?.getAttribute("dateTime")).toBe(new Date(timestamp).toISOString());
+    expect(time?.parentElement?.className).toContain("items-center");
+    expect(time?.nextElementSibling).toBe(bubble);
+    expect(bubble?.contains(time)).toBe(false);
   });
 });
 
@@ -105,6 +109,60 @@ describe("working indicator", () => {
       />,
     );
     expect(container.querySelector("[role=status]")?.textContent).toBe("Working…");
+  });
+});
+
+describe("assistant streaming text", () => {
+  it("keeps the visible text node mounted when its step finishes", () => {
+    const { container, rerender } = render(
+      <ChatMessage
+        message={{
+          id: "assistant-streaming-text",
+          role: "assistant",
+          content: "",
+          steps: [{ n: 1, items: [{ type: "text", content: "visible answer", finished: false }] }],
+          timestamp: 0,
+        }}
+        isStreaming
+      />,
+    );
+    const before = Array.from(container.querySelectorAll("p")).find((paragraph) => paragraph.textContent === "visible answer");
+    expect(before).not.toBeUndefined();
+
+    rerender(
+      <ChatMessage
+        message={{
+          id: "assistant-streaming-text",
+          role: "assistant",
+          content: "",
+          steps: [{ n: 1, items: [{ type: "text", content: "visible answer", finished: true }] }],
+          timestamp: 0,
+        }}
+      />,
+    );
+
+    const after = Array.from(container.querySelectorAll("p")).find((paragraph) => paragraph.textContent === "visible answer");
+    expect(after).toBe(before);
+  });
+
+  it("keeps the fallback response mounted when streaming finishes", () => {
+    const { container, rerender } = render(
+      <ChatMessage
+        message={{ id: "assistant-fallback-text", role: "assistant", content: "fallback answer", steps: [], timestamp: 0 }}
+        isStreaming
+      />,
+    );
+    const before = Array.from(container.querySelectorAll("p")).find((paragraph) => paragraph.textContent === "fallback answer");
+    expect(before).not.toBeUndefined();
+
+    rerender(
+      <ChatMessage
+        message={{ id: "assistant-fallback-text", role: "assistant", content: "fallback answer", steps: [], timestamp: 0 }}
+      />,
+    );
+
+    const after = Array.from(container.querySelectorAll("p")).find((paragraph) => paragraph.textContent === "fallback answer");
+    expect(after).toBe(before);
   });
 });
 

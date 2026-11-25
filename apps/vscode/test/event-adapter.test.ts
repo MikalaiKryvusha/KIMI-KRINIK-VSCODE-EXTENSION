@@ -43,6 +43,19 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
     });
   });
 
+  it('keeps internal hook results out of assistant content', () => {
+    const result = adaptSdkEvent(createEventAdapterState(), {
+      type: 'hook.result',
+      sessionId: 'session-1',
+      agentId: 'main',
+      turnId: 7,
+      hookEvent: 'UserPromptSubmit',
+      content: '<hook_result hook_event="UserPromptSubmit">\nclock-now and KAIF knowledge\n</hook_result>',
+    });
+
+    expect(result.event).toBeUndefined();
+  });
+
   it('emits thinking content when the model streams a thinking delta', () => {
     const result = adaptSdkEvent(createEventAdapterState(), {
       type: 'thinking.delta',

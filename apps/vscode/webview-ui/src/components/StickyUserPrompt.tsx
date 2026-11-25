@@ -135,13 +135,23 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
 
   return (
     <div data-testid="sticky-user-prompt" className="sticky top-0 z-20 border-b bg-background text-foreground shadow-sm">
-      <div data-testid="sticky-prompt-bubble" className="w-full rounded-2xl rounded-br-md bg-zinc-100 px-3.5 py-1.5 transition-colors duration-200 motion-reduce:transition-none dark:bg-zinc-800">
-        <button type="button" onClick={onToggle} disabled={!expanded && !canExpand} aria-label={expanded || canExpand ? action : undefined} aria-expanded={expanded} aria-controls="sticky-prompt-full" className="flex w-full min-w-0 items-center gap-3 text-left">
-          {!expanded && <span ref={summaryRef} className="min-w-0 flex-1 truncate text-xs">{text || t("queue.mediaOnly")}</span>}
+      <div data-testid="sticky-prompt-bubble" className="relative w-full rounded-2xl rounded-br-md bg-zinc-100 px-3.5 py-1.5 transition-colors duration-200 motion-reduce:transition-none dark:bg-zinc-800">
+        <button
+          type="button"
+          onClick={onToggle}
+          disabled={!expanded && !canExpand}
+          aria-label={expanded || canExpand ? action : undefined}
+          aria-expanded={expanded}
+          aria-controls="sticky-prompt-full"
+          className={expanded
+            ? "absolute right-2 top-1.5 z-10 flex size-5 items-center justify-center rounded-md text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
+            : "flex w-full min-w-0 items-center gap-3 text-left"}
+        >
+          {!expanded && <span ref={summaryRef} className="min-w-0 flex-1 truncate text-xs leading-none">{text || t("queue.mediaOnly")}</span>}
           {(expanded || canExpand) && <IconChevronDown className={`ml-auto size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`} />}
         </button>
         {expanded && (
-          <div id="sticky-prompt-full" data-testid="sticky-prompt-full" className="mt-2 min-w-0 animate-in fade-in slide-in-from-top-1 text-xs leading-relaxed duration-200 motion-reduce:animate-none">
+          <div id="sticky-prompt-full" data-testid="sticky-prompt-full" className="min-w-0 animate-in fade-in slide-in-from-top-1 pr-6 text-xs leading-relaxed duration-200 motion-reduce:animate-none">
             {text && <div className="whitespace-pre-wrap wrap-break-word">{text}</div>}
             <MessageMedia images={images} videos={videos} onPreview={setPreviewMedia} />
           </div>

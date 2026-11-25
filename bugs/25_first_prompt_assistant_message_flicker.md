@@ -1,7 +1,7 @@
 # Bug 25 — Chat feed briefly shows and then removes a Kimi message on the first prompt
 
-**Status:** 🔧 replay flicker reproduced and fixed on isolated build 19; original main-profile first-prompt variant remains unverified
-**Version/build:** KIMI KRINIK 1.0.0 build 12 · `6fea8307b` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 23:50 +03:00, first message of a new session
+**Status:** 🔧 replay and live Markdown remounts fixed and verified on isolated build 22; accumulated main-profile running-build acceptance pending
+**Version/build:** KIMI KRINIK 1.0.0 builds 12 and 19 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 23:50 +03:00 and 2026-11-25 16:41 +03:00, first message of a new session
 **Severity:** S2
 **Fixing:** after the owner-requested context-ring color change; before further backlog work
 **Fix accepted when (observable):** sending the first message does not flash the conversation or transiently show an assistant entry; every real assistant message remains visible in the same position through reconciliation, completion and reload.
@@ -9,6 +9,7 @@
 ## Symptom
 
 [OWNER] «когда я тебе это сообщение отправил первое - в полотне чато что-то резко моргнуло. словно какое-то сообщение от КИМИ появилось и тут же исчезло - баг» · 2026-11-24 23:46 +03:00 (чат)
+[OWNER] «сразу как я тебе первое сообщение resume отправил - в полотне чата твоё какое-то сообщение появилось и мгновенно исчезло. Баг присутвтствует.» · 2026-11-25 16:41 +03:00 (чат)
 
 The whole chat feed flickered immediately after the first prompt. The owner perceived a short-lived Kimi message that appeared and disappeared. Whether this was an optimistic assistant placeholder, a durable event reconciliation, or another render path is not yet known.
 
@@ -19,9 +20,13 @@ The whole chat feed flickered immediately after the first prompt. The owner perc
 3. Observe the chat feed frame by frame until the durable assistant response settles.
 4. Reload the session and compare the persisted entries with the transient sequence.
 
-The symptom is owner-observed once; deterministic reproduction and frame-level evidence are still missing.
+The symptom is owner-observed on builds 12 and 19; deterministic reproduction and frame-level evidence of the original first-prompt path are still missing.
 
 ## Forensics
+
+2026-11-25 16:41 +03:00 — the owner sent `resume` as the first message of this session on the accumulated main profile and immediately saw a Kimi message appear and vanish. Build 19 was installed with exact extension/webview hashes before this session; this reopens the original first-prompt path after the isolated non-reproductions below. The session wire contains no completion before the first visible text: `resume` at 16:41:11, first step at 16:41:15, first text at 16:41:29. An early current-turn `stream_complete` is therefore not the observed cause.
+
+2026-11-25 16:52 +03:00 — re-reading the old build-19 traces found the evidence the earlier container-only verdict missed: `.tmp/k25-instant-trace.json` records `K25 response` removed and re-added around text finalization, and `.tmp/k25-fixed-summary.json` has one frame with `assistants: 1` but `hasResponse: false`. The assistant container survived while its visible response did not. This matches the owner's perceptual symptom and redirects reproduction from message-list emptiness to Markdown/text replacement.
 
 2026-11-25 02:14 +03:00 — isolated build 18 instant first prompt did not reproduce assistant loss: MutationObserver/requestAnimationFrame kept one assistant container through optimistic, durable and completed states. Markdown text nodes were replaced internally without losing the container. Trace: `.tmp/k25-instant-trace.json`; final WebP `.tmp/k5-vscode/49-k25-instant-settled.webp`.
 
@@ -49,9 +54,29 @@ REAL WORLD: accumulated — the owner's original build-12 first-prompt observati
 
 TWINS: searched `messages: []`, replay loops through `get().processEvent` and `attentionSuppressed` — the single `loadSession` replay path now applies atomically; `startNewConversation` intentionally remains a real empty conversation, not a replay.
 
+## Fix evidence — 2026-11-25 17:16 +03:00
+
+The live first-prompt class also had a rendering cause: changing `enableEnrichment` replaced Markdown's custom component identities and remounted visible assistant paragraphs. `Markdown.tsx` now keeps those identities stable while the latest enrichment state is read through a ref; deferred file checks and all existing call sites are unchanged.
+
+Hygiene: step and fallback regressions were red before the change and green afterward. Webview is 165/165 and the full extension suite is 610 passed / 1 skipped, with typecheck and root lint green.
+
+Functional run: isolated build 22 completed first and multiline prompts with no assistant-response removals in `.tmp/k22-trace.json`. Build 20 had shown the old remove/re-add behavior. The build-22 screenshots were opened and read. Report: `testcases/reports/2026-11-25_chat_rendering_build_22.md`.
+
+@guard assistant-text-finalization
+THREAT: a real assistant response flashes out of the conversation when a streaming step or fallback response finishes.
+PROVED-AGAINST: component rerenders from unfinished to finished text remounted the exact visible paragraph before the fix; both variants are green afterward, and isolated build 22 recorded no response removals.
+GAP: the component test does not measure the owner's full accumulated-profile frame sequence; the isolated VSIX covers the real renderer and event path.
+ON-REAL-PATH: isolated packaged build 22 verified; accumulated main-profile running build 22 NOT YET.
+
+REAL WORLD: accumulated — the owner's build-12/build-19 first-prompt observations; data and machine — his Windows main profile; path — first prompt in Second Side Bar. Build 22 is installed on that profile, but its running Extension Host has not been restarted and observed. This bug is not DONE.
+
+TWINS: searched every `enableEnrichment` call site and the old component-map dependencies. The shared Markdown fix covers normal steps, fallback content, thinking and tool text; no second component map with the old finalization dependency remains.
+
+TWINS-MECH: a visible response can vanish through list reset, container removal, text-node replacement, renderer remount or viewport movement. The first three forms were searched and measured; viewport movement was excluded by the reproduced DOM replacement, not assumed impossible in other reports.
+
 ## Decisions made without the owner
 
-Classified as S2 because a disappearing response can hide product output and interrupt work. Kept the cause open because the single visual observation cannot distinguish reconciliation from replay or viewport movement.
+Classified as S2 because a disappearing response can hide product output and interrupt work. Kept the cause open because the single visual observation cannot distinguish reconciliation from replay or viewport movement. Later preserved deferred enrichment through a latest-value ref instead of enabling file checks on every streaming delta, after the component tests isolated renderer identity as the remount cause.
 
 ## Links
 

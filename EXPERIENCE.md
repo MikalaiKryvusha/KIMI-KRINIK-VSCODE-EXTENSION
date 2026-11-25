@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0016 · 2026-11-25 · ❌→✅ · #chat #markdown #hooks #testing
+class: guard-not-proven-against-threat
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-message.test.tsx apps/vscode/test/event-adapter.test.ts
+**Context:** an assistant-container check stayed green while the owner saw text vanish, and the replay-only hook filter left the live hook path visible.
+**Tried / did:** measured response-text frames instead of container counts, asserted DOM identity across finalization, and exercised the real main-agent/live-hook adapter plus packaged VSIX delivery.
+**Result:** ❌→✅ — both finalization variants remounted before stable renderer identities; build 20 showed live hook text, builds 21/22 hid it while model input retained it. Full extension 610/1 is green.   → link: bugs/25 · bugs/15 · testcases/reports/2026-11-25_chat_rendering_build_22.md
+**Lesson:** assert the exact perceptible thing that can disappear and cover the live adapter as well as replay; a surviving wrapper or a green replay path says nothing about live text.
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-message.test.tsx apps/vscode/test/event-adapter.test.ts`; functional evidence is `testcases/reports/2026-11-25_chat_rendering_build_22.md`.
+**Trigger:** verifying chat rendering or internal-event visibility → measure visible content through the live public event path, not only container counts or replay.
+**Not for:** claiming the accumulated main-profile running build before its Extension Host is restarted and observed.
+
 ### EXP-0015 · 2026-11-25 · ❌→✅ · #context #compaction #testing
 class: guard-not-proven-against-threat
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/session-runtime.test.ts apps/vscode/test/kimi-harness.integration.test.ts -t "Context Window Control"
