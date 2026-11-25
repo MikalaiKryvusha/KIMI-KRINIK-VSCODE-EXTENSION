@@ -3,7 +3,7 @@
 > Topic: разрешение на финальную приёмку build 19 на основном профиле и последующую публикацию релиза
 > Source of the idea: owner's «готовь релиз 1.0.0» in chat, 2026-11-25
 > Created: 2026-11-25 14:07 +03:00
-> Status: **🟡 awaiting the owner's answers**
+> Status: **✅ ANSWERS RECEIVED 2026-11-25 16:33 +03:00 — option B, installation only**
 
 ## Context / what I already found in the code
 

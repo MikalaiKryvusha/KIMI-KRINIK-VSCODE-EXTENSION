@@ -29,12 +29,13 @@
 - [OWNER] «вот это в ДИДМИ продукта зачем? ... ЗАЧЕМ МНЕ ЭТа ИНФОРМАЦИЯ? ... ✅ работает без KAIF», «вот это тоже нахуй все такое поудаляй из ридми · 🚧 приёмка на основном профиле» (чат). Removed KAIF badges/integration/credits and every 🚧 acceptance marker from README in all three languages. Product documentation now describes only KIMI KRINIK behavior.
 - `release-notes/1.0.0/changelog.{en,ru,zh}.md` is ready with the neutral factual title `KIMI KRINIK 1.0.0`. Independent semantic review is resolved and voice/link checks are green.
 - [OWNER] «разрешаю установить» · 2026-11-25 16:33 +03:00 (chat). Option B is selected: build-19 installation on the main profile is authorized; publication is not authorized. Install and verify the running build before any further acceptance.
+- Process correction: the owner requires the newest fixed builds on his working profile by default, not only on isolated stands. This is now standing authorization in `HOUSE_RULES.md` R5; release publication remains separately gated.
 - Closure debt: final Desktop E2E smoke passed 1/1 (`core-turn.spec.ts`, 46.3s), full extension 607/1, typecheck/lint/build and voice/link checks green. Final judge and final commit/push are recorded below after execution. The earlier force-closed README/judge debts were paid in this chat.
 - [OWNER] challenged an unsupported multiline dash: the comparison cells now say `standard Markdown whitespace` instead of claiming the feature is absent. KAIF and all acceptance markers were removed by the owner's direct instruction.
 
 ## Where we are now
 
-Main and origin/main are synchronized before the closing commit. The release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `8ef5b5e37606ca9de1a6c96f97e68eb5ea8e3f8327730416a912db9b031f405d`. The extension has 607 passed / 1 skipped and 0 failures. No GitHub Release exists and no build-19 main-profile installation has been performed.
+Main and origin/main are synchronized before the closing commit. The release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `8ef5b5e37606ca9de1a6c96f97e68eb5ea8e3f8327730416a912db9b031f405d`. The extension has 607 passed / 1 skipped and 0 failures. Build 19 is installed on the main profile: manifest `buildNumber: 19`, installed extension/webview hashes exactly match the VSIX. Direct VS Code CLI installation was required because test-electron reported success without replacing the build-14 files. No GitHub Release exists.
 
 ## ❓ Awaiting human review
 
@@ -43,7 +44,7 @@ Main and origin/main are synchronized before the closing commit. The release can
 
 ## Where to continue next session
 
-1. Run `/skill:resume`, read the interview and the current answer. If A: install build 19 on the main profile and finish the remaining accumulated-profile acceptance. If B: install only and report without publishing. If C: leave the main profile on build 14 and stop the release path.
+1. Run `/skill:resume`. Option B is complete: build 19 is installed on the main profile with exact hashes. Restart VS Code so the running Extension Host loads it, then finish the remaining accumulated-profile acceptance. Do not publish without separate owner `AUTH:`.
 2. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
 3. If the answer is still absent, do not install or publish. Next clear work is real VSIX preflight verification for `bugs/29`, then accumulated-profile acceptance of `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` when the owner prioritizes it.
 4. `bugs/11` stays parked by the owner's Pareto direction; resume only with new deterministic evidence. Do not start `ideas/02` before 1.0.0 is released. `ideas/03` is the next development cut after the release path.
