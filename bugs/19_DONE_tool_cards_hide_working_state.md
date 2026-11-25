@@ -1,6 +1,6 @@
 # Bug 19 — Tool cards leave no visible working state
 
-**Status:** 🔴 OPEN
+**Status:** ✅ DONE — current isolated build 19 passes active tool, completion and replay observations
 **Version/build:** KIMI KRINIK 1.0.0 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 16:02 +03:00, recurring owner observation during active agent turns
 **Severity:** S2
 **Fixing:** after the immediate duplicate-steer fix in `bugs/20`; verify in isolated VS Code
@@ -24,7 +24,7 @@ The active response always retains a visible «Работаю…» indicator aft
 
 ## Actual result
 
-Only the tool card and empty space remain. No «Работаю…» is visible in the supplied screenshot.
+Current build 19 shows «Работаю…» after the completed ReadFile card while the next model step is held. The indicator disappears on genuine completion and remains absent after replay.
 
 ## Forensics / hypotheses
 
@@ -33,9 +33,16 @@ Only the tool card and empty space remain. No «Работаю…» is visible i
 - `event-handlers.ts` clears global streaming on `stream_complete`, runtime errors and `StepInterrupted`, not on `ToolResult`.
 - The owner screenshot alone does not distinguish an incorrect false streaming state, a last-message/timeline problem or a viewport issue. The live event sequence must be captured before naming the root cause.
 
-## Fix plan
+## Resolution
 
-Reproduce with store-driven ToolCall → ToolResult → next-step events and inspect both the store and rendered indicator. Pin the exact failing transition before editing. Preserve the indicator after completed tool cards while work is active, remove it on genuine settlement and never show it during replay. Verify the same sequence in an isolated installed VSIX with DOM and WebP evidence.
+The current lifecycle already preserves global streaming after ToolResult and passes it to the last assistant message. The original defect did not reproduce on the current build; no additional product change was needed.
+
+## ✅ STATUS: DONE (2026-11-25 03:11 +03:00)
+
+Hygiene: existing WorkingIndicator and chat lifecycle checks remain green in the full extension suite (597 passed, 1 skipped, 0 failed); root lint exits 0.
+Functional run: fresh isolated build 19, scripted ToolCall → ToolResult → held next step. «Работаю…» was present with visible bounds top 169.58 / bottom 194.08 in a 522 px viewport and WebP `.tmp/k5-vscode/53-k19-tool-working.webp`. After release `statusText=null`; after real history replay `statusText=null` with the same tool card/response present. Report: `testcases/reports/2026-11-25_tool_working_build_19.md`.
+
+Two-client replay is outside this bug's original acceptance and remains in the broader lifecycle matrix.
 
 ## Decisions made without the owner
 

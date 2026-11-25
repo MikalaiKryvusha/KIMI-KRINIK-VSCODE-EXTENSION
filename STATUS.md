@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 03:11 +03:00 — tool-card Working state verified; bugs/19 DONE
+- Isolated build 19 showed «Работаю…» below ReadFile while the next model step was held, within visible bounds. It disappeared on genuine completion and stayed absent after history replay. No additional product change was needed.
+- Report: `testcases/reports/2026-11-25_tool_working_build_19.md`. Two-client replay remains in the broader lifecycle matrix.
+
 ### 2026-11-25 02:58 +03:00 — multiline queue/Steer integrity confirmed; bugs/23 DONE
 - Exact owner sample passed AUTO STEER OFF queue/dequeue and ON running-turn Steer on isolated build 19. Both provider bodies matched the UTF-8 source including the blank line; final bubbles retained it. Only the intentional queue preview is compact; no product change was needed.
 - Report: `testcases/reports/2026-11-25_multiline_queue_steer.md`. `ideas/01` was also tagged DONE in this backlog revision; other partial bugs remain open.
@@ -173,7 +177,6 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔧 `bugs/22_first_send_stuck_in_steering_queue.md` — exactly-once/result contracts implemented; main-profile build-12 acceptance pending.
 - 🔧 `bugs/24_glass_preview_silent.md` — real packaged MP3 playback passed in isolation; main-profile build-12 acceptance pending.
 - 🔧 `bugs/20_queue_steer_duplicate_submission.md` — whole-batch delivery verified on fresh isolated build 17; main-profile acceptance pending.
-- 🔴 `bugs/19_tool_cards_hide_working_state.md` — completed tool cards can leave no visible «Работаю…» while the turn remains active.
 - 🔴 `bugs/18_reentrant_prompt_internal_error.md` — owner hit the generic send error in both extensions; the fresh KIMI KRINIK log proves a second ordinary prompt hit the active-response guard.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — steering bubbles wait for acknowledgement and some sends are lost at a state transition.
 - 🔧 `bugs/12_steer_composer_restores_previous_text.md` — stale/latest composer contracts fixed; main-profile build-12 acceptance pending.
