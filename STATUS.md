@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 03:26 +03:00 — steering avatar/user order verified; bugs/16 DONE
+- Immediate, two-consecutive and replayed steering on isolated build 19 preserve base → steer one → steer two → assistant response. Clean replay offsets were 14/61/71/87 with no avatar inversion, error or Retry; three WebP frames were read.
+- Report: `testcases/reports/2026-11-25_steer_avatar_order.md`. Current lifecycle already had the fix; no product change was needed.
+
 ### 2026-11-25 03:11 +03:00 — tool-card Working state verified; bugs/19 DONE
 - Isolated build 19 showed «Работаю…» below ReadFile while the next model step was held, within visible bounds. It disappeared on genuine completion and stayed absent after history replay. No additional product change was needed.
 - Report: `testcases/reports/2026-11-25_tool_working_build_19.md`. Two-client replay remains in the broader lifecycle matrix.
@@ -183,7 +187,6 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔧 `bugs/13_steer_attachments_and_thumbnails.md` — thumbnails/viewer fixed and observed; media delivery and main-profile build-12 acceptance pending.
 - 🔴 `bugs/14_steer_queue_not_added.md` — the follow-up queue is not visibly added; exact state combination needs reproduction.
 - 🔧 `bugs/15_hook_results_visible_in_chat.md` — replay hook rendering fixed; main-profile build-12 confirmation pending.
-- 🔴 `bugs/16_steer_avatar_precedes_user_bubble.md` — steering is nested inside assistant steps, placing the avatar above the user's bubble.
 - 🔴 `bugs/04_frozen_prompt_windows_path.md` — pre-existing Windows cwd/listing failure reproduced on the original engine service.
 - 🔴 `bugs/05_pre_post_compact_hook_log_empty.md` — pre-existing empty Pre/PostCompact payload list reproduced on the original engine service.
 - 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.

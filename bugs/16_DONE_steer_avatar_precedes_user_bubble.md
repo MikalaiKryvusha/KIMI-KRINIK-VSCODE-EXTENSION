@@ -1,6 +1,6 @@
 # Bug 16 — Assistant avatar appears above the user's steering bubble
 
-**Status:** 🔴 OPEN
+**Status:** ✅ DONE — immediate, consecutive steering and replay order verified on isolated build 19
 **Version/build:** KIMI KRINIK 1.0.0 · current working tree after `8ac5df733` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:33 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** as part of the chat-pipeline research and redesign; verify in isolated VS Code
@@ -21,7 +21,7 @@ The user steering bubble is a separate user entry in the conversation flow. The 
 
 ## Actual result
 
-The assistant avatar introduces a container that includes the later user steering bubble, reversing the visible ownership/order boundary.
+The current lifecycle creates separate user entries for immediate and consecutive steering. On build 19 the visible and replayed order is base user → steer one → steer two → assistant avatar/response; no assistant avatar introduces a container above a later user bubble.
 
 ## Forensics / hypotheses
 
@@ -29,9 +29,14 @@ The assistant avatar introduces a container that includes the later user steerin
 - `apps/vscode/webview-ui/src/components/ChatMessage.tsx:258-287` renders the assistant avatar before all step items, including `steer`.
 - This structural ordering is confirmed by the code. The redesign must also preserve chronological order across multiple steers and replay.
 
-## Fix plan
+## Resolution
 
-Include this case in the chat-pipeline research. Represent steering as a separate user entry or otherwise split the assistant container at the steering boundary, with stable message identity and no duplicate optimistic/replayed entries. Add immediate and replay rendering regressions with avatar order assertions and isolated-VS-Code screenshots.
+The current optimistic `clientId` lifecycle and atomic replay already provide the required separate user sections. The original defect did not reproduce on the current build; no additional product change was needed.
+
+## ✅ STATUS: DONE (2026-11-25 03:26 +03:00)
+
+Hygiene: existing optimistic reconciliation and chat component checks remain green in the full extension suite (597 passed, 1 skipped, 0 failed); root lint exits 0.
+Functional run: fresh isolated build 19, two consecutive steering messages. Immediate WebP `.tmp/k5-vscode/54-k16-two-steers.webp` showed base/one/two before KIMI. A clean second series and real replay returned text offsets base=14, one=61, two=71, response=87, with no active indicator, error or Retry. WebP `.tmp/k5-vscode/55-k16b-clean-order.webp` and `.tmp/k5-vscode/56-k16b-replay-order.webp` were opened and read. Report: `testcases/reports/2026-11-25_steer_avatar_order.md`.
 
 ## Decisions made without the owner
 
