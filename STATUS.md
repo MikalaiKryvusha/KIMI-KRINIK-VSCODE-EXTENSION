@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 04:27 +03:00 — root AGENTS.md translated to English without rule changes
+- Translated all project principles, maps, verification, testing, workflow and review contracts into English; no Han-script prose remains. Condensed wording only to satisfy the existing size guard, without raising the limit.
+- `pnpm lint` exits 0: root `AGENTS.md` is 22986/23200 bytes and all 174 references resolve. Full extension suite remains 597 passed, 1 skipped, 0 failed.
+
 ### 2026-11-25 04:18 +03:00 — full isolated media matrix passes
 - ON image-only delivered one PNG with zero text; OFF video-only queued and delivered one MP4 with zero text. Thumbnail/viewer and replayed video use identical URIs. `bugs/13` and `bugs/14` now have image/video, text+media and media-only evidence.
 - Only accumulated main-profile acceptance remains for both. Report: `testcases/reports/2026-11-25_media_only_video.md`.
@@ -182,7 +186,7 @@ KNOWLEDGE: the outbound result/queue lifecycle and packaged-audio flow live in `
 3. Keep `bugs/12`, `bugs/13`, `bugs/15`, `bugs/20`, `bugs/22` and `bugs/24` open until those real-profile observations. Fix the separate `usage-status-bar` selector without claiming the current full suite was green.
 4. Take the sticky-last-message feature as the next separate task after acceptance. Two-client replay, `bugs/16`, `bugs/18`, `bugs/23` and the remaining K5 matrix stay explicit follow-ups.
 5. After KIMI KRINIK 1.0.0 is completed and released, implement the owner-approved `ideas/02_control_panel_skill_picker.md`; keep the KAIF translation work in its linked upstream idea 39.
-6. Translate the root `AGENTS.md` fully into English without changing any rule or engineering contract; the owner does not want Chinese-language legacy in the project's working documents.
+6. ✅ Root `AGENTS.md` is fully translated into English without changing any rule or engineering contract; the owner does not want Chinese-language legacy in the project's working documents. Completed on 2026-11-25 with lint green at 22986/23200 bytes.
 7. Owner question answered: native VS Code General Settings follow the VS Code display language (`package.nls*.json`), not the extension's own language. Implement the owner-approved `ideas/03_extension_general_settings.md` as the next development cut: the extension-owned screen follows `kimi.language`, settings keep one owning screen, and Context Window Control plus thresholds move out of Control Panel settings.
 8. In the new chat, web-research whether Kimi Code supports subagents running in parallel without blocking the main agent flow. Use current sources, distinguish a supported nonblocking mode from an unsupported one, and record the evidence and any viable boundary instead of assuming either answer.
 
