@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 04:30 +03:00 — nonblocking subagent boundary confirmed
+- Official docs and local contracts prove `Agent(run_in_background=true)` returns a task ID immediately, supports concurrent background subagents and delivers results automatically. `AgentSwarm` runs concurrently but waits for its aggregated report, so it is parallel-but-blocking, not nonblocking.
+- Nested tasks must settle, task-management tools are required, and completion arrives as a notification/steered turn. No live subagent was launched because the project forbids unauthorized launches. Evidence: `researches/56_nonblocking_subagents.md`.
+
 ### 2026-11-25 04:27 +03:00 — root AGENTS.md translated to English without rule changes
 - Translated all project principles, maps, verification, testing, workflow and review contracts into English; no Han-script prose remains. Condensed wording only to satisfy the existing size guard, without raising the limit.
 - `pnpm lint` exits 0: root `AGENTS.md` is 22986/23200 bytes and all 174 references resolve. Full extension suite remains 597 passed, 1 skipped, 0 failed.
@@ -188,7 +192,7 @@ KNOWLEDGE: the outbound result/queue lifecycle and packaged-audio flow live in `
 5. After KIMI KRINIK 1.0.0 is completed and released, implement the owner-approved `ideas/02_control_panel_skill_picker.md`; keep the KAIF translation work in its linked upstream idea 39.
 6. ✅ Root `AGENTS.md` is fully translated into English without changing any rule or engineering contract; the owner does not want Chinese-language legacy in the project's working documents. Completed on 2026-11-25 with lint green at 22986/23200 bytes.
 7. Owner question answered: native VS Code General Settings follow the VS Code display language (`package.nls*.json`), not the extension's own language. Implement the owner-approved `ideas/03_extension_general_settings.md` as the next development cut: the extension-owned screen follows `kimi.language`, settings keep one owning screen, and Context Window Control plus thresholds move out of Control Panel settings.
-8. In the new chat, web-research whether Kimi Code supports subagents running in parallel without blocking the main agent flow. Use current sources, distinguish a supported nonblocking mode from an unsupported one, and record the evidence and any viable boundary instead of assuming either answer.
+8. ✅ Nonblocking subagents researched and recorded in `researches/56_nonblocking_subagents.md`: background `Agent` is supported; `AgentSwarm` is parallel-but-blocking; nested tasks/task-management/notification boundaries are explicit.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md` and `KIMI CODE LOGO/GPT ROBOT REFERENCES/`; do not sweep them into a commit.
 
