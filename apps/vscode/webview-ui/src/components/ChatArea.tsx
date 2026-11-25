@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom";
 import { IconArrowDown } from "@tabler/icons-react";
-import { ChatMessage } from "./ChatMessage";
+import { ChatMessage, hasMessageContent } from "./ChatMessage";
 import { getPromptKey, StickyUserPrompt, useActivePromptId } from "./StickyUserPrompt";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { useChatStore } from "@/stores";
@@ -27,6 +27,14 @@ function ScrollButton() {
 function MessageList() {
   const messages = useChatStore((s) => s.messages);
   const isStreaming = useChatStore((s) => s.isStreaming);
+  let streamingAssistantIndex = -1;
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message = messages[index]!;
+    if (message.role === "assistant" && (message.deferPresentation !== true || hasMessageContent(message))) {
+      streamingAssistantIndex = index;
+      break;
+    }
+  }
 
   return (
     <>
@@ -36,7 +44,7 @@ function MessageList() {
             key={message.id}
             message={message}
             turnIndex={getForkTurnIndex(messages, idx)}
-            isStreaming={isStreaming && idx === messages.length - 1 && message.role === "assistant"}
+            isStreaming={isStreaming && idx === streamingAssistantIndex}
           />
         ))}
       </div>

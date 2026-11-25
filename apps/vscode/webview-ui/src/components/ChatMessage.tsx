@@ -264,6 +264,10 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
     return typeof message.content === "string" ? message.content : "";
   })();
 
+  if (message.deferPresentation && !hasMessageContent(message)) {
+    return null;
+  }
+
   if (!isStreaming && !hasMessageContent(message) && !message.inlineError) {
     return null;
   }
@@ -338,7 +342,7 @@ function AssistantMessage({ message, turnIndex, isStreaming }: { message: ChatMe
   );
 }
 
-function hasMessageContent(message: ChatMessageType): boolean {
+export function hasMessageContent(message: ChatMessageType): boolean {
   if (!Content.isEmpty(message.content)) {
     return true;
   }

@@ -30,8 +30,9 @@
    reconciles the pair instead of duplicating it. Old events without an ID use content/order fallback.
 2. **Follow-up during a turn.** `sendMessage` while `isStreaming` → optimistic `clientId` pair → `steerNow` → `bridge.steerChat`.
    The host returns the complete `PromptSubmissionResult`; runtime emits `SteerInput` only for an accepted running steer, maps a queued
-   `promptId` to its later `TurnBegin`, and starts a non-steered running submission as its own correlated turn. `ok:false` reuses the same
-   optimistic record through idempotent `sendIdle`; only the latest failed action restores its text/media. Queue lightning is store-owned,
+   `promptId` to its later `TurnBegin`, and starts a non-steered running submission as its own correlated turn. A steering-created assistant
+   keeps its `clientId` and event route but defers presentation until real content arrives, so the previous robot and Working indicator do not jump to an empty region.
+   `ok:false` reuses the same optimistic record through idempotent `sendIdle`; only the latest failed action restores its text/media. Queue lightning is store-owned,
    uses the queued ID as `clientId`, holds the remaining queue through the selected operation and restores the original index on failure.
    A genuine completion opens a batch window: the next idle prompt carries `drainQueue`, the host emits `QueueBatchReady` immediately after
    `session.prompt` accepts it, and every remaining item joins through sequential steering. Terminal `turnIndex` values suppress completions

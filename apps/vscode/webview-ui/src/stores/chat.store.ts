@@ -60,6 +60,7 @@ export interface ChatMessage {
   forkable?: boolean;
   clientId?: string;
   optimistic?: boolean;
+  deferPresentation?: boolean;
 }
 
 export interface TokenUsage {
@@ -170,14 +171,16 @@ function buildDraftContent(text: string, media: readonly DraftMediaItem[]): stri
   return dataUris.length > 0 ? Content.build(text, dataUris) : text;
 }
 
-function appendOptimisticTurn(clientId: string, content: string | ContentPart[]): void {
+function appendOptimisticTurn(clientId: string, content: string | ContentPart[], deferPresentation = false): void {
   latestOutboundClientId = clientId;
   useChatStore.setState(
     produce((draft: ChatState) => {
+      const existingAssistant = draft.messages.find((message) => message.role === "assistant" && message.clientId === clientId);
+      if (existingAssistant) existingAssistant.deferPresentation = deferPresentation;
       if (draft.messages.some((message) => message.clientId === clientId)) return;
       const timestamp = Date.now();
       draft.messages.push({ id: clientId, role: "user", content, timestamp, clientId, optimistic: true });
-      draft.messages.push({ id: randomUUID(), role: "assistant", content: "", timestamp, steps: [], clientId, optimistic: true });
+      draft.messages.push({ id: randomUUID(), role: "assistant", content: "", timestamp, steps: [], clientId, optimistic: true, deferPresentation });
     }),
   );
 }
@@ -320,7 +323,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set((state) => ({
       draftMedia: state.draftMedia.map((item) => (sentMediaIds.has(item.id) ? { ...item, steering: true } : item)),
     }));
-    appendOptimisticTurn(clientId, content);
+    appendOptimisticTurn(clientId, content, true);
 
     void bridge.steerChat(content, clientId)
       .then((response) => {

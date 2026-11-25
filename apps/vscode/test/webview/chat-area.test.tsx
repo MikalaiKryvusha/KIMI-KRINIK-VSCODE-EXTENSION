@@ -35,6 +35,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  document.body.removeAttribute("data-baseuri");
   vi.restoreAllMocks();
 });
 
@@ -194,5 +195,52 @@ describe("sticky user prompt", () => {
     act(() => useChatStore.setState({ messages: firstMessages }));
 
     expect(screen.queryByTestId("sticky-prompt-full")).toBeNull();
+  });
+});
+
+describe("steering presentation", () => {
+  it("keeps the current robot and working state until the post-steer response has content", () => {
+    document.body.setAttribute("data-baseuri", "https://extension.test");
+    const deferredAssistant: ChatMessageType = {
+      id: "assistant-steered",
+      role: "assistant",
+      content: "",
+      timestamp: 4,
+      steps: [],
+      clientId: "steer-client",
+      optimistic: true,
+      deferPresentation: true,
+    };
+    useChatStore.setState({
+      messages: [
+        { id: "user-original", role: "user", content: "original", timestamp: 1, clientId: "original-client" },
+        {
+          id: "assistant-original",
+          role: "assistant",
+          content: "",
+          timestamp: 2,
+          steps: [{ n: 1, items: [{ type: "thinking", content: "thinking", finished: false }] }],
+          clientId: "original-client",
+        },
+        { id: "steer-client", role: "user", content: "steer", timestamp: 3, clientId: "steer-client", optimistic: true },
+        deferredAssistant,
+      ],
+      isStreaming: true,
+    });
+    render(<ChatArea />);
+
+    expect(screen.getAllByRole("img", { name: "KIMI KRINIK" })).toHaveLength(1);
+    expect(screen.getByRole("status").textContent).toBe("Working…");
+    expect(screen.getByRole("status").closest("[data-message-id]")?.getAttribute("data-message-id")).toBe("assistant-original");
+
+    act(() => useChatStore.setState((state) => ({
+      messages: state.messages.map((message) => message.id === "assistant-steered"
+        ? { ...message, steps: [{ n: 1, items: [{ type: "text", content: "post-steer answer", finished: false }] }] }
+        : message),
+    })));
+
+    expect(screen.getAllByRole("img", { name: "KIMI KRINIK" })).toHaveLength(2);
+    expect(screen.getByRole("status").closest("[data-message-id]")?.getAttribute("data-message-id")).toBe("assistant-steered");
+    document.body.removeAttribute("data-baseuri");
   });
 });

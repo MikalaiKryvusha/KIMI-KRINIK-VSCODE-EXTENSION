@@ -19,6 +19,7 @@ function reconcileOptimisticTurn(
   clientId?: string,
   turnIndex?: number,
   forkable?: boolean,
+  revealAssistant = true,
 ): boolean {
   const user = draft.messages.find((message) => message.role === "user" && message.optimistic === true
     && (clientId === undefined ? sameContent(message.content, content) : message.clientId === clientId));
@@ -33,6 +34,7 @@ function reconcileOptimisticTurn(
     assistant.turnIndex = turnIndex;
     assistant.forkable = forkable;
     assistant.steps ??= [];
+    if (revealAssistant) assistant.deferPresentation = false;
   }
   return true;
 }
@@ -613,7 +615,7 @@ const eventHandlers: Record<string, EventHandler> = {
   },
 
   SteerInput: (draft, payload: { user_input: string | ContentPart[]; clientId?: string }) => {
-    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId)) {
+    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId, undefined, undefined, false)) {
       draft.isStreaming = true;
       return;
     }

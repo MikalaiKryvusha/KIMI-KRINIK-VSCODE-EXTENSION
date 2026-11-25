@@ -136,6 +136,7 @@ describe("automatic follow-up steer", () => {
     expect(optimisticUsers[0]?.optimistic).toBe(true);
     const clientId = boundary.steerChat.mock.calls[0]?.[1] as string;
     expect(clientId).toEqual(expect.any(String));
+    expect(useChatStore.getState().messages.at(-1)).toMatchObject({ role: "assistant", deferPresentation: true });
 
     useChatStore.getState().processEvent({ type: "SteerInput", payload: { user_input: "second", clientId } });
     const users = useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "second");
@@ -145,6 +146,18 @@ describe("automatic follow-up steer", () => {
     expect(assistant?.steps?.flatMap((step) => step.items).some((item) => item.type === "steer")).toBe(false);
 
     finishSteer(RUNNING_STEER);
+  });
+
+  it("reveals the deferred assistant when a non-steered running submission becomes its own turn", () => {
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.getState().sendMessage("second");
+    const clientId = boundary.steerChat.mock.calls[0]?.[1] as string;
+
+    expect(useChatStore.getState().messages.at(-1)).toMatchObject({ role: "assistant", deferPresentation: true });
+    useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "second", clientId, turnIndex: 7 } });
+
+    expect(useChatStore.getState().messages.at(-1)).toMatchObject({ role: "assistant", deferPresentation: false });
   });
 
   it("passes every manual line break unchanged to idle prompts and running-turn steers", () => {
@@ -173,6 +186,7 @@ describe("automatic follow-up steer", () => {
 
     await vi.waitFor(() => expect(boundary.streamChat).toHaveBeenCalledTimes(2));
     expect(boundary.steerChat).toHaveBeenCalledTimes(1);
+    expect(useChatStore.getState().messages.at(-1)).toMatchObject({ role: "assistant", deferPresentation: false });
     expect(useChatStore.getState().queue).toHaveLength(0);
     expect(useChatStore.getState().messages.filter((message) => message.role === "user" && message.content === "second")).toHaveLength(1);
     useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "second", clientId } });
