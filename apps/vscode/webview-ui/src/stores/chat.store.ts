@@ -82,7 +82,6 @@ export interface MediaInConversation {
 export interface DraftMediaItem {
   id: string;
   dataUri?: string;
-  steering?: boolean;
 }
 
 export interface PendingInput {
@@ -163,12 +162,17 @@ function notifyEventAttention(event: UIStreamEvent): void {
 }
 
 function sendableDraftMedia(draftMedia: readonly DraftMediaItem[]): DraftMediaItem[] {
-  return draftMedia.filter((item) => item.dataUri && item.steering !== true);
+  return draftMedia.filter((item) => item.dataUri);
 }
 
 function buildDraftContent(text: string, media: readonly DraftMediaItem[]): string | ContentPart[] {
   const dataUris = media.map((item) => item.dataUri!);
   return dataUris.length > 0 ? Content.build(text, dataUris) : text;
+}
+
+function restoreSentDraftMedia(current: readonly DraftMediaItem[], sent: readonly DraftMediaItem[]): DraftMediaItem[] {
+  const sentIds = new Set(sent.map((item) => item.id));
+  return [...sent, ...current.filter((item) => !sentIds.has(item.id))];
 }
 
 function appendOptimisticTurn(clientId: string, content: string | ContentPart[], deferPresentation = false): void {
@@ -321,7 +325,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const sentMediaIds = new Set(media.map((item) => item.id));
     const clientId = randomUUID();
     set((state) => ({
-      draftMedia: state.draftMedia.map((item) => (sentMediaIds.has(item.id) ? { ...item, steering: true } : item)),
+      draftMedia: state.draftMedia.filter((item) => !sentMediaIds.has(item.id)),
     }));
     appendOptimisticTurn(clientId, content, true);
 
@@ -335,9 +339,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           discardOptimisticTurn(clientId);
           if (latestOutboundClientId === clientId) {
             set((state) => ({
-              draftMedia: state.draftMedia.map((item) => (
-                sentMediaIds.has(item.id) ? { id: item.id, dataUri: item.dataUri } : item
-              )),
+              draftMedia: restoreSentDraftMedia(state.draftMedia, media),
             }));
             get().rollbackInput(content);
           }
@@ -353,9 +355,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         discardOptimisticTurn(clientId);
         if (latestOutboundClientId === clientId) {
           set((state) => ({
-            draftMedia: state.draftMedia.map((item) => (
-              sentMediaIds.has(item.id) ? { id: item.id, dataUri: item.dataUri } : item
-            )),
+            draftMedia: restoreSentDraftMedia(state.draftMedia, media),
           }));
           get().rollbackInput(content);
         }

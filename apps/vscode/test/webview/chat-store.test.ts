@@ -265,7 +265,7 @@ describe("automatic follow-up steer", () => {
     expect(boundary.toastError.mock.calls[0]?.[0]).toBe("steer failed");
   });
 
-  it("clears media only after an accepted steer acknowledgement", async () => {
+  it("clears sent media with the optimistic turn before a steer acknowledgement", async () => {
     let acceptSteer: (value: SteerChatResult) => void = () => undefined;
     boundary.steerChat.mockImplementation(() => new Promise((resolve) => { acceptSteer = resolve; }));
     useChatStore.getState().sendMessage("first");
@@ -275,9 +275,15 @@ describe("automatic follow-up steer", () => {
     });
     useChatStore.getState().sendMessage("look");
 
-    expect(useChatStore.getState().draftMedia).toHaveLength(2);
+    const clientId = boundary.steerChat.mock.calls[0]?.[1] as string;
+    expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-2-still-uploading" }]);
+    expect(useChatStore.getState().messages.find((message) => message.role === "user" && message.clientId === clientId)?.content).toMatchObject([
+      { type: "text", text: "look" },
+      { type: "image_url", image_url: { url: IMAGE } },
+    ]);
     acceptSteer(RUNNING_STEER);
-    await vi.waitFor(() => expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-2-still-uploading" }]));
+    await boundary.steerChat.mock.results[0]?.value;
+    expect(useChatStore.getState().draftMedia).toEqual([{ id: "image-2-still-uploading" }]);
     expect(boundary.steerChat.mock.calls[0]?.[0]).toMatchObject([
       { type: "text", text: "look" },
       { type: "image_url", image_url: { url: IMAGE } },
