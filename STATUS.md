@@ -23,6 +23,10 @@
 
 ---
 
+### 2026-11-25 04:08 +03:00 — isolated PNG delivery closed for ON/OFF queue and replay
+- `bugs/13`: ON steering raw request carried exactly one PNG; thumbnail/viewer matched before and after replay. `bugs/14`: OFF immediately showed text + «+ медиа» and dequeue carried exactly one PNG. Replay restored two entries/two thumbnails for two sends.
+- Video-only and accumulated main-profile paths remain unverified; both bugs stay 🔧. Report: `testcases/reports/2026-11-25_media_queue_steer.md`.
+
 ### 2026-11-25 03:58 +03:00 — status correction: isolated evidence is not main-profile DONE
 - Corrected premature DONE tags for `bugs/16`, `bugs/18` and `bugs/19`; all three are 🔧 isolated-verified with their original main-profile paths pending. Their scoped run reports remain valid, while completion claims and filenames were corrected everywhere they stood.
 - `bugs/23` stays DONE as a research-only payload-integrity question; `bugs/05` stays DONE as a harness defect. Production chat fixes require the accumulated-profile acceptance boundary.
@@ -200,8 +204,8 @@ Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kim
 - 🔧 `bugs/20_queue_steer_duplicate_submission.md` — whole-batch delivery verified on fresh isolated build 17; main-profile acceptance pending.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — steering bubbles wait for acknowledgement and some sends are lost at a state transition.
 - 🔧 `bugs/12_steer_composer_restores_previous_text.md` — stale/latest composer contracts fixed; main-profile build-12 acceptance pending.
-- 🔧 `bugs/13_steer_attachments_and_thumbnails.md` — thumbnails/viewer fixed and observed; media delivery and main-profile build-12 acceptance pending.
-- 🔴 `bugs/14_steer_queue_not_added.md` — the follow-up queue is not visibly added; exact state combination needs reproduction.
+- 🔧 `bugs/13_steer_attachments_and_thumbnails.md` — isolated build-19 ON/OFF PNG delivery, thumbnails/viewer and replay pass; video and main-profile acceptance pending.
+- 🔧 `bugs/14_steer_queue_not_added.md` — isolated text+image immediate queue/dequeue/replay passes; video, other races and main-profile acceptance pending.
 - 🔧 `bugs/15_hook_results_visible_in_chat.md` — replay hook rendering fixed; main-profile build-12 confirmation pending.
 - 🔧 `bugs/04_frozen_prompt_windows_path.md` — Windows harness fixed and full file 123/123; Linux CI row remains unrun (WSL not installed, Docker unavailable).
 - 🔧 `bugs/KAIF/04` / upstream #204 — local dormant-state diagnostic fix is red-to-green and live activation is observed; keep open until an origin update absorbs it.

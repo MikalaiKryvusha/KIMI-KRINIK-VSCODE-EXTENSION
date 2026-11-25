@@ -1,6 +1,6 @@
 # Bug 14 — A follow-up is not added to the visible queue
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 immediate text+image queue, dequeue delivery and replay verified on isolated build 19; video and main-profile acceptance pending
 **Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment
@@ -36,6 +36,12 @@ The owner reports that the queue is not added. No isolated reproduction has yet 
 ## Fix plan
 
 Reproduce text and media cases in the isolated installed VSIX, printing the stand state before attributing a red result. Trace store insertion, panel rendering and the running→idle dequeue. Add immediate visual and exactly-once delivery regressions without changing the ON path.
+
+## Isolated text+image evidence — 2026-11-25 04:08 +03:00
+
+With AUTO STEER OFF and a held running turn, pasting PNG and sending `steer media` immediately produced one visible queue row with the exact text and «+ медиа». After release, the raw provider request contained one text part and exactly one PNG data URL. Replay restored the media entry and clickable thumbnail with the same URI. Report: `testcases/reports/2026-11-25_media_queue_steer.md`.
+
+Video-only, additional race combinations and the owner's accumulated main profile remain open; no DONE claim.
 
 ## Decisions made without the owner
 

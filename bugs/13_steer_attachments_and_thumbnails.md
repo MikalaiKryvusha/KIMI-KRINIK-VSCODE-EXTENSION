@@ -1,6 +1,6 @@
 # Bug 13 — Steering attachments are not delivered and steer bubbles lack clickable thumbnails
 
-**Status:** 🔧 media rendering fixed and observed; main-profile build-12 restart/acceptance pending
+**Status:** 🔧 ON/OFF image delivery, thumbnails/viewer and replay verified on isolated build 19; video and main-profile acceptance pending
 **Version/build:** originally `8ac5df733`; media presentation reproduced by the owner on KIMI KRINIK 1.0.0 build 3 · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00 and again at 2026-11-24 19:07 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** this session inside KIMI KRINIK; reproduce at the existing component/runtime boundaries and verify fixes in an isolated VS Code environment
@@ -54,3 +54,9 @@ Recorded delivery and presentation in one media-focused bug while keeping their 
 
 Hygiene: the original renderer was red because no `img[alt="Media"]` existed; after the change image/video thumbnails and same-URI viewer checks pass. Existing runtime conversion tests remain green.
 Functional run: a real packaged image paste produced a visible thumbnail in the installed UI and opened the same data URI in the viewer. The media-capable model fallback means fake-model delivery of that media was not proven. Final main-profile build-12 acceptance remains pending.
+
+## Media delivery evidence — 2026-11-25 04:08 +03:00
+
+Supersedes the earlier unproven-delivery caveat for PNG on isolated build 19. The isolated testkit model enabled image/video input; AUTO STEER ON running-turn steering produced one text part and exactly one PNG data URL in the raw provider request. AUTO STEER OFF immediately showed queue text plus «+ медиа» and dequeue produced the same single-image request. Replay restored two media entries with two thumbnails and one shared source; viewer source matched exactly. WebP `.tmp/k5-vscode/57-k13-media-replay.webp` was opened and read. Report: `testcases/reports/2026-11-25_media_queue_steer.md`.
+
+Video-only delivery and the owner's accumulated main profile remain unverified; this bug is not DONE.
