@@ -39,7 +39,7 @@ Build 19 is committed and pushed. The VSIX contains the complete changelog and h
 
 - **D) your own answer** — напиши свой вариант здесь
 
-**Answer:**
+**Answer:** [OWNER] «разрешаю установить» · 2026-11-25 16:33 +03:00 (chat)
 
 ## Proposed implementation plan (after answers)
 
