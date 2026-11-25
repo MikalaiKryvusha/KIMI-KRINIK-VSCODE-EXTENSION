@@ -46,19 +46,23 @@ describe("session header", () => {
     expect(screen.queryByTitle("Context Window Usage")).toBeNull();
   });
 
-  it("uses matching rounded containers and only extension tooltips in the header", () => {
+  it("uses matching rounded borders and 8px Session padding in the header", () => {
     useChatStore.setState({ lastStatus: { context_usage: 0.1 } });
     render(<Header />);
 
     const session = screen.getByTestId("session-info-trigger");
     const history = screen.getByTestId("session-history-trigger");
     const tokens = screen.getByTestId("token-status-container");
-    for (const element of [session, history, tokens]) {
+    const newChat = screen.getByTestId("new-chat-trigger");
+    for (const element of [session, history, tokens, newChat]) {
       expect(element.className).toContain("rounded-lg");
+      expect(element.className).toContain("border-border!");
+      expect(element.className).not.toContain("border-border/40");
     }
     expect(tokens.className).not.toContain("rounded-full");
-    expect(session.className).toContain("border-border/40");
-    expect(history.className).toContain("border-border/40");
+    expect(session.className).toContain("px-2!");
+    expect(session.className).not.toContain("pl-px!");
+    expect(session.className).not.toContain("pr-1!");
     expect(screen.queryByTitle("Total Input Tokens")).toBeNull();
     expect(screen.queryByTitle("Total Output Tokens")).toBeNull();
   });

@@ -4,7 +4,7 @@
   "displayName": "KIMI KRINIK",
   "description": "An improved and advanced Kimi Code extension for VS Code based on vanilla Kimi Code and Kimi Fork",
   "version": "1.0.0",
-  "buildNumber": 33,
+  "buildNumber": 34,
   "private": true,
   "license": "Apache-2.0",
   "type": "module",

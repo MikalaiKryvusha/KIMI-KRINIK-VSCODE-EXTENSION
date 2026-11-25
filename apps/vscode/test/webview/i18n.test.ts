@@ -62,7 +62,7 @@ describe("interface dictionaries", () => {
 
   it("describes Compact and Steer states with their visible consequences", () => {
     expect(translate("ru", "menu.autoCompactOff")).toBe("Выкл: автоматическое сжатие контекста чата отключено. Чат может переполниться и перестать работать.");
-    expect(translate("ru", "menu.autoCompactOn")).toBe("Вкл: автоматическое сжатие контекста чата включено. Контекст чата будет автоматически сжат на 85% заполнения.");
+    expect(translate("ru", "menu.autoCompactOn")).toBe("Вкл: автоматическое сжатие контекста чата включено. Контекст чата будет автоматически сжат при заполнении контекстного окна модели на 85% её номинала.");
     expect(translate("ru", "menu.autoSteerOff")).toBe("Выкл: новое сообщение ставится в очередь. Очередь отправится целиком, когда у KIMI будет окно после текущего шага.");
     expect(translate("ru", "menu.autoSteerOn")).toBe("Вкл: новое сообщение сразу вливается в ход работы без постановки в очереди.");
 

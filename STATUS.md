@@ -23,16 +23,15 @@
 
 ---
 
-### 2026-11-26 00:17 +03:00 — BUILD 33 INSTALLED; accumulated acceptance remains
-- Implemented the owner's skill inventory choices, always-large skill dialog with animated two-clear-line/faded-third descriptions and hover-matched fade, persistent Control Panel ordering, custom General Settings, welcome/model/header/MCP refinements, and sticky preview preservation with smooth max-height/fade animation.
-- `bugs/25` now has deterministic fixes for late-turn delta routing and duplicate prompt-only reconciliation; `bugs/31` and `plans/03` record the revised sticky contract. Full extension: 643 passed / 1 skipped; lint, typecheck, build and VSIX static audit are green.
-- Build 33 SHA-256: `1924bb5496f708f3e26d1e7812d6af1db634fcf648be625218e4756c4842ed7c`; installed on main and isolated profiles. Build 32 real visual smoke passed: 32px dialog margins, 42 skills with rejected ones absent, no compact toggle, description `60 → 100 → 60px`, welcome robot/KIMI 48px high with 16px gap. Build 33 sticky and accumulated running profile were not observed.
-- Build 33 real isolated functional run passed: the held first chunk remained in the same assistant through steer and the late response stayed visible; sticky animated `32 → 827px`, remained expanded on wheel and manually collapsed to `32px`. The test-debt waiver names these observations and wrapper limits; `test debt: none`.
-- Next-chat owner ideas: 48px skill-dialog margins, larger robot/text spacing in welcome and header, and separate «Вкл» / «Выкл» lines in General Settings. Build 33 accumulated main running profile remains unobserved. No release publication is authorized.
+### 2026-11-26 01:18 +03:00 — BUILD 34 PACKAGED; per-message assistant actions are next
+- Session, tokens, History and new-chat now share one opaque 8px-radius contour; Session has 8px side padding. The Russian Compact On text now names 85% of the model's nominal context window.
+- Build 34 SHA-256: `36a964774a474b70abfb369cd0371e853e5de6b9021ce6b22c65cb8e59f851b3`; installed on main and isolated profiles. Full extension: 643 passed / 1 skipped; lint, typecheck, build and VSIX audit are green.
+- Restarted isolated build 34 passed computed-style and WebP readback plus the live Compact tooltip. Main-window UI Automation did not execute Reload Window; the running accumulated main build is not claimed verified. Evidence: `testcases/reports/2026-11-26_build_34_session_header_compact.md`.
+- The owner reported a new attachment/composer timing race, recorded as `bugs/35`; he also requires Copy/Branch actions directly under every assistant text message, custom shared tooltips and copying only the adjacent text. Dayloop is active; no release publication is authorized.
 
 ## Where we are now
 
-The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `1924bb5496f708f3e26d1e7812d6af1db634fcf648be625218e4756c4842ed7c`. The extension has 643 passed / 1 skipped and 0 failures. Build 33 is installed on main and isolated profiles; its accumulated running-profile acceptance is pending. No GitHub Release exists.
+The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `36a964774a474b70abfb369cd0371e853e5de6b9021ce6b22c65cb8e59f851b3`. The extension has 643 passed / 1 skipped and 0 failures. Build 34 is installed on main and isolated profiles; isolated visual acceptance passed, while main running-profile acceptance is pending. No GitHub Release exists.
 
 ## ❓ Awaiting human review
 
@@ -41,13 +40,16 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 ## Where to continue next session
 
-1. Restart/reload the main Extension Host to load build 33, then observe the accumulated profile: always-large skill dialog and animated descriptions, Control Panel order, custom General Settings, header/MCP labels, and the new sticky preview/animation. Record results beside `testcases/reports/2026-11-26_build_33_release_polish.md`.
-2. Apply the owner's next-chat refinements from `ideas/02` and `ideas/03`: 48px skill-dialog margins, larger robot/text spacing in welcome and header, and separate «Вкл» / «Выкл» description lines. Build and install the next VSIX after checks.
-3. Investigate `bugs/34_refresh_marker_write_lost.md` as the remaining owner-priority machinery bug, then run real VSIX preflight verification for `bugs/29`.
-4. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
+1. Put Copy/Branch actions directly under every assistant text message, use the shared custom tooltip, and copy only the adjacent text rather than the whole step; add red-first coverage and real VSIX observation.
+2. Reproduce and fix `bugs/35_attachment_composer_chat_race.md` from the owner's real symptom, with frame-level composer/chat evidence.
+3. Reload the accumulated main profile onto the newest verified build and observe the pending header, skill, General Settings, sticky and chat acceptance paths. Record results in a new run report.
+4. Apply the remaining refinements from `ideas/02` and `ideas/03`: 48px skill-dialog margins, larger robot/text spacing in welcome and header, and separate «Вкл» / «Выкл» description lines.
+5. Investigate `bugs/34_refresh_marker_write_lost.md`, then run real VSIX preflight verification for `bugs/29`.
+6. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
 
 ## Open bugs
 
+- 🔴 `bugs/35_attachment_composer_chat_race.md` — owner observed the text bubble before its image while the image remained in the composer for several seconds; live race capture and root-cause assignment are pending.
 - 🔴 `bugs/34_refresh_marker_write_lost.md` — owner-priority investigation into the lost refresh-marker update; timer matches the stale file, culprit not yet assigned.
 - 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated build-25 acceptance passed; `bugs/31_expanded_sticky_scroll_oscillation.md` has the revised scroll-preservation and animation contract, component-verified with build-33 real observation pending.
 - 🔧 `bugs/29_preflight_error_deletes_unrelated_history.md` — deterministic regressions and full suite pass; real VSIX preflight path pending.
