@@ -12,11 +12,11 @@ KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FOR
 
 - Send follow-ups immediately with AUTO STEER or restore the ordinary queue. Ordered batches join once, and rejected messages return to their original positions.
 
-- Keep the last fully-scrolled-out prompt on top: a prompt still visible on screen never duplicates into the sticky bar. The bar animates smoothly on appearance, exit and replacement, and the centered chevron expands full text and media in the existing viewer.
+- Keep the last fully-scrolled-out prompt on top: a prompt still visible on screen never duplicates into the sticky bar. The bar animates smoothly on appearance, exit and replacement; expansion and collapse use one synchronized 200ms motion for the bubble and outer container. The centered chevron expands full text and media in the existing viewer.
 
 - Send images, video and media-only prompts with clickable thumbnails and the same viewer after replay. Preserve manual line breaks and blank lines, and read localized send times to the left of user bubbles.
 
-- Use the Copy and Branch actions under every assistant text item: each Copy writes only its adjacent text.
+- Use the Copy and Fork actions under every assistant text item: each Copy writes only its adjacent text.
 
 - Open the Skill picker with 48px margins and localized descriptions, then send a skill immediately with Steer or queue it with Steer OFF.
 
@@ -30,13 +30,13 @@ KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FOR
 
 - Use English, Russian or Chinese with a selected-first language dialog and localized interface controls.
 
-- Use responsive Control Panel actions, live status panels, the Working indicator and the pink KIMI KRINIK robot. Read the version and build number in Action Menu.
+- Use responsive Control Panel actions, live status panels, the Working indicator and the pink KIMI KRINIK robot. The left Activity Bar now uses a thick-outlined robot with clipped top corners and the packaged logo's square eye positions. Read the version and build number in Action Menu.
 
 - Keep history stable during replay and late request-setup errors. Internal instructions do not appear as assistant text during live work or history replay, and unrelated turns are not deleted.
 
 ## Verification
 
-The extension has 653 passing checks and 1 skipped check, green typecheck and lint. The isolated packaged install verified the chat, sticky prompt, sound settings, Control Panel and dialogs with measured geometry and screenshots. Six platform-specific VSIX packages and the platform-independent `kimi-code-universal.vsix` are packaged and statically audited.
+The extension has 656 passing checks and 1 skipped check, green typecheck and lint. The isolated packaged install verified the chat, sticky prompt, sound settings, Control Panel and dialogs with measured geometry and screenshots. Six platform-specific VSIX packages and the platform-independent `kimi-code-universal.vsix` are packaged and statically audited.
 
 ## Install
 

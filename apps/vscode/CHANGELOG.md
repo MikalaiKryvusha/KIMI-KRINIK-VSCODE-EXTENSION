@@ -1,288 +1,35 @@
-# Changelog
+# KIMI KRINIK Changelog
 
 ## 1.0.0
 
-### Minor Changes
-
-- Use the official Kimi Code 2.7.2 engine with the KIMI FORK interface, responsive Control Panel actions, live status panels and the pink KIMI KRINIK robot.
-- Turn off automatic compaction, including an operation already in progress, while keeping manual `/compact` available.
-- Use independent Context Window Control with configurable thresholds and a clean KAIF handoff. The accumulated main profile confirmed real threshold delivery.
-- Send follow-ups immediately with AUTO STEER or restore the ordinary queue. Deliver ordered batches once and restore rejected items to their original positions.
-- Send images, video and media-only prompts with clickable thumbnails and the same viewer after replay. Preserve manual line breaks and blank lines.
-- Keep the prompt that owns the visible response on top with an animated chevron, and show localized send times inside user bubbles.
-- Choose models and reasoning effort through one picker with search and favorites. Persist explicit MAX/XHigh choices while resumed sessions keep their own effort.
-- Switch between English, Russian and Chinese with a selected-first language dialog and localized controls.
-- Configure a sound and volume per event with prerecorded clips in all three languages. Keep sound selectors editable after choosing Off.
-- Show the version and build number in Action Menu.
-
-### Patch Changes
-
-- Keep history stable during replay and late request-setup errors. Internal instructions do not appear as assistant text, and unrelated turns are not deleted.
-
-## 0.9.1
-
-### Minor Changes
-
-- Show 5-hour and 7-day or monthly managed quota rings with reset countdowns in the composer.
-- Send follow-ups into running turns immediately, preserving attachments and restoring input if steering fails.
-
-### Patch Changes
-
-- Match the webview background to the VS Code sidebar theme.
-- Bundle runtime dependencies and give the KAIF extension a separate VS Code identity.
-
-## 0.9.0
-
-### Minor Changes
-
-- [#4611](https://github.com/MoonshotAI/kimi-code/pull/4611) [`cc6b98e`](https://github.com/MoonshotAI/kimi-code/commit/cc6b98ec0eb19236c9498b55ccb68dc07d7c5b4e) Thanks [@Grapedge](https://github.com/Grapedge)! - Automatically refresh the VS Code model list on startup and every six hours.
-
-### Patch Changes
-
-- Updated dependencies [[`8019337`](https://github.com/MoonshotAI/kimi-code/commit/80193374ebb47973a97d21d0b4ce4c27128eee82)]:
-  - @moonshot-ai/kimi-code-sdk@0.23.0
-  - @moonshot-ai/migration-legacy@0.1.18
-
-## 0.8.4
-
-### Patch Changes
-
-- Updated dependencies [[`b3c6e0a`](https://github.com/MoonshotAI/kimi-code/commit/b3c6e0a75a3b1716a360a75eed7194be9b97c176)]:
-  - @moonshot-ai/kimi-code-sdk@0.22.0
-
-## 0.8.3
-
-### Patch Changes
-
-- [#4186](https://github.com/MoonshotAI/kimi-code/pull/4186) [`0341173`](https://github.com/MoonshotAI/kimi-code/commit/034117338c382efb8a7f8d13b4020e1c407fa692) Thanks [@gaoyuan1223m](https://github.com/gaoyuan1223m)! - Add Back navigation to the VS Code question prompt so users can return to earlier questions without losing answers.
-
-- Updated dependencies [[`c1459a6`](https://github.com/MoonshotAI/kimi-code/commit/c1459a61845056832b85a0a220ee11a2bc5132f8), [`9f0693b`](https://github.com/MoonshotAI/kimi-code/commit/9f0693becb63a329cbf764325688448e76f40922)]:
-  - @moonshot-ai/kimi-code-sdk@0.21.1
-  - @moonshot-ai/kimi-code-oauth@0.5.0
-
-## 0.8.2
-
-### Patch Changes
-
-- Updated dependencies [[`cbd7540`](https://github.com/MoonshotAI/kimi-code/commit/cbd754049a114ee36d1b27675c82819e4963c692), [`e5b4b88`](https://github.com/MoonshotAI/kimi-code/commit/e5b4b88ba93d5a27aa9a36cf847eed4f1aa39c48)]:
-  - @moonshot-ai/kimi-code-sdk@0.21.0
-  - @moonshot-ai/migration-legacy@0.1.17
-
-## 0.8.1
-
-### Patch Changes
-
-- [#3915](https://github.com/MoonshotAI/kimi-code/pull/3915) [`02d829e`](https://github.com/MoonshotAI/kimi-code/commit/02d829e13120781dfd2f7aa5e78b9ce56cfc013a) Thanks [@Grapedge](https://github.com/Grapedge)! - Fix the VS Code question dialog submitting unfinished custom answers when pressing Enter to confirm IME input.
-
-## 0.8.0
-
-### Minor Changes
-
-- [#3852](https://github.com/MoonshotAI/kimi-code/pull/3852) [`bbcdde0`](https://github.com/MoonshotAI/kimi-code/commit/bbcdde0b13a06fbadedca680ef565a5b01cb6c61) Thanks [@Grapedge](https://github.com/Grapedge)! - Add anonymous usage telemetry to the VS Code extension, following the VS Code telemetry setting.
-
-### Patch Changes
-
-- Updated dependencies [[`bbcdde0`](https://github.com/MoonshotAI/kimi-code/commit/bbcdde0b13a06fbadedca680ef565a5b01cb6c61)]:
-  - @moonshot-ai/kimi-telemetry@0.2.0
-
-## 0.7.5
-
-### Patch Changes
-
-- [#3453](https://github.com/MoonshotAI/kimi-code/pull/3453) [`411572e`](https://github.com/MoonshotAI/kimi-code/commit/411572e166edee8581ba9c5a7f1bbf6c8b405606) Thanks [@Grapedge](https://github.com/Grapedge)! - Highlight matched characters in @ file suggestions and allow folders to be inserted as mentions.
-
-- [#3453](https://github.com/MoonshotAI/kimi-code/pull/3453) [`411572e`](https://github.com/MoonshotAI/kimi-code/commit/411572e166edee8581ba9c5a7f1bbf6c8b405606) Thanks [@Grapedge](https://github.com/Grapedge)! - Show the image/video picker entry in the @ menu only before a search query is typed, and remove the Browse folders mode.
-
-- [#3453](https://github.com/MoonshotAI/kimi-code/pull/3453) [`411572e`](https://github.com/MoonshotAI/kimi-code/commit/411572e166edee8581ba9c5a7f1bbf6c8b405606) Thanks [@Grapedge](https://github.com/Grapedge)! - Fix the @ and / suggestion lists jittering when the mouse rests at the scroll edge.
-
-- Updated dependencies [[`411572e`](https://github.com/MoonshotAI/kimi-code/commit/411572e166edee8581ba9c5a7f1bbf6c8b405606)]:
-  - @moonshot-ai/kimi-code-sdk@0.20.0
-
-## 0.7.4
-
-### Patch Changes
-
-- [#3371](https://github.com/MoonshotAI/kimi-code/pull/3371) [`9e88152`](https://github.com/MoonshotAI/kimi-code/commit/9e881528a89945a373002b0b229f91735e8f2c4f) Thanks [@tpoisonooo](https://github.com/tpoisonooo)! - Fix prompts remaining queued forever after reopening a session.
-
-- [#3366](https://github.com/MoonshotAI/kimi-code/pull/3366) [`9619277`](https://github.com/MoonshotAI/kimi-code/commit/961927739ef34819d67d76fa5870cbe4ba7a01ff) Thanks [@kimi-agent-bot](https://github.com/kimi-agent-bot)! - Use the Unicode ellipsis "…" in user-facing TUI and VS Code webview text.
-
-## 0.7.3
-
-### Patch Changes
-
-- [#3098](https://github.com/MoonshotAI/kimi-code/pull/3098) [`75550c5`](https://github.com/MoonshotAI/kimi-code/commit/75550c5686cb867c0cb34bc515997d5e6305fc94) Thanks [@LCZcn96](https://github.com/LCZcn96)! - Restore live context-window usage updates after switching to the v2 engine.
-
-- [#3276](https://github.com/MoonshotAI/kimi-code/pull/3276) [`f34b2ec`](https://github.com/MoonshotAI/kimi-code/commit/f34b2ecfb01dc194aaa3f209a00772991caad3f3) Thanks [@Grapedge](https://github.com/Grapedge)! - Fix streamed replies occasionally showing every character twice and tool calls appearing in duplicate.
-
-- Updated dependencies [[`75550c5`](https://github.com/MoonshotAI/kimi-code/commit/75550c5686cb867c0cb34bc515997d5e6305fc94), [`d723cc4`](https://github.com/MoonshotAI/kimi-code/commit/d723cc47ee43e5ca3c3c4ec2473f205d44acede2)]:
-  - @moonshot-ai/kimi-code-sdk@0.19.2
-
-## 0.7.2
-
-### Patch Changes
-
-- [#3079](https://github.com/MoonshotAI/kimi-code/pull/3079) [`35befdc`](https://github.com/MoonshotAI/kimi-code/commit/35befdcef2be344d931ea20063cb64113350dc4b) Thanks [@gaoyuan1223m](https://github.com/gaoyuan1223m)! - Fix multi-select questions jumping to the next question after only one answer is selected.
-
-- Updated dependencies [[`3d77620`](https://github.com/MoonshotAI/kimi-code/commit/3d7762003a4a35cbeb8571d471c6898a006152e6)]:
-  - @moonshot-ai/kimi-code-sdk@0.19.1
-
-## 0.7.1
-
-### Patch Changes
-
-- [#3026](https://github.com/MoonshotAI/kimi-code/pull/3026) [`13857f3`](https://github.com/MoonshotAI/kimi-code/commit/13857f383200881aa77dc972a8963ba421eeb2b6) Thanks [@bj456736](https://github.com/bj456736)! - Show plugin- and file-declared MCP servers as read-only entries in the MCP servers panel.
-
-- Updated dependencies [[`d833a1a`](https://github.com/MoonshotAI/kimi-code/commit/d833a1a893c4d69d96af542f40557442992085e0), [`61591bc`](https://github.com/MoonshotAI/kimi-code/commit/61591bce09f4467aa1664cb8ecb6aa6904b7accd), [`d833a1a`](https://github.com/MoonshotAI/kimi-code/commit/d833a1a893c4d69d96af542f40557442992085e0), [`13857f3`](https://github.com/MoonshotAI/kimi-code/commit/13857f383200881aa77dc972a8963ba421eeb2b6)]:
-  - @moonshot-ai/kimi-code-sdk@0.19.0
-
-## 0.7.0
-
-### Minor Changes
-
-- [#2916](https://github.com/MoonshotAI/kimi-code/pull/2916) [`7475c2e`](https://github.com/MoonshotAI/kimi-code/commit/7475c2e2e3dd86ac0b8a8d51d4f1d233ed7df797) Thanks [@Grapedge](https://github.com/Grapedge)! - Run the extension on the v2 agent engine by default; the interface, sessions, and workflows are unchanged. To roll back, enable the `kimi.useAgentCoreV1` setting and reload the window.
-
-### Patch Changes
-
-- Updated dependencies [[`6be2697`](https://github.com/MoonshotAI/kimi-code/commit/6be26978b123bacf1c5ebce52bbeb6f7b7ff0629), [`7475c2e`](https://github.com/MoonshotAI/kimi-code/commit/7475c2e2e3dd86ac0b8a8d51d4f1d233ed7df797), [`7475c2e`](https://github.com/MoonshotAI/kimi-code/commit/7475c2e2e3dd86ac0b8a8d51d4f1d233ed7df797), [`7475c2e`](https://github.com/MoonshotAI/kimi-code/commit/7475c2e2e3dd86ac0b8a8d51d4f1d233ed7df797)]:
-  - @moonshot-ai/kimi-code-sdk@0.18.0
-
-## 0.6.9
-
-### Patch Changes
-
-- Updated dependencies [[`c9bfe8b`](https://github.com/MoonshotAI/kimi-code/commit/c9bfe8b2c8314ba4ef8806fb3b92ac654c1d1860), [`c212ae9`](https://github.com/MoonshotAI/kimi-code/commit/c212ae9715371c0d7939c15e664acbe0d7cf7fc3)]:
-  - @moonshot-ai/kimi-code-sdk@0.17.0
-
-## 0.6.8
-
-### Patch Changes
-
-- Updated dependencies [[`437a1b8`](https://github.com/MoonshotAI/kimi-code/commit/437a1b8ba1b7e0f6662bdadc669564fdc58c3f5a), [`0b2e803`](https://github.com/MoonshotAI/kimi-code/commit/0b2e803d5e71afaab45212bb2ee6117ecbf8bbc9), [`3c9e3b2`](https://github.com/MoonshotAI/kimi-code/commit/3c9e3b297cf5286c761159c1b4d642c478fd394d)]:
-  - @moonshot-ai/kimi-code-sdk@0.16.0
-
-## 0.6.7
-
-### Patch Changes
-
-- [#2326](https://github.com/MoonshotAI/kimi-code/pull/2326) [`302b2cd`](https://github.com/MoonshotAI/kimi-code/commit/302b2cd680e0ec66f68b4572238de84ce311c5f4) Thanks [@gaoyuan1223m](https://github.com/gaoyuan1223m)! - Fix only the first question being answerable when the agent asked multiple questions at once; each question is now answered one by one and submitted together.
-
-## 0.6.6
-
-### Patch Changes
-
-- [#2393](https://github.com/MoonshotAI/kimi-code/pull/2393) [`6d0a046`](https://github.com/MoonshotAI/kimi-code/commit/6d0a046488edda56219961b253c4787abae7a113) Thanks [@wbxl2000](https://github.com/wbxl2000)! - Fix new users getting stranded on "Model setup required" with no way back to sign-in when the first login finishes authorization but fails to complete model setup; the screen now offers a path back to the sign-in page so login can be retried.
-- [#2402](https://github.com/MoonshotAI/kimi-code/pull/2402) [`0f3b106`](https://github.com/MoonshotAI/kimi-code/commit/0f3b106c4260ad626f66bc5c457a535d3163f2bc) Thanks [@wbxl2000](https://github.com/wbxl2000)! - Reword the sign-in waiting message from "Waiting for authorization" to "Waiting for authentication".
-
-- Updated dependencies [[`40172c7`](https://github.com/MoonshotAI/kimi-code/commit/40172c7ca96ca981b043b793588dd32e898979fa)]:
-  - @moonshot-ai/kimi-code-sdk@0.15.0
-
-## 0.6.5
-
-### Patch Changes
-
-- [#1994](https://github.com/MoonshotAI/kimi-code/pull/1994) [`beeb964`](https://github.com/MoonshotAI/kimi-code/commit/beeb964393c8f9a38c2b1e2273e4415fc434b16d) Thanks [@RealKai42](https://github.com/RealKai42)! - Reduce webview streaming re-render churn: settled assistant messages no longer re-render on every streaming delta, and local images over 10MB are no longer inlined into the webview DOM.
-- Updated dependencies [[`ec88d35`](https://github.com/MoonshotAI/kimi-code/commit/ec88d352e8f4dc5e8ffd1212f016138458f69893), [`b5efba7`](https://github.com/MoonshotAI/kimi-code/commit/b5efba7abcaf4041f81ec520097a61e6546e8c50), [`ce0e3ce`](https://github.com/MoonshotAI/kimi-code/commit/ce0e3ceb04223bdaad8e8931bad46eff561055b6), [`e458323`](https://github.com/MoonshotAI/kimi-code/commit/e45832398d0d9cad98dbad1cbf1e5b103a20aace)]:
-  - @moonshot-ai/kimi-code-sdk@0.14.0
-
-## 0.6.4
-
-### Changed
-
-- Picking a model's highest thinking effort now applies to the current session
-  only instead of becoming the global default: the top tier saves just the
-  on/off toggle, lower tiers persist as the default as before, and
-  re-confirming the current effort no longer rewrites the saved preference.
-  The model and thinking pickers also note that switching mid-conversation
-  invalidates the existing prompt cache.
-- Unified the YOLO and Auto permission mode naming and descriptions with the
-  CLI (`/afk` is now `/auto`), and approval requests that fall outside the
-  active permission mode (sensitive files, plan reviews, ask rules) are now
-  always shown to you instead of being auto-approved.
-
-## 0.6.3
+2026-11-26
+
+The first independent KIMI KRINIK release combines the official Kimi Code 2.7.2 engine with the KIMI FORK interface and the KIMI KRINIK product changes.
+
+### Added
+
+- Turn off automatic compaction, including an active automatic operation, while keeping manual `/compact` available.
+- Configure independent Context Window Control thresholds without requiring KAIF.
+- Send follow-ups and attachments immediately with Steer ON or restore the ordinary queue with Steer OFF.
+- Reorder Control Panel buttons and hide them without disabling their features. Use the localized General Settings dialog for editor, context and threshold controls.
+- Choose models and reasoning effort through one picker with search and favorites; resumed sessions retain their own effort.
+- Use English, Russian and Chinese with a selected-first language dialog.
+- Configure approval, question, error and turn-complete sounds with per-event volume and packaged voice clips in all three languages.
+- Keep the prompt that owns the visible response in a sticky bubble. Expand full text and media with synchronized 200ms bubble/container motion and reduced-motion support.
+- Use Copy and Fork under each assistant text item; Copy includes only the adjacent text.
+- Send image, video and media-only prompts, preserve multiline input and open the same media viewer after replay.
+- Read live session status, background tasks, todos, queue state and the version/build identity.
+- Use the pink KIMI KRINIK robot in responses and its thick-outlined, clipped-corner shape in the VS Code Activity Bar.
+- Install one universal VSIX on Windows, macOS and Linux, or choose one of six platform-specific packages.
 
 ### Fixed
 
-- Editor mentions now work for files outside the working directory, and paths
-  containing spaces are quoted correctly.
-- Cancelling a running turn now reliably reaches the engine, and the UI no
-  longer reports a task as stopped when there is nothing to cancel.
-- Attaching to or resuming an existing session no longer overwrites its model
-  and thinking effort with the configured defaults; model or effort changes
-  picked in the composer are applied when the prompt is sent.
+- Preserve turn identity, attachments, composer state and unrelated history across steering, queue batches, replay and late request-setup errors.
+- Return rejected queue items to their original positions and avoid duplicate submissions.
+- Keep internal hook output out of assistant messages and sticky prompt selection.
+- Keep sticky appearance, exit, replacement, expansion and collapse synchronized without moving the reading anchor.
+- Keep sound selectors usable when an event is Off and prevent replayed events from producing attention sounds.
 
-## 0.6.2
+### Distribution
 
-### Fixed
-
-- A core error arriving in the middle of a turn no longer corrupts the active
-  turn; the turn now ends cleanly with an error instead of leaving the chat in
-  a broken state.
-- Kimi sign-in and connection failures now include the underlying transport
-  cause (for example DNS or connection refused) instead of a generic error.
-- Closed several FetchURL SSRF bypasses and the DNS-rebinding window.
-- Tool calls interrupted mid-stream are now recorded and closed, so they no
-  longer corrupt the session history.
-
-## 0.6.1
-
-### Fixed
-
-- The **Sign in** action in the settings (gear) menu now actually starts the
-  Kimi login flow and shows an error toast when sign-in fails, instead of
-  silently doing nothing.
-
-## 0.6.0
-
-### Breaking
-
-- Raised the minimum supported editor version to VS Code 1.100.0.
-- Legacy Kimi Code OAuth credentials and MCP OAuth credentials are deliberately
-  not migrated. Sign in to Kimi Code again and re-authorize affected MCP
-  servers after upgrading.
-- Removed the `kimi.executablePath` and `kimi.environmentVariables` settings.
-  The old `kimi.environmentVariables.KIMI_SHARE_DIR` value is consulted only to
-  discover legacy data during migration; it is not applied to the new runtime.
-  The system-level `KIMI_CODE_HOME` environment variable remains supported.
-
-### Changed
-
-- Replaced the legacy Python/stdio runtime with the in-process Kimi Code Node
-  SDK. The extension no longer downloads or starts a separate Kimi executable.
-- The in-process engine is the same one that powers the Kimi Code CLI, so the
-  agent gains CLI-parity capabilities beyond the legacy runtime, including
-  parallel subagent swarms, background tasks, and long-running goal runs.
-- Added an opt-in legacy migration prompt on the first launch that detects data
-  from version 0.5.x. The migration copies or merges supported data into the
-  current Kimi Code home and does not delete the legacy source. If migration is
-  skipped or needs to be retried, run **Kimi Code: Migrate Legacy Data** from the
-  Command Palette.
-- When VS Code and the Kimi Code terminal app resolve to the same
-  `KIMI_CODE_HOME`, they use the same configuration and session storage. Running
-  the same session concurrently from multiple processes is not supported or
-  protected by cross-process locking.
-- The model picker groups models by provider when multiple providers are
-  configured, keeps provider identity when display names match, and recognizes
-  adaptive-thinking metadata. A configured custom default provider no longer
-  requires dismissing the Kimi account login screen on every launch.
-- The file changes panel and Undo actions use extension-maintained baselines.
-  Files changed through Kimi's Write and Edit operations are tracked on a
-  best-effort basis. File deletions performed inside Bash are not tracked by
-  this baseline and therefore cannot be restored by the panel's Undo action.
-
-### Fixed
-
-- The `kimi.yoloMode` setting now reaches the permission engine: enabling it
-  maps to the core `yolo` permission mode and takes effect when a session
-  attaches, including sessions that previously stored a disabled auto-approve
-  state.
-- Kept the chat header and input toolbar readable when the sidebar is narrow:
-  controls wrap and shrink instead of being clipped.
-
-### Distribution boundary
-
-Release packaging produces target-specific VSIX files for `darwin-x64`,
-`darwin-arm64`, `linux-x64`, `linux-arm64`, `win32-x64`, and `win32-arm64`.
-Archive and static verification for a target does not by itself prove that the
-extension has run successfully in that target's Extension Host; runtime test
-results must be recorded separately for each operating system and architecture.
+The universal package has no target-platform marker. Platform-specific packages cover darwin-x64, darwin-arm64, linux-x64, linux-arm64, win32-x64 and win32-arm64. Package verification does not claim a real run on an operating system that was not available for testing.

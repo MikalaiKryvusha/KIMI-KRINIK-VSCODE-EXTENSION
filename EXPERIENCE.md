@@ -57,7 +57,7 @@
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
 >      field-dropped-in-rebuild, red-accepted-unread, defaults-overwrite-session-state,
-      late-cancellation-masquerades-as-live-flip -->
+      late-cancellation-masquerades-as-live-flip, self-host-reload -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -75,6 +75,7 @@
 > | `red-accepted-unread` | a failing test labelled "baseline" or "flaky" before its assertion diff was read |
 > | `defaults-overwrite-session-state` | a global default is applied over a restored session's own persisted state |
 > | `late-cancellation-masquerades-as-live-flip` | cleanup after the provider response is mistaken for immediate cancellation on a live config change |
+> | `self-host-reload` | a live acceptance reload restarts the Extension Host that is executing the agent itself |
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -83,6 +84,17 @@
 > Skill: `/experience` (capture a lesson · recall relevant lessons).
 
 ## Entries
+
+### EXP-0026 · 2026-11-26 · ❌ · #vscode #testing #action:reload-window
+class: self-host-reload
+none-cheap: the incident came from an ad hoc PowerShell UI command outside existing tool gates; the scripts created for that route are removed and `HOUSE_RULES.md` R7 carries the safe route
+**Context:** final build-45 acceptance attempted `Developer: Reload Window` on the owner's main VS Code window while the active KIMI KRINIK session was executing there.
+**Tried / did:** set the focused command-palette value to `>Developer: Reload Window` and sent Enter through UI Automation.
+**Result:** ❌ — the Shell call was interrupted without a recorded result, the active chat restarted, and no running-build observation was produced.
+**Lesson:** reloading a window that hosts the current agent terminates the observer as well as the observed extension; use the isolated CDP profile, or schedule the main-window restart after the active session ends / from a separate session.   → link: HOUSE_RULES.md R7
+**Repro:** do not reproduce the interruption; before a reload, OBSERVE the target profile and session ownership and use `.tmp/k5-vscode-ui.mjs launch` for the isolated path.
+**Trigger:** considering `Developer: Reload Window`, a process restart or a native command that reloads the current workbench → stop if it hosts the active agent and switch to the isolated profile.
+**Not for:** restarting the disposable isolated VS Code process after killing its recorded PID tree; EXP-0024 covers that route.
 
 ### EXP-0025 · 2026-11-26 · ❌→✅ · #kaif #testing #forensics
 class: claim-without-tool-call

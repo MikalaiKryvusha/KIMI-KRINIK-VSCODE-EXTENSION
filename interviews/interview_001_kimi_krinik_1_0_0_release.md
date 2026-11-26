@@ -3,7 +3,7 @@
 > Topic: разрешение на финальную приёмку build 19 на основном профиле и последующую публикацию релиза
 > Source of the idea: owner's «готовь релиз 1.0.0» in chat, 2026-11-25
 > Created: 2026-11-25 14:07 +03:00
-> Status: **✅ ANSWERS RECEIVED 2026-11-25 16:33 +03:00 — option B, installation only**
+> Status: **✅ ANSWERS RECEIVED — Q1 option B, installation only; publication subsequently authorized on 2026-11-26, conditional on a successful positive smoke**
 
 ## Context / what I already found in the code
 
@@ -41,8 +41,20 @@ Build 19 is committed and pushed. The VSIX contains the complete changelog and h
 
 **Answer:** [OWNER] «разрешаю установить» · 2026-11-25 16:33 +03:00 (chat)
 
+## Subsequent release authorization — 2026-11-26 13:10 +03:00
+
+[OWNER] «и если позитивный смоук пройдет успешно: даю дабро на оформление и релиз KIMI KRINIK 1.0.0 !» · 2026-11-26 13:10 +03:00 (chat)
+
+This supersedes the earlier installation-only limitation for release 1.0.0. The condition is binding: publish only after the positive smoke succeeds. The build-43 smoke exposed `bugs/41` (desynchronized sticky expansion), so the condition is not yet met.
+
+## Marketplace and independent project-history decision — 2026-11-26 16:06 +03:00
+
+[OWNER] «мое дерешие: да, разрешаю, делаем. Выполняй подготовку. Оформляй Ридми и всё, что нужно. Отвязываемся от наследия оффициального экстеншена, оформляем свою сопроводительную документацию и историю проекта KIMI KRINIK для - Маркетплейса VS Code - GitHub. чистим теги, которых там накопилось от оффициального КИМИ, ведем свою историю тегов» · 2026-11-26 16:06 +03:00 (chat)
+
+Scope: prepare KIMI KRINIK's own Marketplace and GitHub presentation, documentation, changelog and release-tag history; publish through Marketplace only after its readiness gates pass. Remote tag deletion is handled as a separate destructive action with an exact inventory before deletion.
+
 ## Proposed implementation plan (after answers)
 
 1. Install build 19 only if A or B is selected, then run the accumulated-profile acceptance and record the results.
-2. Publish only if A is selected and every check is green: create the `v1.0.0` tag and GitHub Release with the neutral factual title and the three language notes.
+2. Publish under Q1 option A or the subsequent explicit authorization above only after the positive smoke and every release check are green: create the `v1.0.0` tag and GitHub Release with the neutral factual title and the three language notes.
 3. Open the published page and read the first screen. If any check fails, stop and report it without publishing.
