@@ -23,7 +23,16 @@
 
 ---
 
-### 2026-11-26 11:17 +03:00 — BUILD 42: STICKY ANIMATION, SUBAGENT LABEL, CHEVRON
+### 2026-11-26 11:40 +03:00 — BUILD 43 + PRE-RELEASE PACKAGE
+- `package:platform --universal` now also produces `kimi-code-universal.vsix` (no TargetPlatform) next to the six target packages; universal and all targets pass the static audit. Universal SHA-256: `4b4ef32254eaaa16818ea4c515b69f5cfbe7244f857030d0ae0243dd35fe9c80`; win32-x64 build 43 SHA `3c4c4c1d3b1682c6ad6c8ca690d82799271068a54c60bfad3353207f1081f477`, installed on main.
+- MacBook verdict: the universal VSIX installs on macOS (no TargetPlatform, pure JS/WASM/SVG/PNG/MP3 — no native binaries); darwin-arm64/x64 packages also build and audit clean. A real Mac install is NOT verified — no Mac host here.
+- Pre-release test plan with positive/negative cases and release-blocking open items: `testcases/TC_1.0.0_release_readiness.md`.
+- README actualized in EN/RU/ZH: big pink DOWNLOAD button with the robot (`docs/media/download-{en,ru,zh}.svg`) linking to `releases/latest/download/kimi-code-universal.vsix` (404 until the first release is published), universal+per-target install text, new feature rows, build example 43. Local links checked; voice-lint 0 findings.
+- Release notes actualized in Krinik's style for the current build: `release-notes/1.0.0/changelog.{en,ru,zh}.md`. No release publication is authorized.
+
+## Where we are now
+
+The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` (build 43), SHA-256 `3c4c4c1d3b1682c6ad6c8ca690d82799271068a54c60bfad3353207f1081f477`; the universal candidate is `apps/vscode/artifacts/vsix/kimi-code-universal.vsix`, SHA-256 `4b4ef32254eaaa16818ea4c515b69f5cfbe7244f857030d0ae0243dd35fe9c80`. Build 42 is verified on the isolated profile (653 passed / 1 skipped, lint, typecheck, build and all VSIX audits green); build 43 changes only the build number and packaging scripts. Main running-profile acceptance is pending. No GitHub Release exists. Build 40 (SHA `87eb16de45dba2ad7d20420abee16d5ecfc68156f414fa8395b2d237c6c970f6`) covered sound-off dimming, sticky selection/padding/fade and the Control Panel state style — verified on the isolated profile in `testcases/reports/2026-11-26_build_40_sound_sticky_control_panel.md`.
 - `bugs/41`: sticky bar animates max-height/opacity on appearance, exit and one/two-line replacements — computed 61 → 0px over ~200ms before unmount; the chat no longer jumps at the top. `bugs/42`: subagent-model button shows «Субагенты» in the large form (92.97px wide), compact stays exactly 24×24 icon-only. `bugs/43`: chevron exactly centered (delta 0/0) after removing `ml-auto`.
 - Build 42 SHA-256: `7ca5e532f3f773fad13d41f6d6f17ddaf08f755bf4bd90de2b639a62fceab208`; installed on main and isolated profiles. Full extension: 653 passed / 1 skipped; lint, typecheck, build and VSIX audit green. Evidence: `testcases/reports/2026-11-26_build_42_sticky_animation_subagent_chevron.md`, WebP 119/120/121.
 - EXP-0024: Playwright `browser.close()` over CDP does NOT kill the isolated VS Code process — the next launch attaches to the stale build; kill the isolated PID tree and read the running build from the action menu before measuring.
@@ -45,8 +54,8 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 ## Where to continue next session
 
 1. Reload the accumulated main profile onto build 42 and observe the pending acceptance paths (header, assistant actions, media race, skill, General Settings, sticky, sound dimming, tinted tooltips, subagent label). Use real screenshots per `HOUSE_RULES.md` R2 and do not infer the running build from the installed VSIX hash. The failed focus/palette attempts are recorded in `testcases/reports/2026-11-26_build_34_session_header_compact.md`; do not repeat them blindly. Record fresh results in a new run report.
-2. Pre-release package (owner-ordered 2026-11-26): test plan + positive/negative cases in `testcases/`, README actualization with the big pink three-language DOWNLOAD button to the latest VSIX, release notes in Krinik style (`release-notes/1.0.0/changelog.{en,ru,zh}.md`), MacBook install verdict (darwin VSIX build/audit done; a real Mac install is unverified). Then `bugs/34_refresh_marker_write_lost.md` and the real VSIX preflight for `bugs/29`.
-3. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, then open and read the published page.
+2. Done this session: the pre-release package — test plan `testcases/TC_1.0.0_release_readiness.md`, README with the three-language DOWNLOAD button, release notes in Krinik's style, universal VSIX for macOS and all platforms. Next technical tasks: `bugs/34_refresh_marker_write_lost.md` and the real VSIX preflight for `bugs/29`.
+3. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified universal and per-target VSIX files, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
 
 ## Open bugs
 

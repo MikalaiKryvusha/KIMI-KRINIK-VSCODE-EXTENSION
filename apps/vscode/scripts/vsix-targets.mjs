@@ -14,6 +14,7 @@ export const extensionRoot = resolve(dirname(fileURLToPath(import.meta.url)), '.
 export const defaultVsixOutputDir = join(extensionRoot, 'artifacts', 'vsix');
 
 export function vsixFileName(target) {
+  if (target === 'universal') return 'kimi-code-universal.vsix';
   assertVsixTarget(target);
   return `kimi-code-${target}.vsix`;
 }

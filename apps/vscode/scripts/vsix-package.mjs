@@ -19,6 +19,7 @@ function parseArguments(argv) {
   const targets = [];
   let outputDir = defaultVsixOutputDir;
   let dryRun = false;
+  let universal = false;
   let help = false;
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -29,6 +30,8 @@ function parseArguments(argv) {
       help = true;
     } else if (argument === '--dry-run') {
       dryRun = true;
+    } else if (argument === '--universal') {
+      universal = true;
     } else if (argument === '--out-dir') {
       outputDir = requireOptionValue(argv, ++index, '--out-dir');
     } else if (argument === '--target') {
@@ -44,6 +47,7 @@ function parseArguments(argv) {
     targets: normalizeVsixTargets(targets),
     outputDir: resolve(outputDir),
     dryRun,
+    universal,
     help,
   };
 }
@@ -58,8 +62,10 @@ function usage() {
   return [
     'Usage: node scripts/vsix-package.mjs [targets...] [--out-dir <directory>]',
     '       node scripts/vsix-package.mjs --target win32-x64 --dry-run',
+    '       node scripts/vsix-package.mjs --universal',
     '',
     'With no targets, all six supported VSIX targets are built and audited.',
+    'With --universal, a platform-independent kimi-code-universal.vsix is also produced.',
     'This command never publishes an extension.',
   ].join('\n');
 }
@@ -112,6 +118,24 @@ async function main() {
     console.log(
       `Verified ${target}: ${result.files} files, ${result.bytes} unpacked bytes; package/static checks passed.`,
     );
+  }
+
+  if (options.universal) {
+    const outputPath = join(options.outputDir, vsixFileName('universal'));
+    if (options.dryRun) {
+      console.log(`Would package universal -> ${outputPath}`);
+    } else {
+      console.log('\nPackaging the platform-independent universal VSIX...');
+      await packVsix({
+        cwd: extensionRoot,
+        dependencies: false,
+        packagePath: outputPath,
+      });
+      const result = await verifyVsix(outputPath, 'universal', { sourceRoot: extensionRoot });
+      console.log(
+        `Verified universal: ${result.files} files, ${result.bytes} unpacked bytes; package/static checks passed.`,
+      );
+    }
   }
 
   if (!options.dryRun) {

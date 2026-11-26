@@ -32,6 +32,17 @@ describe('VSIX package CLI (target planning and validation)', () => {
     expect(result.stdout).toContain('kimi-code-win32-arm64.vsix');
   });
 
+  it('plans a platform-independent universal package alongside the targets', async () => {
+    const outputDir = await makeTempDir('kimi-package-universal-');
+
+    const result = runNode(packageScript, ['--universal', '--dry-run', '--out-dir', outputDir]);
+
+    expect(result.status).toBe(0);
+    expect(result.stdout.match(/Would package /g)).toHaveLength(7);
+    expect(result.stdout).toContain('Would package universal -> ');
+    expect(result.stdout).toContain('kimi-code-universal.vsix');
+  });
+
   it('accepts a Windows ARM target when the output path contains spaces', async () => {
     const root = await makeTempDir('kimi-package-windows-');
     const outputDir = join(root, 'output with spaces');
@@ -103,6 +114,25 @@ describe('VSIX verifier CLI (package contract and failure details)', () => {
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('VSIX manifest target is darwin-arm64, expected linux-x64');
+  });
+
+  it('accepts a universal package without TargetPlatform and rejects a targeted one', async () => {
+    const universalFixture = await makeVsixFixture('win32-x64');
+    await writeFile(
+      join(universalFixture, 'extension.vsixmanifest'),
+      '<PackageManifest><Metadata><Identity /></Metadata></PackageManifest>',
+    );
+
+    const universalResult = runNode(verifierScript, ['--target', 'universal', '--directory', universalFixture]);
+
+    expect(universalResult.status).toBe(0);
+    expect(universalResult.stdout).toContain('static audit and entry import smoke passed (package-only)');
+
+    const targetedFixture = await makeVsixFixture('darwin-arm64');
+    const targetedResult = runNode(verifierScript, ['--target', 'universal', '--directory', targetedFixture]);
+
+    expect(targetedResult.status).toBe(1);
+    expect(targetedResult.stderr).toContain('expected no TargetPlatform for a universal package');
   });
 
   it('names a missing required Webview resource', async () => {

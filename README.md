@@ -15,6 +15,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases/latest/download/kimi-code-universal.vsix">
+    <img src="docs/media/download-en.svg" width="360" alt="Download KIMI KRINIK VSIX">
+  </a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/version-1.0.0_in_progress-1E1E1E.svg" alt="Version: 1.0.0 in progress">
   <a href="https://github.com/MoonshotAI/kimi-code"><img src="https://img.shields.io/badge/engine-Kimi_Code_2.7.2-2C7BE5.svg" alt="Engine: Kimi Code 2.7.2"></a>
   <a href="https://github.com/gxgleo67/kimi-code-vscode-fork"><img src="https://img.shields.io/badge/UI-KIMI_FORK-8E44AD.svg" alt="UI: KIMI FORK"></a>
@@ -43,29 +49,32 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | Queue actions and failures | ordinary queue | forced steering can repeat or skip items | ✅ the whole batch joins once in order; rejected items return to their original positions |
 | Attachments in chat and steering | — | can lose attachments | ✅ image, video and media-only prompts, clickable thumbnails, the same viewer after replay |
 | Multiline prompts | standard Markdown whitespace | standard Markdown whitespace | ✅ manual line breaks and blank lines reach the model unchanged |
-| Sticky user prompt while reading a long conversation | — | — | ✅ no extra strip at chat start; one-line prompts have no fade or expand control; an expanded prompt stays open while scrolling and collapses manually or when another prompt becomes sticky; the chevron opens full text and media in the existing viewer |
+| Sticky user prompt while reading a long conversation | — | — | ✅ no extra strip at chat start; one-line prompts have no fade or expand control; an expanded prompt stays open while scrolling and collapses manually or when another prompt becomes sticky; the chevron opens full text and media in the existing viewer; smooth appearance, exit and replacement animations; a prompt still visible on screen never duplicates into the sticky |
 | User message send time | — | — | ✅ localized `HH:MM` send time to the left of the user bubble |
 | Managed quota: 5-hour ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: 7-day ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: monthly ring with a reset countdown | — | ✅ | ✅ |
-| Sound and voice for approval requests, questions and errors | — | — | ✅ a sound and a volume for each event, prerecorded clips in three languages; Off never locks the selector |
+| Sound and voice for approval requests, questions and errors | — | — | ✅ a sound and a volume for each event, prerecorded clips in three languages; Off never locks the selector; an Off event's section dims while its selector stays usable |
 | Interface languages | English | English, 中文 | ✅ English, 中文, Русский, with a language dialog that puts the selected language first |
-| Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection |
+| Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection; the secondary-model button carries a «Subagents» label in the large form |
 | Model and reasoning effort between sessions | — | — | ✅ explicit MAX/XHigh choices persist; a resumed session keeps its own effort |
 | Live status and session header | — | ✅ | ✅ queued/changed panels, background tasks, todos, compaction viewer, session title, Working indicator and KIMI KRINIK robot |
 | History replay and internal events | — | — | ✅ atomic replay without blank frames; internal hook results never become assistant text |
 | Context ring and queue feedback | — | ✅ | ✅ blue → yellow → red-orange ring interpolation and one pulse when an item joins the queue |
 | Control Panel at narrow widths | — | ✅ | ✅ horizontal scrolling only on real overflow, with fading edges and one-click actions |
 | Control Panel skill picker | — | — | ✅ a scrollable list with bold skill names and plain localized descriptions; the selected skill joins the running turn with Steer ON or waits in the queue with Steer OFF |
-| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (39)` |
+| Control Panel state descriptions | — | — | ✅ ON/OFF in uppercase with a slight green/red tint in all three languages |
+| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (43)` |
 | Late preflight errors | can surface a generic internal error | can surface a generic internal error | ✅ unrelated and newer chat turns stay intact; only the send that actually failed is rolled back |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
 ### 2. Install
 
 Version 1.0.0 is being built and tested; its `.vsix` will be attached to the
-[releases](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases). Download the `.vsix` and install it
-with **Extensions → ⋯ → Install from VSIX…**. KIMI KRINIK has its own extension ID: it installs next to the official
+[releases](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases). The DOWNLOAD button above gets
+`kimi-code-universal.vsix`, which installs on Windows, macOS and Linux; platform-specific packages (for example
+`kimi-code-win32-x64.vsix` or `kimi-code-darwin-arm64.vsix`) are attached there too. Install the file with
+**Extensions → ⋯ → Install from VSIX…**. KIMI KRINIK has its own extension ID: it installs next to the official
 Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 
 ### 3. Based on, with thanks
@@ -92,6 +101,12 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
   <a href="#russian"><img src="https://img.shields.io/badge/Русский-C0392B?style=for-the-badge" alt="Русский"></a>
   &nbsp;
   <a href="#chinese"><img src="https://img.shields.io/badge/中文-E67E22?style=for-the-badge" alt="中文"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases/latest/download/kimi-code-universal.vsix">
+    <img src="docs/media/download-ru.svg" width="360" alt="Скачать KIMI KRINIK VSIX">
+  </a>
 </p>
 
 <p align="center">
@@ -124,28 +139,31 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Действия с очередью и ошибки отправки | обычная очередь | принудительный steering может повторить или пропустить сообщения | ✅ вся пачка отправляется один раз по порядку; отклонённые сообщения возвращаются на исходные места |
 | Вложения в чате и steering | — | вложения могут теряться | ✅ изображения, видео и сообщения без текста, кликабельные миниатюры и существующий просмотрщик после восстановления истории |
 | Многострочные сообщения | обычное Markdown-разбиение строк | обычное Markdown-разбиение строк | ✅ ручные переносы строк и пустые строки доходят до модели без изменений |
-| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ в начале чата лишней полосы нет; у однострочного запроса нет затухания текста и кнопки раскрытия; развёрнутый запрос остаётся раскрытым при прокрутке и сворачивается вручную или при закреплении другого запроса; шеврон открывает полный текст и медиа в существующем просмотрщике |
+| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ в начале чата лишней полосы нет; у однострочного запроса нет затухания текста и кнопки раскрытия; развёрнутый запрос остаётся раскрытым при прокрутке и сворачивается вручную или при закреплении другого запроса; шеврон открывает полный текст и медиа в существующем просмотрщике; плавные анимации появления, исчезновения и смены; видимое на экране сообщение не дублируется в закреплённую полосу |
 | Время отправки сообщения пользователя | — | — | ✅ локализованное время `HH:MM` слева от пузыря сообщения |
 | Квота на 5 часов: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Квота на 7 дней: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Месячная квота: кольцо с отсчётом до сброса | — | ✅ | ✅ |
-| Звук и голос для запросов одобрения, вопросов и ошибок | — | — | ✅ свой звук и громкость для каждого события, готовые записи на трёх языках; «Выкл» не блокирует выбор |
+| Звук и голос для запросов одобрения, вопросов и ошибок | — | — | ✅ свой звук и громкость для каждого события, готовые записи на трёх языках; «Выкл» не блокирует выбор; при «Выкл» секция события затемняется, а выбор звука остаётся доступным |
 | Языки интерфейса | English | English, 中文 | ✅ English, 中文, Русский, диалог выбора языка, где активный язык стоит первым |
-| Панель ввода: режим разрешений, Plan, Goal, Swarm, дополнительная модель, кольцо контекста и просмотр контекста | — | ✅ | ✅ общий выбор модели и уровня рассуждений, поиск, избранное и дополнительная модель |
+| Панель ввода: режим разрешений, Plan, Goal, Swarm, дополнительная модель, кольцо контекста и просмотр контекста | — | ✅ | ✅ общий выбор модели и уровня рассуждений, поиск, избранное и дополнительная модель; кнопка дополнительной модели в крупном виде подписана «Субагенты» |
 | Модель и уровень рассуждений между сессиями | — | — | ✅ явный выбор MAX/XHigh сохраняется; восстановленная сессия хранит собственный уровень |
 | Текущий статус и заголовок сессии | — | ✅ | ✅ очередь и изменения, фоновые задачи, список задач, просмотр контекста, название сессии, индикатор «Работаю…» и робот KIMI KRINIK |
 | История и внутренние события | — | — | ✅ восстановление истории без пустых кадров; внутренние служебные инструкции не отображаются как ответ агента |
 | Кольцо контекста и отклик очереди | — | ✅ | ✅ плавный переход синего в жёлтый и красно-оранжевый, один импульс при добавлении сообщения |
 | Панель управления на узком экране | — | ✅ | ✅ горизонтальная прокрутка только при реальном переполнении, затухание краёв и действия одним кликом |
 | Кнопка «Навык» в Control Panel | — | — | ✅ открывает прокручиваемый список с именем навыка жирным шрифтом и описанием обычным; при включённом Стиринге выбранный навык сразу идёт в текущий ход, при выключенном — в очередь |
-| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (39)` |
+| Состояния в подсказках Панели Управления | — | — | ✅ «ВКЛ»/«ВЫКЛ» в верхнем регистре с чуть зелёным и чуть красным оттенком на всех трёх языках |
+| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (43)` |
 | Запоздавшие ошибки подготовки запроса | общая ошибка без подробностей | общая ошибка без подробностей | ✅ не связанные с ошибкой и более новые ходы чата сохраняются; откатывается только текущая неудачная отправка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
 ### 2. Установка
 
 Версия 1.0.0 собирается и проходит проверку; её `.vsix` выйдет в
-[релизах](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases). Скачайте `.vsix` и установите его через
+[релизах](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases). Кнопка СКАЧАТЬ выше забирает
+`kimi-code-universal.vsix` — он ставится на Windows, macOS и Linux; там же лежат пакеты для конкретных платформ
+(например `kimi-code-win32-x64.vsix` и `kimi-code-darwin-arm64.vsix`). Установите файл через
 **Extensions → ⋯ → Install from VSIX…**. У KIMI KRINIK свой ID расширения: оно встаёт рядом с официальным Kimi Code и
 KIMI FORK, ваши проекты и сессии остаются на месте.
 
@@ -173,6 +191,12 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
   <a href="#russian"><img src="https://img.shields.io/badge/Русский-C0392B?style=for-the-badge" alt="Русский"></a>
   &nbsp;
   <a href="#chinese"><img src="https://img.shields.io/badge/中文-E67E22?style=for-the-badge" alt="中文"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases/latest/download/kimi-code-universal.vsix">
+    <img src="docs/media/download-zh.svg" width="360" alt="下载 KIMI KRINIK VSIX">
+  </a>
 </p>
 
 <p align="center">
@@ -204,30 +228,32 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 队列操作与发送失败 | 普通队列 | 强制 steering 可能重复或跳过消息 | ✅ 整批消息按顺序仅发送一次；被拒绝的消息回到原位置 |
 | 聊天和 steering 中的附件 | — | 可能丢失附件 | ✅ 图片、视频及纯媒体消息，可点击缩略图，replay 后使用同一查看器 |
 | 多行消息 | 标准 Markdown 空白处理 | 标准 Markdown 空白处理 | ✅ 手动换行和空行原样传递给模型 |
-| 长聊天中置顶的用户消息 | — | — | ✅ 聊天开始时不显示多余横条；单行消息不显示淡出效果或展开按钮；展开的消息在滚动时保持展开，可手动折叠或在另一条消息置顶时折叠；chevron 在现有查看器中打开全文与媒体 |
+| 长聊天中置顶的用户消息 | — | — | ✅ 聊天开始时不显示多余横条；单行消息不显示淡出效果或展开按钮；展开的消息在滚动时保持展开，可手动折叠或在另一条消息置顶时折叠；chevron 在现有查看器中打开全文与媒体；出现、消失与替换均有平滑动画；仍在屏幕上的消息不会重复进入置顶栏 |
 | 用户消息发送时间 | — | — | ✅ 用户气泡左侧显示本地化的 `HH:MM` 发送时间 |
 | 5 小时配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 7 天配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 月度配额：带重置倒计时的圆环 | — | ✅ | ✅ |
-| 需要审批、收到问题或发生错误时，用提示音和语音提醒 | — | — | ✅ 为每个事件设置声音与音量，提供三种语言的预录语音；Off 不会锁住选择器 |
+| 需要审批、收到问题或发生错误时，用提示音和语音提醒 | — | — | ✅ 为每个事件设置声音与音量，提供三种语言的预录语音；Off 不会锁住选择器；事件设为 Off 时其区域变暗，但选择器仍可用 |
 | 界面语言 | English | English、中文 | ✅ English、中文、Русский，语言对话框将当前语言放在首位 |
-| 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ 模型与推理强度合并选择器、搜索、收藏及次级模型选择 |
+| 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ 模型与推理强度合并选择器、搜索、收藏及次级模型选择；次级模型按钮在大尺寸下显示「子智能体」文字 |
 | 会话之间的模型与推理强度 | — | — | ✅ 明确选择的 MAX/XHigh 会持久保存；恢复的会话保留自己的推理强度 |
 | 实时状态与会话标题栏 | — | ✅ | ✅ 排队与更改、后台任务、待办、上下文查看器、会话标题、Working 指示器及 KIMI KRINIK 机器人 |
 | 历史 replay 与内部事件 | — | — | ✅ 原子 replay 不出现空白帧；内部 hook 结果不会成为助手文本 |
 | 上下文圆环与队列反馈 | — | ✅ | ✅ 蓝色 → 黄色 → 红橙色平滑渐变，消息入队时仅脉冲一次 |
 | 窄宽度下的 Control Panel | — | ✅ | ✅ 仅在实际溢出时横向滚动，边缘渐隐，单击执行操作 |
 | Control Panel Skill 选择器 | — | — | ✅ 可滚动列表以粗体显示技能名称，以常规字体显示本地化描述；Steer 开启时立即发送，关闭时进入普通队列 |
-| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (39)` |
+| Control Panel 状态提示 | — | — | ✅ ON/OFF 全大写并带轻微绿色/红色着色，支持全部三种语言 |
+| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (43)` |
 | 延迟到达的 preflight 错误 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 无关及更新的聊天消息保持不变，仅回滚当前失败的发送 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 
 ### 2. 安装
 
 1.0.0 版本正在构建与测试，其 `.vsix` 将发布在
-[Releases](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases)。下载 `.vsix`，通过
-**Extensions → ⋯ → Install from VSIX…** 安装。KIMI KRINIK 拥有独立的扩展 ID，可与官方 Kimi Code 和 KIMI FORK
-并存，项目与会话保持原样。
+[Releases](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases)。上方下载按钮获取
+`kimi-code-universal.vsix`，可安装于 Windows、macOS 和 Linux；同时也提供各平台专用包（例如
+`kimi-code-win32-x64.vsix`、`kimi-code-darwin-arm64.vsix`）。通过 **Extensions → ⋯ → Install from VSIX…** 安装。KIMI KRINIK
+拥有独立的扩展 ID，可与官方 Kimi Code 和 KIMI FORK 并存，项目与会话保持原样。
 
 ### 3. 基础与致谢
 

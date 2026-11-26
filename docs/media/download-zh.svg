@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="112" viewBox="0 0 400 112">
+  <rect width="400" height="112" rx="20" fill="#FF1A8C"/>
+  <g transform="translate(28,32) scale(0.3)">
+    <path d="M20 0H220L240 20V160H0V20L20 0Z" fill="#FFFFFF"/>
+    <rect x="87" y="30" width="30" height="45" fill="#FF1A8C"/>
+    <rect x="177" y="30" width="30" height="45" fill="#FF1A8C"/>
+  </g>
+  <text x="250" y="72" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="bold" fill="#FFFFFF">下载</text>
+</svg>

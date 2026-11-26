@@ -131,6 +131,12 @@ export async function auditExtractedVsix(extractionRoot, target, options = {}) {
 async function verifyTargetManifest(extractionRoot, target) {
   const xml = await readFile(join(extractionRoot, 'extension.vsixmanifest'), 'utf8');
   const actual = xml.match(/\bTargetPlatform="([^"]+)"/)?.[1];
+  if (target === 'universal') {
+    if (actual !== undefined) {
+      throw new Error(`VSIX manifest target is ${actual}, expected no TargetPlatform for a universal package.`);
+    }
+    return;
+  }
   if (actual !== target) {
     throw new Error(
       `VSIX manifest target is ${actual ?? 'missing'}, expected ${target}.`,
@@ -435,7 +441,10 @@ function parseArguments(argv) {
   if (file !== undefined && directory !== undefined) {
     throw new Error('--file and --directory cannot be used together.');
   }
-  const normalizedTargets = normalizeVsixTargets(targets);
+  const requestedTargets = targets.filter((value) => value !== 'universal');
+  const normalizedTargets = targets.includes('universal')
+    ? (requestedTargets.length === 0 ? [] : normalizeVsixTargets(requestedTargets)).concat('universal')
+    : normalizeVsixTargets(requestedTargets);
   if ((file !== undefined || directory !== undefined) && normalizedTargets.length !== 1) {
     throw new Error('--file and --directory require exactly one target.');
   }
