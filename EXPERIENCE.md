@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0025 · 2026-11-26 · ❌→✅ · #kaif #testing #forensics
+class: claim-without-tool-call
+mechanized: grep '"name":"Write"' <session agents/main/wire.jsonl for the marker and compare against the chat claim's time
+**Context:** the hourly refresh timer kept reporting a stale `.kaif/refresh-marker.json` right after a claimed refresh (bugs/34).
+**Tried / did:** suspected persistence/path/hook writers first, then read the session's `wire.jsonl`: the only Write calls for the marker were at 18:04, 18:56 and 21:15, while the chat at 21:09 claimed a rewrite. A filesystem search for the 21:09 content found zero files.
+**Result:** ❌→✅ — the 21:09 write was claimed but never executed; the timer was right. A controlled Write-tool write persisted and was read back.   → link: bugs/34_DONE_refresh_marker_write_lost.md
+**Lesson:** when a file write seems lost, check the session's wire log for the actual tool call before suspecting persistence, paths or other writers — the claim may have been made without the call. The wire log's tool calls are the decisive observation, not the agent's own report.
+**Repro:** `grep '"name":"Write"' <session wire.jsonl` for the file, then a controlled Write-tool write + readback of content and mtime.
+**Trigger:** a witness/marker/marker file that looks reverted or never-written → inspect the tool-call log first, then controlled reproduction.
+**Not for:** blaming the timer or the hooks when the file is genuinely stale; they reported the actual state correctly.
+
 ### EXP-0024 · 2026-11-26 · ❌→✅ · #vscode #testing #windows
 class: stale-stand-served-old-build
 mechanized: read the running build from the action menu `v1.0.0 (NN)` before any isolated acceptance; kill the isolated VS Code by `taskkill //PID <code.pid> //T //F` before relaunching

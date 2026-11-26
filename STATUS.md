@@ -47,7 +47,7 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 ## Where to continue next session
 
 1. Reload the accumulated main profile onto build 43 and observe the pending acceptance paths (header, assistant actions, media race, skill, General Settings, sticky, sound dimming, tinted tooltips, subagent label). Use real screenshots per `HOUSE_RULES.md` R2 and do not infer the running build from the installed VSIX hash. The failed focus/palette attempts are recorded in `testcases/reports/2026-11-26_build_34_session_header_compact.md`; do not repeat them blindly. Record fresh results in a new run report.
-2. Done this session: the pre-release package — test plan `testcases/TC_1.0.0_release_readiness.md`, README with the three-language DOWNLOAD button, release notes in Krinik's style, universal VSIX for macOS and all platforms. Next technical tasks: `bugs/34_refresh_marker_write_lost.md` and the real VSIX preflight for `bugs/29`.
+2. Done this session: the pre-release package — test plan `testcases/TC_1.0.0_release_readiness.md`, README with the three-language DOWNLOAD button, release notes in Krinik's style, universal VSIX for macOS and all platforms. `bugs/34` is closed: the 21:09 marker write was claimed but never executed; the timer and the witness hunt were right (EXP-0025). Next technical task: the real VSIX preflight for `bugs/29`.
 3. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified universal and per-target VSIX files, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
 
 ## Open bugs
@@ -58,7 +58,7 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 - 🔧 `bugs/41_sticky_appearance_and_switch_animation.md`, `bugs/42_subagent_button_label.md`, `bugs/43_sticky_chevron_centering.md` — smooth sticky animations, «Субагенты» label and centered chevron verified on isolated build 42; main-profile acceptance pending.
 - 🔧 `bugs/36_assistant_text_action_scope.md` — per-text Copy/Fork placement, adjacent-only copying and custom message tooltips verified on isolated build 36; accumulated main-profile acceptance pending.
 - 🔧 `bugs/35_attachment_composer_chat_race.md` — deferred-acknowledgement cleanup fixed; isolated build 37 passed before/after frame traces, failure restoration, completion and replay; accumulated main-profile acceptance pending.
-- 🔴 `bugs/34_refresh_marker_write_lost.md` — owner-priority investigation into the lost refresh-marker update; timer matches the stale file, culprit not yet assigned.
+- ✅ `bugs/34_DONE_refresh_marker_write_lost.md` — root cause found: the 21:09 write was claimed in chat but never executed (the wire log has no Write call at 21:09; only 18:04/18:56/21:15). The timer and the refresh-witness hunt were right; no product defect. Controlled Write-tool write persisted and was read back. Lesson in EXP-0025.
 - 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated build-25 acceptance passed; `bugs/31_expanded_sticky_scroll_oscillation.md` includes the revised scroll contract and one-line no-fade/no-collapse boundary, verified on isolated build 38; main-profile acceptance pending.
 - 🔧 `bugs/29_preflight_error_deletes_unrelated_history.md` — deterministic regressions and full suite pass; real VSIX preflight path pending.
 - 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — repeated owner symptom, three isolated non-reproductions; parked with evidence, not DONE.
