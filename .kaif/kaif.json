@@ -23,6 +23,14 @@
   },
   "build": "40a046eebf68",
   "projectName": "KIMI KRINIK",
+  "testHook": {
+    "kinds": {
+      "vscode": {
+        "files": ["^apps/vscode/(webview-ui/src|src|shared|scripts|test)/.*\\.(tsx?|mjs|cjs)$"],
+        "runs": ["vitest\\s+run", "\\.tmp/k5-(cdp|vscode-ui|install)\\.mjs", "extension-host-smoke\\.mjs"]
+      }
+    }
+  },
   "contextWindow": {
     "warnPct": 70,
     "cutPct": 75,
