@@ -192,6 +192,63 @@ describe("Webview RPC boundary (validates requests before host dispatch)", () =>
     expect(steer).toHaveBeenCalledWith("second", "client-steer-1");
   });
 
+  it("waits for an ordinary prompt preflight before accepting steering", async () => {
+    const submission = { promptId: "prompt-steer-1", createdAt: "2026-11-24T00:00:00.000Z", state: "running", turnId: 7, steered: true } as const;
+    let busy = false;
+    let finishPrompt!: (result: { status: "finished" }) => void;
+    const promptResult = new Promise<{ status: "finished" }>((resolve) => { finishPrompt = resolve; });
+    const steer = vi.fn(async () => submission);
+    const prompt = vi.fn(() => {
+      busy = true;
+      return promptResult;
+    });
+    const runtime = {
+      id: "session-1",
+      summary: undefined,
+      get isBusy() { return busy; },
+      session: {
+        workDir: root,
+        getStatus: async () => ({ model: "kimi-test", thinkingEffort: "off", planMode: false }),
+      },
+      announceSessionStart: vi.fn(),
+      prompt,
+      steer,
+    };
+    vi.spyOn(bridge.runtime, "openSession").mockResolvedValue(runtime as never);
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue(runtime as never);
+
+    const original = bridge.handle({
+      id: "rpc-original",
+      method: Methods.StreamChat,
+      params: { content: "first", model: "kimi-test", effort: "off", clientId: "client-original" },
+    }, "view-1");
+    const steering = bridge.handle({
+      id: "rpc-steer-preflight",
+      method: Methods.SteerChat,
+      params: { content: "second", clientId: "client-steer-preflight" },
+    }, "view-1");
+    const steered = await steering;
+    finishPrompt({ status: "finished" });
+    await original;
+
+    expect(steered).toEqual({ id: "rpc-steer-preflight", result: { ok: true, submission } });
+    expect(steer).toHaveBeenCalledWith("second", "client-steer-preflight");
+  });
+
+  it("returns false for steering when the session is genuinely idle", async () => {
+    const steer = vi.fn();
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ isBusy: false, steer } as never);
+
+    const result = await bridge.handle({
+      id: "rpc-steer-idle",
+      method: Methods.SteerChat,
+      params: { content: "second", clientId: "client-steer-idle" },
+    }, "view-1");
+
+    expect(result).toEqual({ id: "rpc-steer-idle", result: { ok: false } });
+    expect(steer).not.toHaveBeenCalled();
+  });
+
   it.each(["missingMethod", "toString", "constructor", "__proto__"])(
     "does not dispatch the unknown or prototype method %s",
     async (method) => {

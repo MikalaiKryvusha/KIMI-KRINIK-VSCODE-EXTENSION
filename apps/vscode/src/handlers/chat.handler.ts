@@ -38,6 +38,7 @@ interface RespondQuestionParams {
 }
 
 const injectedEditorContextSessions = new Map<string, string>();
+const pendingPromptPreflights = new Map<string, Promise<void>>();
 
 async function buildSystemContext(sessionId: string, ctx: Parameters<Handler>[1]): Promise<string> {
   const mode = VSCodeSettings.editorContext;
@@ -76,7 +77,11 @@ function prependSystemContext(content: string | ContentPart[], context: string):
   return copy;
 }
 
-const streamChat: Handler<StreamChatParams, { done: boolean }> = async (params, ctx) => {
+async function streamChatInner(
+  params: StreamChatParams,
+  ctx: Parameters<Handler>[1],
+  onPromptReady: () => void,
+): Promise<{ done: boolean }> {
   if (!ctx.workDir) {
     emitPreflightError(ctx, "NO_WORKSPACE", "Please open a folder to start.");
     void vscode.window.showWarningMessage("Kimi: Please open a folder first.", "Open Folder").then((action) => {
@@ -135,7 +140,9 @@ const streamChat: Handler<StreamChatParams, { done: boolean }> = async (params, 
   const slash = parseHostSlashCommand(params.content);
   if (slash !== undefined) {
     try {
-      return { done: await runHostSlashCommand(runtime, slash, ctx) };
+      const action = runHostSlashCommand(runtime, slash, ctx);
+      onPromptReady();
+      return { done: await action };
     } catch (error) {
       emitCaughtError(ctx, error, "runtime", runtime.id);
       return { done: false };
@@ -145,13 +152,27 @@ const streamChat: Handler<StreamChatParams, { done: boolean }> = async (params, 
   const systemContext = await buildSystemContext(runtime.id, ctx);
   try {
     const input = prependSystemContext(params.content, systemContext);
-    const result = params.drainQueue === true
-      ? await runtime.prompt(input, params.clientId, true)
-      : await runtime.prompt(input, params.clientId);
+    const prompt = params.drainQueue === true
+      ? runtime.prompt(input, params.clientId, true)
+      : runtime.prompt(input, params.clientId);
+    onPromptReady();
+    const result = await prompt;
     return { done: result.status === "finished" };
   } catch (error) {
     emitCaughtError(ctx, error, "runtime", runtime.id);
     return { done: false };
+  }
+}
+
+const streamChat: Handler<StreamChatParams, { done: boolean }> = async (params, ctx) => {
+  let ready!: () => void;
+  const preflight = new Promise<void>((resolve) => { ready = resolve; });
+  pendingPromptPreflights.set(ctx.webviewId, preflight);
+  try {
+    return await streamChatInner(params, ctx, ready);
+  } finally {
+    ready();
+    if (pendingPromptPreflights.get(ctx.webviewId) === preflight) pendingPromptPreflights.delete(ctx.webviewId);
   }
 };
 
@@ -179,6 +200,8 @@ const setPlanMode: Handler<{ enabled: boolean }, { ok: boolean; planMode: boolea
 };
 
 const steerChat: Handler<{ content: string | ContentPart[]; clientId?: string }, SteerChatResult> = async (params, ctx) => {
+  const preflight = pendingPromptPreflights.get(ctx.webviewId);
+  if (preflight !== undefined) await preflight;
   const runtime = ctx.getSession();
   if (runtime === undefined || !runtime.isBusy) return { ok: false };
   const submission = await runtime.steer(params.content, params.clientId);

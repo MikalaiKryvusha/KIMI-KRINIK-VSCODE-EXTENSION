@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 1 — Steering и attention: `bugs/44`, `bugs/45`, `bugs/46`»
-> **Статус:** активен; шаги 4.1–4.2 выполнены на packaged build 49, далее `bugs/45` и `bugs/46` · [TESTED: 2026-11-27 · 52/52 runtime, 664/1 full extension, typecheck/lint/package audit and isolated immediate+queued guest acceptance in `testcases/reports/2026-11-27_steer_completion_attention_build49.md`; accumulated main/audible output not verified]
+> **Статус:** активен; шаги 4.1–4.3 выполнены на packaged builds 49–50, далее `bugs/46` · [TESTED: 2026-11-27 · 52/52 runtime, 39/39 bridge-handler, 666/1 full extension, typecheck/lint/package audits and isolated steering/error acceptance in `testcases/reports/2026-11-27_steer_completion_attention_build49.md` and `2026-11-27_steer_transient_error_build50.md`; accumulated main/audible output not verified]
 > **Вовне:** результаты обновляют `bugs/44`–`bugs/46`, их GitHub Issues и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -56,11 +56,11 @@ Anchor: Epic 04 Phase 1 — «кандидат `bugs/44` требует реал
 
 Anchor: Epic 04 Phase 1 — «красный error frame идентифицирован».
 
-- [ ] Повторить immediate, queued и running→idle sends с MutationObserver и bridge/runtime error payload log до изменения продукта.
-- [ ] Записать точные code/message/detail/phase/terminal, owning client/turn и первый/последний красный DOM frame. Отдельно выполнить genuine rejected/failed control.
-- [ ] Если переход воспроизводится, добавить red-before regression на owning public store/runtime path и внести одну адресную правку после `INTENT:`.
-- [ ] Если переход не воспроизводится минимум на трёх названных вариантах, не подавлять ошибки; зафиксировать охоту и перенести захват на накопленный профиль по R7.
-- [ ] Verification: accepted immediate/queued не создают красный кадр; genuine failure остаётся видимым с правильным rollback.
+- [x] Повторить immediate, queued и running→idle sends с MutationObserver и bridge/runtime error payload log до изменения продукта.
+- [x] Записать точные code/message/detail/phase/terminal, owning client/turn и первый/последний красный DOM frame. Отдельно выполнить genuine rejected/failed control.
+- [x] Если переход воспроизводится, добавить red-before regression на owning public store/runtime path и внести одну адресную правку после `INTENT:`.
+- [x] Условие не наступило: переход воспроизведён, поэтому подавления ошибок и перенос охоты на накопленный профиль не потребовались.
+- [x] Verification: accepted immediate/queued не создают красный кадр; genuine failure остаётся видимым с правильным rollback.
 
 ### 4.4 Измерить и исправить `bugs/46`
 
