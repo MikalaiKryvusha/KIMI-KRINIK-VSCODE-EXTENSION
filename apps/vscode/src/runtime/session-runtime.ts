@@ -92,6 +92,7 @@ export class SessionRuntime {
   private pendingHostCompaction: PendingHostCompaction | undefined;
   private readonly activeWorkSettledWaiters = new Set<() => void>();
   private exclusiveActionActive = false;
+  private readonly activeTurnIds = new Set<number>();
   private readonly terminalKeys = new Set<string>();
   private suppressedError: SuppressedError | undefined;
   private legacyApproval: LegacyApprovalFlags;
@@ -499,8 +500,9 @@ export class SessionRuntime {
       }
     }
 
-    if (event.type === "turn.started" && event.agentId === "main" && this.activePrompt !== undefined) {
-      this.activePrompt.started = true;
+    if (event.type === "turn.started" && event.agentId === "main") {
+      this.activeTurnIds.add(event.turnId);
+      if (this.activePrompt !== undefined) this.activePrompt.started = true;
     }
 
     if (event.type === "tool.call.started") {
@@ -567,27 +569,32 @@ export class SessionRuntime {
   private emitTerminal(terminal: TurnTerminalMetadata): void {
     if (this.terminalKeys.has(terminal.key)) return;
     this.terminalKeys.add(terminal.key);
+    this.activeTurnIds.delete(terminal.turnId);
 
     if (terminal.reason === "completed") {
-      this.emitStreamEvent({
-        type: "stream_complete",
-        result: { status: "finished" },
-        turnIndex: terminal.turnId,
-        _sessionId: terminal.sessionId,
-      });
       this.settlePrompt({ status: "finished" });
+      if (this.waitingForInput) {
+        this.emitStreamEvent({
+          type: "stream_complete",
+          result: { status: "finished" },
+          turnIndex: terminal.turnId,
+          _sessionId: terminal.sessionId,
+        });
+      }
       return;
     }
 
     if (terminal.reason === "cancelled") {
       this.reverseRpc.cancelAll("Turn cancelled");
-      this.emitStreamEvent({
-        type: "stream_complete",
-        result: { status: "cancelled" },
-        turnIndex: terminal.turnId,
-        _sessionId: terminal.sessionId,
-      });
       this.settlePrompt({ status: "cancelled" });
+      if (this.waitingForInput) {
+        this.emitStreamEvent({
+          type: "stream_complete",
+          result: { status: "cancelled" },
+          turnIndex: terminal.turnId,
+          _sessionId: terminal.sessionId,
+        });
+      }
       return;
     }
 
@@ -649,6 +656,10 @@ export class SessionRuntime {
 
   private get hasActiveWork(): boolean {
     return this.activePrompt !== undefined || this.hostActionActive;
+  }
+
+  private get waitingForInput(): boolean {
+    return this.activeTurnIds.size === 0 && !this.hasActiveWork && this.pendingSteers.size === 0 && !this.exclusiveActionActive;
   }
 
   private waitForActiveWorkToSettle(): Promise<void> {

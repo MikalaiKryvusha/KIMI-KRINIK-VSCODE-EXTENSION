@@ -206,12 +206,12 @@ function streamData(records: readonly BroadcastRecord[]): unknown[] {
   return records.filter((record) => record.event === Events.StreamEvent).map((record) => record.data);
 }
 
-function turnStarted(promptId?: string): Event {
+function turnStarted(promptId?: string, turnId = 7): Event {
   return {
     type: "turn.started",
     sessionId: "session-1",
     agentId: "main",
-    turnId: 7,
+    turnId,
     origin: { kind: "user" },
     ...(promptId === undefined ? {} : { promptId }),
   };
@@ -220,12 +220,13 @@ function turnStarted(promptId?: string): Event {
 function turnEnded(
   reason: "completed" | "cancelled" | "failed",
   error?: Extract<Event, { type: "turn.ended" }>["error"],
+  turnId = 7,
 ): Event {
   return {
     type: "turn.ended",
     sessionId: "session-1",
     agentId: "main",
-    turnId: 7,
+    turnId,
     reason,
     error,
   };
@@ -642,6 +643,47 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
       payload: { user_input: "Queue this", turnIndex: 7, clientId: "client-queued" },
       _sessionId: "session-1",
     });
+  });
+
+  it("suppresses completion until every immediate steering turn is idle", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const completion = runtime.prompt("first");
+    sdk.emit(turnStarted(undefined, 1));
+    sdk.setSteerResult({ ...RUNNING_STEER_RESULT, turnId: 2 });
+    await runtime.steer("second", "client-steer-2");
+    sdk.emit(turnStarted(undefined, 2));
+
+    sdk.emit(turnEnded("completed", undefined, 1));
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "stream_complete" }));
+
+    sdk.emit(turnEnded("completed", undefined, 2));
+    const completions = streamData(broadcasts).filter((event) => typeof event === "object" && event !== null
+      && "type" in event && event.type === "stream_complete" && "result" in event
+      && (event.result as { status?: string }).status === "finished");
+    expect(completions).toHaveLength(1);
+    expect(completions[0]).toMatchObject({ turnIndex: 2 });
+    await expect(completion).resolves.toEqual({ status: "finished" });
+  });
+
+  it("suppresses completion while an accepted queued steer still waits for its turn", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const completion = runtime.prompt("first");
+    sdk.emit(turnStarted(undefined, 1));
+    const queued = { promptId: "prompt-queued", createdAt: "2026-11-24T00:00:00.000Z", state: "queued", steered: false } as const;
+    sdk.setSteerResult(queued);
+    await runtime.steer("queued second", "client-queued-2");
+
+    sdk.emit(turnEnded("completed", undefined, 1));
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "stream_complete" }));
+
+    sdk.emit(turnStarted("prompt-queued", 2));
+    sdk.emit(turnEnded("completed", undefined, 2));
+    const completions = streamData(broadcasts).filter((event) => typeof event === "object" && event !== null
+      && "type" in event && event.type === "stream_complete" && "result" in event
+      && (event.result as { status?: string }).status === "finished");
+    expect(completions).toHaveLength(1);
+    expect(completions[0]).toMatchObject({ turnIndex: 2 });
+    await expect(completion).resolves.toEqual({ status: "finished" });
   });
 
   it("returns a blocked steer without emitting a success echo", async () => {
