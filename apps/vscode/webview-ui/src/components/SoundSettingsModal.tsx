@@ -1,4 +1,5 @@
 import { IconPlayerPlay } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -62,11 +63,12 @@ export function SoundSettingsModal() {
         <div className="space-y-3 py-1">
           {SOUND_EVENTS.map((event) => {
             const setting = sounds[event];
-            const playbackDisabled = !soundEnabled || setting.sound === "off";
+            const soundOff = setting.sound === "off";
+            const playbackDisabled = !soundEnabled || soundOff;
             return (
               <div key={event} className="rounded-md border border-border p-2 space-y-1.5" data-testid={`sound-row-${event}`}>
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex flex-col min-w-0">
+                  <div className={cn("flex flex-col min-w-0 transition-opacity", soundOff && "opacity-40")}>
                     <span className="text-xs font-medium">{t(EVENT_TEXT[event].label)}</span>
                     <span className="text-[10px] text-muted-foreground">{t(EVENT_TEXT[event].when)}</span>
                   </div>
@@ -88,7 +90,7 @@ export function SoundSettingsModal() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className={cn("flex items-center gap-2 transition-opacity", soundOff && "opacity-40")}>
                   <input
                     type="range"
                     min={0}

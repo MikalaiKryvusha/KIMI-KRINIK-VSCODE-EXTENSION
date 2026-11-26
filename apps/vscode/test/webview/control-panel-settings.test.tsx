@@ -33,7 +33,7 @@ vi.mock("@/components/ui/sonner", () => ({
   toast: { error: vi.fn(), warning: vi.fn(), info: vi.fn(), success: vi.fn() },
 }));
 
-import { BehaviorButtons } from "../../webview-ui/src/components/BehaviorButtons";
+import { BehaviorButtons, StateDescription } from "../../webview-ui/src/components/BehaviorButtons";
 import { ActionMenu } from "../../webview-ui/src/components/ActionMenu";
 import { ControlPanelSettingsDialog } from "../../webview-ui/src/components/ControlPanelSettingsDialog";
 import { GeneralSettingsDialog } from "../../webview-ui/src/components/GeneralSettingsDialog";
@@ -154,6 +154,26 @@ describe("Control Panel settings", () => {
     const compact = screen.getByTestId("mode-compact");
     expect(compact.className).toContain("disabled:cursor-default");
     expect(compact.className).not.toContain("disabled:cursor-not-allowed");
+  });
+
+  it("tints the state word green for ON and red for OFF in all three languages", () => {
+    const { rerender } = render(<StateDescription text="ON: automatic compaction is enabled." on={true} />);
+    expect(screen.getByText("ON:").className).toContain("text-green-600");
+    expect(screen.getByText("ON:").className).toContain("dark:text-green-400");
+
+    rerender(<StateDescription text="OFF: automatic compaction is disabled." on={false} />);
+    expect(screen.getByText("OFF:").className).toContain("text-red-600");
+    expect(screen.getByText("OFF:").className).toContain("dark:text-red-400");
+
+    rerender(<StateDescription text="ВЫКЛ: сжатие отключено." on={false} />);
+    expect(screen.getByText("ВЫКЛ:").className).toContain("text-red-600");
+
+    rerender(<StateDescription text="ВКЛ: сжатие включено." on={true} />);
+    expect(screen.getByText("ВКЛ:").className).toContain("text-green-600");
+
+    const { container } = render(<StateDescription text="关闭：聊天上下文自动压缩已禁用。" on={false} />);
+    expect(screen.getByText("关闭：").className).toContain("text-red-600");
+    expect(container.textContent).toBe("关闭：聊天上下文自动压缩已禁用。");
   });
 
   it("hides only the unchecked behavior and mode buttons", () => {

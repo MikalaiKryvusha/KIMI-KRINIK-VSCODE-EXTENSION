@@ -252,7 +252,7 @@ function UserMessage({ message }: { message: ChatMessageType }) {
   const sentAt = Number.isFinite(message.timestamp) ? new Date(message.timestamp) : undefined;
 
   return (
-    <div className="px-3 pt-3 pb-1 flex items-center justify-end gap-2">
+    <div data-message-id={message.id} data-message-role="user" className="px-3 pt-3 pb-1 flex items-center justify-end gap-2">
       {sentAt && <time dateTime={sentAt.toISOString()} className="shrink-0 text-[10px] leading-none text-muted-foreground">{formatMessageTime(message.timestamp, language)}</time>}
       <div className={cn("min-w-0 max-w-[85%] px-3.5 py-1.5 rounded-2xl rounded-br-md", "bg-zinc-100 dark:bg-zinc-800", "text-foreground")}>
         {displayContent && (

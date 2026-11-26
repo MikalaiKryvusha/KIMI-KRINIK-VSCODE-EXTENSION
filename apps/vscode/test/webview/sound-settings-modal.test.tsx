@@ -72,10 +72,14 @@ describe("Sound Settings", () => {
 
     expect(selector).toHaveProperty("disabled", false);
     expect(document.querySelector('input[type="range"]')).toHaveProperty("disabled", true);
+    const row = screen.getByTestId("sound-row-approval");
+    expect(row.querySelectorAll(".opacity-40").length).toBe(2);
+    expect(row.querySelector('[data-slot="select-trigger"]')?.closest(".opacity-40")).toBeNull();
     await user.click(selector);
     await user.click(await screen.findByRole("option", { name: "Glass" }));
 
     expect(useSettingsStore.getState().extensionConfig.sounds.approval.sound).toBe("glass");
+    expect(row.querySelectorAll(".opacity-40").length).toBe(0);
     expect(boundary.updateExtensionSetting).toHaveBeenLastCalledWith({
       key: "sounds",
       value: expect.objectContaining({ approval: expect.objectContaining({ sound: "glass" }) }),

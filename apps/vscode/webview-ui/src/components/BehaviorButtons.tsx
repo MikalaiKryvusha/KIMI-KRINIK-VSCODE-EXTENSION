@@ -13,6 +13,18 @@ function behaviorButtonClass(active: boolean): string {
   }`;
 }
 
+export function StateDescription({ text, on }: { text: string; on: boolean }) {
+  const match = /^(\S+[:：])(\s*)([\s\S]*)$/.exec(text);
+  if (!match) return <>{text}</>;
+  return (
+    <>
+      <span className={on ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>{match[1]}</span>
+      {match[2]}
+      {match[3]}
+    </>
+  );
+}
+
 export function BehaviorButtons() {
   const extensionConfig = useSettingsStore((state) => state.extensionConfig);
   const autoCompact = useSettingsStore((state) => state.autoCompact);
@@ -40,7 +52,7 @@ export function BehaviorButtons() {
               <span className="leading-none @max-[480px]/composer:hidden">{t("menu.autoCompact")}</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent>{compactEnabled ? t("menu.autoCompactOn") : t("menu.autoCompactOff")}</TooltipContent>
+          <TooltipContent><StateDescription text={compactEnabled ? t("menu.autoCompactOn") : t("menu.autoCompactOff")} on={compactEnabled} /></TooltipContent>
         </Tooltip>
       )}
 
@@ -58,7 +70,7 @@ export function BehaviorButtons() {
               <span className="leading-none @max-[480px]/composer:hidden">{t("menu.autoSteer")}</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent>{extensionConfig.autoSteer ? t("menu.autoSteerOn") : t("menu.autoSteerOff")}</TooltipContent>
+          <TooltipContent><StateDescription text={extensionConfig.autoSteer ? t("menu.autoSteerOn") : t("menu.autoSteerOff")} on={extensionConfig.autoSteer} /></TooltipContent>
         </Tooltip>
       )}
 
@@ -76,7 +88,7 @@ export function BehaviorButtons() {
               <span className="leading-none @max-[480px]/composer:hidden">{t("controlWindow.button")}</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent>{extensionConfig.contextWindowControl ? t("controlWindow.on") : t("controlWindow.off")}</TooltipContent>
+          <TooltipContent><StateDescription text={extensionConfig.contextWindowControl ? t("controlWindow.on") : t("controlWindow.off")} on={extensionConfig.contextWindowControl} /></TooltipContent>
         </Tooltip>
       )}
 

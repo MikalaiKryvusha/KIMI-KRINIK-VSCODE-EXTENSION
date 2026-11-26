@@ -20,7 +20,7 @@
 |---|---|---|
 | AC1 | Scroll through two assistant turns and read the active prompt identity | sticky changes to the user prompt owning the visible assistant turn |
 | AC2 | Send a new prompt while viewing an older turn | sticky stays on the older turn until the viewport reaches the new turn |
-| AC3 | Scroll back to the bottom | sticky belongs to the current turn |
+| AC3 | Scroll back to the bottom | sticky shows the latest prompt that has fully scrolled out of the viewport; a prompt still visible on screen never appears in the sticky (owner's refinement, 2026-11-26) |
 | AC4 | Click «Развернуть» | full prompt text and its image/video thumbnails are visible; clicking a thumbnail opens the existing media viewer |
 | AC5 | Click «Свернуть» | prompt returns to one line; scroll position and active prompt do not change |
 | AC6 | Repeatedly cross a turn boundary and send steering messages | no sticky flicker, duplicate section or assistant avatar above the corresponding user prompt |
@@ -32,7 +32,7 @@
 | AC12 | Read a collapsed sticky prompt | the summary is raised and optically centered vertically inside the bubble rather than sitting low |
 | AC13 | Open or return to the very beginning of the conversation | no sticky prompt is rendered at `scrollTop = 0`; scrolling into an assistant turn can activate it again |
 | AC14 | Scroll with an expanded sticky prompt, then pin another prompt and return | wheel/touch scrolling preserves the expansion; only manual collapse or a different prompt becoming sticky closes it, and a replaced prompt's expansion does not reappear on return; height grows downward with text fade-in and collapses upward with fade-out |
-| AC15 | Read the sticky bubble inside its container | small top/left/right padding leaves visible space around the bubble |
+| AC15 | Read the sticky bubble inside its container | small padding on all sides, including the bottom edge, leaves visible space around the bubble |
 | AC16 | Expand and collapse a prompt that overflows one line | only an overflowing prompt gets a collapsed preview with one clear line and part of the second under a bubble-colored fade; max-height animates smoothly in both directions with reduced-motion support |
 
 ## 3. Reference findings
@@ -94,5 +94,8 @@ KIMI KRINIK will keep its own React/Zustand structure. The implementation is lim
 - [OWNER] «ну сообщения юзера А) справа, б) фон имеют другой» · 2026-11-25 (чат): the sticky prompt uses the user-message visual identity.
 - [OWNER] «так что стики нужно делать по аналогии с тем, как он в чате выглядит, чтобы сохранялась у юзера ассоциация», «не нужна ему кнопка развернуть, если он в одну строку», «и всю верхнюю панель можешь в цвет сообщения юзера превращать, такого цвета - на всю ширину чата такой пузырь сообщени юзера вверху» · 2026-11-25 (чат): sticky spans the chat with the user-message background; expansion is available only for truncated, multiline or media prompts.
 - [OWNER] «давай время сообщений пользователя писать слева от них, вот тут» · 2026-11-25 16:46 +03:00 (чат): ordinary user-message send time belongs to the left of the bubble.
+- [OWNER] «в стики попало сообщение, которое сейчас у меня на экране - это неверно, так как я до него ещё не мог долистать. В стики должно было быть предыдущее сообщенгие из чата.» · 2026-11-26 ≈10:07 +03:00 (чат): the sticky shows the latest fully-scrolled-out prompt, never a prompt still visible on screen; the at-bottom latest-prompt shortcut is removed and selection measures user-message bottom edges directly.
+- [OWNER] «в контейнере стики сообщений не хватает отсутпа между нижней границей оконтейнера и нижней границей пузыря сообщения» · 2026-11-26 ≈10:08 +03:00 (чат): the sticky container gets bottom padding matching its other sides.
+- [OWNER] «сейчас вторую строчку почти не видно в свернутом стики сообщении. нужно чуть-чуть сильнее её показывать» · 2026-11-26 ≈10:10 +03:00 (чат): the collapsed-preview fade midpoint softens from 85 % to 60 % bubble-color opacity so the second line stays readable while the bottom still fades out.
 - [OWNER] «а в стики сообщении вверху не делать пустое место на всю ширину пузыря только ради кнопки сворачинвания - её можно как-то аккуратно в уголке вверху справа поместить так, чтобы тексту не мешала, но текст поднять вверх пузыря» · 2026-11-25 16:46 +03:00 (чат): the expanded sticky chevron overlays the top-right corner and the text moves up into the former control-row space.
 - [OWNER] «в стики пузыре нужно текст выше поднять, по оптическому центру тяжести чтобы вертикально текст был в пузыре выровнен» · 2026-11-25 16:55 +03:00 (чат): the collapsed summary is optically centered vertically rather than sitting low.

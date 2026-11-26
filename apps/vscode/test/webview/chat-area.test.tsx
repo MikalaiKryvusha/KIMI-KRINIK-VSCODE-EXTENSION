@@ -60,12 +60,20 @@ const promptMessages: ChatMessageType[] = [
 ];
 
 describe("sticky user prompt", () => {
-  it("selects the prompt owning the visible assistant turn with boundary hysteresis", () => {
-    const tops = new Map([["assistant-1", -240], ["assistant-2", 40], ["assistant-3", 400]]);
-    expect(selectActivePromptId(promptMessages, tops)).toBe("turn:1");
-    expect(selectActivePromptId(promptMessages, new Map([["assistant-1", -240], ["assistant-2", 85]]), "turn:0")).toBe("turn:0");
-    expect(selectActivePromptId(promptMessages, new Map([["assistant-1", -240], ["assistant-2", 50]]), "turn:0")).toBe("turn:1");
-    expect(selectActivePromptId(promptMessages, new Map([["assistant-1", -100], ["assistant-2", 500], ["assistant-3", 800]]), "turn:0")).toBe("turn:0");
+  it("selects the last prompt scrolled out of the viewport with boundary hysteresis", () => {
+    const prompts = [
+      { key: "turn:0", bottom: -240 },
+      { key: "turn:1", bottom: 40 },
+      { key: "steer-client", bottom: 400 },
+    ];
+    expect(selectActivePromptId(prompts)).toBe("turn:1");
+    expect(selectActivePromptId([{ key: "turn:0", bottom: -100 }, { key: "turn:1", bottom: 85 }], "turn:1")).toBe("turn:1");
+    expect(selectActivePromptId([{ key: "turn:0", bottom: -100 }, { key: "turn:1", bottom: 60 }], "turn:0")).toBe("turn:0");
+    expect(selectActivePromptId([{ key: "turn:0", bottom: -100 }, { key: "turn:1", bottom: 40 }], "turn:0")).toBe("turn:1");
+    expect(selectActivePromptId([{ key: "turn:0", bottom: -100 }, { key: "turn:1", bottom: 500 }, { key: "steer-client", bottom: 800 }], "turn:0")).toBe("turn:0");
+    expect(selectActivePromptId([{ key: "turn:0", bottom: 300 }])).toBeUndefined();
+    expect(selectActivePromptId([{ key: "turn:0", bottom: 300 }], "turn:0")).toBeUndefined();
+    expect(selectActivePromptId([{ key: "turn:0", bottom: 85 }], "turn:0")).toBe("turn:0");
   });
 
   it("uses clientId, durable turn and content/order identities in that order", () => {
@@ -99,6 +107,7 @@ describe("sticky user prompt", () => {
     expect(sticky.textContent).toContain("second full prompt");
     expect(sticky.className).toContain("px-2");
     expect(sticky.className).toContain("pt-2");
+    expect(sticky.className).toContain("pb-2");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("w-full");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("bg-zinc-100");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("rounded-2xl");
@@ -106,7 +115,9 @@ describe("sticky user prompt", () => {
     expect(screen.getByTestId("sticky-prompt-expansion").style.maxHeight).toBe("32px");
     expect(screen.getByTestId("sticky-prompt-expansion").className).toContain("transition-[max-height]");
     expect(screen.getByTestId("sticky-prompt-fade").className).toContain("from-zinc-100");
+    expect(screen.getByTestId("sticky-prompt-fade").className).toContain("via-zinc-100/60");
     expect(screen.getByTestId("sticky-prompt-fade").className).toContain("dark:from-zinc-800");
+    expect(screen.getByTestId("sticky-prompt-fade").className).toContain("dark:via-zinc-800/60");
     expect(sticky.querySelector("button")?.className).toContain("items-center");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("transition-transform");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("motion-reduce:transition-none");

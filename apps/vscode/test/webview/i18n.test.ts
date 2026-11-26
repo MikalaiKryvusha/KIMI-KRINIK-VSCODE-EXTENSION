@@ -53,23 +53,23 @@ describe("interface dictionaries", () => {
     expect(translate("en", "controlWindow.description")).toBe("Notify the agent when context window usage reaches the configured thresholds.");
     expect(translate("ru", "controlWindow.description")).toBe("Предупреждать агента, когда контекстное окно заполняется до заданных порогов.");
     expect(translate("zh", "controlWindow.description")).toBe("当上下文窗口使用量达到配置的阈值时提醒代理。");
-    expect(translate("ru", "controlWindow.off")).toBe("Выкл: KIMI KRINIK не следит за заполнением контекстного окна чата. Чат может переполниться или дойти до автосжатия.");
-    expect(translate("ru", "controlWindow.on")).toBe("Вкл: KIMI KRINIK следит за заполнением контекстного окна чата и не позволяет чату переполниться или дойти до сжатия контекста. При приближении к переполнению контекстного окна чата работа будет мягко остановлена для передачи в новый чат.");
+    expect(translate("ru", "controlWindow.off")).toBe("ВЫКЛ: KIMI KRINIK не следит за заполнением контекстного окна чата. Чат может переполниться или дойти до автосжатия.");
+    expect(translate("ru", "controlWindow.on")).toBe("ВКЛ: KIMI KRINIK следит за заполнением контекстного окна чата и не позволяет чату переполниться или дойти до сжатия контекста. При приближении к переполнению контекстного окна чата работа будет мягко остановлена для передачи в новый чат.");
     for (const dictionary of Object.values(dictionaries)) {
       expect(dictionary["controlWindow.description"]).not.toContain("KAIF");
     }
   });
 
   it("describes Compact and Steer states with their visible consequences", () => {
-    expect(translate("ru", "menu.autoCompactOff")).toBe("Выкл: автоматическое сжатие контекста чата отключено. Чат может переполниться и перестать работать.");
-    expect(translate("ru", "menu.autoCompactOn")).toBe("Вкл: автоматическое сжатие контекста чата включено. Контекст чата будет автоматически сжат при заполнении контекстного окна модели на 85% её номинала.");
-    expect(translate("ru", "menu.autoSteerOff")).toBe("Выкл: новое сообщение ставится в очередь. Очередь отправится целиком, когда у KIMI будет окно после текущего шага.");
-    expect(translate("ru", "menu.autoSteerOn")).toBe("Вкл: новое сообщение сразу вливается в ход работы без постановки в очереди.");
+    expect(translate("ru", "menu.autoCompactOff")).toBe("ВЫКЛ: автоматическое сжатие контекста чата отключено. Чат может переполниться и перестать работать.");
+    expect(translate("ru", "menu.autoCompactOn")).toBe("ВКЛ: автоматическое сжатие контекста чата включено. Контекст чата будет автоматически сжат при заполнении контекстного окна модели на 85% её номинала.");
+    expect(translate("ru", "menu.autoSteerOff")).toBe("ВЫКЛ: новое сообщение ставится в очередь. Очередь отправится целиком, когда у KIMI будет окно после текущего шага.");
+    expect(translate("ru", "menu.autoSteerOn")).toBe("ВКЛ: новое сообщение сразу вливается в ход работы без постановки в очереди.");
 
-    expect(translate("en", "menu.autoCompactOff")).toBe("Off: automatic chat context compaction is disabled. The chat may overflow and stop working.");
-    expect(translate("en", "menu.autoCompactOn")).toBe("On: automatic chat context compaction is enabled. Chat context will be compacted automatically when it reaches 85% capacity.");
-    expect(translate("en", "menu.autoSteerOff")).toBe("Off: a new message is queued. The whole queue is sent when KIMI is free after the current step.");
-    expect(translate("en", "menu.autoSteerOn")).toBe("On: a new message joins the current work immediately without being queued.");
+    expect(translate("en", "menu.autoCompactOff")).toBe("OFF: automatic chat context compaction is disabled. The chat may overflow and stop working.");
+    expect(translate("en", "menu.autoCompactOn")).toBe("ON: automatic chat context compaction is enabled. Chat context will be compacted automatically when it reaches 85% capacity.");
+    expect(translate("en", "menu.autoSteerOff")).toBe("OFF: a new message is queued. The whole queue is sent when KIMI is free after the current step.");
+    expect(translate("en", "menu.autoSteerOn")).toBe("ON: a new message joins the current work immediately without being queued.");
 
     expect(translate("zh", "menu.autoCompactOff")).toBe("关闭：聊天上下文自动压缩已禁用。聊天可能会溢出并停止工作。");
     expect(translate("zh", "menu.autoCompactOn")).toBe("开启：聊天上下文自动压缩已启用。聊天上下文达到 85% 时将自动压缩。");

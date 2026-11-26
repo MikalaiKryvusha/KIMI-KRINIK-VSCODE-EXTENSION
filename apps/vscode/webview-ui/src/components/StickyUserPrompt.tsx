@@ -9,21 +9,12 @@ import { MediaPreviewModal } from "./MediaPreviewModal";
 
 const PROMPT_BOUNDARY_PX = 80;
 const PROMPT_HYSTERESIS_PX = 24;
-const BOTTOM_THRESHOLD_PX = 32;
 const COLLAPSED_STICKY_PREVIEW_HEIGHT = 32;
 
 export function getPromptKey(message: ChatMessage, index: number): string {
   if (message.clientId !== undefined) return message.clientId;
   if (message.turnIndex !== undefined) return `turn:${message.turnIndex}`;
   return `content:${index}:${Content.getText(message.content)}`;
-}
-
-function promptForAssistant(messages: readonly ChatMessage[], assistantIndex: number): { key: string; index: number } | undefined {
-  for (let index = assistantIndex - 1; index >= 0; index -= 1) {
-    const message = messages[index];
-    if (message?.role === "user") return { key: getPromptKey(message, index), index };
-  }
-  return undefined;
 }
 
 export function getLatestPromptKey(messages: readonly ChatMessage[]): string | undefined {
@@ -34,33 +25,32 @@ export function getLatestPromptKey(messages: readonly ChatMessage[]): string | u
   return undefined;
 }
 
-export function selectActivePromptId(
-  messages: readonly ChatMessage[],
-  assistantTops: ReadonlyMap<string, number>,
-  currentPromptId?: string,
-): string | undefined {
-  const visible = messages.flatMap((message, index) => {
-    if (message.role !== "assistant") return [];
-    const top = assistantTops.get(message.id);
-    const prompt = promptForAssistant(messages, index);
-    return top === undefined || prompt === undefined ? [] : [{ ...prompt, top }];
-  });
-  if (visible.length === 0) return getLatestPromptKey(messages);
+export interface PromptBottom {
+  key: string;
+  bottom: number;
+}
 
-  let selected = visible[0]!;
-  for (const candidate of visible) {
-    if (candidate.top > PROMPT_BOUNDARY_PX) break;
-    selected = candidate;
+export function selectActivePromptId(prompts: readonly PromptBottom[], currentPromptId?: string): string | undefined {
+  let candidateIndex = -1;
+  for (let index = 0; index < prompts.length; index += 1) {
+    if (prompts[index]!.bottom <= PROMPT_BOUNDARY_PX) candidateIndex = index;
+    else break;
   }
+  const candidate = candidateIndex < 0 ? undefined : prompts[candidateIndex]!.key;
+  if (currentPromptId === undefined || candidate === currentPromptId) return candidate;
+  const nextIndex = candidateIndex + 1;
+  let nearestIndex = candidateIndex;
+  if (nearestIndex < 0) nearestIndex = nextIndex < prompts.length ? nextIndex : -1;
+  else if (nextIndex < prompts.length && Math.abs(prompts[nextIndex]!.bottom - PROMPT_BOUNDARY_PX) < Math.abs(prompts[candidateIndex]!.bottom - PROMPT_BOUNDARY_PX)) nearestIndex = nextIndex;
+  if (nearestIndex < 0) return candidate;
+  const nearestPreviousKey = nearestIndex <= 0 ? undefined : prompts[nearestIndex - 1]!.key;
   if (
-    currentPromptId !== undefined
-    && selected.key !== currentPromptId
-    && Math.abs(selected.top - PROMPT_BOUNDARY_PX) < PROMPT_HYSTERESIS_PX
-    && visible.some((candidate) => candidate.key === currentPromptId)
+    Math.abs(prompts[nearestIndex]!.bottom - PROMPT_BOUNDARY_PX) < PROMPT_HYSTERESIS_PX
+    && (currentPromptId === prompts[nearestIndex]!.key || (nearestPreviousKey !== undefined && currentPromptId === nearestPreviousKey))
   ) {
     return currentPromptId;
   }
-  return selected.key;
+  return candidate;
 }
 
 export function useActivePromptId(messages: readonly ChatMessage[], hostRef: RefObject<HTMLDivElement | null>): string | undefined {
@@ -78,18 +68,18 @@ export function useActivePromptId(messages: readonly ChatMessage[], hostRef: Ref
         setActivePromptId(undefined);
         return;
       }
-      const atBottom = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight <= BOTTOM_THRESHOLD_PX;
-      if (atBottom) {
-        setActivePromptId(getLatestPromptKey(messages));
-        return;
+      const viewportTop = scroll.getBoundingClientRect().top;
+      const userElements = scroll.querySelectorAll<HTMLElement>("[data-message-role=user]");
+      const prompts: PromptBottom[] = [];
+      let elementIndex = 0;
+      for (let index = 0; index < messages.length && elementIndex < userElements.length; index += 1) {
+        const message = messages[index];
+        if (message?.role !== "user") continue;
+        const element = userElements[elementIndex]!;
+        elementIndex += 1;
+        prompts.push({ key: getPromptKey(message, index), bottom: element.getBoundingClientRect().bottom - viewportTop });
       }
-      const scrollTop = scroll.getBoundingClientRect().top;
-      const tops = new Map<string, number>();
-      for (const element of scroll.querySelectorAll<HTMLElement>("[data-message-role=assistant]")) {
-        const id = element.getAttribute("data-message-id");
-        if (id) tops.set(id, element.getBoundingClientRect().top - scrollTop);
-      }
-      setActivePromptId((current) => selectActivePromptId(messages, tops, current));
+      setActivePromptId((current) => selectActivePromptId(prompts, current));
     };
 
     update();
@@ -136,7 +126,7 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
   const action = expanded ? t("sticky.collapse") : t("sticky.expand");
 
   return (
-    <div data-testid="sticky-user-prompt" className="sticky top-0 z-20 border-b bg-background px-2 pt-2 text-foreground shadow-sm">
+    <div data-testid="sticky-user-prompt" className="sticky top-0 z-20 border-b bg-background px-2 pt-2 pb-2 text-foreground shadow-sm">
       <div data-testid="sticky-prompt-bubble" className="relative w-full rounded-2xl rounded-br-md bg-zinc-100 px-3.5 py-1.5 transition-colors duration-200 motion-reduce:transition-none dark:bg-zinc-800">
         <button
           type="button"
@@ -171,7 +161,7 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
               </div>
             </div>
             {!expanded && (
-              <span data-testid="sticky-prompt-fade" className="pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-zinc-100 via-zinc-100/85 to-transparent dark:from-zinc-800 dark:via-zinc-800/85" />
+              <span data-testid="sticky-prompt-fade" className="pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent dark:from-zinc-800 dark:via-zinc-800/60" />
             )}
           </div>
         )}

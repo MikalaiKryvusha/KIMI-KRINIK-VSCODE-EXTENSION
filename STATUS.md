@@ -23,16 +23,15 @@
 
 ---
 
-### 2026-11-26 03:17 +03:00 — BUILD 39 COMPLETES THE CURRENT UI REFINEMENTS
-- Skill-dialog margins are 48px; Welcome robot ↔ KIMI spacing is 24px and header spacing is 12px. General Settings renders On/Off on separate lines in EN/RU/ZH.
-- Build 39 SHA-256: `ad8f87a544e3738e6dd5b6b5e71e117da7e3079741c3e47d423173e8579316d5`; installed on main and isolated profiles. Full extension: 650 passed / 1 skipped; lint, typecheck, build and VSIX audit are green.
-- Isolated WebP/geometry passed for Welcome, the header, the 42-skill dialog and every RU General Settings row. Evidence: `testcases/reports/2026-11-26_build_39_ui_refinements.md` and WebP 108/111/112/113 in `.tmp/k5-vscode/`.
-- Session commits pushed to `main`: `cd4cbd87b` (build 34), `4ceda9ab1` (36), `7ba8bfff9` (37), `2a210cc75` (38), `04edb7412` (39). Nested-webview clipboard testing is recorded in EXP-0023.
-- Builds 34–38 covered header/Compact, per-text assistant actions, media/composer atomicity and one-line sticky behavior. Main-window Reload Window automation failed; accumulated running-profile acceptance remains pending. Dayloop entered measured soft closure at 80%; no new task is being taken. No release publication is authorized.
+### 2026-11-26 10:52 +03:00 — BUILD 40: OWNER UI-POLISH BATCH
+- Sound-event section at «Выкл» is dimmed to opacity 0.4 except its selector (`bugs/36` surface, `SoundSettingsModal`). Sticky: visible prompts never enter the bar — selection measures user-bubble bottoms (`bugs/37`); bottom padding added (`bugs/38`); collapsed second-line fade softened 85 % → 60 % (`bugs/39`). Control Panel tooltips write «ВКЛ»/«ВЫКЛ» uppercase with a green/red tinted state word in EN/RU/ZH (`bugs/40`).
+- Build 40 SHA-256: `87eb16de45dba2ad7d20420abee16d5ecfc68156f414fa8395b2d237c6c970f6`; installed on main and isolated profiles. Full extension: 651 passed / 1 skipped; lint, typecheck, build and all six VSIX target audits green (darwin-arm64/x64 included — pure-JS content, no native binaries).
+- Isolated functional acceptance passed with computed styles and WebP 114/117/118: dimmed sound section, visible «k40 final distinct prompt» never sticky, 8px bottom padding, readable second line, uppercase tinted tooltips. Evidence: `testcases/reports/2026-11-26_build_40_sound_sticky_control_panel.md`.
+- Main running-profile acceptance still pending a window reload. New owner items filed: `bugs/41` (smooth sticky exit/switch animations), `bugs/42` («Субагенты» label on the subagent-model button). Owner also ordered the pre-release package: test plan + positive/negative cases for 1.0.0, README actualization with a big pink DOWNLOAD button to the latest VSIX in three languages, release notes in Krinik style, and the MacBook VSIX install check (darwin packages build and audit clean; real Mac install not verifiable here). No release publication is authorized.
 
 ## Where we are now
 
-The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `ad8f87a544e3738e6dd5b6b5e71e117da7e3079741c3e47d423173e8579316d5`. The extension has 650 passed / 1 skipped and 0 failures. Build 39 is installed on main and isolated profiles; isolated functional acceptance passed, while main running-profile acceptance is pending. No GitHub Release exists.
+The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `87eb16de45dba2ad7d20420abee16d5ecfc68156f414fa8395b2d237c6c970f6`. The extension has 651 passed / 1 skipped and 0 failures. Build 40 is installed on main and isolated profiles; isolated functional acceptance passed, while main running-profile acceptance is pending. No GitHub Release exists.
 
 ## ❓ Awaiting human review
 
@@ -41,12 +40,18 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 ## Where to continue next session
 
-1. Reload the accumulated main profile onto build 39 and observe the pending header, assistant actions, media race, skill, General Settings and sticky acceptance paths. Use real screenshots per `HOUSE_RULES.md` R2 and do not infer the running build from the installed VSIX hash. The failed focus/palette attempts and their screenshots are recorded in `testcases/reports/2026-11-26_build_34_session_header_compact.md`; do not repeat them blindly. Record fresh results in a new run report.
-2. Investigate `bugs/34_refresh_marker_write_lost.md`, then run real VSIX preflight verification for `bugs/29`.
-3. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
+1. Reload the accumulated main profile onto build 40 and observe the pending acceptance paths (header, assistant actions, media race, skill, General Settings, sticky, sound dimming, tinted tooltips). Use real screenshots per `HOUSE_RULES.md` R2 and do not infer the running build from the installed VSIX hash. The failed focus/palette attempts are recorded in `testcases/reports/2026-11-26_build_34_session_header_compact.md`; do not repeat them blindly. Record fresh results in a new run report.
+2. Implement `bugs/41` (smooth sticky exit/switch animations) and `bugs/42` («Субагенты» label), then `bugs/34_refresh_marker_write_lost.md` and the real VSIX preflight for `bugs/29`.
+3. Pre-release package (owner-ordered 2026-11-26): test plan + positive/negative cases in `testcases/`, README actualization with the big pink three-language DOWNLOAD button to the latest VSIX, release notes in Krinik style (`release-notes/1.0.0/changelog.{en,ru,zh}.md`), MacBook install verdict (darwin VSIX build/audit done; a real Mac install is unverified).
+4. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, then open and read the published page.
 
 ## Open bugs
 
+- 🔧 `bugs/37_sticky_shows_visible_message.md` — visible prompts no longer enter the sticky; direct user-bubble-bottom selection verified on isolated build 40; main-profile acceptance pending.
+- 🔧 `bugs/38_sticky_container_bottom_padding.md`, `bugs/39_sticky_collapsed_second_line_fade.md` — 8px bottom padding and a softer second-line fade verified on isolated build 40; main-profile acceptance pending.
+- 🔧 `bugs/40_control_panel_on_off_case_and_tint.md` — uppercase «ВКЛ»/«ВЫКЛ» with green/red tint verified on isolated build 40 in EN/RU/ZH; main-profile acceptance pending.
+- 🔴 `bugs/41_sticky_appearance_and_switch_animation.md` — owner wants smooth animations for the sticky's disappearance at the top and one/two-line replacements.
+- 🔴 `bugs/42_subagent_button_label.md` — «Субагенты» label on the subagent-model button in the large form; compact form stays icon-only.
 - 🔧 `bugs/36_assistant_text_action_scope.md` — per-text Copy/Fork placement, adjacent-only copying and custom message tooltips verified on isolated build 36; accumulated main-profile acceptance pending.
 - 🔧 `bugs/35_attachment_composer_chat_race.md` — deferred-acknowledgement cleanup fixed; isolated build 37 passed before/after frame traces, failure restoration, completion and replay; accumulated main-profile acceptance pending.
 - 🔴 `bugs/34_refresh_marker_write_lost.md` — owner-priority investigation into the lost refresh-marker update; timer matches the stale file, culprit not yet assigned.
