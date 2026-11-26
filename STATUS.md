@@ -42,6 +42,9 @@ Build 45 is packaged, audited and installed on main and isolated profiles; its i
 
 2026-11-26 closure update: KAIF #207 is fixed in origin `066522e` and deployed `b48313d20` with 20/20 hook checks, 6/6 real-wire replay, build and full affected `s14`; full origin core is 25/28 and hooks-mutants 33/34 due to unrelated baseline `s01`/`s22`/`W9`, documented in `testcases/reports/2026-11-26_refresh_after_closure.md`. Steering candidate `abe90b6c8` is pushed with 121/121 targeted and 658/1 full tests, typecheck, lint, build 46 and Extension Host smoke. Public backlog and audio research are pushed in `077c7fd97`. Build 46 is installed on main and isolated profiles. `bugs/44` is NOT DONE: real guest-DOM steering/audio acceptance is still pending.
 
+2026-11-27 00:18 +03:00 — the owner ordered code analysis, written fix/acceptance plans, implementation and iterative testing for every named release blocker. `researches/59_release_blocker_remediation.md`, `plans/04_EPIC_release_blocker_remediation.md` and Phase 1 `plans/05_epic04_phase1_steering_attention.md` define the evidence ladder: `bugs/44`–`46`, five Act findings, then `bugs/25`/`11`, then final hardening. Phase 1 first tests the previously uncovered accepted-running-steer → old-terminal → new-`turn.started` ordering. Planning changed no production code.
+[OWNER] «Проводим по всем анализ кода, пишем план починки и приемки исправления тестами. Фиксим. Тестируем. Закрываем как исправленное, если тесты проходят. Если тесты не проходят - чиним дальше.» · 2026-11-27 00:07 +03:00 (chat)
+
 ## ❓ Awaiting human review
 
 - GitHub and Marketplace publication are owner-authorized only after green readiness gates. Current publication is blocked by the audit's five Act findings and the fresh `bugs/25` disappearance recurrence. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md`.

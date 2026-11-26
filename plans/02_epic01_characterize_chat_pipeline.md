@@ -2,7 +2,7 @@
 
 > **Created:** 2026-11-24
 > **Parent:** `plans/01_EPIC_chat_pipeline_reliability.md` — «Phase 0 — Characterization and red contracts»
-> **Status:** ready for execution; no production code changed
+> **Status:** historical phase-0 plan; related contracts landed incrementally through bug documents, with no standalone phase closure claimed; current execution is tracked by `plans/04_EPIC_release_blocker_remediation.md`
 > **Outbound:** red evidence and the final case matrix feed Phase 1, whose operational plan is written afterward
 > **Verification:** [TESTED: 2026-11-24 · suite paths and phase anchors checked; requirements/attribution lint and fable-judge VERIFIED WITH CAVEATS — scenario-lint SKIPPED, red contracts not executed yet]
 

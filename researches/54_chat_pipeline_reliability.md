@@ -2,7 +2,7 @@
 
 > **Created:** 2026-11-24
 > **Parent:** `bugs/11`–`bugs/16`; owner's request to research Claude Code and redesign the whole KIMI KRINIK chat flow
-> **Status:** evidence complete; implementation not started
+> **Status:** evidence complete; implementation has substantially landed through subsequent bug fixes; remaining release gaps are tracked by `plans/04_EPIC_release_blocker_remediation.md`
 > **Outbound:** `plans/01_EPIC_chat_pipeline_reliability.md`; phase 0 operational plan `plans/02_epic01_characterize_chat_pipeline.md`
 > **Verification:** [TESTED: 2026-11-24 · official URLs, installed Claude bundle and local source quotes checked; requirements/attribution lint and fable-judge VERIFIED WITH CAVEATS — scenario-lint SKIPPED, no implementation or functional run claimed]
 

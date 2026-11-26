@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-24
 > **Родитель:** `researches/54_chat_pipeline_reliability.md`; `GOAL.md` критерии 3–4; `bugs/11`–`bugs/16`
-> **Статус:** предложен по исследованию; фаза 0 не начата
+> **Статус:** реализация существенно продвинута через последующие bug fixes; оставшиеся приёмка и release-пробелы отслеживаются в `plans/04_EPIC_release_blocker_remediation.md`
 > **Вовне:** технические решения и последующие фазы требуют отдельной приёмки; публичный релиз не входит в эпик
 > **Потомки:** `plans/02_epic01_characterize_chat_pipeline.md`
 > **Проверка:** [TESTED: 2026-11-24 · source and scope review; requirements/attribution lint and fable-judge VERIFIED WITH CAVEATS — scenario-lint SKIPPED, no implementation or functional run claimed]
