@@ -1,7 +1,7 @@
 # Bug 25 — Chat feed briefly shows and then removes a Kimi message on the first prompt
 
-**Status:** 🔧 replay and live Markdown remounts fixed and verified on isolated build 22; accumulated main-profile running-build acceptance pending
-**Version/build:** KIMI KRINIK 1.0.0 builds 12 and 19 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 23:50 +03:00 and 2026-11-25 16:41 +03:00, first message of a new session
+**Status:** 🔴 OPEN — owner observed another message-specific disappearance during the build-45 release-preparation closure; the running main build is not inferred
+**Version/build:** KIMI KRINIK 1.0.0 builds 12 and 19; recurrence during the build-45 closure with the main running build unverified · **When/context:** original first prompts and 2026-11-26 17:06 +03:00, ordinary progress messages during closure
 **Severity:** S2
 **Fixing:** after the owner-requested context-ring color change; before further backlog work
 **Fix accepted when (observable):** sending the first message does not flash the conversation or transiently show an assistant entry; every real assistant message remains visible in the same position through reconciliation, completion and reload.
@@ -22,6 +22,14 @@ The whole chat feed flickered immediately after the first prompt. The owner perc
 2026-11-25 23:34 +03:00 — the owner's steering-race hypothesis reproduced deterministically at the public store boundary. With an original turn 0 and an optimistic steering assistant already appended, a late turn-0 ContentPart was written into the steering assistant; turn-0 completion also finalized that wrong assistant. The SDK had supplied turnId all along, but the event adapter discarded it. ContentPart now carries optional additive turnIndex metadata, and ContentPart/stream completion select the owning assistant with legacy fallback for events without an index. Adapter and store regressions were red before and green afterward: 65/65. This is the confirmed routing race, but the owner's rendered disappearance is not called verified-fixed until the packaged held-response → steer DOM run.
 
 2026-11-26 00:36 +03:00 — packaged build 33 real isolated run: a fresh fake model emitted `K5 first chunk`, the user steered while the original turn was held, and MutationObserver kept that first chunk in the same assistant ID before and after steer; the late response remained visible with no disappearance frame. No original-text loss reproduced on the real packaged path. Accumulated main-profile observation remains open.
+
+## Recurrence during release-preparation closure — 2026-11-26 17:06 +03:00
+
+[OWNER] «ну вот опять - ты сейчас одно сообщение написал, оно побыло несколько секунд. Затем исчезло, и появилось другое , а потом и оно исчезло.» · 2026-11-26 17:06 +03:00 (chat)
+
+The owner then corrected the second part: «а, нет, чторое не исчезло … но первое исчезло», followed by «вот опять исчезло сообщение». The durable sequence therefore is: the first progress message appeared briefly and disappeared; the later closure message remained; a subsequent disappearance was reported without identifying its text.
+
+This is a fresh owner-observed recurrence on the accumulated main profile, during ordinary progress reporting rather than only the first prompt. The current running build and the precise render path are not established. Do not call the earlier replay/Markdown fixes sufficient and do not infer the cause from the closure itself. The next session must capture frame-level DOM mutations for these specific progress messages before changing code.
 
 ## Repro
 

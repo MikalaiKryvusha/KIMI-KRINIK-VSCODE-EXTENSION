@@ -1,6 +1,6 @@
 # Test plan — KIMI KRINIK 1.0.0 release readiness
 
-**Created:** 2026-11-26 · **Under test:** KIMI KRINIK 1.0.0 VSIX (build 43, universal and per-target) · **Test basis:** `GOAL.md` success criteria 1–10, `plans/03_sticky_viewport_prompt.md`, `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`, `testcases/TC_K5_live_acceptance.md`, the `bugs/` history (regression-prone areas).
+**Created:** 2026-11-26 · **Under test:** KIMI KRINIK 1.0.0 VSIX (build 45; final package will be rebuilt after review fixes) · **Test basis:** `GOAL.md` success criteria 1–10, `plans/03_sticky_viewport_prompt.md`, `PROJECT_ARCHITECTURE_INTERNAL_MAP.md`, `testcases/TC_K5_live_acceptance.md`, the `bugs/` history (regression-prone areas).
 **Statuses:** `pass` = observed on a real run with evidence named · `partial` = some dimensions observed, others open · `[NOT-TESTED]` = no live observation yet · `blocked` = cannot run on this machine.
 
 ## 1. Goal vector
@@ -77,4 +77,6 @@
 ## 6. Evidence index
 
 - `testcases/reports/2026-11-26_build_40_sound_sticky_control_panel.md` · `2026-11-26_build_42_sticky_animation_subagent_chevron.md` · earlier build reports in the same directory.
-- Full extension suite: 653 passed / 1 skipped; `pnpm lint` and typecheck green; all six target VSIX audits + the universal audit green.
+- Current build-45 run: `testcases/reports/2026-11-26_build_45_release_preparation.md`.
+- Full extension suite after the final icon refinement: 656 passed / 1 skipped; `pnpm lint` and typecheck green; all six target VSIX audits + the universal audit green.
+- Marketplace feasibility and publication gaps: `researches/58_vscode_marketplace_publication.md`.
