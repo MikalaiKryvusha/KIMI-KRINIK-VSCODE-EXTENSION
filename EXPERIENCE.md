@@ -57,7 +57,8 @@
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
 >      field-dropped-in-rebuild, red-accepted-unread, defaults-overwrite-session-state,
-      late-cancellation-masquerades-as-live-flip, self-host-reload -->
+      late-cancellation-masquerades-as-live-flip, self-host-reload, terminal-state-not-propagated,
+      session-env-contamination -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -76,6 +77,8 @@
 > | `defaults-overwrite-session-state` | a global default is applied over a restored session's own persisted state |
 > | `late-cancellation-masquerades-as-live-flip` | cleanup after the provider response is mistaken for immediate cancellation on a live config change |
 > | `self-host-reload` | a live acceptance reload restarts the Extension Host that is executing the agent itself |
+| `terminal-state-not-propagated` | a periodic or queued trigger fires without knowing the session's terminal lifecycle state |
+| `session-env-contamination` | an inherited agent-session variable redirects a test from its fixture to the live session |
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -84,6 +87,28 @@
 > Skill: `/experience` (capture a lesson · recall relevant lessons).
 
 ## Entries
+
+### EXP-0028 · 2026-11-26 · ❌→✅ · #testing #kimi #environment
+class: session-env-contamination
+mechanized: env -u KIMI_CODE_SESSION_ID node D:/work/ai_sandbox/KAIF/tools/sandbox/s14-refresh-hooks.mjs
+**Context:** the KAIF core run failed `--measure` and `--alive` when launched from an active Kimi session.
+**Tried / did:** read the failing output and the process environment instead of changing the hook; `KIMI_CODE_SESSION_ID` named the live session, so the fixture selected the real wire and config instead of its own.
+**Result:** ❌→✅ — the complete affected s14 suite passed after only that variable was removed. The full core suite still has unrelated s01/s22 baseline failures and was not called green.
+**Lesson:** when a sandbox result contradicts the change, print the inherited agent-session variables before assigning the red to the product; clear the proven contaminant and rerun the affected suite, never the other way around.   → link: testcases/reports/2026-11-26_refresh_after_closure.md (origin)
+**Repro:** in `D:/work/ai_sandbox/KAIF`, run `env -u KIMI_CODE_SESSION_ID node tools/sandbox/s14-refresh-hooks.mjs`.
+**Trigger:** running KAIF sandbox suites from a Kimi-controlled process, especially after an unexpected measurement or routing failure.
+**Not for:** genuine product failures or stripping unrelated configuration; only the observed contaminant is removed.
+
+### EXP-0027 · 2026-11-26 · ❌→✅ · #kaif #hooks #closure #refresh
+class: terminal-state-not-propagated
+mechanized: node .kaif/hooks/stop-farewell-capture.mjs --selftest
+**Context:** a completed chat closure was followed by a 101-minute timer that re-read the canon and repeated the full creed/prayer.
+**Tried / did:** the timer and pending SessionStart paths had no closed-session predicate. The real wire also showed that entering the closing skill and writing the farewell occur in different turns, with `content.part` rather than only appended assistant records.
+**Result:** ❌→✅ — farewell-scoped `closedSessionIds` now suppress both automatic paths; 20/20 hook checks and 6/6 real-wire observations pass in the deployed copy and the KAIF source.   → link: bugs/KAIF/06 · origin bugs/160
+**Lesson:** periodic and queued triggers must consume terminal lifecycle state; use actual farewell completion, not entry into a closing skill, and preserve that state across later owner turns and StopFailure.   → link: testcases/reports/2026-11-26_refresh_after_closure.md
+**Repro:** run the mechanized selftest and the real-wire replay named in the report; new sessions and explicit `/resume` must remain active.
+**Trigger:** adding a timer, pending-event injector or lifecycle observer → enumerate terminal states and prove same-session silence plus new-session behavior.
+**Not for:** the unfinished-closure latch and soft→force escalation covered by origin bugs/150 and EXP-0222.
 
 ### EXP-0026 · 2026-11-26 · ❌ · #vscode #testing #action:reload-window
 class: self-host-reload

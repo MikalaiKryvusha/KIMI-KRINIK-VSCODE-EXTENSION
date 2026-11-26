@@ -194,6 +194,10 @@ taxonomy above) is therefore RE-READ, not remembered, at four triggers:
 4. **Ritual points:** `/resume` (the full canon pass), `/refresh-context`, and every iteration of
    the long loops (`/autoloop` · `/dayloop` · `/nightloop` · `/guarded-loop`).
 
+A COMPLETED closure closes the refresh contour too: after the farewell of `/end-chat-soft` or `/end-chat-force`, every automatic trigger above stays dormant for the rest of THAT session (later work, idle, an hour, compaction), with no canon re-read or repeated creed/prayer; new sessions refresh normally, explicit `/resume` and `/refresh-context` remain direct owner orders, and `.kaif/farewell-capture.json` → `closedSessionIds` is preserved across `StopFailure` (KAIF_REFERENCE.md §17).
+
+[OWNER] «Если агент уже выполнил ЗАКРЫТИЕ чата ... то всё, больше обновления канона не нудно в жтом чате, даже если после закрытия ещё какая-то работа будет делаться, и даже если со времени последнего обновления-чтения канона пробло более 60 минут» · 2026-11-26 17:46 +03:00 (chat)
+
 A refresh is a VERIFIABLE ACTION, not a claim — recalling the rule does not prove following it.
 The witness has two parts, both mandatory:
 
@@ -820,7 +824,7 @@ aren't working — revise them.
 `DONE` tag as the open backlog, and tags genuinely-closed files DONE (with a status section appended).
 
 **Bug reporting skill — `/report-bug`:** hit a defect during dev/test — file a dedicated md in `bugs/`
-by the canon, per `BUG_FIXING_FRAMEWORK.md`: one doc per defect, nothing lost.
+by the canon, per `BUG_FIXING_FRAMEWORK.md`: one doc per defect, nothing lost. Create and update the paired public GitHub issue in the same move (`HOUSE_RULES.md` R9).
 
 **A defect in KAIF ITSELF — the five-step contour.** When the rake exists because of how the framework
 itself is worded or behaves — not because of this project's code:
