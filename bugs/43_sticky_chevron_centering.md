@@ -1,6 +1,7 @@
 # Bug 43 — Sticky expand/collapse chevron sits off-center in its button container
 
 **Status:** 🔧 fixed and verified on isolated build 42 — chevron center delta 0/0 on both axes; accumulated main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/4
 **Version/build:** owner's accumulated main profile, KIMI KRINIK 1.0.0 build 40 · **When/context:** 2026-11-26 ≈11:06 +03:00, tossed by the owner mid-task during the UI-polish review
 **Severity:** S3 (cosmetic, owner-flagged)
 **Fixing:** this session, together with bugs 41–42

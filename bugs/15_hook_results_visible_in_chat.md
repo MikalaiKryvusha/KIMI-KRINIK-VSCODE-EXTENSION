@@ -1,6 +1,7 @@
 # Bug 15 — Internal KAIF hook results are rendered as assistant chat text
 
 **Status:** 🔧 replay and live hook rendering fixed and verified on isolated build 22; accumulated main-profile running-build acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/15
 **Version/build:** KIMI KRINIK 1.0.0 builds 12 and 19 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00 and 2026-11-25 16:56 +03:00, owner live sessions
 **Severity:** S2
 **Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment

@@ -1,6 +1,7 @@
 # Bug 24 — Glass preview is silent
 
 **Status:** 🔧 fix pending real-path verification
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/19
 **Version/build:** owner screenshot on KIMI KRINIK 1.0.0 build 3 · **When/context:** 2026-11-24 19:57 +03:00, owner sound-settings preview
 **Severity:** S2
 **Fixing:** this session with the prerecorded-notification change; verify through the actual isolated sound-settings button

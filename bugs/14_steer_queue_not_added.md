@@ -1,6 +1,7 @@
 # Bug 14 — A follow-up is not added to the visible queue
 
 **Status:** 🔧 immediate text+image/video and media-only queue, dequeue delivery and replay verified on isolated build 19; main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/25
 **Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment

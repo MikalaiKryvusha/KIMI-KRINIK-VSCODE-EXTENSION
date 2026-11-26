@@ -1,6 +1,7 @@
 # Bug 22 — First Send appears lost and requires a steering lightning retry
 
 **Status:** 🔧 exactly-once contracts implemented; main-profile build-9 restart/acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/22
 **Version/build:** KIMI KRINIK 1.0.0 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 16:38 +03:00, urgent owner release blocker before the requested replacement VSIX
 **Severity:** S2
 **Fixing:** this session before building and installing the replacement VSIX

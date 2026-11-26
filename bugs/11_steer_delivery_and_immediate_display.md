@@ -1,6 +1,7 @@
 # Bug 11 — Steering messages are sometimes lost and appear only after engine acknowledgement
 
 **Status:** 🔴 OPEN
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/16
 **Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** next work session inside KIMI KRINIK; run and verify fixes in an isolated VS Code environment

@@ -1,6 +1,7 @@
 # Bug 16 — Assistant avatar appears above the user's steering bubble
 
 **Status:** 🔧 immediate/consecutive/replay order verified on isolated build 19; original main-profile path pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/23
 **Version/build:** KIMI KRINIK 1.0.0 · current working tree after `8ac5df733` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:33 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** as part of the chat-pipeline research and redesign; verify in isolated VS Code

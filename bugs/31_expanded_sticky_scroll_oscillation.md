@@ -1,6 +1,7 @@
 # Bug 31 — Expanded sticky prompt oscillates during scrolling
 
 **Status:** 🔧 revised scroll/animation contract and one-line boundary verified on isolated build 38; accumulated main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/10
 **Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:12–23:18 +03:00, owner visual review
 **Severity:** S2
 **Fixing:** this session, with the revised sticky behavior and animation

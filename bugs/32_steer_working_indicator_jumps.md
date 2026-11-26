@@ -1,6 +1,7 @@
 # Bug 32 — Steering moves the robot and Working indicator to an empty assistant
 
 **Status:** 🔧 verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/14
 **Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:15 +03:00, owner steering review
 **Severity:** S2
 **Fixing:** this session, after the sticky boundaries

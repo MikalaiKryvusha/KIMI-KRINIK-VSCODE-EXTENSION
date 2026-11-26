@@ -1,6 +1,7 @@
 # Bug 25 — Chat feed briefly shows and then removes a Kimi message on the first prompt
 
 **Status:** 🔴 OPEN — owner observed another message-specific disappearance during the build-45 release-preparation closure; the running main build is not inferred
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/2
 **Version/build:** KIMI KRINIK 1.0.0 builds 12 and 19; recurrence during the build-45 closure with the main running build unverified · **When/context:** original first prompts and 2026-11-26 17:06 +03:00, ordinary progress messages during closure
 **Severity:** S2
 **Fixing:** after the owner-requested context-ring color change; before further backlog work

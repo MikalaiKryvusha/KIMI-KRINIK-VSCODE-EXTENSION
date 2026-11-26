@@ -1,6 +1,7 @@
 # Bug 13 — Steering attachments are not delivered and steer bubbles lack clickable thumbnails
 
 **Status:** 🔧 ON/OFF image+video and media-only delivery, thumbnails/viewer and replay verified on isolated build 19; main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/27
 **Version/build:** originally `8ac5df733`; media presentation reproduced by the owner on KIMI KRINIK 1.0.0 build 3 · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00 and again at 2026-11-24 19:07 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** this session inside KIMI KRINIK; reproduce at the existing component/runtime boundaries and verify fixes in an isolated VS Code environment

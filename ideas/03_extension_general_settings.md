@@ -1,6 +1,7 @@
 # Idea 03 — KIMI KRINIK-owned General Settings
 
 > **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 custom localized General Settings and separate On/Off lines verified on isolated build 39; accumulated main-profile acceptance pending · **Outbound:** none
+> **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/30
 
 ## Goal vector
 

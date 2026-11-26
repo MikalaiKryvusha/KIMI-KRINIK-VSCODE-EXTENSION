@@ -1,6 +1,7 @@
 # Bug 37 — Sticky shows the message that is still visible on screen
 
 **Status:** 🔧 fixed; full suite 651/1, lint and typecheck green; real isolated and main-profile visual acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/9
 **Version/build:** owner's accumulated main profile, KIMI KRINIK 1.0.0 build 39 · **When/context:** 2026-11-26 10:07 +03:00, tossed by the owner mid-task during the UI-polish review
 **Severity:** S2
 **Fixing:** this session, after the sound-section dimming task

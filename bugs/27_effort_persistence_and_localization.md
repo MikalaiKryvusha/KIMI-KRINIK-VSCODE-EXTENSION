@@ -1,6 +1,7 @@
 # Bug 27 — MAX reasoning effort appears as High in a new VS Code session and effort labels are not localized
 
 **Status:** 🔧 isolated build-18 persistence, wire and RU/EN/ZH label checks passed; main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/17
 **Version/build:** KIMI KRINIK 1.0.0 build 12 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 01:03 +03:00, owner new-session model review
 **Severity:** S2
 **Fixing:** this session after `bugs/26`

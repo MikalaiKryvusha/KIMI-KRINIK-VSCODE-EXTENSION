@@ -1,6 +1,7 @@
 # Bug 36 — Assistant Copy joins text items and its actions sit after unrelated tools
 
 **Status:** 🔧 fixed and verified on isolated packaged build 36; accumulated main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/12
 **Version/build:** reported from the owner's current accumulated UI; fixed in KIMI KRINIK 1.0.0 build 36 · **When/context:** 2026-11-26, owner visual review during the UI-polish session
 **Severity:** S2
 **Fixing:** this session, completed through the isolated packaged user path

@@ -1,6 +1,7 @@
 # Bug 12 — A previous steering message reappears in the composer after a newer send
 
 **Status:** 🔧 fix implemented and contracts green; main-profile build-12 restart/acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/26
 **Version/build:** originally `8ac5df733`; reproduced by the owner on KIMI KRINIK 1.0.0 build 3 · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00 and again at 2026-11-24 19:07 +03:00, owner live steering acceptance
 **Severity:** S2
 **Fixing:** this session inside KIMI KRINIK; reproduce at the store boundary and verify fixes in an isolated VS Code environment

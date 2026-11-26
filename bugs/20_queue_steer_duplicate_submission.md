@@ -1,6 +1,7 @@
 # Bug 20 — Queue lightning gives no immediate response and submits duplicates
 
 **Status:** 🔧 whole-batch delivery verified on isolated build 17; main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/21
 **Version/build:** KIMI KRINIK 1.0.0 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 16:02 +03:00, owner queue steering during an active response
 **Severity:** S2
 **Fixing:** this session before the other open chat-pipeline contracts; verify in isolated VS Code

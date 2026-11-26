@@ -1,6 +1,7 @@
 # Bug 30 — Sticky prompt duplicates the start of the chat at the top
 
 **Status:** 🔧 verified on isolated packaged build 25; accumulated main-profile running-build acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/13
 **Version/build:** KIMI KRINIK 1.0.0 build 22 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 18:12 +03:00, owner visual review
 **Severity:** S2
 **Fixing:** this session, before the remaining 1.0.0 UI work

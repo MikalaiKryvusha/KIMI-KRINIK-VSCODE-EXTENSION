@@ -1,6 +1,7 @@
 # Bug 42 — Subagent model settings button needs a «Субагенты» text label in its large form
 
 **Status:** 🔧 fixed and verified on isolated build 42 — large form 92.97px wide with «Субагенты» visible in the row, compact form exactly 24×24 icon-only; accumulated main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/5
 **Version/build:** owner's accumulated main profile, KIMI KRINIK 1.0.0 build 40 · **When/context:** 2026-11-26 ≈10:56 +03:00, tossed by the owner mid-task during the UI-polish review
 **Severity:** S3 (cosmetic, owner-flagged)
 **Fixing:** this session, together with bug 41

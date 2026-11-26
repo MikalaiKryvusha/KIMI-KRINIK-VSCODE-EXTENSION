@@ -1,6 +1,7 @@
 # Bug 04 — Frozen compaction prompt has a concatenated Windows cwd and unreadable listing
 
 **Status:** 🔧 Windows harness fixed and full file 123/123; Linux CI acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/28
 **Build:** KIMI KRINIK 1.0.0 · `74a76daf2` · **Environment:** Windows · Node v24.15.0 · real agent-core harness · **Evidence:** assertion diff at `fullCompaction.test.ts:303` and `testcases/reports/2026-11-24_inflight_auto_compact_off.md`
 **Version/build:** KIMI KRINIK 1.0.0 · `74a76daf2` · **When/context:** 2026-11-24 02:28 +03:00, full `fullCompaction` suite after K2.6
 **Severity:** S2

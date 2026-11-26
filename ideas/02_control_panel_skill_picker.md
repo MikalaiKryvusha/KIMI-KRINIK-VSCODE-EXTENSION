@@ -1,6 +1,7 @@
 # Idea 02 — Control Panel skill picker with localized descriptions
 
 > **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 all owner refinements implemented and verified on isolated build 39; accumulated main-profile acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
+> **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/29
 
 ## Goal vector
 

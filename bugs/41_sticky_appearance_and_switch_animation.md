@@ -1,6 +1,7 @@
 # Bug 41 — Abrupt sticky disappearance at the top and abrupt one/two-line sticky switches
 
 **Status:** 🔧 fixed and verified on isolated build 44 — expand and collapse share 200ms ease-in-out and equal progress per frame; accumulated main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/3
 **Version/build:** owner's accumulated main profile, KIMI KRINIK 1.0.0 builds 40 and 43 · **When/context:** reopened 2026-11-26 13:10 +03:00 during the owner's pre-release positive smoke
 **Severity:** S3 (cosmetic, owner-flagged)
 **Fixing:** this session, before the 1.0.0 release

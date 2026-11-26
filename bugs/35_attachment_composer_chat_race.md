@@ -1,6 +1,7 @@
 # Bug 35 — Sent attachment remains in the composer while its text bubble appears without it
 
 **Status:** 🔧 fixed and verified through isolated build 37, including completion and replay; accumulated main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/11
 **Version/build:** reported with build 33 installed; fixed in KIMI KRINIK 1.0.0 build 37 · **When/context:** 2026-11-26 01:01 +03:00, tossed by the owner during Session-header UI work
 **Severity:** S2
 **Fixing:** implemented and verified on the isolated real product in this session; main-profile reload remains

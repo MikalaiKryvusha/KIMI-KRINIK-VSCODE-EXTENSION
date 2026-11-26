@@ -1,6 +1,7 @@
 # Bug 18 — Sending during an active response surfaces a generic internal error
 
 **Status:** 🔧 current ON/OFF/fallback contracts and isolated build-19 paths pass; original main-profile path pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/24
 **Version/build:** KIMI KRINIK 1.0.0 and official `moonshot-ai.kimi-code-0.9.0` · owner's accumulated VS Code profile · **When/context:** 2026-11-24 15:24:10 +03:00, owner chat sends; reported during chat-pipeline characterization
 **Severity:** S2
 **Fixing:** this session as owner debt; include the contract in the chat-pipeline characterization before implementation

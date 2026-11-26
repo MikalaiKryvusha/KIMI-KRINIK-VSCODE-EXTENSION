@@ -1,6 +1,7 @@
 # Bug 26 — Selecting Off disables the sound dropdown instead of only its playback controls
 
 **Status:** 🔧 isolated build-18 fix verified; main-profile acceptance pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/18
 **Version/build:** KIMI KRINIK 1.0.0 build 12 · owner's accumulated VS Code profile · **When/context:** 2026-11-25 01:03 +03:00, owner sound-settings review
 **Severity:** S2
 **Fixing:** this session

@@ -1,6 +1,7 @@
 # Bug 19 — Tool cards leave no visible working state
 
 **Status:** 🔧 current isolated build 19 passes active tool, completion and replay; original main-profile path pending
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/20
 **Version/build:** KIMI KRINIK 1.0.0 · owner's accumulated VS Code profile · **When/context:** 2026-11-24 16:02 +03:00, recurring owner observation during active agent turns
 **Severity:** S2
 **Fixing:** after the immediate duplicate-steer fix in `bugs/20`; verify in isolated VS Code
