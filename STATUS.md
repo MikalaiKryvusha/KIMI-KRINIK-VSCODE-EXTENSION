@@ -26,7 +26,7 @@
 ### 2026-11-26 11:40 +03:00 — BUILD 43 + PRE-RELEASE PACKAGE
 - `package:platform --universal` now also produces `kimi-code-universal.vsix` (no TargetPlatform) next to the six target packages; universal and all targets pass the static audit. Universal SHA-256: `4b4ef32254eaaa16818ea4c515b69f5cfbe7244f857030d0ae0243dd35fe9c80`; win32-x64 build 43 SHA `3c4c4c1d3b1682c6ad6c8ca690d82799271068a54c60bfad3353207f1081f477`, installed on main.
 - MacBook verdict: the universal VSIX installs on macOS (no TargetPlatform, pure JS/WASM/SVG/PNG/MP3 — no native binaries); darwin-arm64/x64 packages also build and audit clean. A real Mac install is NOT verified — no Mac host here.
-- Pre-release test plan with positive/negative cases and release-blocking open items: `testcases/TC_1.0.0_release_readiness.md`.
+- Pre-release test plan with positive/negative cases and release-blocking open items: `testcases/TC_1.0.0_release_readiness.md`. Full extension suite after universal packaging: 655 passed / 1 skipped; lint green.
 - README actualized in EN/RU/ZH: big pink DOWNLOAD button with the robot (`docs/media/download-{en,ru,zh}.svg`) linking to `releases/latest/download/kimi-code-universal.vsix` (404 until the first release is published), universal+per-target install text, new feature rows, build example 43. Local links checked; voice-lint 0 findings.
 - Release notes actualized in Krinik's style for the current build: `release-notes/1.0.0/changelog.{en,ru,zh}.md`. No release publication is authorized.
 
