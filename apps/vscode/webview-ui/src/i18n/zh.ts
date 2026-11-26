@@ -323,6 +323,7 @@ export const zh: Record<TranslationKey, string> = {
   "toast.soundsNotChanged": "声音设置未保存：{error}",
 
   "subagent.title": "辅助模型",
+  "subagent.button": "子智能体",
   "subagent.description": "选择子智能体使用的现有模型，而不是主模型。",
   "subagent.tooltip": "子智能体模型：{label}",
   "subagent.followsMain": "跟随主模型",

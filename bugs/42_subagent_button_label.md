@@ -1,6 +1,6 @@
 # Bug 42 — Subagent model settings button needs a «Субагенты» text label in its large form
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 fixed and verified on isolated build 42 — large form 92.97px wide with «Субагенты» visible in the row, compact form exactly 24×24 icon-only; accumulated main-profile acceptance pending
 **Version/build:** owner's accumulated main profile, KIMI KRINIK 1.0.0 build 40 · **When/context:** 2026-11-26 ≈10:56 +03:00, tossed by the owner mid-task during the UI-polish review
 **Severity:** S3 (cosmetic, owner-flagged)
 **Fixing:** this session, together with bug 41
@@ -14,14 +14,14 @@ The subagent model settings button is only a robot icon in every form. Owner's o
 
 1. Look at the Control Panel subagent-model button at a wide composer width — icon only, no label.
 
-## Fix plan
+## Fix
 
-1. Add the same responsive label pattern the other Control Panel buttons use (`@max-[480px]/composer:hidden` span) to the subagent button, with a new i18n key in EN/RU/ZH (R4).
-2. Component test for the label presence and the compact-hiding class; verify on the isolated build at both widths (R2).
+1. Added `subagent.button` = «Subagents»/«Субагенты»/«子智能体» (matching the existing ZH dictionary term) and a label span with the Control Panel's responsive `@max-[480px]/composer:hidden` pattern. The compact form keeps the exact `size-6` icon-only square; the large form expands via `@min-[480px]/composer:w-auto/px-1.5/gap-1`.
+2. Component test pins the label text, its compact-hiding class and the preserved compact square; verify on the isolated build at both widths (R2).
 
 ## Decisions made without the owner
 
-To fill at closing.
+[AI] ZH label uses the dictionary's existing 子智能体 rather than introducing a second translation for subagents.
 
 ## Links
 

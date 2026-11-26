@@ -323,6 +323,7 @@ export const ru: Record<TranslationKey, string> = {
   "toast.soundsNotChanged": "Настройки звука не сохранены: {error}",
 
   "subagent.title": "Вторичная модель",
+  "subagent.button": "Субагенты",
   "subagent.description": "Выберите существующую модель для субагентов вместо основной.",
   "subagent.tooltip": "Модель субагентов: {label}",
   "subagent.followsMain": "Следует основной",

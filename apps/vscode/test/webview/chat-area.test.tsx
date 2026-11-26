@@ -121,6 +121,7 @@ describe("sticky user prompt", () => {
     expect(sticky.querySelector("button")?.className).toContain("items-center");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("transition-transform");
     expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).toContain("motion-reduce:transition-none");
+    expect(sticky.querySelector(".tabler-icon-chevron-down")?.getAttribute("class")).not.toContain("ml-auto");
 
     fireEvent.click(within(sticky).getByRole("button", { name: /Expand/ }));
     const expansion = screen.getByTestId("sticky-prompt-expansion");
@@ -204,6 +205,33 @@ describe("sticky user prompt", () => {
       fireEvent.scroll(scroll);
     });
     expect(screen.queryByTestId("sticky-user-prompt")).not.toBeNull();
+  });
+
+  it("animates the sticky bar height and its exit instead of unmounting instantly", () => {
+    vi.useFakeTimers();
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(100);
+    useChatStore.setState({ messages: promptMessages, isStreaming: false });
+    scrollTop = 100;
+    render(<ChatArea />);
+
+    const sticky = screen.getByTestId("sticky-user-prompt");
+    expect(sticky.className).toContain("transition-[max-height,opacity]");
+    expect(sticky.className).toContain("motion-reduce:transition-none");
+    expect(sticky.style.maxHeight).toBe("117px");
+    expect(sticky.style.opacity).toBe("1");
+
+    const scroll = document.querySelector(".chat-scroll-view")!;
+    act(() => {
+      scrollTop = 0;
+      fireEvent.scroll(scroll);
+    });
+    expect(screen.getByTestId("sticky-user-prompt").style.maxHeight).toBe("0px");
+    expect(screen.getByTestId("sticky-user-prompt").style.opacity).toBe("0");
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+    expect(screen.queryByTestId("sticky-user-prompt")).toBeNull();
+    vi.useRealTimers();
   });
 
   it("keeps an expanded sticky prompt open on wheel and touch scrolling", () => {

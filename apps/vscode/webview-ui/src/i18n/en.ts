@@ -324,6 +324,7 @@ export const en = {
   "toast.soundsNotChanged": "Sound settings were not saved: {error}",
 
   "subagent.title": "Secondary model",
+  "subagent.button": "Subagents",
   "subagent.description": "Choose which existing model subagents use instead of the main model.",
   "subagent.tooltip": "Subagent model: {label}",
   "subagent.followsMain": "Follow main model",

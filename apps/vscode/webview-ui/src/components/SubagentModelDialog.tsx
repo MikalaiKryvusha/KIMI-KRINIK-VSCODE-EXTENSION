@@ -58,12 +58,14 @@ export function SubagentModelDialog({ disabled }: { disabled?: boolean }) {
             onClick={() => setOpen(true)}
             disabled={disabled || models.length === 0}
             className={cn(
-              "relative flex items-center justify-center size-6 rounded-md transition-all",
+              "relative flex items-center justify-center size-6 rounded-md transition-all text-xs",
+              "@min-[480px]/composer:w-auto @min-[480px]/composer:px-1.5 @min-[480px]/composer:gap-1",
               "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
               !disabled && models.length > 0 ? "cursor-pointer" : "cursor-default",
             )}
           >
             <IconRobot className="size-4" />
+            <span className="leading-none @max-[480px]/composer:hidden">{t("subagent.button")}</span>
             {secondaryModel !== null && <span className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-blue-500" />}
           </button>
         </TooltipTrigger>

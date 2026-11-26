@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0024 · 2026-11-26 · ❌→✅ · #vscode #testing #windows
+class: stale-stand-served-old-build
+mechanized: read the running build from the action menu `v1.0.0 (NN)` before any isolated acceptance; kill the isolated VS Code by `taskkill //PID <code.pid> //T //F` before relaunching
+**Context:** the isolated build-42 acceptance probed the webview and saw build-40 classes although build 42 was installed.
+**Tried / did:** Playwright `browser.close()` over `chromium.connectOverCDP` was used to stop the isolated instance after build 40; the next launch then attached to the STILL-RUNNING old process, whose CDP port 9223 kept serving the old build.
+**Result:** ❌→✅ — the action menu proved `v1.0.0 (40)`; killing the old PID tree and relaunching gave build 42 and all probes passed.   → link: testcases/reports/2026-11-26_build_42_sticky_animation_subagent_chevron.md
+**Lesson:** `browser.close()` over a CDP connection closes the connection, not the VS Code process; a new launch then attaches to the stale instance. Kill the isolated instance by PID tree, and read the running build number from the action menu before trusting any isolated measurement.
+**Repro:** install a new VSIX, `taskkill` the previous isolated PID from `.tmp/k5-vscode/code.pid`, relaunch, then check `v1.0.0 (NN)` in the action menu.
+**Trigger:** any isolated VS Code acceptance or a DOM reading that contradicts the just-installed build → verify the running process before suspecting the code.
+**Not for:** claiming the main profile's running build from its installed VSIX hash either; the same rule applies there.
+
 ### EXP-0023 · 2026-11-26 · ❌→✅ · #vscode #testing #windows
 class: twins-missed
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-message.test.tsx

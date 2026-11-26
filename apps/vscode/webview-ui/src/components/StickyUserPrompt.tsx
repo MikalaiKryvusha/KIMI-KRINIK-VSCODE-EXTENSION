@@ -10,6 +10,8 @@ import { MediaPreviewModal } from "./MediaPreviewModal";
 const PROMPT_BOUNDARY_PX = 80;
 const PROMPT_HYSTERESIS_PX = 24;
 const COLLAPSED_STICKY_PREVIEW_HEIGHT = 32;
+const STICKY_EXIT_MS = 200;
+const STICKY_OUTER_VERTICAL_PX = 17;
 
 export function getPromptKey(message: ChatMessage, index: number): string {
   if (message.clientId !== undefined) return message.clientId;
@@ -105,10 +107,38 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
   const t = useT();
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const fullRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
   const [fullHeight, setFullHeight] = useState(COLLAPSED_STICKY_PREVIEW_HEIGHT);
-  const text = message ? Content.getText(message.content) : "";
-  const images = message ? Content.getImages(message.content) : [];
-  const videos = message ? Content.getVideos(message.content) : [];
+  const [renderedMessage, setRenderedMessage] = useState(message);
+  const [barHeight, setBarHeight] = useState(0);
+  const shownMessage = message ?? renderedMessage;
+  const text = shownMessage ? Content.getText(shownMessage.content) : "";
+  const images = shownMessage ? Content.getImages(shownMessage.content) : [];
+  const videos = shownMessage ? Content.getVideos(shownMessage.content) : [];
+
+  useEffect(() => {
+    if (message !== undefined) setRenderedMessage(message);
+  }, [message]);
+
+  useEffect(() => {
+    if (message !== undefined || renderedMessage === undefined) return;
+    const reducedMotion = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timer = setTimeout(() => setRenderedMessage(undefined), reducedMotion ? 0 : STICKY_EXIT_MS);
+    return () => clearTimeout(timer);
+  }, [message, renderedMessage]);
+
+  useEffect(() => {
+    const bubble = bubbleRef.current;
+    if (!bubble) {
+      setBarHeight(0);
+      return;
+    }
+    const update = () => setBarHeight(bubble.offsetHeight + STICKY_OUTER_VERTICAL_PX);
+    update();
+    const resizeObserver = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update);
+    resizeObserver?.observe(bubble);
+    return () => resizeObserver?.disconnect();
+  }, [shownMessage, expanded]);
 
   useLayoutEffect(() => {
     const full = fullRef.current;
@@ -120,14 +150,19 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
     return () => resizeObserver?.disconnect();
   }, [text, images.length, videos.length, expanded]);
 
-  if (!message) return null;
+  if (!shownMessage) return null;
 
+  const visible = message !== undefined;
   const canExpand = text.includes("\n") || images.length > 0 || videos.length > 0;
   const action = expanded ? t("sticky.collapse") : t("sticky.expand");
 
   return (
-    <div data-testid="sticky-user-prompt" className="sticky top-0 z-20 border-b bg-background px-2 pt-2 pb-2 text-foreground shadow-sm">
-      <div data-testid="sticky-prompt-bubble" className="relative w-full rounded-2xl rounded-br-md bg-zinc-100 px-3.5 py-1.5 transition-colors duration-200 motion-reduce:transition-none dark:bg-zinc-800">
+    <div
+      data-testid="sticky-user-prompt"
+      className="sticky top-0 z-20 border-b bg-background px-2 pt-2 pb-2 text-foreground shadow-sm overflow-hidden transition-[max-height,opacity] duration-200 motion-reduce:transition-none"
+      style={{ maxHeight: visible ? barHeight : 0, opacity: visible ? 1 : 0 }}
+    >
+      <div ref={bubbleRef} data-testid="sticky-prompt-bubble" className="relative w-full rounded-2xl rounded-br-md bg-zinc-100 px-3.5 py-1.5 transition-colors duration-200 motion-reduce:transition-none dark:bg-zinc-800">
         <button
           type="button"
           onClick={onToggle}
@@ -140,7 +175,7 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
             : "flex w-full min-w-0 items-center gap-3 text-left"}
         >
           {!expanded && <span className={canExpand ? "sr-only" : "min-w-0 flex-1 truncate text-xs leading-none"}>{text || t("queue.mediaOnly")}</span>}
-          {(expanded || canExpand) && <IconChevronDown className={`ml-auto size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`} />}
+          {(expanded || canExpand) && <IconChevronDown className={`size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`} />}
         </button>
         {(canExpand || expanded) && (
           <div

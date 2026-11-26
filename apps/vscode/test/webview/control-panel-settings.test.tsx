@@ -332,6 +332,16 @@ describe("Control Panel settings", () => {
     expect(useSettingsStore.getState().thinkingEffort).toBe("high");
   });
 
+  it("labels the subagent button in the large form and keeps the compact icon-only form", () => {
+    render(<SubagentModelDialog />);
+    const button = screen.getByTestId("secondary-model");
+    const label = screen.getByText("Subagents");
+    expect(label.className).toContain("@max-[480px]/composer:hidden");
+    expect(button.className).toContain("size-6");
+    expect(button.className).toContain("@min-[480px]/composer:w-auto");
+    expect(button.className).toContain("@min-[480px]/composer:gap-1");
+  });
+
   it("shows the persisted default permission before a session starts", () => {
     useSettingsStore.setState({ defaultPermissionMode: "auto" });
     useChatStore.setState({ permissionMode: null });
