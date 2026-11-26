@@ -108,6 +108,7 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
   const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const fullRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const expansionRef = useRef<HTMLDivElement>(null);
   const [fullHeight, setFullHeight] = useState(COLLAPSED_STICKY_PREVIEW_HEIGHT);
   const [renderedMessage, setRenderedMessage] = useState(message);
   const [barHeight, setBarHeight] = useState(0);
@@ -133,12 +134,17 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
       setBarHeight(0);
       return;
     }
-    const update = () => setBarHeight(bubble.offsetHeight + STICKY_OUTER_VERTICAL_PX);
+    const update = () => {
+      const expansion = expansionRef.current;
+      const currentExpansionHeight = expansion?.offsetHeight ?? 0;
+      const targetExpansionHeight = expansion === null ? 0 : expanded ? fullHeight : COLLAPSED_STICKY_PREVIEW_HEIGHT;
+      setBarHeight(bubble.offsetHeight - currentExpansionHeight + targetExpansionHeight + STICKY_OUTER_VERTICAL_PX);
+    };
     update();
     const resizeObserver = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update);
     resizeObserver?.observe(bubble);
     return () => resizeObserver?.disconnect();
-  }, [shownMessage, expanded]);
+  }, [shownMessage, expanded, fullHeight]);
 
   useLayoutEffect(() => {
     const full = fullRef.current;
@@ -159,8 +165,8 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
   return (
     <div
       data-testid="sticky-user-prompt"
-      className="sticky top-0 z-20 border-b bg-background px-2 pt-2 pb-2 text-foreground shadow-sm overflow-hidden transition-[max-height,opacity] duration-200 motion-reduce:transition-none"
-      style={{ maxHeight: visible ? barHeight : 0, opacity: visible ? 1 : 0 }}
+      className="sticky top-0 z-20 border-b bg-background px-2 pt-2 pb-2 text-foreground shadow-sm overflow-hidden transition-[max-height,opacity] duration-200 ease-in-out motion-reduce:transition-none"
+      style={{ maxHeight: visible ? barHeight : "0px", opacity: visible ? 1 : 0 }}
     >
       <div ref={bubbleRef} data-testid="sticky-prompt-bubble" className="relative w-full rounded-2xl rounded-br-md bg-zinc-100 px-3.5 py-1.5 transition-colors duration-200 motion-reduce:transition-none dark:bg-zinc-800">
         <button
@@ -179,8 +185,9 @@ export function StickyUserPrompt({ message, expanded, onToggle }: StickyUserProm
         </button>
         {(canExpand || expanded) && (
           <div
+            ref={expansionRef}
             data-testid="sticky-prompt-expansion"
-            className="relative overflow-hidden transition-[max-height] duration-300 ease-in-out motion-reduce:transition-none"
+            className="relative overflow-hidden transition-[max-height] duration-200 ease-in-out motion-reduce:transition-none"
             style={{ maxHeight: expanded ? fullHeight : COLLAPSED_STICKY_PREVIEW_HEIGHT }}
           >
             <div

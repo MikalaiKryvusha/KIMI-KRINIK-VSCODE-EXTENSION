@@ -86,6 +86,11 @@ describe("sticky user prompt", () => {
   it("expands full text and media with the existing viewer and collapses back", () => {
     vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(500);
     vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(100);
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (this: HTMLElement) {
+      if (this.dataset.testid === "sticky-prompt-bubble") return 44;
+      if (this.dataset.testid === "sticky-prompt-expansion") return 32;
+      return 0;
+    });
     const image = "data:image/png;base64,AAAA";
     useChatStore.setState({
       messages: [
@@ -113,6 +118,7 @@ describe("sticky user prompt", () => {
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("rounded-2xl");
     expect(sticky.querySelector("[data-testid=sticky-prompt-bubble]")?.className).toContain("rounded-br-md");
     expect(screen.getByTestId("sticky-prompt-expansion").style.maxHeight).toBe("32px");
+    expect(sticky.style.maxHeight).toBe("61px");
     expect(screen.getByTestId("sticky-prompt-expansion").className).toContain("transition-[max-height]");
     expect(screen.getByTestId("sticky-prompt-fade").className).toContain("from-zinc-100");
     expect(screen.getByTestId("sticky-prompt-fade").className).toContain("via-zinc-100/60");
@@ -126,8 +132,13 @@ describe("sticky user prompt", () => {
     fireEvent.click(within(sticky).getByRole("button", { name: /Expand/ }));
     const expansion = screen.getByTestId("sticky-prompt-expansion");
     expect(expansion.style.maxHeight).toBe("1000px");
+    expect(sticky.style.maxHeight).toBe("1029px");
     expect(expansion.className).toContain("transition-[max-height]");
     expect(expansion.className).toContain("motion-reduce:transition-none");
+    for (const element of [sticky, expansion]) {
+      expect(element.className).toContain("duration-200");
+      expect(element.className).toContain("ease-in-out");
+    }
     const fullPrompt = screen.getByTestId("sticky-prompt-full");
     expect(fullPrompt.className).toContain("opacity-100");
     expect(fullPrompt.className).toContain("pr-6");

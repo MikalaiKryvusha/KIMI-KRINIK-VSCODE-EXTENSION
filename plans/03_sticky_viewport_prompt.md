@@ -33,7 +33,7 @@
 | AC13 | Open or return to the very beginning of the conversation | no sticky prompt is rendered at `scrollTop = 0`; scrolling into an assistant turn can activate it again |
 | AC14 | Scroll with an expanded sticky prompt, then pin another prompt and return | wheel/touch scrolling preserves the expansion; only manual collapse or a different prompt becoming sticky closes it, and a replaced prompt's expansion does not reappear on return; height grows downward with text fade-in and collapses upward with fade-out |
 | AC15 | Read the sticky bubble inside its container | small padding on all sides, including the bottom edge, leaves visible space around the bubble |
-| AC16 | Expand and collapse a prompt that overflows one line | only an overflowing prompt gets a collapsed preview with one clear line and part of the second under a bubble-colored fade; max-height animates smoothly in both directions with reduced-motion support |
+| AC16 | Expand and collapse a prompt that overflows one line | only an overflowing prompt gets a collapsed preview with one clear line and part of the second under a bubble-colored fade; max-height animates smoothly in both directions with reduced-motion support; the bubble and outer container share one duration and timing function, and the outer target is the final expanded height from the first frame rather than a repeatedly measured intermediate height |
 
 ## 3. Reference findings
 

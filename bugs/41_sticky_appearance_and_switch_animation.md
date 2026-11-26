@@ -1,10 +1,10 @@
 # Bug 41 — Abrupt sticky disappearance at the top and abrupt one/two-line sticky switches
 
-**Status:** 🔧 fixed and verified on isolated build 42 — computed max-height collapses 61 → 0px over ~200ms before unmount, replacements animate between measured heights; accumulated main-profile acceptance pending
-**Version/build:** owner's accumulated main profile, KIMI KRINIK 1.0.0 build 40 · **When/context:** 2026-11-26 ≈10:55 +03:00, tossed by the owner mid-task during the UI-polish review
+**Status:** 🔧 fixed and verified on isolated build 44 — expand and collapse share 200ms ease-in-out and equal progress per frame; accumulated main-profile acceptance pending
+**Version/build:** owner's accumulated main profile, KIMI KRINIK 1.0.0 builds 40 and 43 · **When/context:** reopened 2026-11-26 13:10 +03:00 during the owner's pre-release positive smoke
 **Severity:** S3 (cosmetic, owner-flagged)
-**Fixing:** this session, after the build-40 commit
-**Fix accepted when (observable):** scrolling to the very top no longer makes the chat canvas jump into the sticky's freed space, and sticky replacements between one-line and two-line previews animate smoothly instead of snapping.
+**Fixing:** this session, before the 1.0.0 release
+**Fix accepted when (observable):** scrolling to the very top no longer makes the chat canvas jump into the sticky's freed space; sticky replacements between one-line and two-line previews animate smoothly; expanding the sticky viewer animates the message bubble and outer container with the same duration and timing function, matching the already synchronous collapse.
 
 ## Symptom
 
@@ -16,6 +16,14 @@ Two moments: (1) at `scrollTop = 0` the sticky unmounts, its flow space collapse
 
 1. Scroll a long chat to the very top — the sticky vanishes and the content jumps upward by the bar's height.
 2. Scroll between turns whose prompts differ (one line vs multiline) — the sticky height snaps.
+
+## Reopened on main build 43 — expansion desynchronization
+
+[OWNER] «при разворачиваниистики сообщения с разной скоростью разворачиваются пузырь сообщения и весь контейнер, в котором находится пузырь. Сворачиваются синхронно, но при разворачивании выглядит некрасиво. Должны с одинаковой скоростью разворачиваться» · 2026-11-26 13:10 +03:00 (chat)
+
+The owner's positive smoke therefore fails on the accumulated main profile. The bubble and outer container must use one expansion duration and timing function; the release remains blocked until a packaged build demonstrates synchronized expand and collapse.
+
+Build 43 was confirmed running on the isolated packaged product through the action menu `v1.0.0 (43)`. A real expand probe read outer `transitionDuration: 0.2s` versus inner `0.3s`; both used `cubic-bezier(0.4, 0, 0.2, 1)`. The inner preview reached its final 41px at ≈303ms while the outer max-height was still 69.98px at ≈407ms. The outer target was repeatedly recomputed from the bubble while that bubble's own expansion was still animating, so the outer animation chased intermediate heights instead of sharing the inner animation's final target.
 
 ## Root cause
 
