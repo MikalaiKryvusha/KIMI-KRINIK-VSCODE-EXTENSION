@@ -43,7 +43,7 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | Queue actions and failures | ordinary queue | forced steering can repeat or skip items | ✅ the whole batch joins once in order; rejected items return to their original positions |
 | Attachments in chat and steering | — | can lose attachments | ✅ image, video and media-only prompts, clickable thumbnails, the same viewer after replay |
 | Multiline prompts | standard Markdown whitespace | standard Markdown whitespace | ✅ manual line breaks and blank lines reach the model unchanged |
-| Sticky user prompt while reading a long conversation | — | — | ✅ no extra strip at chat start; an expanded prompt collapses when the user scrolls or another prompt becomes sticky; the chevron opens full text and media in the existing viewer |
+| Sticky user prompt while reading a long conversation | — | — | ✅ no extra strip at chat start; one-line prompts have no fade or expand control; an expanded prompt stays open while scrolling and collapses manually or when another prompt becomes sticky; the chevron opens full text and media in the existing viewer |
 | User message send time | — | — | ✅ localized `HH:MM` send time to the left of the user bubble |
 | Managed quota: 5-hour ring with a reset countdown | — | ✅ | ✅ |
 | Managed quota: 7-day ring with a reset countdown | — | ✅ | ✅ |
@@ -57,7 +57,7 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | Context ring and queue feedback | — | ✅ | ✅ blue → yellow → red-orange ring interpolation and one pulse when an item joins the queue |
 | Control Panel at narrow widths | — | ✅ | ✅ horizontal scrolling only on real overflow, with fading edges and one-click actions |
 | Control Panel skill picker | — | — | ✅ a scrollable list with bold skill names and plain localized descriptions; the selected skill joins the running turn with Steer ON or waits in the queue with Steer OFF |
-| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (25)` |
+| Action Menu build identity | — | — | ✅ version and build number, for example `v1.0.0 (39)` |
 | Late preflight errors | can surface a generic internal error | can surface a generic internal error | ✅ unrelated and newer chat turns stay intact; only the send that actually failed is rolled back |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
@@ -124,7 +124,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Действия с очередью и ошибки отправки | обычная очередь | принудительный steering может повторить или пропустить сообщения | ✅ вся пачка отправляется один раз по порядку; отклонённые сообщения возвращаются на исходные места |
 | Вложения в чате и steering | — | вложения могут теряться | ✅ изображения, видео и сообщения без текста, кликабельные миниатюры и существующий просмотрщик после восстановления истории |
 | Многострочные сообщения | обычное Markdown-разбиение строк | обычное Markdown-разбиение строк | ✅ ручные переносы строк и пустые строки доходят до модели без изменений |
-| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ в начале чата лишней полосы нет; развёрнутый запрос сворачивается при прокрутке или закреплении другого запроса; шеврон открывает полный текст и медиа в существующем просмотрщике |
+| Закреплённое сообщение пользователя в длинном чате | — | — | ✅ в начале чата лишней полосы нет; у однострочного запроса нет затухания текста и кнопки раскрытия; развёрнутый запрос остаётся раскрытым при прокрутке и сворачивается вручную или при закреплении другого запроса; шеврон открывает полный текст и медиа в существующем просмотрщике |
 | Время отправки сообщения пользователя | — | — | ✅ локализованное время `HH:MM` слева от пузыря сообщения |
 | Квота на 5 часов: кольцо с отсчётом до сброса | — | ✅ | ✅ |
 | Квота на 7 дней: кольцо с отсчётом до сброса | — | ✅ | ✅ |
@@ -138,7 +138,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | Кольцо контекста и отклик очереди | — | ✅ | ✅ плавный переход синего в жёлтый и красно-оранжевый, один импульс при добавлении сообщения |
 | Панель управления на узком экране | — | ✅ | ✅ горизонтальная прокрутка только при реальном переполнении, затухание краёв и действия одним кликом |
 | Кнопка «Навык» в Control Panel | — | — | ✅ открывает прокручиваемый список с именем навыка жирным шрифтом и описанием обычным; при включённом Стиринге выбранный навык сразу идёт в текущий ход, при выключенном — в очередь |
-| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (25)` |
+| Версия в Action Menu | — | — | ✅ версия и номер билда, например `v1.0.0 (39)` |
 | Запоздавшие ошибки подготовки запроса | общая ошибка без подробностей | общая ошибка без подробностей | ✅ не связанные с ошибкой и более новые ходы чата сохраняются; откатывается только текущая неудачная отправка |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
@@ -204,7 +204,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 队列操作与发送失败 | 普通队列 | 强制 steering 可能重复或跳过消息 | ✅ 整批消息按顺序仅发送一次；被拒绝的消息回到原位置 |
 | 聊天和 steering 中的附件 | — | 可能丢失附件 | ✅ 图片、视频及纯媒体消息，可点击缩略图，replay 后使用同一查看器 |
 | 多行消息 | 标准 Markdown 空白处理 | 标准 Markdown 空白处理 | ✅ 手动换行和空行原样传递给模型 |
-| 长聊天中置顶的用户消息 | — | — | ✅ 聊天开始时不显示多余横条；滚动或切换置顶请求时，展开的请求自动折叠；chevron 在现有查看器中打开全文与媒体 |
+| 长聊天中置顶的用户消息 | — | — | ✅ 聊天开始时不显示多余横条；单行消息不显示淡出效果或展开按钮；展开的消息在滚动时保持展开，可手动折叠或在另一条消息置顶时折叠；chevron 在现有查看器中打开全文与媒体 |
 | 用户消息发送时间 | — | — | ✅ 用户气泡左侧显示本地化的 `HH:MM` 发送时间 |
 | 5 小时配额：带重置倒计时的圆环 | — | ✅ | ✅ |
 | 7 天配额：带重置倒计时的圆环 | — | ✅ | ✅ |
@@ -218,7 +218,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 上下文圆环与队列反馈 | — | ✅ | ✅ 蓝色 → 黄色 → 红橙色平滑渐变，消息入队时仅脉冲一次 |
 | 窄宽度下的 Control Panel | — | ✅ | ✅ 仅在实际溢出时横向滚动，边缘渐隐，单击执行操作 |
 | Control Panel Skill 选择器 | — | — | ✅ 可滚动列表以粗体显示技能名称，以常规字体显示本地化描述；Steer 开启时立即发送，关闭时进入普通队列 |
-| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (25)` |
+| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如 `v1.0.0 (39)` |
 | 延迟到达的 preflight 错误 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 无关及更新的聊天消息保持不变，仅回滚当前失败的发送 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 

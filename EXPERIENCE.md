@@ -84,6 +84,17 @@
 
 ## Entries
 
+### EXP-0023 · 2026-11-26 · ❌→✅ · #vscode #testing #windows
+class: twins-missed
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/webview/chat-message.test.tsx
+**Context:** real packaged VS Code clipboard verification used nested webviews and userEvent-driven component coverage.
+**Tried / did:** first instrumented the outer wrapper's `navigator`, then used the inner `window.navigator`; installed the product clipboard spy after `userEvent.setup()` replaced it.
+**Result:** ❌→✅ — the outer capture was empty; the inner capture observed exactly `K35 second answer`, and the component suite passes.   → link: bugs/36 · testcases/reports/2026-11-26_build_36_assistant_text_actions.md
+**Lesson:** instrument the API in the same execution world as the product, and install a clipboard spy after userEvent's setup stub.
+**Repro:** run the mechanized chat-message suite; for the packaged path use the inner-window setup/read probes named in the build-36 report.
+**Trigger:** observing a browser API in a nested VS Code webview or testing clipboard behavior → verify the execution world and the order of test-library setup.
+**Not for:** claiming that an intercepted renderer write proves the OS clipboard stayed untouched.
+
 ### EXP-0022 · 2026-11-26 · ❌→✅ · #chat #steer #testing
 class: field-dropped-in-rebuild
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/event-adapter.test.ts apps/vscode/test/session-runtime.test.ts apps/vscode/test/webview/chat-store.test.ts
