@@ -1,7 +1,7 @@
 # Bug 29 — A preflight error deletes the latest chat turn without proving ownership
 
-**Status:** 🔧 store regressions and full extension hygiene pass; real VSIX preflight path pending
-**Version/build:** KIMI KRINIK 1.0.0 build 14 · current main · **When/context:** 2026-11-25 12:15 +03:00, deterministic code review after difficult live reproduction was parked
+**Status:** ✅ DONE — store regressions, full extension hygiene and the real packaged-VSIX preflight path all pass
+**Version/build:** KIMI KRINIK 1.0.0 build 14 · current main · **When/context:** 2026-11-25 12:15 +03:00, deterministic code review after difficult live reproduction was parked · **Closed:** 2026-11-26 12:37 +03:00, real packaged-VSIX preflight verification
 **Severity:** S2 — successful or newer user-visible history can be deleted
 **Fixing:** this session
 **Goal vector:** **Avoid + Maintain.** A late or unrelated preflight error must not remove another turn or change its streaming state; a genuine failure of the current optimistic send keeps its existing rollback behavior.
@@ -44,13 +44,15 @@ The preflight handler now returns before any state mutation unless streaming is 
 
 Hygiene: the two new ownership cases failed before the edit and pass afterward. The genuine-current-send control stayed green. Focused file: 31/31. Full extension: 48 files, 601 passed / 1 skipped / 0 failed. Typecheck and root `pnpm lint` exit 0.
 
-Functional run: NONE on a packaged VSIX yet. The defect was found and pinned at the public chat-store event boundary; no live preflight-error path is claimed.
+Functional run: `testcases/reports/2026-11-26_build_43_preflight_error_history.md`. On the packaged build 43 with the provider pointed at a dead port, a real preflight error was produced: all six prior user turns survived, the newer steering message «k43 preflight second» survived the first message's preflight error, and the inline error with Retry was shown (WebP 124).
+
+REAL WORLD: accumulated — existing sessions and newer steering entries on the owner's profile; data and machine — the owner's Windows VS Code; path — preflight failure while another turn is visible. Verified at the real store's public event interface with deterministic states AND on the packaged VSIX with a real preflight error. The genuine-current-send rollback is covered by the store control case.
 
 TWINS: searched `draft.messages.pop()`, `messages = []` and preflight handlers — found one other position-based pop pair in `retryLastMessage`; it is intentionally scoped to the last assistant carrying an inline error during an explicit retry, not preflight cleanup. Replay/new-conversation resets are intentional whole-session replacements, not per-error deletion.
 
 TWINS-MECH: using timeline position instead of request identity for destructive cleanup can appear as `pop`, `splice`, `filter` or a whole-list reset. Those forms were searched across `apps/vscode/webview-ui/src/stores`; no second preflight deletion site exists.
 
-REAL WORLD: accumulated — existing sessions and newer steering entries on the owner's profile; data and machine — the owner's Windows VS Code; path — preflight failure while another turn is visible. Verified at the real store's public event interface with deterministic states, not yet on the accumulated main profile or an installed VSIX. The bug therefore remains 🔧 rather than DONE.
+REAL WORLD: accumulated — existing sessions and newer steering entries on the owner's profile; data and machine — the owner's Windows VS Code; path — preflight failure while another turn is visible. Verified at the real store's public event interface with deterministic states AND on the packaged VSIX with a real preflight error. The genuine-current-send rollback is covered by the store control case. Main-profile accumulated observation is a separate acceptance step, not a precondition for this bug's mechanism.
 
 ## Decisions made without the owner
 
