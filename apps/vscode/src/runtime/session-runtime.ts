@@ -411,6 +411,8 @@ export class SessionRuntime {
       const result = await this.session.steer(toSdkPromptInput(input));
       if (result.state === "running" && result.turnId !== undefined) {
         this.activeTurnIds.add(result.turnId);
+        const terminalKey = `${this.id}:main:${result.turnId}`;
+        if (this.deferredCompletions.has(terminalKey)) this.terminalKeys.delete(terminalKey);
         accepted = true;
       }
       if (result.state === "queued") {

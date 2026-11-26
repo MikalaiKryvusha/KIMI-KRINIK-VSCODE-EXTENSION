@@ -1,6 +1,6 @@
 # Bug 46 — the beginning of packaged attention audio is clipped (“Это” is not heard)
 
-**Status:** 🔬 RESEARCH COMPLETE — focused measurement plan ready
+**Status:** 🔬 MEASUREMENT COMPLETE — clipping not reproduced on packaged previews; no code change justified; accumulated main-profile/audible path remains open
 **Version/build:** KIMI KRINIK 1.0.0, owner's accumulated profile · **When/context:** 2026-11-26, owner heard “Это Кими Криник — задача завершена” without the initial word «Это»
 **Severity:** S2
 **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/32
@@ -69,9 +69,25 @@ The first word is intermittently or systematically lost. Whether the source MP3 
 
 No human decision is required before these measurements; adding a permanent one-second pause is deferred until evidence selects the mechanism.
 
+## Measurement result — 2026-11-27 02:05 +03:00
+
+Real Sound Settings Preview clicks with user activation produced the following native media observations on packaged build 50:
+
+- EN first play: `playing` at `currentTime = 0`, full `ended` at 4.056 s; warmed second play also starts at zero and completes.
+- RU play: starts at zero and ends at exactly 2.4225 s, the source duration.
+- ZH play: starts `playing` at zero with no rejection.
+- Source and installed EN/RU/ZH MP3 hashes match exactly.
+
+These observations do not support the first-play readiness hypothesis on the measured path. A readiness-first rewrite, shared queue or one-second source pause is therefore not justified and no production code or audio was changed.
+
+Audible capture is unresolved: the available DroidCam microphone recorded only silence and the installed FFmpeg reports `Unknown format 'wasapi'`, so no loopback route was found. This measurement limitation is not attributed to the product. The owner's accumulated-profile notification and audible first word remain open.
+
+Hygiene: source/installed asset identity confirmed; no production diff or new build count is claimed for this measurement-only cut.
+Functional run: real packaged Preview paths read through native media events; report `testcases/reports/2026-11-27_attention_audio_first_play.md`.
+
 ## Decisions made without the owner
 
-Filed separately from bugs/44 completion-event correctness: a correct event can still have clipped audio. No leading pause has been added and no implementation decision made.
+Filed separately from bugs/44 completion-event correctness: a correct event can still have clipped audio. No leading pause has been added and no implementation decision made. Kept the issue open rather than DONE because the original audible accumulated-profile symptom was not observed.
 
 ## Links
 

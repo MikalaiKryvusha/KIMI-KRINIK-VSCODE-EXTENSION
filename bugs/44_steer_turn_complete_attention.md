@@ -1,6 +1,6 @@
 # Bug 44 — steering can incorrectly trigger the “task completed” attention event
 
-**Status:** 🔧 ISOLATED ACCEPTANCE PASS on packaged build 49 — accumulated main-profile and audible-output boundaries pending; not DONE
+**Status:** 🔧 ISOLATED ACCEPTANCE PASS on packaged build 51, including independent same-turn review — accumulated main-profile and audible-output boundaries pending; not DONE
 **Version/build:** KIMI KRINIK 1.0.0, owner's accumulated profile · **When/context:** 2026-11-26 18:29 +03:00, owner report during steering
 **Severity:** S2
 **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/1
@@ -61,6 +61,14 @@ TWINS: searched `activeTurnIds.add`, `waitingForInput`, `session.steer(` and eve
 TWINS-MECH: premature completion can arise from turn IDs registered late, unsettled outbound requests, or a second terminal emitter bypassing the idle predicate. All three syntaxes were searched and covered by public runtime regressions.
 
 AFTER-WORK: `activeTurnIds` records accepted work; `steerInFlight` records an unsettled request; `deferredCompletions` preserves a terminal while the request is unresolved. If execution dies after accepted registration, later terminal ownership remains; if it dies before acceptance, blocked/rejected settlement releases only a genuine idle completion and never fabricates a turn index.
+
+## Independent same-turn review and fix — 2026-11-27 02:27 +03:00
+
+An independent skeptic found that an accepted result and deferred terminal can share one turn. Clearing the deferral then left that turn's dedup key in place, so a later genuine terminal produced no completion. A new public regression reproduced zero completions before the fix.
+
+Accepted running registration now re-arms dedup only when that exact terminal was deferred by the current steering request. A later same-turn terminal produces exactly one completion; unrelated dedup is unchanged. Runtime is 53/53 and full extension 667/1 with typecheck, lint and build-51 VSIX audit green. Build-51 immediate and accepted-queued sequences again show zero completion/audio during work and one at idle. Evidence: `testcases/reports/2026-11-27_steer_completion_attention_build51.md`.
+
+The RU warmed-second preview required by the plan was also performed and ends at source duration. Accumulated main-profile and audible-output boundaries remain open.
 
 ## Decisions made without the owner
 

@@ -706,6 +706,26 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     await expect(completion).resolves.toEqual({ status: "finished" });
   });
 
+  it("allows a later same-turn terminal after acceptance to complete", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const completion = runtime.prompt("first");
+    sdk.emit(turnStarted(undefined, 1));
+    sdk.setSteerResult({ ...RUNNING_STEER_RESULT, turnId: 1, steered: true });
+    const steering = runtime.steer("joined", "client-steer-joined");
+
+    sdk.emit(turnEnded("completed", undefined, 1));
+    expect(streamData(broadcasts)).not.toContainEqual(expect.objectContaining({ type: "stream_complete" }));
+
+    await steering;
+    sdk.emit(turnEnded("completed", undefined, 1));
+    const completions = streamData(broadcasts).filter((event) => typeof event === "object" && event !== null
+      && "type" in event && event.type === "stream_complete" && "result" in event
+      && (event.result as { status?: string }).status === "finished");
+    expect(completions).toHaveLength(1);
+    expect(completions[0]).toMatchObject({ turnIndex: 1 });
+    await expect(completion).resolves.toEqual({ status: "finished" });
+  });
+
   it("releases completion when a pending steering submission is blocked", async () => {
     const { runtime, sdk, broadcasts } = createRuntime();
     const completion = runtime.prompt("first");

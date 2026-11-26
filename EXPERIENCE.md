@@ -88,6 +88,17 @@
 
 ## Entries
 
+### EXP-0029 · 2026-11-27 · ❌→✅ · #chat #lifecycle #testing
+class: terminal-state-not-propagated
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/session-runtime.test.ts
+**Context:** completion attention could fire before steering finished, and a later same-turn terminal could also be lost through deduplication.
+**Tried / did:** registered accepted turn IDs, deferred completion for pending submissions and host actions, and re-armed only the deferred terminal's dedup key after an independent skeptic reproduced the same-turn loss.
+**Result:** ❌→✅ — runtime 53/53 and full extension 667/1 pass; build-51 immediate and accepted-queued sequences emit no completion during work and one at idle.
+**Lesson:** completion is a property of the whole outbound lifecycle, not just the current turn: cover accepted-before-start, pending accepted/blocked, host actions and a repeated terminal of the same turn. Every deferral needs a named later emitter and an explicit dedup decision.   → link: bugs/44 · plans/05
+**Repro:** `pnpm exec vitest run --reporter=agent apps/vscode/test/session-runtime.test.ts`; include accepted-before-start, pending accepted/blocked, host and repeated same-turn cases.
+**Trigger:** adding or changing completion/attention, prompt submission, queue or host-action lifecycle logic.
+**Not for:** claiming the accumulated main profile or audible output; those remain separate observations.
+
 ### EXP-0028 · 2026-11-26 · ❌→✅ · #testing #kimi #environment
 class: session-env-contamination
 mechanized: env -u KIMI_CODE_SESSION_ID node D:/work/ai_sandbox/KAIF/tools/sandbox/s14-refresh-hooks.mjs

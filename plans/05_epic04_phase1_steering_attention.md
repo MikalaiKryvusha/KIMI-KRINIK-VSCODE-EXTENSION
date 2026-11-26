@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 1 — Steering и attention: `bugs/44`, `bugs/45`, `bugs/46`»
-> **Статус:** активен; шаги 4.1–4.3 выполнены на packaged builds 49–50, далее `bugs/46` · [TESTED: 2026-11-27 · 52/52 runtime, 39/39 bridge-handler, 666/1 full extension, typecheck/lint/package audits and isolated steering/error acceptance in `testcases/reports/2026-11-27_steer_completion_attention_build49.md` and `2026-11-27_steer_transient_error_build50.md`; accumulated main/audible output not verified]
+> **Статус:** шаги 4.1–4.4 выполнены в доступном объёме, включая independent same-turn review на build 51 и RU warmed-second; `bugs/46` не воспроизводится, product/audio diff не нужен; накопленный main-profile и слышимый вывод остаются открытыми · [TESTED: 2026-11-27 · 53/53 runtime, 39/39 bridge-handler, 667/1 full extension, typecheck/lint/package audits and build-51 immediate/queued observations in `testcases/reports/2026-11-27_steer_completion_attention_build51.md`; accumulated main/audible output not verified]
 > **Вовне:** результаты обновляют `bugs/44`–`bugs/46`, их GitHub Issues и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -66,11 +66,11 @@ Anchor: Epic 04 Phase 1 — «красный error frame идентифицир�
 
 Anchor: Epic 04 Phase 1 — «аудио исправляется только по измеренной причине».
 
-- [ ] На packaged RU `turnComplete.mp3` сравнить first-play после активации и warmed second play того же файла; читать media events, `currentTime`, rejection и фактический аудиовыход при доступном захвате.
-- [ ] Повторить EN/ZH и Glass как control; сверить running build и source/installed MP3 hashes.
-- [ ] Если подтверждена readiness-гонка, добавить красный regression в `sounds.test.ts` и сравнить readiness-first playback с короткой playback-side задержкой без изменения MP3. Выбрать минимальный механизм по наблюдению и записать `FORK:` с consulted sources.
-- [ ] Если источник или lifecycle окажется причиной, исправлять доказанный слой; равномерную секунду тишины не добавлять без отдельного обоснования.
-- [ ] Verification: первое слово присутствует на first и warmed play, `play()` rejection не считается успехом, повторные уведомления не обрывают друг друга.
+- [x] На packaged RU `turnComplete.mp3` сравнить first-play после активации и warmed second play того же файла; читать media events, `currentTime`, rejection и фактический аудиовыход при доступном захвате.
+- [x] Повторить EN/ZH и Glass как control; сверить running build и source/installed MP3 hashes.
+- [x] Условие не наступило: readiness-гонка не подтверждена, поэтому regression и playback-side задержка не добавлялись.
+- [x] Источник и lifecycle не подтвердились как причина; исходные MP3 и playback оставлены без изменений, равномерная секунда тишины не добавлялась.
+- [ ] Verification: первое слово присутствует на first и warmed play, `play()` rejection не считается успехом, повторные уведомления не обрывают друг друга. Остаётся заблокированным: available mic записал тишину, WASAPI loopback отсутствует; DOM/media first/warmed paths прошли, слышимое первое слово не подтверждено.
 
 ### 4.5 Проверить, задокументировать и закрыть фазу
 
