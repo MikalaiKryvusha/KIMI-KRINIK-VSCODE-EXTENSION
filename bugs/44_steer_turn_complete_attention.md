@@ -1,6 +1,6 @@
 # Bug 44 — steering can incorrectly trigger the “task completed” attention event
 
-**Status:** 🔧 CANDIDATE FIX — real guest-DOM steering/audio acceptance pending
+**Status:** 🔧 ISOLATED ACCEPTANCE PASS on packaged build 49 — accumulated main-profile and audible-output boundaries pending; not DONE
 **Version/build:** KIMI KRINIK 1.0.0, owner's accumulated profile · **When/context:** 2026-11-26 18:29 +03:00, owner report during steering
 **Severity:** S2
 **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/1
@@ -33,19 +33,38 @@ The intermittent transition still needs deterministic reproduction; do not infer
 
 ## Root cause
 
-`SessionRuntime.emitTerminal` emitted `stream_complete` for every terminal turn. It did not check whether a later steering turn had already started or an accepted queued steer still waited for its turn. Since `notifyEventAttention` maps every finished `stream_complete` to the completion sound, an older turn's completion could sound while the agent continued.
+Three lifecycle gaps produced the same false completion:
 
-## Candidate fix
+1. Accepted running `turnId` values were added to `activeTurnIds` only by a later `turn.started`, leaving an accepted-before-start window.
+2. `emitTerminal` did not account for a `session.steer()` request still awaiting its result. The live build-47 sequence was `StepInterrupted → stream_complete(finished, turn 0) → StepBegin → SteerInput`.
+3. `completeHostAction` emitted unconditionally. During `/compact` with a follow-up, build 48 emitted host completion and audio before the queued turn's `TurnBegin`.
 
-Track active main-turn ids in `SessionRuntime`. After each terminal, settle its prompt but emit `stream_complete` only when no active turn remains, no accepted queued steer waits and no exclusive/host work remains. Ordinary single-turn completion and error reporting remain unchanged.
+## Fix
 
-Regression evidence: both new cases were red before the fix and pass afterward. Targeted 121/121 and full extension 658/1 pass; typecheck and lint pass. Build 46 is packaged, audited, installed on main and isolated profiles, and its Extension Host smoke opens the webview on VS Code 1.123.0.
+Register accepted running IDs immediately, count in-flight steering and defer completed/cancelled completion until the outcome is known. Accepted running/queued work clears the deferral; blocked or rejected outcomes release a genuine completion only if the runtime is idle. Host actions use the same gate, with no fabricated `turnIndex`. Ordinary single-turn completion, same-turn steering, error reporting and replay remain unchanged.
 
-Real guest-DOM steering/audio acceptance is not verified. `page.frames()`, direct guest attachment, `Runtime.evaluate` and `DOM.getDocument` exposed only an outer guest target without the composer, so no claim about the actual sound is made. Next session needs a fresh working guest harness to finish the acceptance. Report: `testcases/reports/2026-11-26_steer_completion_attention.md`.
+Regression evidence: all three red groups were observed before their fixes. `session-runtime` is 52/52; the full extension suite is 664 passed / 1 skipped, with typecheck and root lint green. Build 49 is packaged, audited and installed on main and isolated profiles.
+
+Real guest-DOM steering/audio acceptance passed on isolated build 49:
+
+- Immediate: zero completion/audio between `StepInterrupted` and subsequent work; exactly one `stream_complete(turnIndex=1)` and one `Audio.play` at idle.
+- Accepted queued during `/compact`: zero completion/audio through the follow-up `TurnBegin`; exactly one `stream_complete(turnIndex=2)` and one `Audio.play` at idle.
+- Synthetic `turnComplete` playback rejects with `NotAllowedError`, so this is an attention-event/play-attempt observation, not an audible-output claim. A real Glass control played to `ended`.
+
+Hygiene: 52/52 runtime, 664/1 full extension, typecheck, lint and package audit pass.
+Functional run: real packaged guest DOM, bridge and native audio events read; WebP 202/203 inspected. Report: `testcases/reports/2026-11-27_steer_completion_attention_build49.md`.
+
+REAL WORLD: accumulated — owner's main VS Code profile with existing sessions and configuration; data and machine — his Windows machine; path — Second Side Bar immediate/queued steering and `/compact`. Verified on the isolated packaged product with real state from the fake-model stand; not verified on the accumulated main profile, so DONE is not claimed.
+
+TWINS: searched `activeTurnIds.add`, `waitingForInput`, `session.steer(` and every `type: "stream_complete"` emitter. The third emitter, `completeHostAction`, was found and fixed. `replay-adapter.ts` also emits completion, but replay intentionally suppresses attention; no fourth live emitter was found.
+
+TWINS-MECH: premature completion can arise from turn IDs registered late, unsettled outbound requests, or a second terminal emitter bypassing the idle predicate. All three syntaxes were searched and covered by public runtime regressions.
+
+AFTER-WORK: `activeTurnIds` records accepted work; `steerInFlight` records an unsettled request; `deferredCompletions` preserves a terminal while the request is unresolved. If execution dies after accepted registration, later terminal ownership remains; if it dies before acceptance, blocked/rejected settlement releases only a genuine idle completion and never fabricates a turn index.
 
 ## Decisions made without the owner
 
-Recorded as a separate attention-lifecycle defect rather than folded into message-loss bugs: the audible event is wrong even when chat delivery itself succeeds. No implementation decision has been made.
+Recorded as a separate attention-lifecycle defect rather than folded into message-loss bugs. Kept one deferred-completion mechanism for SDK and host terminals instead of adding a second pending-running state. Accepted running/queued outcomes discard the deferral; blocked/rejected outcomes release it only at genuine idle. The isolated event sequence is accepted, while the file remains open rather than DONE because the accumulated main profile and audible speaker output are still unverified.
 
 ## Links
 

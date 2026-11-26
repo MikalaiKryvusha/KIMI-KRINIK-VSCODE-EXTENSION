@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 1 — Steering и attention: `bugs/44`, `bugs/45`, `bugs/46`»
-> **Статус:** готов к исполнению; production code не изменён · [TESTED: 2026-11-27 · parent anchors, existing suites and scoped requirements lint checked; no product functional run claimed]
+> **Статус:** активен; шаги 4.1–4.2 выполнены на packaged build 49, далее `bugs/45` и `bugs/46` · [TESTED: 2026-11-27 · 52/52 runtime, 664/1 full extension, typecheck/lint/package audit and isolated immediate+queued guest acceptance in `testcases/reports/2026-11-27_steer_completion_attention_build49.md`; accumulated main/audible output not verified]
 > **Вовне:** результаты обновляют `bugs/44`–`bugs/46`, их GitHub Issues и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -36,21 +36,21 @@
 
 Anchor: Epic 04 Phase 1 — «immediate/queued steering и audio прочитаны на реальном VS Code».
 
-- [ ] Зафиксировать исходный commit, build 46 и новый isolated profile; завершить старый isolated PID tree, перезапустить и прочитать running build в Action Menu по EXP-0024.
-- [ ] Не перезагружать основное self-hosting окно. Проверить fake-model positive smoke до steering: prompt → request → rendered response → idle.
-- [ ] Восстановить guest composer доступ через существующий CDP/UI harness. При повторном outer-only target исправить observation path и записать, что именно видно; не приписывать это продукту.
-- [ ] Добавить временную регистрацию `new Audio`, `AudioContext`, `play`, `playing`, `currentTime`, `AudioContext.resume/close`, bridge events и DOM error frames.
-- [ ] Verification: immediate/queued сценарии управляются harness, а их события и видимый DOM читаются в одной временной последовательности.
+- [x] Зафиксировать исходный commit, build 46 и новый isolated profile; завершить старый isolated PID tree, перезапустить и прочитать running build в Action Menu по EXP-0024.
+- [x] Не перезагружать основное self-hosting окно. Проверить fake-model positive smoke до steering: prompt → request → rendered response → idle.
+- [x] Восстановить guest composer доступ через существующий CDP/UI harness. При повторном outer-only target исправить observation path и записать, что именно видно; не приписывать это продукту.
+- [x] Добавить временную регистрацию `new Audio`, `AudioContext`, `play`, `playing`, `currentTime`, `AudioContext.resume/close`, bridge events и DOM error frames.
+- [x] Verification: immediate/queued сценарии управляются harness, а их события и видимый DOM читаются в одной временной последовательности.
 
 ### 4.2 Закрыть приёмку `bugs/44`
 
 Anchor: Epic 04 Phase 1 — «кандидат `bugs/44` требует реальной приёмки до дальнейшего выпуска».
 
-- [ ] В `session-runtime.test.ts` добавить публичный regression: accepted running steer с новым `turnId`, затем terminal старого turn ДО `turn.started` нового. Запустить на неизменённом кандидате и записать фактический результат.
-- [ ] Если сценарий красный, записать `INTENT:` и исправить только accepted-turn ownership; не менять queued, replay, error и single-turn семантику. Добавить control cases для same-turn steered result и terminal без steering.
-- [ ] Прогнать targeted runtime/adapter/store/attention suites, затем выполнить real immediate steering: 0 completion при продолжающейся работе, 1 при idle.
-- [ ] Выполнить accepted queued steering с completion до durable start: 0 completion в ожидании, 1 после queued turn и idle.
-- [ ] Verification: emitted `stream_complete`, `new Audio`/`AudioContext` и видимый Working/idle state совпадают во всех трёх путях; отчёт отличает звук от DOM-proxy.
+- [x] В `session-runtime.test.ts` добавить публичный regression: accepted running steer с новым `turnId`, затем terminal старого turn ДО `turn.started` нового. Запустить на неизменённом кандидате и записать фактический результат.
+- [x] Если сценарий красный, записать `INTENT:` и исправить только accepted-turn ownership; не менять queued, replay, error и single-turn семантику. Добавить control cases для same-turn steered result и terminal без steering.
+- [x] Прогнать targeted runtime/adapter/store/attention suites, затем выполнить real immediate steering: 0 completion при продолжающейся работе, 1 при idle.
+- [x] Выполнить accepted queued steering с completion до durable start: 0 completion в ожидании, 1 после queued turn и idle.
+- [x] Verification: emitted `stream_complete`, `new Audio`/`AudioContext` и видимый Working/idle state совпадают во всех трёх путях; отчёт отличает звук от DOM-proxy.
 
 ### 4.3 Идентифицировать и исправить `bugs/45`
 

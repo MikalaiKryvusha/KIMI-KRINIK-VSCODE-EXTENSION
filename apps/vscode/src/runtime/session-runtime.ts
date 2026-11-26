@@ -72,6 +72,11 @@ interface PendingHostCompaction {
   readonly reject: (error: unknown) => void;
 }
 
+type DeferredCompletion = Omit<TurnTerminalMetadata, "reason" | "turnId"> & {
+  readonly status: "finished" | "cancelled";
+  readonly turnId?: number;
+};
+
 export class SessionRuntime {
   readonly session: Session;
 
@@ -94,6 +99,8 @@ export class SessionRuntime {
   private exclusiveActionActive = false;
   private readonly activeTurnIds = new Set<number>();
   private readonly terminalKeys = new Set<string>();
+  private readonly deferredCompletions = new Map<string, DeferredCompletion>();
+  private steerInFlight = 0;
   private suppressedError: SuppressedError | undefined;
   private legacyApproval: LegacyApprovalFlags;
   private closed = false;
@@ -296,11 +303,18 @@ export class SessionRuntime {
     if (!this.hostActionActive || actionId !== this.activeHostActionId) return;
     this.hostActionActive = false;
     this.activeHostActionId = undefined;
-    this.emitStreamEvent({
-      type: "stream_complete",
-      result: { status },
-      _sessionId: this.id,
-    });
+    if (this.waitingForInput) {
+      if (this.steerInFlight > 0) {
+        const key = `host-action:${actionId}`;
+        this.deferredCompletions.set(key, { key, sessionId: this.id, agentId: "main", status });
+      } else {
+        this.emitStreamEvent({
+          type: "stream_complete",
+          result: { status },
+          _sessionId: this.id,
+        });
+      }
+    }
     this.notifyActiveWorkSettled();
   }
 
@@ -391,25 +405,52 @@ export class SessionRuntime {
 
   async steer(input: string | LegacyContentPart[], clientId?: string): Promise<PromptSubmissionResult> {
     this.ensureOpen();
-    const result = await this.session.steer(toSdkPromptInput(input));
-    if (result.state === "queued") {
-      this.pendingSteers.set(result.promptId, { input, ...(clientId === undefined ? {} : { clientId }) });
-    } else if (result.state === "running") {
-      this.emitStreamEvent(result.steered ? {
-        type: "SteerInput",
-        payload: { user_input: input, ...(clientId === undefined ? {} : { clientId }) },
-        _sessionId: this.id,
-      } : {
-        type: "TurnBegin",
-        payload: {
-          user_input: input,
-          ...(result.turnId === undefined ? {} : { turnIndex: result.turnId }),
-          ...(clientId === undefined ? {} : { clientId }),
-        },
-        _sessionId: this.id,
-      });
+    this.steerInFlight += 1;
+    let accepted = false;
+    try {
+      const result = await this.session.steer(toSdkPromptInput(input));
+      if (result.state === "running" && result.turnId !== undefined) {
+        this.activeTurnIds.add(result.turnId);
+        accepted = true;
+      }
+      if (result.state === "queued") {
+        this.pendingSteers.set(result.promptId, { input, ...(clientId === undefined ? {} : { clientId }) });
+        accepted = true;
+      } else if (result.state === "running") {
+        this.emitStreamEvent(result.steered ? {
+          type: "SteerInput",
+          payload: { user_input: input, ...(clientId === undefined ? {} : { clientId }) },
+          _sessionId: this.id,
+        } : {
+          type: "TurnBegin",
+          payload: {
+            user_input: input,
+            ...(result.turnId === undefined ? {} : { turnIndex: result.turnId }),
+            ...(clientId === undefined ? {} : { clientId }),
+          },
+          _sessionId: this.id,
+        });
+      }
+      return result;
+    } finally {
+      this.steerInFlight -= 1;
+      if (accepted) {
+        this.deferredCompletions.clear();
+      } else {
+        const deferred = [...this.deferredCompletions.values()];
+        this.deferredCompletions.clear();
+        if (this.waitingForInput) {
+          for (const terminal of deferred) {
+            this.emitStreamEvent({
+              type: "stream_complete",
+              result: { status: terminal.status },
+              ...(terminal.turnId === undefined ? {} : { turnIndex: terminal.turnId }),
+              _sessionId: terminal.sessionId,
+            });
+          }
+        }
+      }
     }
-    return result;
   }
 
   respondApproval(id: string, response: ApprovalResponse): boolean {
@@ -574,6 +615,10 @@ export class SessionRuntime {
     if (terminal.reason === "completed") {
       this.settlePrompt({ status: "finished" });
       if (this.waitingForInput) {
+        if (this.steerInFlight > 0) {
+          this.deferredCompletions.set(terminal.key, { ...terminal, status: "finished" });
+          return;
+        }
         this.emitStreamEvent({
           type: "stream_complete",
           result: { status: "finished" },
@@ -588,6 +633,10 @@ export class SessionRuntime {
       this.reverseRpc.cancelAll("Turn cancelled");
       this.settlePrompt({ status: "cancelled" });
       if (this.waitingForInput) {
+        if (this.steerInFlight > 0) {
+          this.deferredCompletions.set(terminal.key, { ...terminal, status: "cancelled" });
+          return;
+        }
         this.emitStreamEvent({
           type: "stream_complete",
           result: { status: "cancelled" },
