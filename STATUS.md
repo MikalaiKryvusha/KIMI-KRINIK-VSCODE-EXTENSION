@@ -23,15 +23,15 @@
 
 ---
 
-### 2026-11-26 02:52 +03:00 — BUILD 38 FIXES ONE-LINE STICKY PRESENTATION
-- A one-line sticky prompt no longer gets fade, expansion controls or collapsed ARIA state, including horizontal truncation. Multiline/media prompts retain their existing expansion and animation.
-- Build 38 SHA-256: `45eb94d10ff97173340e424547baf90e50d9d4094bb1420ba7cad17856357458`; installed on main and isolated profiles. Full extension: 647 passed / 1 skipped; lint, typecheck, build and VSIX audit are green.
-- Real isolated one-line geometry was 498px scroll / 149px client with no fade/control. Multiline still expanded 32→165px, survived wheel and collapsed to 32px. Evidence: `testcases/reports/2026-11-26_build_38_sticky_single_line.md` and `.tmp/k5-vscode/106-build38-one-line-sticky.webp`.
-- Build 36 per-text assistant actions and build 37 media/composer atomicity are committed in `4ceda9ab1` and `7ba8bfff9`. The running accumulated main profile remains unverified because Reload Window automation failed. Dayloop is active; no release publication is authorized.
+### 2026-11-26 03:17 +03:00 — BUILD 39 COMPLETES THE CURRENT UI REFINEMENTS
+- Skill-dialog margins are 48px; Welcome robot ↔ KIMI spacing is 24px and header spacing is 12px. General Settings renders On/Off on separate lines in EN/RU/ZH.
+- Build 39 SHA-256: `ad8f87a544e3738e6dd5b6b5e71e117da7e3079741c3e47d423173e8579316d5`; installed on main and isolated profiles. Full extension: 650 passed / 1 skipped; lint, typecheck, build and VSIX audit are green.
+- Isolated WebP/geometry passed for Welcome, the header, the 42-skill dialog and every RU General Settings row. Evidence: `testcases/reports/2026-11-26_build_39_ui_refinements.md` and WebP 108/111/112/113 in `.tmp/k5-vscode/`.
+- Builds 34–38 covered header/Compact, per-text assistant actions, media/composer atomicity and one-line sticky behavior. Main-window Reload Window automation failed; accumulated running-profile acceptance remains pending. Dayloop is active; no release publication is authorized.
 
 ## Where we are now
 
-The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `45eb94d10ff97173340e424547baf90e50d9d4094bb1420ba7cad17856357458`. The extension has 647 passed / 1 skipped and 0 failures. Build 38 is installed on main and isolated profiles; isolated functional acceptance passed, while main running-profile acceptance is pending. No GitHub Release exists.
+The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix`, SHA-256 `ad8f87a544e3738e6dd5b6b5e71e117da7e3079741c3e47d423173e8579316d5`. The extension has 650 passed / 1 skipped and 0 failures. Build 39 is installed on main and isolated profiles; isolated functional acceptance passed, while main running-profile acceptance is pending. No GitHub Release exists.
 
 ## ❓ Awaiting human review
 
@@ -40,10 +40,9 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 
 ## Where to continue next session
 
-1. Reload the accumulated main profile onto the newest verified build and observe the pending header, assistant actions, media race, skill, General Settings and sticky acceptance paths. Record results in a new run report.
-2. Apply the remaining refinements from `ideas/02` and `ideas/03`: 48px skill-dialog margins, larger robot/text spacing in welcome and header, and separate «Вкл» / «Выкл» description lines.
-3. Investigate `bugs/34_refresh_marker_write_lost.md`, then run real VSIX preflight verification for `bugs/29`.
-4. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
+1. Reload the accumulated main profile onto build 39 and observe the pending header, assistant actions, media race, skill, General Settings and sticky acceptance paths. Record results in a new run report.
+2. Investigate `bugs/34_refresh_marker_write_lost.md`, then run real VSIX preflight verification for `bugs/29`.
+3. Publish only with explicit owner `AUTH:` and only after green real-world acceptance: tag `v1.0.0`, attach the verified VSIX, use `release-notes/1.0.0/changelog.{en,ru,zh}.md`, then open and read the published page.
 
 ## Open bugs
 
@@ -61,6 +60,6 @@ The current release candidate is `apps/vscode/artifacts/vsix/kimi-code-win32-x64
 - 🔧 `bugs/KAIF/04` / upstream #204 and `bugs/KAIF/05` / upstream #206 — framework-local issues remain open until origin updates absorb them.
 - 🔴 `bugs/152` (KAIF origin) — «Starting Kimi Code…» not reproduced; 🟠 `bugs/151` — follow-up steer race, live acceptance left.
 
-KNOWLEDGE: turn-scoped identity is in `bugs/25` / EXP-0022; assistant action ownership is in `bugs/36`; media/composer timing is in `bugs/35`; the revised sticky contract and new one-line boundary are in `plans/03` and `bugs/31`; latest evidence is in `testcases/reports/2026-11-26_build_36_assistant_text_actions.md`, `2026-11-26_build_37_media_composer_atomicity.md` and `2026-11-26_build_38_sticky_single_line.md`; per-skill decisions are in `interviews/interview_002_engine_skills.md` and `HOUSE_RULES.md` R6.
+KNOWLEDGE: turn-scoped identity is in `bugs/25` / EXP-0022; assistant action ownership is in `bugs/36`; media/composer timing is in `bugs/35`; the revised sticky contract and new one-line boundary are in `plans/03` and `bugs/31`; latest evidence is in `testcases/reports/2026-11-26_build_36_assistant_text_actions.md`, `2026-11-26_build_37_media_composer_atomicity.md` `2026-11-26_build_38_sticky_single_line.md` and `2026-11-26_build_39_ui_refinements.md`; per-skill decisions are in `interviews/interview_002_engine_skills.md` and `HOUSE_RULES.md` R6.
 
 Pre-existing untracked paths are `.kaif/kimi-refresh.json`, `Claude_Help_for_Kimi.md`, `KIMI CODE LOGO/GPT ROBOT REFERENCES/` and `interviews/decisions/`; do not sweep them into a commit.

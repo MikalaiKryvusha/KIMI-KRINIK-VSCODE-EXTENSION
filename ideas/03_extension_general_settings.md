@@ -1,6 +1,6 @@
 # Idea 03 — KIMI KRINIK-owned General Settings
 
-> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 custom localized General Settings implemented and component-verified; build 33 installed, real accumulated-profile acceptance pending · **Outbound:** none
+> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 custom localized General Settings and separate On/Off lines verified on isolated build 39; accumulated main-profile acceptance pending · **Outbound:** none
 
 ## Goal vector
 
@@ -33,6 +33,10 @@ This extends the accepted three-language UI and the existing Control Panel contr
 3. Move Context Window Control and its four thresholds out of `ControlPanelSettingsDialog` without changing their host/config behavior.
 4. Keep other settings in their existing dedicated screens unless the inventory identifies a clearer owner.
 5. Verify EN/RU/ZH, existing persisted values, full hygiene and the installed VSIX path.
+
+## Refinement evidence — 2026-11-26 03:17 +03:00
+
+General Settings now renders each two-state description as separate block lines in EN/RU/ZH. The ZH boundary requires no whitespace before `关闭：`. Component cases cover all three languages; the isolated build 39 showed two adjacent lines for every RU setting. Evidence: `testcases/reports/2026-11-26_build_39_ui_refinements.md` and `.tmp/k5-vscode/112-build39-general-lines.webp`.
 
 ## Open questions / what needs the human's answer
 

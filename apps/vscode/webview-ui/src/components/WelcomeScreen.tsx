@@ -7,7 +7,7 @@ export function WelcomeScreen() {
 
   return (
     <div className="flex flex-col items-center gap-3 px-4">
-      <div className="flex max-w-full items-center justify-center gap-4">
+      <div className="flex max-w-full items-center justify-center gap-6">
         <KimiLogo className="w-[72px] shrink-0" />
         <KimiMascot className="h-12 min-w-0 object-contain" />
       </div>

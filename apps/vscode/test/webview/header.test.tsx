@@ -83,6 +83,7 @@ describe("session header", () => {
     render(<Header />);
 
     expect(screen.getByText("KIMI KRINIK")).not.toBeNull();
+    expect(screen.getByRole("img", { name: "KIMI KRINIK" }).parentElement?.className).toContain("gap-3");
     expect(screen.getByText("· Fix login")).not.toBeNull();
     expect(screen.getByText("· Fix login").className).toContain("@max-[430px]:hidden");
     expect(screen.getByRole("img", { name: "KIMI KRINIK" }).getAttribute("src")).toBe("https://extension.test/resources/krinik-robot-logo.png");

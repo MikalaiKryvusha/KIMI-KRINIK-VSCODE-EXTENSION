@@ -225,6 +225,19 @@ describe("Control Panel settings", () => {
     expect(screen.getByTestId("general-settings-dialog")).not.toBeNull();
   });
 
+  it.each([
+    ["en", "On: files are saved before the agent reads or edits them.", "Off: unsaved files remain only in the editor."],
+    ["ru", "Вкл: файлы сохраняются перед чтением или изменением агентом.", "Выкл: несохранённые файлы остаются только в редакторе."],
+    ["zh", "开启：代理读取或修改文件前先保存。", "关闭：未保存的文件仅保留在编辑器中。"],
+  ] as const)("renders General Settings On/Off descriptions on separate lines in %s", (language, on, off) => {
+    useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language } });
+    render(<GeneralSettingsDialog open onOpenChange={vi.fn()} />);
+
+    const description = screen.getByTestId("general-description-autosave");
+    expect(Array.from(description.children).map((line) => line.textContent)).toEqual([on, off]);
+    for (const line of description.children) expect(line.className).toContain("block");
+  });
+
   it("persists general booleans and editor context without duplicating dedicated screens", async () => {
     const user = userEvent.setup();
     render(<GeneralSettingsDialog open onOpenChange={vi.fn()} />);
@@ -435,8 +448,8 @@ describe("Control Panel settings", () => {
 
     await user.click(screen.getByTestId("skill-picker"));
     const dialog = await screen.findByTestId("skill-picker-dialog");
-    expect(dialog.className).toContain("h-[calc(100vh-4rem)]");
-    expect(dialog.className).toContain("max-w-[calc(100%-4rem)]");
+    expect(dialog.className).toContain("h-[calc(100vh-6rem)]");
+    expect(dialog.className).toContain("max-w-[calc(100%-6rem)]");
     const row = within(dialog).getByRole("button", { name: /review/ });
     expect(within(row).getByTestId("skill-picker-name").textContent).toBe("review");
     expect(within(row).getByTestId("skill-picker-name").className).toContain("font-semibold");
@@ -459,7 +472,7 @@ describe("Control Panel settings", () => {
 
     await user.click(screen.getByTestId("skill-picker"));
     const dialog = await screen.findByTestId("skill-picker-dialog");
-    expect(dialog.className).toContain("h-[calc(100vh-4rem)]");
+    expect(dialog.className).toContain("h-[calc(100vh-6rem)]");
     expect(screen.queryByTestId("skill-view-toggle")).toBeNull();
     expect(screen.getByTestId("skill-picker-list").className).not.toContain("max-h-64");
   });

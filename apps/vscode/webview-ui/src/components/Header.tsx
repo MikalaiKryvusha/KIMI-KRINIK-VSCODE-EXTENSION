@@ -35,7 +35,7 @@ export function Header() {
 
   return (
     <header className="flex items-center justify-between px-3 py-2 border-b border-border shrink-0 @container">
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center gap-3 min-w-0">
         <KimiLogo className="size-6 shrink-0" />
         <span className="text-sm font-semibold whitespace-nowrap shrink-0">KIMI KRINIK</span>
         {sessionTitle && (

@@ -122,7 +122,7 @@ export function SkillPickerDialog({ className }: { className?: string }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           data-testid="skill-picker-dialog"
-          className="h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] max-w-[calc(100%-4rem)] grid-rows-[auto_minmax(0,1fr)] sm:max-w-[calc(100%-4rem)]"
+          className="h-[calc(100vh-6rem)] max-h-[calc(100vh-6rem)] max-w-[calc(100%-6rem)] grid-rows-[auto_minmax(0,1fr)] sm:max-w-[calc(100%-6rem)]"
         >
           <DialogHeader>
             <DialogTitle>{t("skills.button")}</DialogTitle>

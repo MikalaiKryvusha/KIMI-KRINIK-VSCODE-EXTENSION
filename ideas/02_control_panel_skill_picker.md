@@ -1,6 +1,6 @@
 # Idea 02 — Control Panel skill picker with localized descriptions
 
-> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 owner refinements implemented; build 32 isolated visual smoke passed and build 33 is installed; accumulated main-profile acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
+> **Created:** 2026-11-24 · **Parent:** owner's direct request in chat · **Status:** 🔧 all owner refinements implemented and verified on isolated build 39; accumulated main-profile acceptance pending · **Outbound:** KAIF translation work stays in `D:/work/ai_sandbox/KAIF/ideas/39_srill_multilang_descriptions.md` and is not duplicated here
 
 ## Goal vector
 
@@ -62,6 +62,8 @@ Contract consumers: `packages/node-sdk/src/index.ts` gains one additive function
 
 - Increase the skill dialog's outer margin from 32px to 48px on every side.
 - Increase the welcome robot ↔ KIMI gap beyond the current 16px and align the header robot ↔ KIMI KRINIK spacing with that direction; the header currently has an 8px gap.
+
+Implemented and verified on isolated build 39: skill margins are 48px, Welcome gap is 24px and header gap is 12px. All 42 accepted skills remain present, rejected skills stay absent, and description animation remains functional. Evidence: `testcases/reports/2026-11-26_build_39_ui_refinements.md`, WebP 108/111/113 in `.tmp/k5-vscode/`.
 
 ## Open questions / what needs the human's answer
 

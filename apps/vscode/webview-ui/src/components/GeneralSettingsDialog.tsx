@@ -22,6 +22,7 @@ const THRESHOLD_LABEL: Record<keyof ContextWindowThresholds, TranslationKey> = {
 };
 
 const THRESHOLD_NAMES = Object.keys(THRESHOLD_LABEL) as Array<keyof ContextWindowThresholds>;
+const OFF_STATE_SEPARATOR = /\s*(?=(?:Off|Выкл|关闭)[:：])/;
 const EDITOR_CONTEXT_LABEL: Record<EditorContext, TranslationKey> = {
   never: "general.editorNever",
   onConversationStart: "general.editorOnStart",
@@ -48,7 +49,9 @@ export function GeneralSettingsDialog({ open, onOpenChange }: { open: boolean; o
             <div key={setting.key} className="flex items-center justify-between gap-4 rounded-md px-2 py-2 hover:bg-muted/50">
               <label className="min-w-0 flex-1 cursor-pointer" htmlFor={`general-setting-${setting.key}`}>
                 <span className="block text-xs font-medium">{t(setting.label)}</span>
-                <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{t(setting.description)}</span>
+                <span data-testid={`general-description-${setting.key}`} className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">
+                  {t(setting.description).split(OFF_STATE_SEPARATOR).map((line) => <span key={line} className="block">{line}</span>)}
+                </span>
               </label>
               <Switch
                 id={`general-setting-${setting.key}`}

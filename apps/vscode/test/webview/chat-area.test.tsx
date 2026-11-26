@@ -311,7 +311,7 @@ describe("welcome screen", () => {
     expect(robot.parentElement?.className).toContain("justify-center");
     expect(robot.parentElement?.className).toContain("max-w-full");
     expect(robot.className).toContain("w-[72px]");
-    expect(robot.parentElement?.className).toContain("gap-4");
+    expect(robot.parentElement?.className).toContain("gap-6");
     expect(wordmark.className).toContain("min-w-0");
   });
 });
