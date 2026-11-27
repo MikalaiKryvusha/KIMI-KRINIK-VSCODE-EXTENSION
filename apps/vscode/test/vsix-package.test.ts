@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 const appRoot = resolve(import.meta.dirname, '..');
 const packageScript = join(appRoot, 'scripts', 'vsix-package.mjs');
 const verifierScript = join(appRoot, 'scripts', 'vsix-verify.mjs');
+const publishArgsScript = join(appRoot, 'scripts', 'publish-args.mjs');
 const prepareDevScript = join(appRoot, 'scripts', 'prepare-dev.mjs');
 const tempDirs: string[] = [];
 
@@ -67,6 +68,25 @@ describe('VSIX package CLI (target planning and validation)', () => {
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('Unknown VSIX target "plan9-x64"');
     expect(result.stderr).toContain('win32-arm64');
+  });
+});
+
+describe('VSIX publish CLI (Marketplace authentication and universal package)', () => {
+  it('plans a universal package with GitHub OIDC authentication', async () => {
+    const { parsePublishArguments } = await loadPublishArgs();
+
+    const options = parsePublishArguments(['universal', '--oidc'], true);
+
+    expect(options.targets).toEqual(['universal']);
+    expect(options.files).toEqual([join(appRoot, 'artifacts', 'vsix', 'kimi-code-universal.vsix')]);
+    expect(options.oidc).toBe(true);
+  });
+
+  it('keeps universal packages and OIDC out of the Open VSX publish path', async () => {
+    const { parsePublishArguments } = await loadPublishArgs();
+
+    expect(() => parsePublishArguments(['universal'])).toThrow('Unknown VSIX target "universal"');
+    expect(() => parsePublishArguments(['--oidc'])).toThrow('Unknown option: --oidc');
   });
 });
 
@@ -251,6 +271,15 @@ describe('Extension Development Host setup (isolated local state)', () => {
     await expect(readFile(join(unsafeDir, 'keep.txt'), 'utf8')).resolves.toBe('keep');
   });
 });
+
+async function loadPublishArgs() {
+  return (await import(pathToFileURL(publishArgsScript).href)) as unknown as {
+    parsePublishArguments: (
+      args: string[],
+      visualStudioMarketplace?: boolean,
+    ) => { targets: string[]; files: string[]; oidc: boolean };
+  };
+}
 
 async function makeTempDir(prefix: string): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), prefix));

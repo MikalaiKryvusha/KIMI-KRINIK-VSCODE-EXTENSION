@@ -7,12 +7,12 @@ import { extensionRoot, isMainModule } from './vsix-targets.mjs';
 import { verifyVsix } from './vsix-verify.mjs';
 
 async function main() {
-  const options = parsePublishArguments(process.argv.slice(2));
+  const options = parsePublishArguments(process.argv.slice(2), true);
   if (options.help) {
     console.log(publishUsage('Visual Studio Marketplace'));
     return;
   }
-  if (!process.env.VSCE_PAT) throw new Error('VSCE_PAT is required to publish.');
+  if (!process.env.VSCE_PAT && !options.oidc) throw new Error('VSCE_PAT or --oidc is required to publish.');
 
   await verifyInputs(options);
   for (const file of options.files) {
@@ -20,7 +20,7 @@ async function main() {
     runLocalCli(
       '@vscode/vsce',
       'vsce',
-      ['publish', '--packagePath', file, '--skip-duplicate'],
+      ['publish', '--packagePath', file, '--skip-duplicate', ...(options.oidc ? ['--oidc'] : [])],
       { cwd: extensionRoot },
     );
   }

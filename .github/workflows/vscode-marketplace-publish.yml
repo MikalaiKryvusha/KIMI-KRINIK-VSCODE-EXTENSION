@@ -1,0 +1,64 @@
+name: Publish KIMI KRINIK to Visual Studio Marketplace
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: GitHub release tag containing the verified universal VSIX
+        required: true
+        default: v1.0.0
+        type: string
+
+concurrency:
+  group: vscode-marketplace-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish verified universal VSIX
+    runs-on: ubuntu-latest
+    if: github.repository == 'MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION'
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download and authenticate release artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./apps/vscode/package.json').version")"
+          test "${RELEASE_TAG}" = "v${version}"
+          asset="kimi-code-universal.vsix"
+          output="apps/vscode/artifacts/vsix"
+          mkdir -p "${output}"
+          gh release download "${RELEASE_TAG}" --pattern "${asset}" --dir "${output}" --clobber
+          expected="$(gh release view "${RELEASE_TAG}" --json assets --jq '.assets[] | select(.name == "kimi-code-universal.vsix") | .digest | sub("^sha256:"; "")')"
+          actual="$(sha256sum "${output}/${asset}" | cut -d' ' -f1)"
+          test -n "${expected}"
+          test "${actual}" = "${expected}"
+
+      - name: Verify universal VSIX
+        run: pnpm --filter kimi-code-kaif run package:verify -- universal
+
+      - name: Publish to Visual Studio Marketplace
+        run: pnpm --filter kimi-code-kaif run publish:vsix -- universal --oidc
