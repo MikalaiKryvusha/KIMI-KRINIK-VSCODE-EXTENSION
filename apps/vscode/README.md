@@ -2,7 +2,7 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/main/apps/vscode/resources/krinik-robot-logo.png" width="240" alt="KIMI KRINIK robot"></p>
 
-KIMI KRINIK is an independent VS Code extension for the Kimi agent. It combines the official Kimi Code engine with a customizable control panel, independent context management and a three-language interface.
+KIMI KRINIK gives you control over long agent work, prevents follow-ups from being lost, and tells you when attention is needed. Its customizable Control Panel, independent context management and three-language interface build on the official Kimi Code engine.
 
 This application is available in English, Russian and Chinese.
 
@@ -12,13 +12,13 @@ This application is available in English, Russian and Chinese.
 
 ## Features
 
-- **Context control.** Turn automatic compaction off, including an operation already in progress, and keep manual `/compact`. Configure four Context Window Control thresholds without requiring KAIF.
-- **Immediate or queued follow-ups.** With Steer ON, a message and its attachments join the running turn. With Steer OFF, messages wait in the ordinary queue and drain in order.
-- **Reliable conversation history.** Preserve multiline prompts, attachments, turn identity and unrelated history during steering, replay and request-setup failures.
+- **Context control.** When a conversation approaches its limit, KIMI KRINIK warns you early and helps you continue in a new chat without losing the thread. Turn automatic compaction off and keep manual `/compact`.
+- **Immediate or queued follow-ups.** Keep writing while the agent works: your message and attachments appear immediately and arrive once, or wait in order when you prefer a queue.
+- **Reliable conversation history.** Reopen earlier conversations with text, attachments and order intact, without blank frames or unrelated deletions.
 - **Sticky prompts.** Keep the prompt that owns the visible response at the top. Expand full text and media with synchronized bubble/container animation and without losing the reading position.
 - **Per-text actions.** Copy one adjacent assistant text item or fork the conversation from that point.
 - **Customizable Control Panel.** Hide buttons without disabling their features, change their order, and use real Plan, Goal, Swarm, Skill and secondary-model controls.
-- **Pointer controls.** See the pointer cursor on eight verified chat controls: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom.
+- **Pointer controls.** See the pointer cursor on eight chat controls: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom.
 - **Models and effort.** Use one picker for model and reasoning effort, with search, favorites and session-specific restored values.
 - **Sounds and voice.** Configure a sound and volume for approvals, questions, errors and turn completion. Use packaged clips in English, Russian and Chinese; replay stays silent.
 - **KIMI KRINIK identity.** Use the pink robot in responses and its thick-outlined, clipped-corner shape in the VS Code Activity Bar. Read the version and build number in Action Menu.
@@ -57,19 +57,19 @@ The extension is licensed under [Apache-2.0](LICENSE.txt).
 
 # KIMI KRINIK
 
-KIMI KRINIK — самостоятельное расширение VS Code для агента Kimi. В нём официальный движок Kimi Code соединён с настраиваемой Панелью Управления, собственным управлением контекстом и интерфейсом на трёх языках.
+KIMI KRINIK помогает не потерять управление над длинной работой агента, продолжать разговор без пропавших сообщений и вовремя узнавать, что нужен ответ. В нём официальный движок Kimi Code соединён с настраиваемой Панелью Управления, собственным управлением контекстом и интерфейсом на трёх языках.
 
 [English](#english) · [Русский](#russian) · [中文](#chinese)
 
 ## Возможности
 
-- **Контроль контекста.** Автоматическое сжатие выключается, включая уже идущую операцию; ручной `/compact` остаётся доступным. Четыре порога Контроля Контекстного Окна настраиваются без обязательного KAIF.
-- **Дополнения сразу или через очередь.** При включённом Стиринге сообщение с вложениями сразу попадает в текущий ход. При выключенном сообщения ждут в обычной очереди и отправляются по порядку.
-- **Сохранность истории.** Ручные переносы строк, вложения, идентичность хода и не связанные с ошибкой сообщения сохраняются при стиринге, восстановлении истории и ошибках подготовки запроса.
+- **Контроль контекста.** Когда разговор приближается к пределу, KIMI KRINIK заранее предупреждает и помогает продолжить обсуждение в новом чате без потери нити. Автоматическое сжатие выключается, ручной `/compact` остаётся доступным.
+- **Дополнения сразу или через очередь.** Продолжайте писать, пока агент работает: сообщение с вложениями сразу появляется и доходит один раз. Если нужна очередь, сообщения ждут своей очереди и отправляются по порядку.
+- **Сохранность истории.** Ранние разговоры открываются с текстом, вложениями и порядком сообщений без пустых кадров и удаления не связанных с ошибкой записей.
 - **Закреплённый запрос.** Запрос, которому принадлежит видимый ответ, остаётся вверху. Полный текст и медиа раскрываются с синхронной анимацией пузыря и контейнера, позиция чтения сохраняется.
 - **Действия с каждым блоком.** Copy копирует только соседний текстовый блок агента, а Fork создаёт новый разговор с этой точки.
 - **Настраиваемая Control Panel.** Галочки скрывают кнопки без отключения функций. Порядок кнопок меняется, а Plan, Goal, Swarm, Skill и дополнительная модель выполняют реальные действия.
-- **Курсор-указатель.** При наведении на восемь проверенных кнопок чата — «Добавить файл или медиа», «История», «Шестерёнка настроек», «Отправить сообщение», «Остановить агента», «Сессия», «Создать новый чат» и плавающую кнопку прокрутки вниз — появляется курсор-указатель.
+- **Курсор-указатель.** При наведении на восемь кнопок чата — «Добавить файл или медиа», «История», «Шестерёнка настроек», «Отправить сообщение», «Остановить агента», «Сессия», «Создать новый чат» и плавающую кнопку прокрутки вниз — появляется курсор-указатель.
 - **Модель и рассуждения.** Одно меню объединяет выбор модели и уровня рассуждений, поиск и избранное. Восстановленная сессия сохраняет собственный уровень.
 - **Звуки и голос.** Для одобрений, вопросов, ошибок и завершения задачи настраиваются звук и громкость. Готовые записи есть на английском, русском и китайском; восстановление истории не озвучивается.
 - **Идентичность KIMI KRINIK.** В ответах показывается розовый робот, а на Activity Bar — его контурный силуэт со срезанными уголками. В Action Menu видны версия и номер билда.
@@ -108,19 +108,19 @@ KIMI KRINIK использует [официальный движок и мон�
 
 # KIMI KRINIK
 
-KIMI KRINIK 是用于 Kimi 智能体的独立 VS Code 扩展，将官方 Kimi Code 引擎、可定制的 Control Panel、独立上下文管理和三语言界面结合在一起。
+KIMI KRINIK 帮助你掌控长时间的智能体工作、继续对话而不丢失消息，并在需要回应时及时收到提醒。它将官方 Kimi Code 引擎、可定制的 Control Panel、独立上下文管理和三语言界面结合在一起。
 
 [English](#english) · [Русский](#russian) · [中文](#chinese)
 
 ## 功能
 
-- **上下文控制。** 可关闭自动压缩，包括正在进行的操作，同时保留手动 `/compact`。无需 KAIF 即可配置四个上下文窗口控制阈值。
-- **立即或排队追加消息。** Steer 开启时，消息及附件立即加入当前轮次；关闭时，消息进入普通队列并按顺序发送。
-- **可靠的会话历史。** 在 steering、历史恢复和请求准备失败时，保留多行消息、附件、轮次身份及无关历史。
+- **上下文控制。** 当对话接近上限时，KIMI KRINIK 会提前提醒，并帮助你在新聊天中继续讨论而不丢失脉络。可关闭自动压缩，同时保留手动 `/compact`。
+- **立即或排队追加消息。** 在智能体工作时继续输入：消息及附件立即显示并只送达一次；需要排队时，消息按顺序等待发送。
+- **可靠的会话历史。** 重新打开早期对话时，文本、附件和消息顺序保持完整，不会出现空白帧或无关记录被删除。
 - **置顶用户消息。** 当前可见回复所属的用户消息保持在顶部。展开全文与媒体时，气泡和外部容器同步运动，并保留阅读位置。
 - **逐文本块操作。** Copy 仅复制相邻的助手文本块，Fork 从该位置创建新会话。
 - **可定制的 Control Panel。** 隐藏按钮时保留对应功能，并可调整按钮顺序。Plan、Goal、Swarm、Skill 和次级模型均执行真实操作。
-- **指针光标。** 鼠标悬停在八个已验证的聊天按钮（添加文件或媒体、历史记录、设置齿轮、发送消息、停止 AI 智能体、会话、创建新聊天和浮动滚动到底部按钮）上时显示指针光标。
+- **指针光标。** 鼠标悬停在八个聊天按钮（添加文件或媒体、历史记录、设置齿轮、发送消息、停止 AI 智能体、会话、创建新聊天和浮动滚动到底部按钮）上时显示指针光标。
 - **模型与推理强度。** 在同一个选择器中搜索和收藏模型、选择推理强度；恢复的会话保留自己的设置。
 - **声音与语音。** 为审批、问题、错误和任务完成设置声音与音量。提供英语、俄语和中文的内置录音；恢复历史时保持静音。
 - **KIMI KRINIK 标识。** 回复中使用粉色机器人，Activity Bar 使用带切角的粗轮廓机器人。Action Menu 显示版本与构建号。

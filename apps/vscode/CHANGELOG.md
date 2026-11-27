@@ -4,12 +4,12 @@
 
 2026-11-27
 
-The first independent KIMI KRINIK release combines the official Kimi Code 2.7.2 engine with the KIMI FORK interface and the KIMI KRINIK product changes.
+The first independent KIMI KRINIK release helps you manage long agent sessions, continue conversations without losing messages and get notified when attention is needed, using the official Kimi Code 2.7.2 engine and the KIMI FORK interface.
 
 ### Added
 
 - Turn off automatic compaction, including an active automatic operation, while keeping manual `/compact` available.
-- Configure independent Context Window Control thresholds without requiring KAIF.
+- Get an early warning before a conversation reaches its context limit and continue in a new chat without losing the discussion.
 - Send follow-ups and attachments immediately with Steer ON or restore the ordinary queue with Steer OFF.
 - Reorder Control Panel buttons and hide them without disabling their features. Use the localized General Settings dialog for editor, context and threshold controls.
 - Choose models and reasoning effort through one picker with search and favorites; resumed sessions retain their own effort.
@@ -21,16 +21,16 @@ The first independent KIMI KRINIK release combines the official Kimi Code 2.7.2 
 - Read live session status, background tasks, todos, queue state and the version/build identity.
 - Use the pink KIMI KRINIK robot in responses and its thick-outlined, clipped-corner shape in the VS Code Activity Bar.
 - Install one universal VSIX on Windows, macOS and Linux, or choose one of six platform-specific packages.
-- See the pointer cursor on eight verified chat controls: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom.
+- See the pointer cursor on eight chat controls: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom.
 
 ### Fixed
 
-- Preserve turn identity, attachments, composer state and unrelated history across steering, queue batches, replay and late request-setup errors.
+- Keep messages, attachments, drafts and unrelated history intact when you follow up, reopen a conversation or a send fails.
 - Return rejected queue items to their original positions and avoid duplicate submissions.
-- Keep internal hook output out of assistant messages and sticky prompt selection.
+- Keep internal instructions out of your conversation and let sticky prompts show only your actual messages.
 - Keep sticky appearance, exit, replacement, expansion and collapse synchronized without moving the reading anchor.
 - Keep sound selectors usable when an event is Off and prevent replayed events from producing attention sounds.
-- Preserve distinct assistant responses and genuine idle completion across late steering acknowledgements, fallback prompts and running-to-idle transitions.
+- Keep each assistant response separate and remove Working as soon as answering finishes, including after follow-ups.
 
 ### Distribution
 

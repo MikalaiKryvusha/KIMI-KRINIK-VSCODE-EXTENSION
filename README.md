@@ -29,10 +29,7 @@
 
 [Читать по-русски →](#russian) · [中文 →](#chinese)
 
-**KIMI KRINIK** is a VS Code extension for the Kimi agent. The engine and the agent runtime (harness) are the
-[official Kimi Code](https://github.com/MoonshotAI/kimi-code) at its current version; the interface comes from
-[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork). The build adds what neither project has: automatic
-context compaction (compaction) can be switched off, a follow-up joins the running turn with its attachments, and the agent alerts you with a tone or a prerecorded voice notification when it waits for you.
+**KIMI KRINIK** gives you control over long agent sessions, prevents follow-ups from being lost, and lets you know when the agent needs your attention. Turn automatic context compaction off, manage context limits yourself, and use the interface in English, Russian or Chinese.
 
 ### 1. What it brings
 
@@ -42,10 +39,10 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 |---|---|---|---|
 | Engine | official 2.7.2 | older 2.2.0 | ✅ official 2.7.2, kept current with upstream |
 | Automatic compaction and overflow recovery can be turned off, including an automatic compaction already in progress; manual `/compact` stays and is not cancelled | — | — | ✅ `[loop_control] auto_compact = false` and a switch in the settings menu |
-| Context Window Control with configurable thresholds | — | — | ✅ with one active control path and a handover to a new chat |
+| Context Window Control with configurable thresholds | — | — | ✅ advance warning before the context limit and help continuing in a new chat without losing the discussion |
 | A follow-up sent during a running turn | waits in the queue | joins the turn, can lose attachments | ✅ immediate AUTO STEER; OFF restores the ordinary queue |
 | Follow-up visible in chat | — | — | ✅ one visible entry per message |
-| Follow-up engine submission | — | — | ✅ one engine submission per message |
+| Follow-up delivery | — | — | ✅ each message reaches the agent exactly once, without duplicates |
 | Queue actions and failures | ordinary queue | forced steering can repeat or skip items | ✅ the whole batch joins once in order; rejected items return to their original positions |
 | Assistant Copy/Fork scope | one action row per response; Copy combines the last step's text | one action row per response; Copy combines the last step's text | ✅ every assistant text item has its own Copy and Fork; Copy writes only its adjacent text |
 | Attachments in chat and steering | — | can lose attachments | ✅ image, video and media-only prompts, clickable thumbnails, the same viewer after replay |
@@ -60,15 +57,15 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | Composer panel: permission mode, Plan, Goal, Swarm, secondary model, context ring and viewer | — | ✅ | ✅ combined model + effort picker, search, favorites and secondary-model selection; the secondary-model button carries a «Subagents» label in the large form |
 | Model and reasoning effort between sessions | — | — | ✅ explicit MAX/XHigh choices persist; a resumed session keeps its own effort |
 | Live status and session header | — | ✅ | ✅ queued/changed panels, background tasks, todos, compaction viewer, session title, Working indicator and KIMI KRINIK robot |
-| History replay and internal events | — | — | ✅ atomic replay without blank frames; internal hook results never become assistant text |
+| History replay and internal events | — | — | ✅ history reopens without blank frames or lost text; internal instructions stay out of your conversation |
 | Context ring and queue feedback | — | ✅ | ✅ blue → yellow → red-orange ring interpolation and one pulse when an item joins the queue |
 | Control Panel at narrow widths | — | ✅ | ✅ horizontal scrolling only on real overflow, with fading edges and one-click actions |
-| Control Panel composition and order | fixed panel | fixed panel | ✅ checkboxes hide buttons without disabling their features; Up/Down actions persist the left-to-right order; the eight verified chat controls—Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom—show a pointer on hover |
+| Control Panel composition and order | fixed panel | fixed panel | ✅ checkboxes hide buttons without disabling their features; Up/Down actions persist the left-to-right order; the eight chat controls—Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom—show a pointer on hover |
 | General Settings | VS Code settings | VS Code settings | ✅ one localized dialog for editor behavior, context sharing and all four context thresholds, with separate ON/OFF explanations |
 | Control Panel skill picker | — | — | ✅ a scrollable list with bold skill names and plain localized descriptions; the selected skill joins the running turn with Steer ON or waits in the queue with Steer OFF |
 | Control Panel state descriptions | — | — | ✅ ON/OFF in uppercase with a slight green/red tint in all three languages |
-| Action Menu build identity | — | — | ✅ version and build number; for example, build 60 is shown as `v1.0.0 (60)` |
-| Late preflight errors | can surface a generic internal error | can surface a generic internal error | ✅ unrelated and newer chat turns stay intact; only the send that actually failed is rolled back |
+| Action Menu build identity | — | — | ✅ version and build number; for example, build 61 is shown as `v1.0.0 (61)` |
+| A failed send | can surface a generic internal error | can surface a generic internal error | ✅ only the failed action is rolled back; the rest of your conversation stays intact |
 | Activity Bar identity | KIMI icon | KIMI FORK icon | ✅ a thick-outlined KIMI KRINIK robot with clipped top corners and square sideways eyes, using the VS Code foreground color |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
@@ -126,11 +123,7 @@ Some reported issues remain open in [GitHub Issues](https://github.com/MikalaiKr
 
 [Read in English →](#english) · [中文 →](#chinese)
 
-**KIMI KRINIK** — расширение VS Code для агента Kimi. Движок и среда выполнения агента (harness) — это
-[официальный Kimi Code](https://github.com/MoonshotAI/kimi-code) текущей версии, интерфейс перенесён из
-[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork). Сборка добавляет то, чего нет ни в одном из них:
-автоматическое сжатие контекста (compaction) выключается, сообщение, отправленное во время работы агента, сразу обрабатывается в текущем ходе вместе с вложениями, агент предупреждает вас звуковым сигналом
-или готовой голосовой записью, когда ждёт ответа.
+**KIMI KRINIK** помогает не потерять управление над длинной работой агента, дослать сообщение без пропажи и вовремя узнать, что агент ждёт ответа. Автоматическое сжатие контекста можно выключить, пределы контекста настраиваются под вашу работу, а интерфейс доступен на английском, русском и китайском языках.
 
 ### 1. Что нового
 
@@ -140,10 +133,10 @@ Some reported issues remain open in [GitHub Issues](https://github.com/MikalaiKr
 |---|---|---|---|
 | Движок | официальный 2.7.2 | старый 2.2.0 | ✅ официальный 2.7.2, обновляется вслед за официальным Kimi Code |
 | Автоматический compaction выключается вместе с восстановлением при переполнении и уже идущим автоматическим сжатием; ручной `/compact` работает и не отменяется | — | — | ✅ `[loop_control] auto_compact = false` и переключатель в меню настроек |
-| Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ использует один активный механизм контроля и передаёт работу в новый чат |
+| Контроль контекстного окна с настраиваемыми порогами | — | — | ✅ заранее предупреждает о приближении предела и помогает продолжить обсуждение в новом чате без потери нити |
 | Сообщение, отправленное во время работы агента | ждёт в очереди | обрабатывается в текущем ходе, вложения могут теряться | ✅ сразу попадает в текущий ход; OFF возвращает обычную очередь |
 | Досланное сообщение в чате | — | — | ✅ одна видимая запись на сообщение |
-| Досланное сообщение в движке | — | — | ✅ одна отправка на сообщение |
+| Доставка дополнения | — | — | ✅ каждое сообщение доходит до агента ровно один раз, без дублей |
 | Действия с очередью и ошибки отправки | обычная очередь | принудительный steering может повторить или пропустить сообщения | ✅ вся пачка отправляется один раз по порядку; отклонённые сообщения возвращаются на исходные места |
 | Область действий Copy/Fork в ответе | одна панель на ответ; Copy объединяет текст последнего шага | одна панель на ответ; Copy объединяет текст последнего шага | ✅ у каждого текстового блока агента свои Copy и Fork; Copy записывает только соседний текст |
 | Вложения в чате и steering | — | вложения могут теряться | ✅ изображения, видео и сообщения без текста, кликабельные миниатюры и существующий просмотрщик после восстановления истории |
@@ -158,15 +151,15 @@ Some reported issues remain open in [GitHub Issues](https://github.com/MikalaiKr
 | Панель ввода: режим разрешений, Plan, Goal, Swarm, дополнительная модель, кольцо контекста и просмотр контекста | — | ✅ | ✅ общий выбор модели и уровня рассуждений, поиск, избранное и дополнительная модель; кнопка дополнительной модели в крупном виде подписана «Субагенты» |
 | Модель и уровень рассуждений между сессиями | — | — | ✅ явный выбор MAX/XHigh сохраняется; восстановленная сессия хранит собственный уровень |
 | Текущий статус и заголовок сессии | — | ✅ | ✅ очередь и изменения, фоновые задачи, список задач, просмотр контекста, название сессии, индикатор «Работаю…» и робот KIMI KRINIK |
-| История и внутренние события | — | — | ✅ восстановление истории без пустых кадров; внутренние служебные инструкции не отображаются как ответ агента |
+| История и внутренние события | — | — | ✅ история открывается без пустых кадров и потерянного текста; внутренние служебные инструкции не появляются в вашем разговоре |
 | Кольцо контекста и отклик очереди | — | ✅ | ✅ плавный переход синего в жёлтый и красно-оранжевый, один импульс при добавлении сообщения |
 | Панель управления на узком экране | — | ✅ | ✅ горизонтальная прокрутка только при реальном переполнении, затухание краёв и действия одним кликом |
-| Состав и порядок кнопок Control Panel | фиксированная панель | фиксированная панель | ✅ галочки скрывают кнопки без отключения самих функций; стрелки вверх и вниз сохраняют порядок кнопок слева направо; при наведении на восемь проверенных кнопок чата — «Добавить файл или медиа», «История», «Шестерёнка настроек», «Отправить сообщение», «Остановить агента», «Сессия», «Создать новый чат» и плавающую кнопку прокрутки вниз — появляется курсор-указатель |
+| Состав и порядок кнопок Control Panel | фиксированная панель | фиксированная панель | ✅ галочки скрывают кнопки без отключения самих функций; стрелки вверх и вниз сохраняют порядок кнопок слева направо; при наведении на восемь кнопок чата — «Добавить файл или медиа», «История», «Шестерёнка настроек», «Отправить сообщение», «Остановить агента», «Сессия», «Создать новый чат» и плавающую кнопку прокрутки вниз — появляется курсор-указатель |
 | Общие настройки | настройки VS Code | настройки VS Code | ✅ одно локализованное окно для поведения редактора, передачи контекста и всех четырёх порогов контекстного окна, с отдельными пояснениями для ВКЛ и ВЫКЛ |
 | Кнопка «Навык» в Control Panel | — | — | ✅ открывает прокручиваемый список с именем навыка жирным шрифтом и описанием обычным; при включённом Стиринге выбранный навык сразу идёт в текущий ход, при выключенном — в очередь |
 | Состояния в подсказках Панели Управления | — | — | ✅ «ВКЛ»/«ВЫКЛ» в верхнем регистре с чуть зелёным и чуть красным оттенком на всех трёх языках |
-| Версия в Action Menu | — | — | ✅ версия и номер билда; например, билд 60 отображается как `v1.0.0 (60)` |
-| Запоздавшие ошибки подготовки запроса | общая ошибка без подробностей | общая ошибка без подробностей | ✅ не связанные с ошибкой и более новые ходы чата сохраняются; откатывается только текущая неудачная отправка |
+| Версия в Action Menu | — | — | ✅ версия и номер билда; например, билд 61 отображается как `v1.0.0 (61)` |
+| Неудачная отправка | общая ошибка без подробностей | общая ошибка без подробностей | ✅ откатывается только неудачное действие; остальной разговор сохраняется |
 | Значок на основной левой панели | значок KIMI | значок KIMI FORK | ✅ контурный робот KIMI KRINIK с толстой линией, срезанными верхними уголками и квадратными глазами, расположенными как на фирменном логотипе; цвет следует теме VS Code |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
@@ -224,10 +217,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 
 [Read in English →](#english) · [Читать по-русски →](#russian)
 
-**KIMI KRINIK** 是用于 Kimi 智能体的 VS Code 扩展。引擎与 agent 运行环境（harness）来自当前版本的
-[官方 Kimi Code](https://github.com/MoonshotAI/kimi-code)，界面移植自
-[KIMI FORK](https://github.com/gxgleo67/kimi-code-vscode-fork)。在此之上，它加入了两者都没有的功能：可以关闭自动上下文压缩（compaction）；
-轮次运行中发送的消息连同附件立即并入当前轮次；智能体等待你时用提示音或预录语音提醒。
+**KIMI KRINIK** 帮助你掌控长时间的智能体工作、追加消息而不丢失，并在智能体等待回应时及时收到提醒。你可以关闭自动上下文压缩、按工作需要设置上下文限制，并使用 English、Русский 或 中文 界面。
 
 ### 1. 新增内容
 
@@ -237,10 +227,10 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 |---|---|---|---|
 | 引擎 | 官方 2.7.2 | 较旧的 2.2.0 | ✅ 官方 2.7.2，跟随上游 |
 | 自动上下文压缩（compaction）可以关闭，包括上下文溢出恢复和已在进行的自动压缩；手动 `/compact` 照常可用且不会被取消 | — | — | ✅ `[loop_control] auto_compact = false` 及设置菜单中的开关 |
-| 上下文窗口控制与可配置阈值 | — | — | ✅ 仅运行一个活动控制路径，并将工作交接到新聊天 |
+| 上下文窗口控制与可配置阈值 | — | — | ✅ 在接近上下文上限时提前提醒，并帮助在新聊天中继续讨论而不丢失脉络 |
 | 轮次运行中发送的追加消息 | 排队等待 | 并入当前轮次，可能丢失附件 | ✅ 立即并入当前轮次；OFF 恢复普通队列 |
 | 追加消息在聊天中的记录 | — | — | ✅ 每条消息仅一条可见记录 |
-| 追加消息在引擎中的提交 | — | — | ✅ 每条消息仅一次提交 |
+| 追加消息的送达 | — | — | ✅ 每条追加消息只送达智能体一次，不会重复 |
 | 队列操作与发送失败 | 普通队列 | 强制 steering 可能重复或跳过消息 | ✅ 整批消息按顺序仅发送一次；被拒绝的消息回到原位置 |
 | 助手回复中的 Copy/Fork 范围 | 每条回复一组操作；Copy 合并最后一步的文本 | 每条回复一组操作；Copy 合并最后一步的文本 | ✅ 每个助手文本块都有独立的 Copy 和 Fork；Copy 仅复制相邻文本 |
 | 聊天和 steering 中的附件 | — | 可能丢失附件 | ✅ 图片、视频及纯媒体消息，可点击缩略图，replay 后使用同一查看器 |
@@ -255,15 +245,15 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 输入框面板：权限模式、Plan、Goal、Swarm、次级模型、上下文圆环及查看器 | — | ✅ | ✅ 模型与推理强度合并选择器、搜索、收藏及次级模型选择；次级模型按钮在大尺寸下显示「子智能体」文字 |
 | 会话之间的模型与推理强度 | — | — | ✅ 明确选择的 MAX/XHigh 会持久保存；恢复的会话保留自己的推理强度 |
 | 实时状态与会话标题栏 | — | ✅ | ✅ 排队与更改、后台任务、待办、上下文查看器、会话标题、Working 指示器及 KIMI KRINIK 机器人 |
-| 历史 replay 与内部事件 | — | — | ✅ 原子 replay 不出现空白帧；内部 hook 结果不会成为助手文本 |
+| 历史 replay 与内部事件 | — | — | ✅ 重新打开历史时不会出现空白帧或文本丢失；内部指令不会出现在你的对话中 |
 | 上下文圆环与队列反馈 | — | ✅ | ✅ 蓝色 → 黄色 → 红橙色平滑渐变，消息入队时仅脉冲一次 |
 | 窄宽度下的 Control Panel | — | ✅ | ✅ 仅在实际溢出时横向滚动，边缘渐隐，单击执行操作 |
-| Control Panel 的按钮组成与顺序 | 固定面板 | 固定面板 | ✅ 复选框隐藏按钮但保留对应功能；上移和下移操作会保存从左到右的按钮顺序；鼠标悬停在八个已验证的聊天按钮（添加文件或媒体、历史记录、设置齿轮、发送消息、停止 AI 智能体、会话、创建新聊天和浮动滚动到底部按钮）上时显示指针光标 |
+| Control Panel 的按钮组成与顺序 | 固定面板 | 固定面板 | ✅ 复选框隐藏按钮但保留对应功能；上移和下移操作会保存从左到右的按钮顺序；鼠标悬停在八个聊天按钮（添加文件或媒体、历史记录、设置齿轮、发送消息、停止 AI 智能体、会话、创建新聊天和浮动滚动到底部按钮）上时显示指针光标 |
 | 通用设置 | VS Code 设置 | VS Code 设置 | ✅ 一个本地化对话框集中管理编辑器行为、上下文共享和全部四个上下文阈值，ON/OFF 说明分行显示 |
 | Control Panel Skill 选择器 | — | — | ✅ 可滚动列表以粗体显示技能名称，以常规字体显示本地化描述；Steer 开启时立即发送，关闭时进入普通队列 |
 | Control Panel 状态提示 | — | — | ✅ ON/OFF 全大写并带轻微绿色/红色着色，支持全部三种语言 |
-| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如构建 60 显示为 `v1.0.0 (60)` |
-| 延迟到达的 preflight 错误 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 无关及更新的聊天消息保持不变，仅回滚当前失败的发送 |
+| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如构建 61 显示为 `v1.0.0 (61)` |
+| 发送失败 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 仅回滚失败的操作，其他对话内容保持不变 |
 | 左侧 Activity Bar 标识 | KIMI 图标 | KIMI FORK 图标 | ✅ KIMI KRINIK 机器人采用粗轮廓、顶部切角和位于两侧的方形眼睛，颜色跟随 VS Code 前景色 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 

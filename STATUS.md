@@ -43,17 +43,21 @@
 
 2026-11-27 15:02 +03:00 — Control build 60 is green: lint, typecheck, full extension 682/1, six-target and universal package audits pass. README build example is 60 and voice-lint remains green. Adversarial release judge is next before commit/push and publication.
 
+2026-11-27 15:16 +03:00 — OWNER PUBLIC-TEXT RULE: KIMI KRINIK is described independently with no KAIF mention and with user value before implementation details. Every public description must say which user problem a feature solves and what becomes easier, in EN/RU/ZH. This is being corrected in root/Marketplace docs, notes and the already-published GitHub Release; see `HOUSE_RULES.md` R10. Soft handover follows this correction, with Marketplace publication left for the next chat.
+
+2026-11-27 16:02 +03:00 — GitHub `v1.0.0` is PUBLISHED at https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases/tag/v1.0.0. All seven build-61 VSIX assets are uploaded with matching local/remote SHA-256 and no KAIF in packaged README/CHANGELOG/THIRD_PARTY_NOTICES. Independent value-led review and voice-lint are green; the rendered release page was reopened and read. GitHub release is done; Marketplace publication and further documentation polish are reserved for the next chat.
+
 ## ❓ Awaiting human review
 
-- GitHub `v1.0.0` and Marketplace publication are owner-authorized with documented Known issues after packaging, documentation, artifact and publication checks. Open issues remain visible as future work, not hidden or called fixed. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md`.
+- GitHub `v1.0.0` is published and verified. Marketplace 1.0.0 is owner-authorized with documented Known issues after its remaining publication checks. Open issues remain visible as future work, not hidden or called fixed. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md`.
 - `GOAL.md` owner confirmation, B9 changelog mechanism and B10 shared `kimi.*` namespace remain open organizational questions, not reasons to start new work during closure.
 - Marketplace recon is complete in `researches/58_vscode_marketplace_publication.md`: self-service publication is technically feasible. The owner subsequently authorized preparation and publication after green gates. The independent `apps/vscode/README.md` and own CHANGELOG are written; privacy/support presentation, the universal-publish path and owner/publisher/OIDC setup still need completion. No Marketplace publication has occurred.
 
 ## Where to continue next session
 
-1. Idea 04 is DONE as `ideas/04_DONE_pointer_cursor_for_chat_controls.md`; close issue #35 with the verified commit after this change is committed and pushed.
-2. Rebuild the final universal+target VSIX set and run full tests, typecheck, lint, package audits and judge. Prepare GitHub and Marketplace release documentation with an explicit Known issues section and links to open follow-up issues.
-3. Publish GitHub `v1.0.0` and Marketplace under the owner's 2026-11-27 release decision, then open and read the published pages. Accumulated-main acceptance and open issues continue as future-version work; the 123 legacy remote tags remain untouched.
+1. Idea 04 is DONE as `ideas/04_DONE_pointer_cursor_for_chat_controls.md`; issue #35 is closed with its verified commit.
+2. GitHub `v1.0.0` is published with seven build-61 VSIX and value-led EN/RU/ZH notes without KAIF. Next chat: publish Marketplace 1.0.0 under the owner's decision and keep polishing public documentation by `HOUSE_RULES.md` R10.
+3. Accumulated-main acceptance and open issues continue as future-version work; the 123 legacy remote tags remain untouched.
 
 ## Open bugs
 

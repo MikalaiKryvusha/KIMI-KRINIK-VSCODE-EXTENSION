@@ -2,15 +2,15 @@
 
 2026-11-27
 
-KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FORK interface and adds independent context management, reliable follow-ups and a three-language UI.
+KIMI KRINIK 1.0.0 helps you keep long sessions under control, follow up without losing messages and use a three-language UI, while keeping the official Kimi Code 2.7.2 engine and the KIMI FORK interface.
 
 ## What's new
 
 - Turn off automatic compaction, including an operation already in progress. Manual `/compact` remains available.
 
-- Use Context Window Control with configurable thresholds, without requiring KAIF. Threshold messages hand work over to a new chat before the window overflows.
+- Get an early warning before a conversation reaches its context limit and continue in a new chat without losing the discussion.
 
-- Send follow-ups immediately with AUTO STEER or restore the ordinary queue. Ordered batches join once, and rejected messages return to their original positions.
+- Keep writing while the agent works: your follow-up and attachments appear immediately and arrive once, or wait in order when you prefer a queue. Rejected messages return to their original positions.
 
 - Keep the last fully-scrolled-out prompt on top: a prompt still visible on screen never duplicates into the sticky bar. The bar animates smoothly on appearance, exit and replacement; expansion and collapse use one synchronized 200 ms motion for the bubble and outer container. The centered chevron expands full text and media in the existing viewer.
 
@@ -18,7 +18,7 @@ KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FOR
 
 - Use the Copy and Fork actions under every assistant text item: each Copy writes only its adjacent text.
 
-- Open the Skill picker with 48 px margins and localized descriptions, then send a skill immediately with Steer or queue it with Steer OFF.
+- Find the right skill with a localized description, then use it immediately or let it wait in the queue.
 
 - Read the «Subagents» label on the secondary-model button in its large form; the compact form keeps the bare robot icon.
 
@@ -34,9 +34,9 @@ KIMI KRINIK 1.0.0 combines the official Kimi Code 2.7.2 engine with the KIMI FOR
 
 - Keep history stable during replay and late request-setup errors. Internal instructions do not appear as assistant text during live work or history replay, and unrelated turns are not deleted.
 
-- Preserve consecutive steering responses and genuine idle completion after late acknowledgements and running-to-idle fallback. Late non-steered turns no longer leave Working active, and distinct responses remain in separate assistants through completion and replay.
+- Keep every assistant response visible and in the right order after follow-ups. When the answer is complete, the chat stops showing Working, and reopening history preserves the same messages.
 
-- See the pointer cursor on eight verified chat controls: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom. All eight controls passed real mouse hover and click acceptance on the installed VSIX.
+- See at a glance which chat controls are clickable: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom all show the pointer cursor. All eight controls passed real mouse hover and click acceptance on the installed VSIX.
 
 ## Verification
 

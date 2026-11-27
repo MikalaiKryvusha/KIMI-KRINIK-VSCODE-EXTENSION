@@ -72,3 +72,7 @@ Scope: prepare and publish KIMI KRINIK 1.0.0 for GitHub and VS Code Marketplace 
 [OWNER] «этот чат + максимум один следующий - у нас должны состояться релизы 1.0.0» · 2026-11-27 14:03 +03:00 (chat)
 
 Scope: both GitHub `v1.0.0` and VS Code Marketplace 1.0.0 must be published in this chat or, at the latest, in the immediately following chat. Work stays on the release path; the next chat can resume from `STATUS.md` and the release documents rather than re-deriving completed verification.
+
+## GitHub publication receipt — 2026-11-27 16:02 +03:00
+
+`v1.0.0` is published at https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases/tag/v1.0.0 with seven build-61 VSIX packages. All assets are uploaded and their remote SHA-256 values match the local artifacts. Release notes are value-led in English, Russian and Chinese with no KAIF mention and with an explicit Known issues section. The rendered page was reopened and read. Marketplace publication is left for the next chat under the same owner decision.
