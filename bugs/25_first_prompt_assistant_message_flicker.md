@@ -1,6 +1,6 @@
 # Bug 25 — Chat feed briefly shows and then removes a Kimi message on the first prompt
 
-**Status:** 🔴 OPEN — owner observed another message-specific disappearance during the build-45 release-preparation closure; the running main build is not inferred
+**Status:** 🔧 ISOLATED ACCEPTANCE PASS on packaged build 57; accumulated main-profile acceptance remains open, not DONE
 **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/2
 **Version/build:** KIMI KRINIK 1.0.0 builds 12 and 19; recurrence during the build-45 closure with the main running build unverified · **When/context:** original first prompts and 2026-11-26 17:06 +03:00, ordinary progress messages during closure
 **Severity:** S2
@@ -92,6 +92,30 @@ REAL WORLD: accumulated — the owner's build-12/build-19 first-prompt observati
 TWINS: searched every `enableEnrichment` call site and the old component-map dependencies. The shared Markdown fix covers normal steps, fallback content, thinking and tool text; no second component map with the old finalization dependency remains.
 
 TWINS-MECH: a visible response can vanish through list reset, container removal, text-node replacement, renderer remount or viewport movement. The first three forms were searched and measured; viewport movement was excluded by the reproduced DOM replacement, not assumed impossible in other reports.
+
+## Fresh packaged reproduction and correlation fix — 2026-11-27 13:18 +03:00
+
+A build-56 run with distinct fake-model answers reproduced the owner's exact perceptual class. `P56 response B` was visible, then removed at the next `StepBegin`, and finally `P56 response C` appeared in the same assistant ID; B never returned. Evidence: `.tmp/k5-vscode/phase3-build56-distinct-two-steers.json`. The DOM observer, bridge events and provider requests were captured together, so this is not a same-text renderer ambiguity.
+
+The owning bridge sequence was `SteerInput` without a turn index → `ContentPart(turnIndex=1, B)` → `stream_complete(1)` → `StepBegin` without a turn index → `ContentPart(turnIndex=2, C)` → `stream_complete(2)`. No corresponding durable `TurnBegin` reached the webview for turn 2. Three correlation gaps combined:
+
+1. `SteerInput` did not carry `result.turnId`, so B fell back to the second optimistic assistant.
+2. The fallback prompt's singleton `activePrompt` settled on the previous turn's terminal, leaving the real next turn without its own `TurnBegin/clientId`.
+3. `StepBegin` discarded its SDK turn ID and could switch the wrong assistant from raw-content rendering to a new empty `steps` view, hiding B.
+
+The fix carries additive optional `turnIndex` metadata through `SteerInput` and `StepBegin`, associates `activePrompt.started` only with a turn not already owned by steering, and settles that prompt only for its own terminal (while preserving SDK paths with no start event). Store handlers select the owning assistant by that metadata.
+
+Hygiene: the runtime and adapter regressions were red before the fix (three failures), and the store contract preserves two different answers in two different assistants. Full extension: 679 passed / 1 skipped; typecheck and root lint pass. Packaged verification of the combined fix is queued as build 57; this bug is not DONE and the accumulated main path remains open.
+
+REAL WORLD: accumulated — the owner's repeated main-profile disappearances; data and machine — his Windows profile; path — progress/steer messages in Second Side Bar. The exact replacement defect is now verified on isolated build 56, not yet on the accumulated main profile.
+
+TWINS: searched `turnIndex` through the live adapter and store handlers, `activePrompt.started`, `activeTurnIds.add`, and `getLastAssistant` fallbacks. `ContentPart` and stream completion already carried identity; `SteerInput` and `StepBegin` were the missing live boundaries and are now covered. Replay's separate atomic transaction remains a control.
+
+## Packaged build-57 verification — 2026-11-27 13:31 +03:00
+
+Functional run: build 57 kept `P56 response B` and `P56 response C` visible in separate assistant IDs through final idle. Bridge now shows `SteerInput(turnIndex=1)`, a real `TurnBegin(turnIndex=2, clientId=second)` and `StepBegin` with the matching index. Durable wire contains both responses under turns 1 and 2. Two-steer replay and the later running→idle boundary replay restored the complete text/order without an empty frame. Evidence: `.tmp/k5-vscode/phase3-build57-distinct-two-steers.json`, `phase3-build57-two-steers-replay-verified.json`, `phase3-build57-running-idle-boundary.json`, `phase3-build57-boundary-replay.json`, and the opened WebP `57-phase3-two-steers-settled.webp` / `57-phase3-boundary-replay.webp`. Run report: `testcases/reports/2026-11-27_phase3_message_visibility.md`.
+
+REAL WORLD: accumulated — the owner's main profile and original disappearing progress messages; data and machine — his Windows machine; path — Second Side Bar. Build 57 is installed on main but its Extension Host has not been restarted. Isolated acceptance passes; the original accumulated-main path is not verified, so this bug remains open.
 
 ## Decisions made without the owner
 

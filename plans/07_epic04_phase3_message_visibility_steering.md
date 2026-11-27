@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 3 — Видимость сообщений и exactly-once steering: `bugs/25`, `bugs/11`»
-> **Статус:** активен с 2026-11-27 11:13 +03:00 после закрытия Phase 2 на packaged build 55; production code ещё не менялся · [NOT-TESTED]
+> **Статус:** §4.1–4.3 закрыты на packaged build 57, run report `testcases/reports/2026-11-27_phase3_message_visibility.md` · 2026-11-27 13:31 +03:00; §4.4 accumulated main и финальный judge остаются · [TESTED: 2026-11-27 · isolated positive/race/boundary/replay на build 57; accumulated main не проверен]
 > **Вовне:** результаты обновляют `bugs/25`, `bugs/11`, issues #2/#16, `STATUS.md` и `testcases/reports/`; релиз не авторизуется этим планом
 
 ## 1. Вектор цели
@@ -39,26 +39,26 @@
 
 Anchor: Epic 04 Phase 3 — «свежий frame-level захват должен читать уже исправленный queue/terminal порядок Phase 2».
 
-- [ ] Восстановить isolated stand на testkit primary, AUTO STEER ON и актуальный fake provider; убрать временные context/secondary fixtures после сохранения Phase 2 evidence.
-- [ ] До отправки prompt установить MutationObserver на видимые assistant text nodes, assistant IDs и user bubble timestamps; включить provider request и durable wire readback.
-- [ ] Выполнить positive first-prompt smoke и прочитать экран/log; если основной путь не работает, сначала исправить stand.
+- [x] Восстановить isolated stand на testkit primary, AUTO STEER ON и актуальный fake provider; убрать временные context/secondary fixtures после сохранения Phase 2 evidence.
+- [x] До отправки prompt установить MutationObserver на видимые assistant text nodes, assistant IDs и user bubble timestamps; включить provider request и durable wire readback.
+- [x] Выполнить positive first-prompt smoke и прочитать экран/log; если основной путь не работает, сначала исправить stand.
 
 ### 4.2 Изолированные race/replay варианты
 
 Anchor: `bugs/25` — «next packaged check must observe this exact progress-text → prompt-only steer sequence with DOM mutations».
 
-- [ ] Held first chunk → immediate steering → original late completion: проверить видимый первый chunk, один user steer, один final assistant и один provider action на каждое сообщение.
-- [ ] Progress text → prompt-only steer → original completion → новый durable TurnBegin: измерить удаление/замену текста по assistant ID и кадрам.
-- [ ] Два последовательных steer и send синхронно с running→idle boundary: отличить product duplicate от лишнего harness send и проверить exactly-once fallback.
-- [ ] Reload/history replay после каждого settled сценария: сравнить durable entries, видимый порядок и отсутствие пустого replay кадра.
+- [x] Held first chunk → immediate steering → original late completion: проверить видимый первый chunk, один user steer, один final assistant и один provider action на каждое сообщение.
+- [x] Progress text → prompt-only steer → original completion → новый durable TurnBegin: измерить удаление/замену текста по assistant ID и кадрам.
+- [x] Два последовательных steer и send синхронно с running→idle boundary: отличить product duplicate от лишнего harness send и проверить exactly-once fallback.
+- [x] Reload/history replay после каждого settled сценария: сравнить durable entries, видимый порядок и отсутствие пустого replay кадра.
 
 ### 4.3 Дефект либо честное невоспроизведение
 
 Anchor: `bugs/25` — «before changing code» и `BUG_FIXING_FRAMEWORK.md` — targeted changes only after reproduction.
 
-- [ ] Если текст исчезает: приложить кадры до/после, owning event и assistant ID; добавить red-before regression наименьшей public boundary и исправить только подтверждённый механизм.
-- [ ] Если текст не исчезает: записать все варианты и отрицательный результат без нового product diff; не объявлять owner symptom опровергнутым.
-- [ ] Выполнить TWINS/TWINS-MECH для любого исправления и проверить live adapter, renderer identity, list reset, text replacement и viewport как разные механизмы.
+- [x] Если текст исчезает: приложить кадры до/после, owning event и assistant ID; добавить red-before regression наименьшей public boundary и исправить только подтверждённый механизм.
+- [x] Если текст не исчезает: записать все варианты и отрицательный результат без нового product diff; не объявлять owner symptom опровергнутым.
+- [x] Выполнить TWINS/TWINS-MECH для любого исправления и проверить live adapter, renderer identity, list reset, text replacement и viewport как разные механизмы.
 
 ### 4.4 Accumulated main и финальная приёмка
 

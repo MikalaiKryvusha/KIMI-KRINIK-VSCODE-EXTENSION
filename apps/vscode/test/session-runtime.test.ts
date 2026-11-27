@@ -610,6 +610,7 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     expect(streamData(broadcasts)).toContainEqual({
       type: "SteerInput",
       payload: { user_input: "Use this instead", clientId: "client-steer-1" },
+      turnIndex: 7,
       _sessionId: "session-1",
     });
   });
@@ -698,6 +699,68 @@ describe("session runtime (adapts one SDK session for subscribed Webviews)", () 
     await steering;
     sdk.emit(turnStarted(undefined, 2));
     sdk.emit(turnEnded("completed", undefined, 2));
+    const completions = streamData(broadcasts).filter((event) => typeof event === "object" && event !== null
+      && "type" in event && event.type === "stream_complete" && "result" in event
+      && (event.result as { status?: string }).status === "finished");
+    expect(completions).toHaveLength(1);
+    expect(completions[0]).toMatchObject({ turnIndex: 2 });
+    await expect(completion).resolves.toEqual({ status: "finished" });
+  });
+
+  it("keeps a fallback prompt and steering responses correlated with their own turns", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const initial = runtime.prompt("first", "client-first");
+    sdk.emit(turnStarted(undefined, 0));
+    sdk.setSteerResult({ ...RUNNING_STEER_RESULT, turnId: 1, steered: true });
+    await runtime.steer("first steer", "client-steer-1");
+    sdk.emit(turnEnded("completed", undefined, 0));
+    await expect(initial).resolves.toEqual({ status: "finished" });
+    sdk.emit(turnStarted(undefined, 1));
+
+    const fallback = runtime.prompt("second", "client-second");
+    sdk.emit({
+      type: "assistant.delta",
+      sessionId: "session-1",
+      agentId: "main",
+      turnId: 1,
+      delta: "first response",
+    });
+    sdk.emit(turnEnded("completed", undefined, 1));
+
+    expect(await Promise.race([fallback, Promise.resolve("pending" as const)])).toBe("pending");
+    sdk.emit(turnStarted(undefined, 2));
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "TurnBegin",
+      payload: { user_input: "second", turnIndex: 2, clientId: "client-second" },
+      _sessionId: "session-1",
+    });
+    expect(streamData(broadcasts)).toContainEqual({
+      type: "SteerInput",
+      payload: { user_input: "first steer", clientId: "client-steer-1" },
+      turnIndex: 1,
+      _sessionId: "session-1",
+    });
+
+    sdk.emit(turnEnded("completed", undefined, 2));
+    await expect(fallback).resolves.toEqual({ status: "finished" });
+  });
+
+  it("does not resurrect a non-steered turn that finished before its acknowledgement", async () => {
+    const { runtime, sdk, broadcasts } = createRuntime();
+    const completion = runtime.prompt("first");
+    sdk.emit(turnStarted(undefined, 1));
+    let acknowledge!: (result: PromptSubmissionResult) => void;
+    vi.spyOn(sdk.session, "steer").mockImplementationOnce(() => new Promise((resolve) => {
+      acknowledge = resolve;
+    }));
+    const steering = runtime.steer("second", "client-steer-2");
+
+    sdk.emit(turnEnded("completed", undefined, 1));
+    sdk.emit(turnStarted(undefined, 2));
+    sdk.emit(turnEnded("completed", undefined, 2));
+    acknowledge({ ...RUNNING_STEER_RESULT, turnId: 2, steered: false });
+    await steering;
+
     const completions = streamData(broadcasts).filter((event) => typeof event === "object" && event !== null
       && "type" in event && event.type === "stream_complete" && "result" in event
       && (event.result as { status?: string }).status === "finished");

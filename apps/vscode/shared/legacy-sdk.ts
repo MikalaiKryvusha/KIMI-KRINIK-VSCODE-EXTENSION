@@ -154,7 +154,7 @@ export interface SubagentEvent {
 export type LegacyWireEvent =
   | { type: 'TurnBegin'; payload: TurnBegin & { forkable?: boolean } }
   | { type: 'TurnEnd'; payload: Record<string, never> }
-  | { type: 'StepBegin'; payload: { n: number } }
+  | { type: 'StepBegin'; payload: { n: number }; turnIndex?: number }
   | { type: 'StepInterrupted'; payload: Record<string, never> }
   | { type: 'CompactionBegin'; payload: Record<string, never> }
   | { type: 'CompactionEnd'; payload: Record<string, never> }
@@ -163,7 +163,7 @@ export type LegacyWireEvent =
   | { type: 'ToolCall'; payload: ToolCall }
   | { type: 'ToolCallPart'; payload: { tool_call_id?: string; arguments_part?: string | null } }
   | { type: 'ToolResult'; payload: ToolResult }
-  | { type: 'SteerInput'; payload: { user_input: string | ContentPart[]; clientId?: string } }
+  | { type: 'SteerInput'; payload: { user_input: string | ContentPart[]; clientId?: string }; turnIndex?: number }
   | { type: 'SubagentEvent'; payload: SubagentEvent }
   | { type: string; payload: unknown };
 

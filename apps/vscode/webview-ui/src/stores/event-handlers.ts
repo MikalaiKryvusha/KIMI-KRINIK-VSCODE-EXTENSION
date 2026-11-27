@@ -439,11 +439,11 @@ const eventHandlers: Record<string, EventHandler> = {
     draft.isCompacting = false;
   },
 
-  StepBegin: (draft, payload) => {
+  StepBegin: (draft, payload, turnIndex?: number) => {
     if (draft.lastStatus?.retrying) {
       draft.lastStatus.retrying = null;
     }
-    const last = getLastAssistant(draft);
+    const last = getLastAssistant(draft, turnIndex);
 
     if (last) {
       if (!last.steps) {
@@ -621,8 +621,8 @@ const eventHandlers: Record<string, EventHandler> = {
     }
   },
 
-  SteerInput: (draft, payload: { user_input: string | ContentPart[]; clientId?: string }) => {
-    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId, undefined, undefined, false)) {
+  SteerInput: (draft, payload: { user_input: string | ContentPart[]; clientId?: string }, turnIndex?: number) => {
+    if (reconcileOptimisticTurn(draft, payload.user_input, payload.clientId, turnIndex, undefined, false)) {
       draft.isStreaming = true;
       return;
     }

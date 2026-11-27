@@ -31,6 +31,8 @@
 
 2026-11-27 11:59 +03:00 — SOFT CLOSURE handover: closed Phase 1–2 entries moved verbatim to `PROJECT_HISTORY.md`; STATUS now contains only the current release handover and open bugs. EXP-0024 gained the non-destructive isolated close-window/PID route; no duplicate lesson remains. README's EN/RU/ZH build example is 55. Final lint, extension/webview typecheck, full extension 676/1, build and voice-lint pass; independent README §7B/7E is PASS. Phase 3 and owner idea 04 remain open for the next chat.
 
+2026-11-27 13:31 +03:00 — Phase 3 §4.1–4.3 is PASS on packaged build 57. The late-acknowledgement stuck Working (`bugs/47`, issue #36) and permanent response B→C replacement (`bugs/25`) have red-before fixes; B and C now remain in separate assistants through idle and replay, and the running→idle boundary is exactly once. Full extension is 679/1, typecheck, lint and build-57 VSIX audit pass; build 57 is installed on main and isolated. Report: `testcases/reports/2026-11-27_phase3_message_visibility.md`. Owner idea 04 is next; accumulated-main and audible acceptance remain pending, so production DONE and release are not claimed.
+
 ## ❓ Awaiting human review
 
 - GitHub and Marketplace publication are owner-authorized only after green readiness gates. All five Act mechanisms and their packaged paths are closed; current publication is blocked by `bugs/25`/`bugs/11`, accumulated-main acceptance and final hardening. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md`.
@@ -39,9 +41,9 @@
 
 ## Where to continue next session
 
-1. PARKED: Phase 3 has not started. Next session execute `plans/07_epic04_phase3_message_visibility_steering.md` §4.1 isolated positive smoke/frame observer, then §4.2 `bugs/25`/`bugs/11` race/replay variants and accumulated-main capture after a safe owner restart. `bugs/46` is not reproduced on packaged EN/RU/ZH previews; no readiness/audio change is justified, while the original audible accumulated-profile symptom remains open.
-2. Implement owner-requested `ideas/04_pointer_cursor_for_chat_controls.md` / GitHub issue #35 after the active blockers: all eight named controls, including floating scroll-to-bottom, must show `cursor: pointer` and pass real installed-VSIX hover/click acceptance.
-3. Rebuild the final universal+target VSIX set only after fixes. Run full tests, typecheck, lint, package audits and judge before release unless the owner explicitly waives it again. Commit and push verified pieces. Only then ask the owner to reload VS Code and start a fresh `resume` session for accumulated-profile acceptance per `HOUSE_RULES.md` R7. Publish GitHub `v1.0.0` and Marketplace only after all gates pass; the 123 legacy remote tags remain untouched.
+1. Implement owner-requested `ideas/04_pointer_cursor_for_chat_controls.md` / GitHub issue #35: all eight named controls, including floating scroll-to-bottom, must show `cursor: pointer` and pass real installed-VSIX hover/click acceptance.
+2. Rebuild the final universal+target VSIX set after idea 04. Run full tests, typecheck, lint, package audits and judge; update the build-57 Phase 3 bugs/issues with the verified commit. `bugs/46` audible acceptance stays separate.
+3. Only after all other work is green, ask the owner for a safe main-profile restart and a fresh `resume` session for accumulated acceptance per `HOUSE_RULES.md` R7. Publish GitHub `v1.0.0` and Marketplace only after all gates pass; the 123 legacy remote tags remain untouched.
 
 ## Open bugs
 
@@ -54,9 +56,10 @@ Public backlog: all 30 open product bugs and 3 open ideas are linked to KIMI KRI
 - 🔧 `bugs/36_assistant_text_action_scope.md` — per-text Copy/Fork placement, adjacent-only copying and custom message tooltips verified on isolated build 36; accumulated main-profile acceptance pending.
 - 🔧 `bugs/35_attachment_composer_chat_race.md` — deferred-acknowledgement cleanup fixed; isolated build 37 passed before/after frame traces, failure restoration, completion and replay; accumulated main-profile acceptance pending.
 - 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated build-25 acceptance passed; `bugs/31_expanded_sticky_scroll_oscillation.md` includes the revised scroll contract and one-line no-fade/no-collapse boundary, verified on isolated build 38; main-profile acceptance pending.
-- 🔴 `bugs/11_steer_delivery_and_immediate_display.md` — repeated owner symptom, three isolated non-reproductions; parked with evidence, not DONE.
+- 🔧 `bugs/11_steer_delivery_and_immediate_display.md` — immediate bubbles, distinct response ownership and exactly-once boundary delivery pass on isolated build 57; accumulated main-profile acceptance pending.
 - 🔧 `bugs/19_tool_cards_hide_working_state.md`, `bugs/18_reentrant_prompt_internal_error.md`, `bugs/16_steer_avatar_precedes_user_bubble.md` — isolated paths pass; original main-profile paths pending.
-- 🔴 `bugs/25_first_prompt_assistant_message_flicker.md` — fresh owner-observed disappearance during closure: the first progress message vanished while a later closure message remained; another disappearance followed. Running build/cause unverified; frame-level main-profile reproduction is a release blocker. `bugs/15_hook_results_visible_in_chat.md` — isolated build-22 fixes passed, accumulated acceptance pending.
+- 🔧 `bugs/25_first_prompt_assistant_message_flicker.md` — build 56 reproduced response B being permanently replaced by response C; build 57 preserves both responses through idle and replay with red-before regressions. Accumulated main remains a release blocker. `bugs/15_hook_results_visible_in_chat.md` — isolated build-22 fixes passed, accumulated acceptance pending.
+- 🔧 `bugs/47_steer_late_ack_keeps_working.md` / issue #36 — late non-steered acknowledgement resurrected a terminal turn and suppressed idle; red-before regression and build-57 idle/replay acceptance pass, accumulated main pending.
 - 🔧 `bugs/44_steer_turn_complete_attention.md` / KIMI KRINIK issue #1 — isolated build-49 immediate and accepted-queued acceptance passes with 52/52 runtime and 664/1 full tests, typecheck, lint and VSIX audit green. Accumulated main-profile and audible-output acceptance remain open; not DONE.
 - 🔧 `bugs/45_steer_transient_error_flash.md` / KIMI KRINIK issue #31 — isolated build-50 immediate/queued paths show no red error; the preflight/fallback race is fixed with real BridgeHandler regressions, full 666/1, typecheck and lint green. Genuine failures remain visible. Accumulated main-profile acceptance pending.
 - 🔬 `bugs/46_attention_audio_start_clipped.md` / KIMI KRINIK issue #32 — packaged EN/RU/ZH previews start at `currentTime=0`; EN first/warmed and RU complete, no readiness defect reproduced. Source/installed hashes match; no code/audio change. Original audible accumulated-profile symptom remains open.

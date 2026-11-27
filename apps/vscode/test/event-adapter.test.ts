@@ -87,6 +87,7 @@ describe('event adapter (projects SDK events into the legacy Webview contract)',
     expect(result.event).toEqual({
       type: 'StepBegin',
       payload: { n: 2 },
+      turnIndex: 7,
       _sessionId: 'session-1',
     });
   });

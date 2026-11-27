@@ -165,6 +165,29 @@ describe("automatic follow-up steer", () => {
       .not.toContainEqual(expect.objectContaining({ type: "text", content: "late original response" }));
   });
 
+  it("keeps consecutive steering responses in their own assistants", () => {
+    useChatStore.getState().sendMessage("first");
+    beginTurn();
+    useChatStore.getState().sendMessage("second");
+    const firstClientId = boundary.steerChat.mock.calls[0]?.[1] as string;
+    useChatStore.getState().processEvent({ type: "SteerInput", payload: { user_input: "second", clientId: firstClientId }, turnIndex: 1 });
+    useChatStore.getState().sendMessage("third");
+    const secondClientId = boundary.steerChat.mock.calls[1]?.[1] as string;
+
+    useChatStore.getState().processEvent({ type: "ContentPart", payload: { type: "text", text: "first response" }, turnIndex: 1 });
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 1 });
+    useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "third", clientId: secondClientId, turnIndex: 2 } });
+    useChatStore.getState().processEvent({ type: "StepBegin", payload: { n: 1 }, turnIndex: 2 });
+    useChatStore.getState().processEvent({ type: "ContentPart", payload: { type: "text", text: "second response" }, turnIndex: 2 });
+    useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 2 });
+
+    const firstAssistant = useChatStore.getState().messages.find((message) => message.role === "assistant" && message.clientId === firstClientId);
+    const secondAssistant = useChatStore.getState().messages.find((message) => message.role === "assistant" && message.clientId === secondClientId);
+    expect(firstAssistant).toMatchObject({ content: "first response", turnIndex: 1 });
+    expect(secondAssistant).toMatchObject({ content: "second response", turnIndex: 2 });
+    expect(secondAssistant?.steps?.flatMap((step) => step.items)).toContainEqual({ type: "text", content: "second response", finished: true });
+  });
+
   it("keeps visible assistant progress through a prompt-only steering turn", () => {
     useChatStore.getState().sendMessage("first");
     beginTurn();

@@ -199,7 +199,7 @@ function mapLegacyWireEvent(
     case 'turn.step.started':
       return {
         state,
-        event: { type: 'StepBegin', payload: { n: sdkEvent.step } },
+        event: { type: 'StepBegin', payload: { n: sdkEvent.step }, turnIndex: sdkEvent.turnId },
       };
     case 'turn.step.retrying':
       return {

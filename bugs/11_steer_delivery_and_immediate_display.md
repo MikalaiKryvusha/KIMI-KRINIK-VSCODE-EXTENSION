@@ -1,6 +1,6 @@
 # Bug 11 — Steering messages are sometimes lost and appear only after engine acknowledgement
 
-**Status:** 🔴 OPEN
+**Status:** 🔧 ISOLATED ACCEPTANCE PASS on packaged build 57; accumulated main-profile acceptance remains open, not DONE
 **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/16
 **Version/build:** KIMI KRINIK 1.0.0 · `8ac5df733` · installed VSIX on the owner's accumulated VS Code profile · **When/context:** 2026-11-24 13:09 +03:00, owner live steering acceptance
 **Severity:** S2
@@ -65,6 +65,12 @@ The main-profile Action Menu showed `v1.0.0 (14)`, Context Window Control was vi
 Three isolated build-14 variants were walked with a visible assistant chunk, AUTO STEER ON, DOM MutationObserver and bridge-event tracing: one steering message; two consecutive steering messages; and a send triggered synchronously by the first `stream_complete` at the running→idle boundary. The first scenario also completed history replay. No assistant-container loss was observed. Removed text nodes were immediately replaced while their assistant containers and text remained present. The consecutive diagnostic's later duplicate was caused by an extra harness send and is excluded from the product verdict.
 
 This is not a DONE claim and does not refute the owner's repeated symptom. The exact original trigger remains unproven. Further live hunting is parked by the owner's explicit priority; deterministic code-level defects come first. Run report: `testcases/reports/2026-11-25_steer_response_stability.md`.
+
+## Build-57 isolated acceptance — 2026-11-27 13:31 +03:00
+
+The Phase 3 packaged run observed every steering user bubble immediately after Enter, before the held model completed. Two quick steering actions produced distinct responses B and C in separate assistant IDs; provider and durable wire preserved each user action exactly once. A separate send armed on the first `stream_complete` produced one provider request and one durable user entry, then reached idle. Both settled scenarios replayed without an empty frame. The correlation fixes are recorded in `bugs/25`, and the late-acknowledgement idle fix is in `bugs/47`. Evidence: `testcases/reports/2026-11-27_phase3_message_visibility.md`.
+
+REAL WORLD: accumulated — the owner's original intermittent steering loss and delayed bubbles on his main profile; data and machine — his Windows profile; path — Second Side Bar. Build 57 is installed on main without a reload, so the original accumulated path is not verified and this bug is not DONE.
 
 ## Links
 

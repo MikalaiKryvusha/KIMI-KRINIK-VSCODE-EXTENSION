@@ -408,12 +408,14 @@ export class SessionRuntime {
     this.ensureOpen();
     this.steerInFlight += 1;
     let accepted = false;
+    let completedTerminalKey: string | undefined;
     try {
       const result = await this.session.steer(toSdkPromptInput(input));
       if (result.state === "running" && result.turnId !== undefined) {
-        this.activeTurnIds.add(result.turnId);
         const terminalKey = `${this.id}:main:${result.turnId}`;
-        if (this.deferredCompletions.has(terminalKey)) this.terminalKeys.delete(terminalKey);
+        completedTerminalKey = !result.steered && this.terminalKeys.has(terminalKey) ? terminalKey : undefined;
+        if (completedTerminalKey === undefined) this.activeTurnIds.add(result.turnId);
+        if (result.steered && this.deferredCompletions.has(terminalKey)) this.terminalKeys.delete(terminalKey);
         accepted = true;
       }
       if (result.state === "queued") {
@@ -423,6 +425,7 @@ export class SessionRuntime {
         this.emitStreamEvent(result.steered ? {
           type: "SteerInput",
           payload: { user_input: input, ...(clientId === undefined ? {} : { clientId }) },
+          ...(result.turnId === undefined ? {} : { turnIndex: result.turnId }),
           _sessionId: this.id,
         } : {
           type: "TurnBegin",
@@ -437,10 +440,13 @@ export class SessionRuntime {
       return result;
     } finally {
       this.steerInFlight -= 1;
-      if (accepted) {
+      if (accepted && completedTerminalKey === undefined) {
         this.deferredCompletions.clear();
       } else {
-        const deferred = [...this.deferredCompletions.values()];
+        const completedTerminal = completedTerminalKey === undefined ? undefined : this.deferredCompletions.get(completedTerminalKey);
+        const deferred = completedTerminalKey === undefined
+          ? [...this.deferredCompletions.values()]
+          : completedTerminal === undefined ? [] : [completedTerminal];
         this.deferredCompletions.clear();
         if (this.waitingForInput) {
           for (const terminal of deferred) {
@@ -545,8 +551,10 @@ export class SessionRuntime {
     }
 
     if (event.type === "turn.started" && event.agentId === "main") {
+      const alreadyOwned = this.activeTurnIds.has(event.turnId)
+        || (event.promptId !== undefined && this.pendingSteers.has(event.promptId));
       this.activeTurnIds.add(event.turnId);
-      if (this.activePrompt !== undefined) this.activePrompt.started = true;
+      if (this.activePrompt !== undefined && !alreadyOwned) this.activePrompt.started = true;
     }
 
     if (event.type === "tool.call.started") {
@@ -613,10 +621,12 @@ export class SessionRuntime {
   private emitTerminal(terminal: TurnTerminalMetadata): void {
     if (this.terminalKeys.has(terminal.key)) return;
     this.terminalKeys.add(terminal.key);
+    const ownsActivePrompt = this.activePrompt !== undefined
+      && (this.activePrompt.started || !this.activeTurnIds.has(terminal.turnId));
     this.activeTurnIds.delete(terminal.turnId);
 
     if (terminal.reason === "completed") {
-      this.settlePrompt({ status: "finished" });
+      if (ownsActivePrompt) this.settlePrompt({ status: "finished" });
       if (this.waitingForInput) {
         if (this.steerInFlight > 0) {
           this.deferredCompletions.set(terminal.key, { ...terminal, status: "finished" });
@@ -634,7 +644,7 @@ export class SessionRuntime {
 
     if (terminal.reason === "cancelled") {
       this.reverseRpc.cancelAll("Turn cancelled");
-      this.settlePrompt({ status: "cancelled" });
+      if (ownsActivePrompt) this.settlePrompt({ status: "cancelled" });
       if (this.waitingForInput) {
         if (this.steerInFlight > 0) {
           this.deferredCompletions.set(terminal.key, { ...terminal, status: "cancelled" });
@@ -666,7 +676,7 @@ export class SessionRuntime {
     if (terminal.error !== undefined) {
       this.suppressedError = { code: terminal.error.code, message: terminal.error.message };
     }
-    this.settlePrompt({ status: "failed" });
+    if (ownsActivePrompt) this.settlePrompt({ status: "failed" });
   }
 
   private consumeSuppressedError(code: string, message: string): boolean {
