@@ -1,6 +1,6 @@
 # Research 58 — Visual Studio Marketplace publication for KIMI KRINIK
 
-> **Created:** 2026-11-26 · **Parent:** owner's marketplace-feasibility request during the 1.0.0 release gate · **Status:** external recon complete; owner authorized preparation and subsequent publication after green gates on 2026-11-26 · **Outbound:** implement the KIMI KRINIK Marketplace/GitHub presentation and prepare the separate publication path
+> **Created:** 2026-11-26 · **Parent:** owner's marketplace-feasibility request during the 1.0.0 release gate · **Status:** published and publicly verified on 2026-11-27; build-62 universal VSIX available as Marketplace version 1.0.0 · **Outbound:** future-version polish of the packaged short description and Marketplace README; do not replace published version 1.0.0
 
 ## Goal vector
 
@@ -45,15 +45,15 @@
 
 | Area | Observed state | Publication effect |
 |---|---|---|
-| Required manifest identity | `name`, `version`, `publisher`, `engines` present | technically satisfied; Marketplace uniqueness not proven |
-| Storefront icon | `kimi-icon-storefront.png`, 128×128 | meets the documented minimum |
-| Package integrity | build 45, six targets plus universal, all statically audited | strong local prerequisite, not Microsoft acceptance |
-| Marketplace README | `apps/vscode/README.md` still starts with `# Kimi Code` and points to the official extension | must be rewritten for KIMI KRINIK before publication |
-| Public SVG rule | root README uses project SVG buttons; the packaged short README currently has no embedded images | check the actual packaged README after rewriting; do not assume root content is used |
-| Existing publish command | `publish:vsix` verifies target packages and uses `vsce publish --packagePath …` | reusable for target packages; requires `VSCE_PAT` |
-| Universal publication | `publish-args.mjs` rejects `universal` because it normalizes only the six targets | needs a tested universal argument or a deliberate direct `vsce publish --packagePath <universal>` path |
-| Existing GitHub workflow | `.github/workflows/vscode-publish.yml` is restricted to `github.repository_owner == 'MoonshotAI'`, queries `moonshot-ai.kimi-code`, and expects repository secrets | not usable for this fork as-is; create a separate owner-approved OIDC workflow |
-| Privacy/support metadata | repository exists; dedicated Marketplace privacy/support presentation not prepared | resolve links and support route before publication |
+| Required manifest identity | `name`, `version`, `publisher`, `engines` present; version 1.0.0, build 62 | published as `mikalai-kryvusha.kimi-code-kaif` |
+| Storefront icon | owner-approved pink robot, 256×256 PNG | accepted after build 61's black K icon was rejected |
+| Package integrity | build 62, six targets plus universal, all statically audited; universal fresh-host smoke passed | Marketplace VSIX SHA-256 matches the GitHub universal asset |
+| Marketplace README | independent KIMI KRINIK README with EN/RU/ZH, privacy, support and Known issues | publicly rendered; future-version priority polish remains |
+| Public image/link rule | packaged PNG icon and HTTPS README image; privacy, support and image URLs returned HTTP 200 | technically satisfied |
+| Existing publish command | verifies `universal` and supports `--oidc` through `@vscode/vsce` 4.1.1 | reusable without a stored PAT |
+| Universal publication | `publish:vsix -- universal --oidc` supported and observed in GitHub Actions | successful in run 46017994560 |
+| Existing GitHub workflow | `.github/workflows/vscode-marketplace-publish.yml` downloads the release asset, checks SHA-256, audits and publishes | owner-configured Trusted Publishing policy verified by the successful run |
+| Privacy/support metadata | Kimi privacy link and GitHub Issues support route included | publicly rendered |
 
 ## Verdict and recommendation
 
@@ -68,3 +68,13 @@ Recommended order:
 5. Have the owner create or select the permanent publisher identity. Perform a final dry-run and publish only after the owner's explicit `AUTH:` for Marketplace; then open and read the live Marketplace page.
 
 No account, workflow, manifest, README or Marketplace state was changed by this recon.
+
+## Publication receipt — 2026-11-27 17:55 +03:00
+
+The implementation followed the recommended GitHub OIDC route. The first run, 46016559851, authenticated and uploaded but Microsoft rejected the black K icon as too similar to an existing icon. The owner explicitly approved the existing pink robot as the KIMI KRINIK logo. Build 62 replaced all seven GitHub `v1.0.0` assets after red-first icon regression coverage, 18/18 targeted tests, lint, typecheck, package audits and a fresh VS Code 1.123.0 Extension Host smoke.
+
+The second run, [46017994560](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/actions/runs/46017994560), downloaded the build-62 universal asset, matched its SHA-256, repeated the audit and published through Trusted Publishing. The Marketplace reports version `1.0.0` and VSIX SHA-256 `5cf8731783d417d60b4ed611cc29f4d85582d4fd7e3180ba5e25b0711a51ccd8`, identical to GitHub and the local file.
+
+The [public Marketplace item](https://marketplace.visualstudio.com/items?itemName=mikalai-kryvusha.kimi-code-kaif) returned HTTP 200 at 17:54 +03:00 and its EN/RU/ZH README and Known issues were read. A clean temporary VS Code profile then installed `mikalai-kryvusha.kimi-code-kaif` 1.0.0 by extension ID. The installed manifest reports build 62 and its icon SHA-256 matches the approved source. No PAT or Azure CLI was used.
+
+Changing the already published short description or packaged README requires a subsequent Marketplace version. Version 1.0.0 was not overwritten after public verification.

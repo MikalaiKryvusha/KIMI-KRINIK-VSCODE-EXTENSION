@@ -89,6 +89,28 @@
 
 ## Entries
 
+### EXP-0032 · 2026-11-27 · ❌→✅ · #voice #kaif #review
+class: twins-missed
+mechanized: node .kaif/tools/contour/voice-soft.mjs --selftest and node .kaif/tools/contour/review.mjs --selftest
+**Context:** the permission hook used `contour.voiceFileTool`, while voice-soft and the review call ignored that marker and could select generic beeps.
+**Tried / did:** shared marker-based file-tool resolution, added a review branch that gives the file tool ownership of the complete signal, and verified both CLIs with no-sound dry runs.
+**Result:** ❌→✅ — voice-soft 16/16 and contour 193/193 pass; review dry-run explicitly names the configured file tool and no contour beeps.   → link: bugs/KAIF/07 · KAIF origin issue #208 · HOUSE_RULES.md R1
+**Lesson:** when one route already reads a machine-specific configuration, inspect every sibling voice entry point before using a generic fallback; a configured file tool must own its complete signal.
+**Repro:** run both selftests, then `node .kaif/tools/contour/review.mjs --call "Test" --dry-run`; `sound:` must name `configured contour.voiceFileTool` and `no contour beeps`.
+**Trigger:** adding or changing any owner call, review-page signal, permission sound or voice fallback.
+**Not for:** claiming the owner heard or accepted a sound; dry-run and selftests do not play audio.
+
+### EXP-0031 · 2026-11-27 · ❌→✅ · #marketplace #release #icon
+class: guard-not-proven-against-threat
+mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/vsix-package.test.ts
+**Context:** the build-61 VSIX passed all local audits, but Marketplace rejected its black K storefront icon as too similar to an existing icon.
+**Tried / did:** replaced the rejected asset with the owner-approved pink robot, added a regression check for the exact rejected hash and square dimensions, rebuilt all seven packages as build 62 and repeated local plus OIDC verification.
+**Result:** ❌→✅ — the icon check was red on build 61 and green on build 62; the second Marketplace upload succeeded with the build-62 SHA-256.   → link: interviews/interview_003_marketplace_publisher_access.md · .changeset/kaif-marketplace-icon.md
+**Lesson:** package integrity does not establish storefront distinctness; preserve a rejected external artifact as an explicit negative fixture and use already approved product branding.
+**Repro:** run the icon regression in `apps/vscode/test/vsix-package.test.ts` and compare the packaged storefront-icon hash with `apps/vscode/resources/kimi-icon-storefront.png`.
+**Trigger:** changing a Marketplace icon or preparing a new extension's first upload.
+**Not for:** guaranteeing Microsoft acceptance of every future icon; the guard excludes the exact rejected asset, not every possible similarity decision.
+
 ### EXP-0030 · 2026-11-27 · ❌→✅ · #documentation #product #voice
 class: text-in-agents-world
 mechanized: pnpm run kaif:voice plus an independent §7B value review
@@ -97,7 +119,8 @@ mechanized: pnpm run kaif:voice plus an independent §7B value review
 **Result:** ❌→✅ — root/Marketplace docs, packaged notices and EN/RU/ZH release notes are independent and value-led; voice-lint and the final §7B review pass, and the rendered GitHub Release was read after editing.
 **Lesson:** public product text is a separate audience surface: name the user problem and visible result first, keep internal methodology out, and verify both meaning and machine style before publishing.   → link: HOUSE_RULES.md R10 · release-notes/1.0.0
 **Repro:** `pnpm run kaif:voice` plus an independent §7B review of README, Marketplace docs and all release-note languages; grep public text for the internal methodology name.
-**Trigger:** writing or editing any public README, changelog, release note, Marketplace listing or user-facing feature description.
+**Trigger:** writing or editing any public README, changelog, release note, Marketplace listing or user-facing feature description. For a first release, lead «What's new» with the README's major capability table and user-visible outcomes; keep animation, cursor, label and tint details out of the primary list (`HOUSE_RULES.md` R10.4).
+**2026-11-27 update:** the owner rejected the first 1.0.0 release-note draft for elevating minor presentation details. The EN/RU/ZH notes were rewritten around 16 major capabilities each, the public GitHub Release was reread, and R10.4 now records the owner's priority rule. Style lint alone did not protect feature prioritization.
 **Not for:** internal agent guides, bug forensics or architecture maps, where implementation detail and the internal methodology are appropriate.
 
 ### EXP-0029 · 2026-11-27 · ❌→✅ · #chat #lifecycle #testing

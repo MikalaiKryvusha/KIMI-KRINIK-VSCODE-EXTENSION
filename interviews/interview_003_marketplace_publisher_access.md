@@ -3,7 +3,7 @@
 > Topic: завершение публикации KIMI KRINIK 1.0.0 в Visual Studio Marketplace
 > Source of the idea: owner's Marketplace publication handover, 2026-11-27
 > Created: 2026-11-27 16:52 +03:00
-> Status: **✅ ANSWERS RECEIVED 2026-11-27 17:07 +03:00 — Q1 option D, compose the detailed current description; Q2 option A, GitHub Trusted Publishing. Owner confirmed the policy setup at 17:23 +03:00; implementation and publication verification in progress**
+> Status: **✅ ANSWERS RECEIVED AND APPLIED 2026-11-27 — Q1 option D, detailed major-capability release notes published; Q2 option A, GitHub Trusted Publishing configured and verified. Marketplace 1.0.0 build 62 is public; the owner explicitly approved the pink robot logo**
 
 ## Что уже проверено
 
@@ -54,3 +54,13 @@
 **Answer:** A) <!-- owner-review: by Mikalai Kryvusha · 27 ноября 2026, 17:07 (+03:00) -->
 
 [OWNER] «сделал» · 2026-11-27 17:23 +03:00 (чат), после заполнения полей Trusted Publishing из Q2.
+
+## Marketplace icon decision — 2026-11-27 17:42 +03:00
+
+[OWNER] «розовый робот - наш логотим, да, это я одобряю, со мной согласовано» · 2026-11-27 17:42 +03:00 (чат)
+
+Scope: the existing pink KIMI KRINIK robot is explicitly approved as the product logo, including the Visual Studio Marketplace storefront icon. The rejected black K icon was replaced in release `1.0.0` build `62`.
+
+## Publication receipt — 2026-11-27 17:55 +03:00
+
+GitHub Trusted Publishing run 46017994560 published `mikalai-kryvusha.kimi-code-kaif` 1.0.0 with universal VSIX SHA-256 `5cf8731783d417d60b4ed611cc29f4d85582d4fd7e3180ba5e25b0711a51ccd8`. The public Marketplace item returned HTTP 200 at 17:54 +03:00 and was read in EN/RU/ZH. A clean VS Code profile installed version 1.0.0 by extension ID; its manifest reports build 62 and its icon matches the approved source. The packaged short description and README remain future-version polish surfaces; version 1.0.0 is left unchanged after verification.
