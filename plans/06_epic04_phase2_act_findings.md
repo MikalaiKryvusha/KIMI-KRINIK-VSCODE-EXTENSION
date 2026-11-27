@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 2 — Пять Act-находок аудита»
-> **Статус:** шаги 4.1–4.3 выполнены на owning public boundaries; 4.1–4.2 имеют full 670/1, typecheck/lint/build-53 audit и Extension Host smoke, 4.3 имеет red-before, 73/73 bridge+Control Panel, typecheck/lint; `sound-default-manifest`, `model-picker-enter-bubbling` и packaged acceptance открыты · [TESTED: 2026-11-27 · 60/60 runtime+controller and 16/16 status pills in `testcases/reports/2026-11-27_phase2_context_queue.md`; packaged guest/main acceptance not verified]
+> **Статус:** шаги 4.1–4.4 выполнены на owning public boundaries; 4.1–4.2 имеют full 670/1, typecheck/lint/build-53 audit и Extension Host smoke, 4.3 имеет red-before, 73/73 bridge+Control Panel, typecheck/lint, 4.4 имеет red-before и packaged build-54 fresh-host Glass/Voice/Alert/Chime; `model-picker-enter-bubbling`, packaged acceptance остальных механизмов и accumulated-main открыты · [TESTED: 2026-11-27 · 60/60 runtime+controller and 16/16 status pills in `testcases/reports/2026-11-27_phase2_context_queue.md`; packaged guest/main acceptance not verified]
 > **Вовне:** каждая находка обновляет audit card, owning bug/issue при наличии, `STATUS.md` и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -64,10 +64,12 @@ Evidence: red at 2026-11-27 09:23:24 +03:00, then 73/73 bridge+Control Panel tes
 
 Anchor: Epic 04 Phase 2 — «sound manifest defaults … red-before public-interface regression».
 
-- [ ] В `sounds.test.ts` сравнить `apps/vscode/package.json` `kimi.sounds.default` с `DEFAULT_SOUND_SETTINGS`; в `extension-host/index.cjs` прочитать fresh `workspace.getConfiguration("kimi").get("sounds")`.
-- [ ] Запустить на исходном manifest и получить Voice/Voice/Voice/Off вместо Glass/Voice/Alert/Chime.
-- [ ] Выровнять manifest и description выборов с shared constant, не меняя normalization, partial-map migration или сохранённые пользовательские настройки.
-- [ ] Verification: manifest/shared deep equality и fresh Extension Host defaults зелёные; VSIX несёт те же значения.
+- [x] В `sounds.test.ts` сравнить `apps/vscode/package.json` `kimi.sounds.default` с `DEFAULT_SOUND_SETTINGS`; в `extension-host/index.cjs` прочитать fresh `workspace.getConfiguration("kimi").get("sounds")`.
+- [x] Запустить на исходном manifest и получить Voice/Voice/Voice/Off вместо Glass/Voice/Alert/Chime.
+- [x] Выровнять manifest и description выборов с shared constant, не меняя normalization, partial-map migration или сохранённые пользовательские настройки.
+- [x] Verification: manifest/shared deep equality и fresh Extension Host defaults зелёные; VSIX несёт те же значения.
+
+Evidence: build-53 fresh host and manifest/shared checks were red at 2026-11-27 09:39 +03:00. Build 54 printed Glass/Voice/Alert/Chime in the real fresh Extension Host at 09:41:43; 69/69 affected tests, typecheck, lint, package audit and main/isolated install readback pass. [TESTED: 2026-11-27 · packaged fresh Extension Host configuration read in `testcases/reports/2026-11-27_phase2_sound_defaults.md`]. Running accumulated-main and audible output are not claimed.
 
 ### 4.5 Model picker Enter
 

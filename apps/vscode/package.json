@@ -4,7 +4,7 @@
   "displayName": "KIMI KRINIK",
   "description": "An improved and advanced Kimi Code extension for VS Code based on vanilla Kimi Code and Kimi Fork",
   "version": "1.0.0",
-  "buildNumber": 53,
+  "buildNumber": 54,
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
@@ -96,7 +96,7 @@
           "type": "object",
           "default": {
             "approval": {
-              "sound": "voice",
+              "sound": "glass",
               "volume": 80
             },
             "question": {
@@ -104,15 +104,15 @@
               "volume": 80
             },
             "error": {
-              "sound": "voice",
+              "sound": "alert",
               "volume": 80
             },
             "turnComplete": {
-              "sound": "off",
+              "sound": "chime",
               "volume": 60
             }
           },
-          "description": "Sound and volume (0-100) for each attention event: approval, question, error and turnComplete. A sound is voice, chime, bell, pop, alert or off. Change it in the Sound Settings window of the settings menu."
+          "description": "Sound and volume (0-100) for each attention event: approval, question, error and turnComplete. A sound is voice, chime, bell, pop, alert, triple, glass or off. Change it in the Sound Settings window of the settings menu."
         },
         "kimi.autoSteer": {
           "type": "boolean",

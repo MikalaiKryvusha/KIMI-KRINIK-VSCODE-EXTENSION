@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_SOUND_SETTINGS, isSoundSettings, normalizeSoundSettings } from "../shared/sounds";
+import manifest from "../package.json";
+import { DEFAULT_SOUND_SETTINGS, SOUND_CHOICES, isSoundSettings, normalizeSoundSettings } from "../shared/sounds";
 
 describe("sound settings", () => {
   it("assigns a distinct meaningful enabled sound to every event", () => {
@@ -10,6 +11,12 @@ describe("sound settings", () => {
       error: { sound: "alert", volume: 80 },
       turnComplete: { sound: "chime", volume: 60 },
     });
+  });
+
+  it("keeps manifest sound defaults matched to the shared settings and documents every choice", () => {
+    const setting = manifest.contributes.configuration.properties["kimi.sounds"];
+    expect(setting.default).toEqual(DEFAULT_SOUND_SETTINGS);
+    for (const choice of SOUND_CHOICES) expect(setting.description).toContain(choice);
   });
 
   it("fills missing or invalid events with the defaults and rounds the volume", () => {

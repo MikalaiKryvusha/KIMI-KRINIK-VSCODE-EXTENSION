@@ -18,6 +18,13 @@ const EXPECTED_COMMANDS = [
   "kimiKaif.showLogs",
 ];
 
+const EXPECTED_SOUND_DEFAULTS = {
+  approval: { sound: "glass", volume: 80 },
+  question: { sound: "voice", volume: 80 },
+  error: { sound: "alert", volume: 80 },
+  turnComplete: { sound: "chime", volume: 60 },
+};
+
 exports.run = async function run() {
   const isolatedHome = process.env.KIMI_VSCODE_SMOKE_OS_HOME;
   assert.ok(isolatedHome, "isolated OS home must be provided");
@@ -51,6 +58,7 @@ exports.run = async function run() {
 
   const config = vscode.workspace.getConfiguration("kimi");
   assert.equal(config.get("autosave"), true);
+  assert.deepEqual(config.get("sounds"), EXPECTED_SOUND_DEFAULTS, "fresh sound defaults must be Glass/Voice/Alert/Chime");
   assert.equal(config.get("executablePath"), undefined, "removed Python CLI setting is still contributed");
   assert.equal(config.get("environmentVariables"), undefined, "removed global CLI env setting is still contributed");
 
@@ -73,6 +81,7 @@ exports.run = async function run() {
       remoteName: vscode.env.remoteName ?? null,
       commands: EXPECTED_COMMANDS.length,
       webview: "opened",
+      soundDefaults: config.get("sounds"),
     }),
   );
   assert.ok(process.env.KIMI_VSCODE_SMOKE_REPORT, "Extension Host report path must be provided");
