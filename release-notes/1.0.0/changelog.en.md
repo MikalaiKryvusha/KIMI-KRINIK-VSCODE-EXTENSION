@@ -2,45 +2,34 @@
 
 2026-11-27
 
-KIMI KRINIK 1.0.0 helps you keep long sessions under control, follow up without losing messages and use a three-language UI, while keeping the official Kimi Code 2.7.2 engine and the KIMI FORK interface.
+KIMI KRINIK 1.0.0 gives you control over long agent sessions, reliable follow-ups and timely attention alerts while keeping the official Kimi Code 2.7.2 engine.
 
 ## What's new
 
-- Turn off automatic compaction, including an operation already in progress. Manual `/compact` remains available.
+✅ — already in the extension.
 
-- Get an early warning before a conversation reaches its context limit and continue in a new chat without losing the discussion.
-
-- Keep writing while the agent works: your follow-up and attachments appear immediately and arrive once, or wait in order when you prefer a queue. Rejected messages return to their original positions.
-
-- Keep the last fully-scrolled-out prompt on top: a prompt still visible on screen never duplicates into the sticky bar. The bar animates smoothly on appearance, exit and replacement; expansion and collapse use one synchronized 200 ms motion for the bubble and outer container. The centered chevron expands full text and media in the existing viewer.
-
-- Send images, video and media-only prompts with clickable thumbnails and the same viewer after replay. Preserve manual line breaks and blank lines, and read localized send times to the left of user bubbles.
-
-- Use the Copy and Fork actions under every assistant text item: each Copy writes only its adjacent text.
-
-- Find the right skill with a localized description, then use it immediately or let it wait in the queue.
-
-- Read the «Subagents» label on the secondary-model button in its large form; the compact form keeps the bare robot icon.
-
-- Read Control Panel state descriptions with ON/OFF in uppercase: ON tinted slightly green, OFF slightly red. General Settings shows the states on separate lines in all three languages.
-
-- See a sound event's section dim when set to Off while its selector stays usable. Configure a sound and volume per event with prerecorded clips in all three languages.
-
-- Choose models and reasoning effort through one picker with search and favorites. Explicit MAX/XHigh choices persist, while resumed sessions keep their own effort.
-
-- Use English, Russian or Chinese with a selected-first language dialog and localized interface controls.
-
-- Use responsive Control Panel actions, live status panels, the Working indicator and the pink KIMI KRINIK robot. The left Activity Bar now uses a thick-outlined robot with clipped top corners and the packaged logo's square eye positions. Read the version and build number in Action Menu.
-
-- Keep history stable during replay and late request-setup errors. Internal instructions do not appear as assistant text during live work or history replay, and unrelated turns are not deleted.
-
-- Keep every assistant response visible and in the right order after follow-ups. When the answer is complete, the chat stops showing Working, and reopening history preserves the same messages.
-
-- See at a glance which chat controls are clickable: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom all show the pointer cursor. All eight controls passed real mouse hover and click acceptance on the installed VSIX.
+| Capability | Kimi Code | KIMI FORK | KIMI KRINIK |
+|---|---|---|---|
+| Engine | Official 2.7.2 | Older 2.2.0 | ✅ Official 2.7.2, kept current with upstream |
+| Automatic compaction control | — | — | ✅ Turn it off, including during an active operation; manual `/compact` remains available |
+| Context Window Control | — | — | ✅ Configure thresholds, get an early warning and continue in a new chat without losing the discussion |
+| Follow-ups during a running turn | Wait in the queue | Join the turn; attachments can be lost | ✅ Steer ON joins the turn immediately; Steer OFF restores the ordered queue |
+| Message and queue reliability | Ordinary queue | Forced steering can repeat or skip messages | ✅ One visible entry and exactly-once delivery per message; rejected items return to their original positions |
+| Conversation history and failed sends | Generic internal errors are possible | Generic internal errors are possible | ✅ Reopen text, attachments and message order without blank frames; only the failed action rolls back; internal instructions stay out of the chat |
+| Attachments and multiline prompts | — | Attachments can be lost | ✅ Send images, video and media-only prompts; preserve manual line breaks and blank lines; reopen the same media viewer after replay |
+| Sticky user prompt | — | — | ✅ Keep the prompt that owns the visible response on top and expand its full text and media without losing the reading position |
+| Per-text Copy and Fork | One action row per response; Copy combines the last step's text | One action row per response; Copy combines the last step's text | ✅ Every assistant text item has its own actions; Copy includes only the adjacent text |
+| Models and reasoning effort | — | — | ✅ Use one picker with search and favorites; keep explicit choices and restore each resumed session's own effort |
+| Control Panel and General Settings | Fixed panel and VS Code settings | Fixed panel and VS Code settings | ✅ Hide buttons without disabling features, reorder them and use one localized settings dialog |
+| Agent controls and skills | — | Interface controls | ✅ Use working permission, Plan, Goal, Swarm, secondary-model and skill controls; selected skills follow the Steer or queue setting |
+| Managed quota | — | ✅ | ✅ See 5-hour, 7-day and monthly rings with reset countdowns |
+| Sounds and voice | — | — | ✅ Set a sound and volume for approvals, questions, errors and completion; use packaged clips in three languages and keep replay silent |
+| Interface languages | English | English, 中文 | ✅ English, Русский and 中文 with a selected-first language dialog |
+| Live session status | — | ✅ | ✅ Read queue and changes, background tasks, todos, compaction state and the session title in one interface |
 
 ## Verification
 
-The extension has 682 passing checks and 1 skipped check, green typecheck and lint. The isolated packaged install verified chat visibility, steering completion, replay, pointer controls, sound settings and dialogs with measured frames and screenshots. Six platform-specific VSIX packages and the platform-independent `kimi-code-universal.vsix` are packaged and statically audited. Both win32-x64 and universal packages passed a fresh Extension Host smoke.
+The extension has 682 passing checks and 1 skipped check, green typecheck and lint. The isolated packaged install verified chat visibility, steering completion, replay, sound settings and dialogs with measured frames and screenshots. Six platform-specific VSIX packages and the platform-independent `kimi-code-universal.vsix` are packaged and statically audited. Both win32-x64 and universal packages passed a fresh Extension Host smoke.
 
 ## Known issues
 
