@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -87,6 +88,18 @@ describe('VSIX publish CLI (Marketplace authentication and universal package)', 
 
     expect(() => parsePublishArguments(['universal'])).toThrow('Unknown VSIX target "universal"');
     expect(() => parsePublishArguments(['--oidc'])).toThrow('Unknown option: --oidc');
+  });
+});
+
+describe('Marketplace storefront icon', () => {
+  it('does not reuse the rejected black K icon and has a square shape', async () => {
+    const icon = await readFile(join(appRoot, 'resources', 'kimi-icon-storefront.png'));
+
+    expect(createHash('sha256').update(icon).digest('hex')).not.toBe(
+      'dbd00e2ad61ea8832ef0b024662a4a8a5d1b66f0599d5d42e1c9688b9d4cfdf6',
+    );
+    expect(icon.readUInt32BE(16)).toBe(icon.readUInt32BE(20));
+    expect(icon.readUInt32BE(16)).toBeGreaterThanOrEqual(128);
   });
 });
 

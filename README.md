@@ -64,7 +64,7 @@
 | General Settings | VS Code settings | VS Code settings | ✅ one localized dialog for editor behavior, context sharing and all four context thresholds, with separate ON/OFF explanations |
 | Control Panel skill picker | — | — | ✅ a scrollable list with bold skill names and plain localized descriptions; the selected skill joins the running turn with Steer ON or waits in the queue with Steer OFF |
 | Control Panel state descriptions | — | — | ✅ ON/OFF in uppercase with a slight green/red tint in all three languages |
-| Action Menu build identity | — | — | ✅ version and build number; for example, build 61 is shown as `v1.0.0 (61)` |
+| Action Menu build identity | — | — | ✅ version and build number; for example, build 62 is shown as `v1.0.0 (62)` |
 | A failed send | can surface a generic internal error | can surface a generic internal error | ✅ only the failed action is rolled back; the rest of your conversation stays intact |
 | Activity Bar identity | KIMI icon | KIMI FORK icon | ✅ a thick-outlined KIMI KRINIK robot with clipped top corners and square sideways eyes, using the VS Code foreground color |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
@@ -158,7 +158,7 @@ Some reported issues remain open in [GitHub Issues](https://github.com/MikalaiKr
 | Общие настройки | настройки VS Code | настройки VS Code | ✅ одно локализованное окно для поведения редактора, передачи контекста и всех четырёх порогов контекстного окна, с отдельными пояснениями для ВКЛ и ВЫКЛ |
 | Кнопка «Навык» в Control Panel | — | — | ✅ открывает прокручиваемый список с именем навыка жирным шрифтом и описанием обычным; при включённом Стиринге выбранный навык сразу идёт в текущий ход, при выключенном — в очередь |
 | Состояния в подсказках Панели Управления | — | — | ✅ «ВКЛ»/«ВЫКЛ» в верхнем регистре с чуть зелёным и чуть красным оттенком на всех трёх языках |
-| Версия в Action Menu | — | — | ✅ версия и номер билда; например, билд 61 отображается как `v1.0.0 (61)` |
+| Версия в Action Menu | — | — | ✅ версия и номер билда; например, билд 62 отображается как `v1.0.0 (62)` |
 | Неудачная отправка | общая ошибка без подробностей | общая ошибка без подробностей | ✅ откатывается только неудачное действие; остальной разговор сохраняется |
 | Значок на основной левой панели | значок KIMI | значок KIMI FORK | ✅ контурный робот KIMI KRINIK с толстой линией, срезанными верхними уголками и квадратными глазами, расположенными как на фирменном логотипе; цвет следует теме VS Code |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
@@ -252,7 +252,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 通用设置 | VS Code 设置 | VS Code 设置 | ✅ 一个本地化对话框集中管理编辑器行为、上下文共享和全部四个上下文阈值，ON/OFF 说明分行显示 |
 | Control Panel Skill 选择器 | — | — | ✅ 可滚动列表以粗体显示技能名称，以常规字体显示本地化描述；Steer 开启时立即发送，关闭时进入普通队列 |
 | Control Panel 状态提示 | — | — | ✅ ON/OFF 全大写并带轻微绿色/红色着色，支持全部三种语言 |
-| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如构建 61 显示为 `v1.0.0 (61)` |
+| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如构建 62 显示为 `v1.0.0 (62)` |
 | 发送失败 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 仅回滚失败的操作，其他对话内容保持不变 |
 | 左侧 Activity Bar 标识 | KIMI 图标 | KIMI FORK 图标 | ✅ KIMI KRINIK 机器人采用粗轮廓、顶部切角和位于两侧的方形眼睛，颜色跟随 VS Code 前景色 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
