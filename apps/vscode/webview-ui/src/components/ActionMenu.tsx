@@ -108,7 +108,7 @@ export function ActionMenu({ className, onAuthAction }: ActionMenuProps) {
     <>
       <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon-xs" className={cn("text-muted-foreground", className)}>
+        <Button variant="ghost" size="icon-xs" className={cn("text-muted-foreground cursor-pointer disabled:cursor-default", className)}>
           <IconSettings className="size-3.5" />
         </Button>
       </PopoverTrigger>

@@ -41,6 +41,13 @@ afterEach(() => {
 });
 
 describe("scroll to bottom button", () => {
+  it("shows pointer cursor on the floating scroll-to-bottom control", () => {
+    render(<ChatArea />);
+
+    const button = document.querySelector(".tabler-icon-arrow-down")?.closest("button");
+    expect(button?.className).toContain("cursor-pointer");
+  });
+
   it("uses the brand pink background", () => {
     render(<ChatArea />);
 

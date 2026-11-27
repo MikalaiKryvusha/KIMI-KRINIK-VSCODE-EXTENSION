@@ -58,3 +58,17 @@ Scope: prepare KIMI KRINIK's own Marketplace and GitHub presentation, documentat
 1. Install build 19 only if A or B is selected, then run the accumulated-profile acceptance and record the results.
 2. Publish under Q1 option A or the subsequent explicit authorization above only after the positive smoke and every release check are green: create the `v1.0.0` tag and GitHub Release with the neutral factual title and the three language notes.
 3. Open the published page and read the first screen. If any check fails, stop and report it without publishing.
+
+## Release with documented Known issues — 2026-11-27 14:03 +03:00
+
+[OWNER] «движемся в сторону оформления релизной документации для GitHub и VS Code Marketplace.
+
+Будем релизить 1.0.0 в том виде, в котором она есть со ссылкой на то, что вероятно есть ряд нерешённых issues в GitHub, которые предстоит релить в экстеншене KIMI KRINIK в будующих версих» · 2026-11-27 14:03 +03:00 (chat)
+
+Scope: prepare and publish KIMI KRINIK 1.0.0 for GitHub and VS Code Marketplace with an explicit Known issues section and a link to the open GitHub issue tracker. Open issues and accumulated-profile scenarios are documented as follow-up work for future versions; they are not represented as fixed and no longer block this release by the owner's direct decision. Release packaging, documentation accuracy, artifact integrity and publication verification still must pass. The 123 legacy remote tags remain untouched.
+
+## Release window — 2026-11-27 14:03 +03:00
+
+[OWNER] «этот чат + максимум один следующий - у нас должны состояться релизы 1.0.0» · 2026-11-27 14:03 +03:00 (chat)
+
+Scope: both GitHub `v1.0.0` and VS Code Marketplace 1.0.0 must be published in this chat or, at the latest, in the immediately following chat. Work stays on the release path; the next chat can resume from `STATUS.md` and the release documents rather than re-deriving completed verification.

@@ -67,6 +67,14 @@ describe("session header", () => {
     expect(screen.queryByTitle("Total Output Tokens")).toBeNull();
   });
 
+  it("shows pointer cursor on session, history and new-chat controls", () => {
+    render(<Header />);
+
+    for (const testId of ["session-info-trigger", "session-history-trigger", "new-chat-trigger"]) {
+      expect(screen.getByTestId(testId).className).toContain("cursor-pointer");
+    }
+  });
+
   it("shows the localized new-chat tooltip", async () => {
     useSettingsStore.setState({ extensionConfig: { ...DEFAULT_EXTENSION_CONFIG, language: "ru" } });
     const user = userEvent.setup();

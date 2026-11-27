@@ -437,7 +437,7 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
                       variant="ghost"
                       size="icon-xs"
                       onClick={handleAddButtonClick}
-                      className="text-muted-foreground"
+                      className="text-muted-foreground cursor-pointer disabled:cursor-default"
                     >
                       <IconPaperclip className="size-3.5" />
                     </Button>
@@ -464,11 +464,11 @@ export function InputArea({ onAuthAction }: InputAreaProps) {
               <ActionMenu onAuthAction={onAuthAction} />
 
               {isStreaming ? (
-                <Button variant="destructive" size="icon-xs" onClick={abort}>
+                <Button variant="destructive" size="icon-xs" className="cursor-pointer disabled:cursor-default" onClick={abort}>
                   <span aria-hidden="true" data-testid="stop-indicator" className="block size-2.5 bg-current" />
                 </Button>
               ) : (
-                <Button variant="default" size="icon-xs" onClick={handleSend} disabled={!canSend}>
+                <Button variant="default" size="icon-xs" className="cursor-pointer disabled:cursor-default" onClick={handleSend} disabled={!canSend}>
                   <IconSend className="size-3.5" />
                 </Button>
               )}

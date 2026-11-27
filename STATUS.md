@@ -33,21 +33,27 @@
 
 2026-11-27 13:31 +03:00 — Phase 3 §4.1–4.3 is PASS on packaged build 57. The late-acknowledgement stuck Working (`bugs/47`, issue #36) and permanent response B→C replacement (`bugs/25`) have red-before fixes; B and C now remain in separate assistants through idle and replay, and the running→idle boundary is exactly once. Full extension is 679/1, typecheck, lint and build-57 VSIX audit pass; build 57 is installed on main and isolated. Report: `testcases/reports/2026-11-27_phase3_message_visibility.md`. Owner idea 04 is next; accumulated-main and audible acceptance remain pending, so production DONE and release are not claimed.
 
+2026-11-27 13:56 +03:00 — Owner idea 04 is DONE on installed build 58: all eight named controls show computed `cursor: pointer` and passed real mouse hover/click, including floating scroll-to-bottom and Send/Stop with provider abort evidence. Red-before style regressions now pass; full extension is 682/1, typecheck, lint and build-58 VSIX audit pass. Report: `testcases/reports/2026-11-27_pointer_chat_controls.md`. Final universal+target VSIX gates are next; accumulated-main and release acceptance remain open.
+
+2026-11-27 14:03 +03:00 — OWNER RELEASE DECISION: proceed with KIMI KRINIK 1.0.0 for GitHub and VS Code Marketplace with an explicit Known issues section and links to future GitHub fixes. Open issues are not represented as fixed and no longer block this release by the owner's direct word; packaging, documentation accuracy, artifact integrity and publication verification still must pass. Both releases must occur in this chat or the immediately following chat at the latest. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md` → «Release with documented Known issues» and «Release window».
+
+2026-11-27 14:09 +03:00 — Final build 59 package gates are green: six target VSIX packages plus universal pass static/import audit; win32-x64 and universal fresh Extension Host smoke both open the webview with correct sound defaults. Full extension is 682/1, typecheck and lint pass. Build 59 is installed on main and isolated. GitHub/Marketplace release documentation with Known issues is next.
+
 ## ❓ Awaiting human review
 
-- GitHub and Marketplace publication are owner-authorized only after green readiness gates. All five Act mechanisms and their packaged paths are closed; current publication is blocked by `bugs/25`/`bugs/11`, accumulated-main acceptance and final hardening. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md`.
+- GitHub `v1.0.0` and Marketplace publication are owner-authorized with documented Known issues after packaging, documentation, artifact and publication checks. Open issues remain visible as future work, not hidden or called fixed. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md`.
 - `GOAL.md` owner confirmation, B9 changelog mechanism and B10 shared `kimi.*` namespace remain open organizational questions, not reasons to start new work during closure.
 - Marketplace recon is complete in `researches/58_vscode_marketplace_publication.md`: self-service publication is technically feasible. The owner subsequently authorized preparation and publication after green gates. The independent `apps/vscode/README.md` and own CHANGELOG are written; privacy/support presentation, the universal-publish path and owner/publisher/OIDC setup still need completion. No Marketplace publication has occurred.
 
 ## Where to continue next session
 
-1. Implement owner-requested `ideas/04_pointer_cursor_for_chat_controls.md` / GitHub issue #35: all eight named controls, including floating scroll-to-bottom, must show `cursor: pointer` and pass real installed-VSIX hover/click acceptance.
-2. Rebuild the final universal+target VSIX set after idea 04. Run full tests, typecheck, lint, package audits and judge; update the build-57 Phase 3 bugs/issues with the verified commit. `bugs/46` audible acceptance stays separate.
-3. Only after all other work is green, ask the owner for a safe main-profile restart and a fresh `resume` session for accumulated acceptance per `HOUSE_RULES.md` R7. Publish GitHub `v1.0.0` and Marketplace only after all gates pass; the 123 legacy remote tags remain untouched.
+1. Idea 04 is DONE as `ideas/04_DONE_pointer_cursor_for_chat_controls.md`; close issue #35 with the verified commit after this change is committed and pushed.
+2. Rebuild the final universal+target VSIX set and run full tests, typecheck, lint, package audits and judge. Prepare GitHub and Marketplace release documentation with an explicit Known issues section and links to open follow-up issues.
+3. Publish GitHub `v1.0.0` and Marketplace under the owner's 2026-11-27 release decision, then open and read the published pages. Accumulated-main acceptance and open issues continue as future-version work; the 123 legacy remote tags remain untouched.
 
 ## Open bugs
 
-Public backlog: all 30 open product bugs and 3 open ideas are linked to KIMI KRINIK GitHub issues #1–32 and #35; the two Act context/queue findings are #33–34. Issue creation and post-fix comments follow `HOUSE_RULES.md` R9; framework-only defects stay in the KAIF tracker.
+Public backlog: all 30 open product bugs and 2 open ideas are linked to KIMI KRINIK GitHub issues #1–32 and #35; the two Act context/queue findings are #33–34. Idea 04 is DONE and issue #35 is ready to close with its verified commit. Issue creation and post-fix comments follow `HOUSE_RULES.md` R9; framework-only defects stay in the KAIF tracker.
 
 - 🔧 `bugs/37_sticky_shows_visible_message.md` — visible prompts no longer enter the sticky; direct user-bubble-bottom selection verified on isolated build 40; main-profile acceptance pending.
 - 🔧 `bugs/38_sticky_container_bottom_padding.md`, `bugs/39_sticky_collapsed_second_line_fade.md` — 8px bottom padding and a softer second-line fade verified on isolated build 40; main-profile acceptance pending.

@@ -1,6 +1,6 @@
 # Idea 04 — Pointer cursor for interactive chat controls
 
-> **Created:** 2026-11-27 · **Parent:** owner's direct requests in chat · **Status:** ✅ owner-requested and accepted; queued behind the in-flight release-blocker work · **Outbound:** GitHub issue #35
+> **Created:** 2026-11-27 · **Parent:** owner's direct requests in chat · **Status:** ✅ DONE — 2026-11-27 13:56 +03:00, installed build-58 hover/click acceptance for all eight controls · **Outbound:** GitHub issue #35
 > **GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/35
 
 ## Goal vector
@@ -43,3 +43,15 @@ None. The control set and expected cursor were specified directly by the owner.
 - при ховере курсора мыши на "Добавить файл или медиа", "История", шестеренка настроек, отправить сообщение, остановить ии агента, "Сессия", "создать новый чат" - курсор мыши должен меняться на руку с пальцем, как на других кнопках панели управления это делает.»
 
 «у кнопки пролистывания чата вниз - тоже курсор-указатель должен быть» — с приложенным изображением плавающей розовой кнопки со стрелкой вниз.
+
+## Implementation and verification — 2026-11-27 13:56 +03:00
+
+Targeted pointer classes now cover all eight controls in `Header.tsx`, `InputArea.tsx`, `ActionMenu.tsx` and `ChatArea.tsx`, including the floating scroll-to-bottom button. Disabled controls retain `cursor-default`; no global selector or click behavior changed.
+
+Three regression groups failed before the change and pass afterward. Full affected suites are 29/29, full extension is 682 passed / 1 skipped, with typecheck and root lint green. Build 58 was installed on isolated and main profiles; real mouse hover and an actual click were recorded for every named control on the isolated packaged product. Run report: `testcases/reports/2026-11-27_pointer_chat_controls.md`.
+
+REAL WORLD: build 58 is installed on the owner's main profile without reload. The idea's installed-VSIX acceptance was performed on the real packaged isolated product; accumulated-main and release gates remain separate.
+
+## Decisions made without the owner
+
+Kept the change presentational and limited each class to a named interactive root. Chose `disabled:cursor-default` to preserve disabled behavior. No engine, configuration, global selector or unrelated control changed.

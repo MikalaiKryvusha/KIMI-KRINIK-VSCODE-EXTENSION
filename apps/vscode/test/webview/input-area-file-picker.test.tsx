@@ -139,6 +139,22 @@ describe("Control Panel composition", () => {
     expect(screen.getByTestId("attachment-picker-toggle")).not.toBeNull();
   });
 
+  it("shows pointer cursor on attachment, settings, send and stop controls", () => {
+    renderInputArea();
+
+    const attachment = screen.getByTestId("attachment-picker-toggle");
+    const settings = document.querySelector(".tabler-icon-settings")?.closest("button");
+    const send = document.querySelector(".tabler-icon-send")?.closest("button");
+    for (const element of [attachment, settings, send]) {
+      expect(element?.className).toContain("cursor-pointer");
+    }
+
+    cleanup();
+    useChatStore.setState({ isStreaming: true });
+    renderInputArea();
+    expect(screen.getByTestId("stop-indicator").closest("button")?.className).toContain("cursor-pointer");
+  });
+
   it("renders Stop as a filled square rather than an outline icon", () => {
     useChatStore.setState({ isStreaming: true });
     renderInputArea();

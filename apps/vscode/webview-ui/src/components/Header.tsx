@@ -52,7 +52,7 @@ export function Header() {
                 variant="ghost"
                 size="xs"
                 data-testid="session-info-trigger"
-                className="gap-1 h-6 rounded-lg! border-border! px-2! text-muted-foreground hover:text-foreground @max-[320px]:hidden"
+                className="gap-1 h-6 rounded-lg! border-border! px-2! text-muted-foreground hover:text-foreground @max-[320px]:hidden cursor-pointer disabled:cursor-default"
                 onClick={() => setShowSessionInfo(true)}
               >
                 <span className="text-[11px] @max-[500px]:hidden">{t("header.session")}</span>
@@ -65,7 +65,7 @@ export function Header() {
         <ChatStatus />
         <Popover open={showSessionList} onOpenChange={setShowSessionList}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="xs" data-testid="session-history-trigger" className="gap-1 h-6 rounded-lg! border-border!">
+            <Button variant="ghost" size="xs" data-testid="session-history-trigger" className="gap-1 h-6 rounded-lg! border-border! cursor-pointer disabled:cursor-default">
               <span className="text-xs @max-[280px]:hidden">{t("header.history")}</span>
               <IconChevronDown className="size-3.5" />
             </Button>
@@ -80,7 +80,7 @@ export function Header() {
               variant="ghost"
               size="icon-xs"
               data-testid="new-chat-trigger"
-              className="rounded-lg! border-border!"
+              className="rounded-lg! border-border! cursor-pointer disabled:cursor-default"
               onClick={() => {
                 void handleNewSession();
               }}
