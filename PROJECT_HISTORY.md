@@ -27,6 +27,28 @@
 
 ## Entries (newest first)
 
+### 2026-11-27 16:02 +03:00 — PHASE 3, IDEA 04 AND GITHUB 1.0.0
+
+2026-11-27 11:34 +03:00 — PARKED before Phase 3 instrumentation: the context contour crossed 75% and reported 79%, so no new heavy task starts. Phase 2 commit `fb58a48fc` is pushed; issues #33/#34 are closed. Fake model and isolated VS Code are stopped cleanly; no product scenario is running. Next session starts `plans/07_epic04_phase3_message_visibility_steering.md` §4.1 positive smoke/frame observer, then §4.2 races; owner idea 04 pointer cursors remains queued after it. Build 55 is installed on main without reload; no release or Marketplace publication exists.
+
+2026-11-27 11:59 +03:00 — SOFT CLOSURE handover: closed Phase 1–2 entries moved verbatim to `PROJECT_HISTORY.md`; STATUS now contains only the current release handover and open bugs. EXP-0024 gained the non-destructive isolated close-window/PID route; no duplicate lesson remains. README's EN/RU/ZH build example is 55. Final lint, extension/webview typecheck, full extension 676/1, build and voice-lint pass; independent README §7B/7E is PASS. Phase 3 and owner idea 04 remain open for the next chat.
+
+2026-11-27 13:31 +03:00 — Phase 3 §4.1–4.3 is PASS on packaged build 57. The late-acknowledgement stuck Working (`bugs/47`, issue #36) and permanent response B→C replacement (`bugs/25`) have red-before fixes; B and C now remain in separate assistants through idle and replay, and the running→idle boundary is exactly once. Full extension is 679/1, typecheck, lint and build-57 VSIX audit pass; build 57 is installed on main and isolated. Report: `testcases/reports/2026-11-27_phase3_message_visibility.md`. Owner idea 04 is next; accumulated-main and audible acceptance remain pending, so production DONE and release are not claimed.
+
+2026-11-27 13:56 +03:00 — Owner idea 04 is DONE on installed build 58: all eight named controls show computed `cursor: pointer` and passed real mouse hover/click, including floating scroll-to-bottom and Send/Stop with provider abort evidence. Red-before style regressions now pass; full extension is 682/1, typecheck, lint and build-58 VSIX audit pass. Report: `testcases/reports/2026-11-27_pointer_chat_controls.md`. Final universal+target VSIX gates are next; accumulated-main and release acceptance remain open.
+
+2026-11-27 14:03 +03:00 — OWNER RELEASE DECISION: proceed with KIMI KRINIK 1.0.0 for GitHub and VS Code Marketplace with an explicit Known issues section and links to future GitHub fixes. Open issues are not represented as fixed and no longer block this release by the owner's direct word; packaging, documentation accuracy, artifact integrity and publication verification still must pass. Both releases must occur in this chat or the immediately following chat at the latest. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md` → «Release with documented Known issues» and «Release window».
+
+2026-11-27 14:09 +03:00 — Final build 59 package gates are green: six target VSIX packages plus universal pass static/import audit; win32-x64 and universal fresh Extension Host smoke both open the webview with correct sound defaults. Full extension is 682/1, typecheck and lint pass. Build 59 is installed on main and isolated. GitHub/Marketplace release documentation with Known issues is next.
+
+2026-11-27 14:57 +03:00 — Release documentation is ready: root/Marketplace README, CHANGELOG and EN/RU/ZH notes carry build identity, the current steering/pointer deltas and an explicit Known issues section with GitHub links. Voice-lint is green and the independent §7B reviewer returns VERIFIED after all findings were fixed. `.tmp/kimi-krinik-1.0.0-release-notes.md` combines the three languages for GitHub. Control build is next; no publication has occurred yet.
+
+2026-11-27 15:02 +03:00 — Control build 60 is green: lint, typecheck, full extension 682/1, six-target and universal package audits pass. README build example is 60 and voice-lint remains green. Adversarial release judge is next before commit/push and publication.
+
+2026-11-27 15:16 +03:00 — OWNER PUBLIC-TEXT RULE: KIMI KRINIK is described independently with no KAIF mention and with user value before implementation details. Every public description must say which user problem a feature solves and what becomes easier, in EN/RU/ZH. This is being corrected in root/Marketplace docs, notes and the already-published GitHub Release; see `HOUSE_RULES.md` R10. Soft handover follows this correction, with Marketplace publication left for the next chat.
+
+2026-11-27 16:02 +03:00 — GitHub `v1.0.0` is PUBLISHED at https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases/tag/v1.0.0. All seven build-61 VSIX assets are uploaded with matching local/remote SHA-256 and no KAIF in packaged README/CHANGELOG/THIRD_PARTY_NOTICES. Independent value-led review and voice-lint are green; the rendered release page was reopened and read. GitHub release is done; Marketplace publication and further documentation polish are reserved for the next chat.
+
 ### 2026-11-27 11:34 +03:00 — RELEASE REMEDIATION: PHASES 1–2 CLOSED; PHASE 3 HANDOFF
 
 2026-11-27 00:18 +03:00 — the owner ordered code analysis, written fix/acceptance plans, implementation and iterative testing for every named release blocker. `researches/59_release_blocker_remediation.md`, `plans/04_EPIC_release_blocker_remediation.md` and Phase 1 `plans/05_epic04_phase1_steering_attention.md` define the evidence ladder: `bugs/44`–`46`, five Act findings, then `bugs/25`/`11`, then final hardening. Phase 1 first tests the previously uncovered accepted-running-steer → old-terminal → new-`turn.started` ordering. Planning changed no production code.

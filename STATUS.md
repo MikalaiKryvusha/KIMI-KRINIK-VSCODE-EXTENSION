@@ -25,27 +25,7 @@
 
 2026-11-26 release-preparation history moved verbatim to `PROJECT_HISTORY.md`.
 
-2026-11-27 release-remediation Phase 1–2 history moved verbatim to `PROJECT_HISTORY.md`; the current handover remains below.
-
-2026-11-27 11:34 +03:00 — PARKED before Phase 3 instrumentation: the context contour crossed 75% and reported 79%, so no new heavy task starts. Phase 2 commit `fb58a48fc` is pushed; issues #33/#34 are closed. Fake model and isolated VS Code are stopped cleanly; no product scenario is running. Next session starts `plans/07_epic04_phase3_message_visibility_steering.md` §4.1 positive smoke/frame observer, then §4.2 races; owner idea 04 pointer cursors remains queued after it. Build 55 is installed on main without reload; no release or Marketplace publication exists.
-
-2026-11-27 11:59 +03:00 — SOFT CLOSURE handover: closed Phase 1–2 entries moved verbatim to `PROJECT_HISTORY.md`; STATUS now contains only the current release handover and open bugs. EXP-0024 gained the non-destructive isolated close-window/PID route; no duplicate lesson remains. README's EN/RU/ZH build example is 55. Final lint, extension/webview typecheck, full extension 676/1, build and voice-lint pass; independent README §7B/7E is PASS. Phase 3 and owner idea 04 remain open for the next chat.
-
-2026-11-27 13:31 +03:00 — Phase 3 §4.1–4.3 is PASS on packaged build 57. The late-acknowledgement stuck Working (`bugs/47`, issue #36) and permanent response B→C replacement (`bugs/25`) have red-before fixes; B and C now remain in separate assistants through idle and replay, and the running→idle boundary is exactly once. Full extension is 679/1, typecheck, lint and build-57 VSIX audit pass; build 57 is installed on main and isolated. Report: `testcases/reports/2026-11-27_phase3_message_visibility.md`. Owner idea 04 is next; accumulated-main and audible acceptance remain pending, so production DONE and release are not claimed.
-
-2026-11-27 13:56 +03:00 — Owner idea 04 is DONE on installed build 58: all eight named controls show computed `cursor: pointer` and passed real mouse hover/click, including floating scroll-to-bottom and Send/Stop with provider abort evidence. Red-before style regressions now pass; full extension is 682/1, typecheck, lint and build-58 VSIX audit pass. Report: `testcases/reports/2026-11-27_pointer_chat_controls.md`. Final universal+target VSIX gates are next; accumulated-main and release acceptance remain open.
-
-2026-11-27 14:03 +03:00 — OWNER RELEASE DECISION: proceed with KIMI KRINIK 1.0.0 for GitHub and VS Code Marketplace with an explicit Known issues section and links to future GitHub fixes. Open issues are not represented as fixed and no longer block this release by the owner's direct word; packaging, documentation accuracy, artifact integrity and publication verification still must pass. Both releases must occur in this chat or the immediately following chat at the latest. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md` → «Release with documented Known issues» and «Release window».
-
-2026-11-27 14:09 +03:00 — Final build 59 package gates are green: six target VSIX packages plus universal pass static/import audit; win32-x64 and universal fresh Extension Host smoke both open the webview with correct sound defaults. Full extension is 682/1, typecheck and lint pass. Build 59 is installed on main and isolated. GitHub/Marketplace release documentation with Known issues is next.
-
-2026-11-27 14:57 +03:00 — Release documentation is ready: root/Marketplace README, CHANGELOG and EN/RU/ZH notes carry build identity, the current steering/pointer deltas and an explicit Known issues section with GitHub links. Voice-lint is green and the independent §7B reviewer returns VERIFIED after all findings were fixed. `.tmp/kimi-krinik-1.0.0-release-notes.md` combines the three languages for GitHub. Control build is next; no publication has occurred yet.
-
-2026-11-27 15:02 +03:00 — Control build 60 is green: lint, typecheck, full extension 682/1, six-target and universal package audits pass. README build example is 60 and voice-lint remains green. Adversarial release judge is next before commit/push and publication.
-
-2026-11-27 15:16 +03:00 — OWNER PUBLIC-TEXT RULE: KIMI KRINIK is described independently with no KAIF mention and with user value before implementation details. Every public description must say which user problem a feature solves and what becomes easier, in EN/RU/ZH. This is being corrected in root/Marketplace docs, notes and the already-published GitHub Release; see `HOUSE_RULES.md` R10. Soft handover follows this correction, with Marketplace publication left for the next chat.
-
-2026-11-27 16:02 +03:00 — GitHub `v1.0.0` is PUBLISHED at https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases/tag/v1.0.0. All seven build-61 VSIX assets are uploaded with matching local/remote SHA-256 and no KAIF in packaged README/CHANGELOG/THIRD_PARTY_NOTICES. Independent value-led review and voice-lint are green; the rendered release page was reopened and read. GitHub release is done; Marketplace publication and further documentation polish are reserved for the next chat.
+2026-11-27 release remediation through GitHub 1.0.0 history moved verbatim to `PROJECT_HISTORY.md`; the current handover remains below.
 
 ## ❓ Awaiting human review
 
@@ -56,12 +36,12 @@
 ## Where to continue next session
 
 1. Idea 04 is DONE as `ideas/04_DONE_pointer_cursor_for_chat_controls.md`; issue #35 is closed with its verified commit.
-2. GitHub `v1.0.0` is published with seven build-61 VSIX and value-led EN/RU/ZH notes without KAIF. Next chat: publish Marketplace 1.0.0 under the owner's decision and keep polishing public documentation by `HOUSE_RULES.md` R10.
+2. GitHub `v1.0.0` is published with seven build-61 VSIX and value-led EN/RU/ZH notes without KAIF. Next chat: publish Marketplace 1.0.0 under the owner's decision and keep polishing public documentation by `HOUSE_RULES.md` R10. <!-- attribution-ok: owner decision is verbatim in interviews/interview_001_kimi_krinik_1_0_0_release.md, «Release with documented Known issues» and «Release window» -->
 3. Accumulated-main acceptance and open issues continue as future-version work; the 123 legacy remote tags remain untouched.
 
 ## Open bugs
 
-Public backlog: all 30 open product bugs and 2 open ideas are linked to KIMI KRINIK GitHub issues #1–32 and #35; the two Act context/queue findings are #33–34. Idea 04 is DONE and issue #35 is ready to close with its verified commit. Issue creation and post-fix comments follow `HOUSE_RULES.md` R9; framework-only defects stay in the KAIF tracker.
+Public backlog: all 30 open product bugs and 2 open ideas are linked to KIMI KRINIK GitHub issues #1–32 and #35; the two Act context/queue findings are #33–34. Idea 04 is DONE and issue #35 is closed with its verified commit. Issue creation and post-fix comments follow `HOUSE_RULES.md` R9; framework-only defects stay in the KAIF tracker.
 
 - 🔧 `bugs/37_sticky_shows_visible_message.md` — visible prompts no longer enter the sticky; direct user-bubble-bottom selection verified on isolated build 40; main-profile acceptance pending.
 - 🔧 `bugs/38_sticky_container_bottom_padding.md`, `bugs/39_sticky_collapsed_second_line_fade.md` — 8px bottom padding and a softer second-line fade verified on isolated build 40; main-profile acceptance pending.
@@ -72,7 +52,7 @@ Public backlog: all 30 open product bugs and 2 open ideas are linked to KIMI KRI
 - 🔧 `bugs/30_sticky_prompt_visible_at_chat_start.md`, `bugs/32_steer_working_indicator_jumps.md` — isolated build-25 acceptance passed; `bugs/31_expanded_sticky_scroll_oscillation.md` includes the revised scroll contract and one-line no-fade/no-collapse boundary, verified on isolated build 38; main-profile acceptance pending.
 - 🔧 `bugs/11_steer_delivery_and_immediate_display.md` — immediate bubbles, distinct response ownership and exactly-once boundary delivery pass on isolated build 57; accumulated main-profile acceptance pending.
 - 🔧 `bugs/19_tool_cards_hide_working_state.md`, `bugs/18_reentrant_prompt_internal_error.md`, `bugs/16_steer_avatar_precedes_user_bubble.md` — isolated paths pass; original main-profile paths pending.
-- 🔧 `bugs/25_first_prompt_assistant_message_flicker.md` — build 56 reproduced response B being permanently replaced by response C; build 57 preserves both responses through idle and replay with red-before regressions. Accumulated main remains a release blocker. `bugs/15_hook_results_visible_in_chat.md` — isolated build-22 fixes passed, accumulated acceptance pending.
+- 🔧 `bugs/25_first_prompt_assistant_message_flicker.md` — build 56 reproduced response B being permanently replaced by response C; build 57 preserves both responses through idle and replay with red-before regressions. Accumulated-main acceptance remains future-version follow-up work under the owner's Known issues decision. `bugs/15_hook_results_visible_in_chat.md` — isolated build-22 fixes passed, accumulated acceptance pending.
 - 🔧 `bugs/47_steer_late_ack_keeps_working.md` / issue #36 — late non-steered acknowledgement resurrected a terminal turn and suppressed idle; red-before regression and build-57 idle/replay acceptance pass, accumulated main pending.
 - 🔧 `bugs/44_steer_turn_complete_attention.md` / KIMI KRINIK issue #1 — isolated build-49 immediate and accepted-queued acceptance passes with 52/52 runtime and 664/1 full tests, typecheck, lint and VSIX audit green. Accumulated main-profile and audible-output acceptance remain open; not DONE.
 - 🔧 `bugs/45_steer_transient_error_flash.md` / KIMI KRINIK issue #31 — isolated build-50 immediate/queued paths show no red error; the preflight/fallback race is fixed with real BridgeHandler regressions, full 666/1, typecheck and lint green. Genuine failures remain visible. Accumulated main-profile acceptance pending.

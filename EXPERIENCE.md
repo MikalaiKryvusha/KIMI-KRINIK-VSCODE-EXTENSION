@@ -89,6 +89,17 @@
 
 ## Entries
 
+### EXP-0030 · 2026-11-27 · ❌→✅ · #documentation #product #voice
+class: text-in-agents-world
+mechanized: pnpm run kaif:voice plus an independent §7B value review
+**Context:** the first public 1.0.0 draft mentioned the project's internal methodology and led with implementation details instead of user value.
+**Tried / did:** removed every internal-methodology mention from public/package text, rewrote feature descriptions around the user problem and visible result, then iterated with an independent reviewer until no violation remained.
+**Result:** ❌→✅ — root/Marketplace docs, packaged notices and EN/RU/ZH release notes are independent and value-led; voice-lint and the final §7B review pass, and the rendered GitHub Release was read after editing.
+**Lesson:** public product text is a separate audience surface: name the user problem and visible result first, keep internal methodology out, and verify both meaning and machine style before publishing.   → link: HOUSE_RULES.md R10 · release-notes/1.0.0
+**Repro:** `pnpm run kaif:voice` plus an independent §7B review of README, Marketplace docs and all release-note languages; grep public text for the internal methodology name.
+**Trigger:** writing or editing any public README, changelog, release note, Marketplace listing or user-facing feature description.
+**Not for:** internal agent guides, bug forensics or architecture maps, where implementation detail and the internal methodology are appropriate.
+
 ### EXP-0029 · 2026-11-27 · ❌→✅ · #chat #lifecycle #testing
 class: terminal-state-not-propagated
 mechanized: pnpm exec vitest run --reporter=agent apps/vscode/test/session-runtime.test.ts
