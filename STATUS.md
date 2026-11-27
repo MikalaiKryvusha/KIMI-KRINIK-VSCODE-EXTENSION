@@ -39,6 +39,10 @@
 
 2026-11-27 14:09 +03:00 — Final build 59 package gates are green: six target VSIX packages plus universal pass static/import audit; win32-x64 and universal fresh Extension Host smoke both open the webview with correct sound defaults. Full extension is 682/1, typecheck and lint pass. Build 59 is installed on main and isolated. GitHub/Marketplace release documentation with Known issues is next.
 
+2026-11-27 14:57 +03:00 — Release documentation is ready: root/Marketplace README, CHANGELOG and EN/RU/ZH notes carry build identity, the current steering/pointer deltas and an explicit Known issues section with GitHub links. Voice-lint is green and the independent §7B reviewer returns VERIFIED after all findings were fixed. `.tmp/kimi-krinik-1.0.0-release-notes.md` combines the three languages for GitHub. Control build is next; no publication has occurred yet.
+
+2026-11-27 15:02 +03:00 — Control build 60 is green: lint, typecheck, full extension 682/1, six-target and universal package audits pass. README build example is 60 and voice-lint remains green. Adversarial release judge is next before commit/push and publication.
+
 ## ❓ Awaiting human review
 
 - GitHub `v1.0.0` and Marketplace publication are owner-authorized with documented Known issues after packaging, documentation, artifact and publication checks. Open issues remain visible as future work, not hidden or called fixed. Verbatim decisions: `interviews/interview_001_kimi_krinik_1_0_0_release.md`.

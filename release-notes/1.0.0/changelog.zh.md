@@ -1,6 +1,6 @@
 # KIMI KRINIK 1.0.0
 
-2026-11-26
+2026-11-27
 
 KIMI KRINIK 1.0.0 将官方 Kimi Code 2.7.2 引擎与 KIMI FORK 界面结合，加入独立的上下文管理、可靠的追加消息和三语言界面。
 
@@ -12,13 +12,13 @@ KIMI KRINIK 1.0.0 将官方 Kimi Code 2.7.2 引擎与 KIMI FORK 界面结合，�
 
 - AUTO STEER 立即发送追加消息，OFF 恢复普通队列。整批消息按顺序仅发送一次，被拒绝的消息回到原位置。
 
-- 置顶栏显示最后一条完全滚出屏幕的用户消息：仍在屏幕上的消息不会重复进入置顶栏。置顶栏在出现、消失和替换时均有平滑动画；展开与折叠时，消息气泡和外部容器以同步的 200ms 动画运动。居中的箭头在现有查看器中展开全文与媒体。
+- 置顶栏显示最后一条完全滚出屏幕的用户消息：仍在屏幕上的消息不会重复进入置顶栏。置顶栏在出现、消失和替换时均有平滑动画；展开与折叠时，消息气泡和外部容器以同步的 200 ms 动画运动。居中的箭头在现有查看器中展开全文与媒体。
 
 - 图片、视频和纯媒体消息提供可点击缩略图，恢复历史后使用同一查看器。手动换行和空行原样保留，用户气泡左侧显示本地化的发送时间。
 
 - 每条助手文本回复下方都有独立的 Copy 和 Fork 按钮：每次复制仅包含相邻文本。
 
-- Skill 选择器提供 48px 边距和本地化描述，选择后可立即通过 Steer 发送，或在 OFF 时排队。
+- Skill 选择器提供 48 px 边距和本地化描述，选择后可立即通过 Steer 发送，或在 OFF 时排队。
 
 - 次级模型按钮在大尺寸下显示「子智能体」文字，紧凑形式保持纯机器人图标。
 
@@ -34,12 +34,20 @@ KIMI KRINIK 1.0.0 将官方 Kimi Code 2.7.2 引擎与 KIMI FORK 界面结合，�
 
 - 历史恢复不会出现空白帧，延迟到达的请求准备错误不会删除无关轮次。内部指令在实时聊天和历史恢复中均不会显示为助手文本。
 
+- 在延迟的 steering 确认和 running→idle 回退后，连续的助手回复仍分别保留在各自消息中。已结束的轮次不会留下 Working 状态，完成与历史恢复后不同回复仍同时可见。
+
+- 鼠标悬停在八个已验证的聊天按钮（添加文件或媒体、历史记录、设置齿轮、发送消息、停止 AI 智能体、会话、创建新聊天和浮动滚动到底部按钮）上时显示指针光标。所有八个按钮均在安装的 VSIX 上通过真实鼠标悬停与点击验收。
+
 ## 验证
 
-扩展有 656 项检查通过、1 项跳过，typecheck 和 lint 全部通过。隔离安装通过实测几何数据与截图验证了聊天、置顶消息、声音设置、Control Panel 与各对话框。六个平台专用 VSIX 与平台无关的 `kimi-code-universal.vsix` 均已打包并通过静态检查。
+扩展有 682 项检查通过、1 项跳过，typecheck 和 lint 全部通过。隔离安装通过实测帧与截图验证了聊天可见性、steering 完成、历史恢复、按钮光标、声音设置与各对话框。六个平台专用 VSIX 与平台无关的 `kimi-code-universal.vsix` 均已打包并通过静态检查。win32-x64 与 universal 包均已在新的 Extension Host 中通过启动验证。
+
+## 已知问题
+
+部分已报告的问题仍在 [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues) 中保持开放。我们不会将这些问题视为已修复，并将在后续版本中继续处理。
 
 ## 安装
 
-README 中的下载按钮获取 `kimi-code-universal.vsix`，可安装于 Windows、macOS 和 Linux；发布页同时提供各平台专用包。选择 **Extensions → ⋯ → Install from VSIX…** 安装。KIMI KRINIK 可与官方 Kimi Code 和 KIMI FORK 并存，项目与会话保持不变。返回官方扩展不会删除它们。
+本发布包含 `kimi-code-universal.vsix` 和六个平台专用包。
 
-[README](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION#readme)
+[安装说明和项目介绍见 README](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION#readme)。

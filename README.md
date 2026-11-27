@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.0_in_progress-1E1E1E.svg" alt="Version: 1.0.0 in progress">
+  <img src="https://img.shields.io/badge/version-1.0.0-1E1E1E.svg" alt="Version: 1.0.0 released">
   <a href="https://github.com/MoonshotAI/kimi-code"><img src="https://img.shields.io/badge/engine-Kimi_Code_2.7.2-2C7BE5.svg" alt="Engine: Kimi Code 2.7.2"></a>
   <a href="https://github.com/gxgleo67/kimi-code-vscode-fork"><img src="https://img.shields.io/badge/UI-KIMI_FORK-8E44AD.svg" alt="UI: KIMI FORK"></a>
   <a href="apps/vscode/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-yellow.svg" alt="License: Apache-2.0"></a>
@@ -63,25 +63,29 @@ context compaction (compaction) can be switched off, a follow-up joins the runni
 | History replay and internal events | — | — | ✅ atomic replay without blank frames; internal hook results never become assistant text |
 | Context ring and queue feedback | — | ✅ | ✅ blue → yellow → red-orange ring interpolation and one pulse when an item joins the queue |
 | Control Panel at narrow widths | — | ✅ | ✅ horizontal scrolling only on real overflow, with fading edges and one-click actions |
-| Control Panel composition and order | fixed panel | fixed panel | ✅ checkboxes hide buttons without disabling their features; Up/Down actions persist the left-to-right order |
+| Control Panel composition and order | fixed panel | fixed panel | ✅ checkboxes hide buttons without disabling their features; Up/Down actions persist the left-to-right order; the eight verified chat controls—Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom—show a pointer on hover |
 | General Settings | VS Code settings | VS Code settings | ✅ one localized dialog for editor behavior, context sharing and all four context thresholds, with separate ON/OFF explanations |
 | Control Panel skill picker | — | — | ✅ a scrollable list with bold skill names and plain localized descriptions; the selected skill joins the running turn with Steer ON or waits in the queue with Steer OFF |
 | Control Panel state descriptions | — | — | ✅ ON/OFF in uppercase with a slight green/red tint in all three languages |
-| Action Menu build identity | — | — | ✅ version and build number; for example, build 55 is shown as `v1.0.0 (55)` |
+| Action Menu build identity | — | — | ✅ version and build number; for example, build 60 is shown as `v1.0.0 (60)` |
 | Late preflight errors | can surface a generic internal error | can surface a generic internal error | ✅ unrelated and newer chat turns stay intact; only the send that actually failed is rolled back |
 | Activity Bar identity | KIMI icon | KIMI FORK icon | ✅ a thick-outlined KIMI KRINIK robot with clipped top corners and square sideways eyes, using the VS Code foreground color |
 | Background, tooltips and menus follow the VS Code theme | — | — | ✅ |
 
 ### 2. Install
 
-Version 1.0.0 is being built and tested; its `.vsix` will be attached to the
+Version 1.0.0 is attached to the
 [releases](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases). The DOWNLOAD button above gets
 `kimi-code-universal.vsix`, which installs on Windows, macOS and Linux; platform-specific packages (for example
 `kimi-code-win32-x64.vsix` or `kimi-code-darwin-arm64.vsix`) are attached there too. Install the file with
 **Extensions → ⋯ → Install from VSIX…**. KIMI KRINIK has its own extension ID: it installs next to the official
 Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 
-### 3. Based on, with thanks
+### 3. Known issues
+
+Some reported issues remain open in [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues). They are not represented as fixed and will be addressed in future releases.
+
+### 4. Based on, with thanks
 
 - **[Kimi Code](https://github.com/MoonshotAI/kimi-code)** by Moonshot AI: the engine, the harness and this monorepo (MIT; the
   extension in `apps/vscode` is Apache-2.0). Our base is upstream `56145f849`. We rebase onto every new official release and
@@ -114,7 +118,7 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/версия-1.0.0_в_работе-1E1E1E.svg" alt="Версия: 1.0.0 в работе">
+  <img src="https://img.shields.io/badge/версия-1.0.0-1E1E1E.svg" alt="Версия: 1.0.0">
   <a href="https://github.com/MoonshotAI/kimi-code"><img src="https://img.shields.io/badge/движок-Kimi_Code_2.7.2-2C7BE5.svg" alt="Движок: Kimi Code 2.7.2"></a>
   <a href="https://github.com/gxgleo67/kimi-code-vscode-fork"><img src="https://img.shields.io/badge/интерфейс-KIMI_FORK-8E44AD.svg" alt="Интерфейс: KIMI FORK"></a>
   <a href="apps/vscode/LICENSE"><img src="https://img.shields.io/badge/лицензия-Apache--2.0-yellow.svg" alt="Лицензия: Apache-2.0"></a>
@@ -157,25 +161,29 @@ Kimi Code and KIMI FORK, and your projects and sessions stay in place.
 | История и внутренние события | — | — | ✅ восстановление истории без пустых кадров; внутренние служебные инструкции не отображаются как ответ агента |
 | Кольцо контекста и отклик очереди | — | ✅ | ✅ плавный переход синего в жёлтый и красно-оранжевый, один импульс при добавлении сообщения |
 | Панель управления на узком экране | — | ✅ | ✅ горизонтальная прокрутка только при реальном переполнении, затухание краёв и действия одним кликом |
-| Состав и порядок кнопок Control Panel | фиксированная панель | фиксированная панель | ✅ галочки скрывают кнопки без отключения самих функций; стрелки вверх и вниз сохраняют порядок кнопок слева направо |
+| Состав и порядок кнопок Control Panel | фиксированная панель | фиксированная панель | ✅ галочки скрывают кнопки без отключения самих функций; стрелки вверх и вниз сохраняют порядок кнопок слева направо; при наведении на восемь проверенных кнопок чата — «Добавить файл или медиа», «История», «Шестерёнка настроек», «Отправить сообщение», «Остановить агента», «Сессия», «Создать новый чат» и плавающую кнопку прокрутки вниз — появляется курсор-указатель |
 | Общие настройки | настройки VS Code | настройки VS Code | ✅ одно локализованное окно для поведения редактора, передачи контекста и всех четырёх порогов контекстного окна, с отдельными пояснениями для ВКЛ и ВЫКЛ |
 | Кнопка «Навык» в Control Panel | — | — | ✅ открывает прокручиваемый список с именем навыка жирным шрифтом и описанием обычным; при включённом Стиринге выбранный навык сразу идёт в текущий ход, при выключенном — в очередь |
 | Состояния в подсказках Панели Управления | — | — | ✅ «ВКЛ»/«ВЫКЛ» в верхнем регистре с чуть зелёным и чуть красным оттенком на всех трёх языках |
-| Версия в Action Menu | — | — | ✅ версия и номер билда; например, билд 55 отображается как `v1.0.0 (55)` |
+| Версия в Action Menu | — | — | ✅ версия и номер билда; например, билд 60 отображается как `v1.0.0 (60)` |
 | Запоздавшие ошибки подготовки запроса | общая ошибка без подробностей | общая ошибка без подробностей | ✅ не связанные с ошибкой и более новые ходы чата сохраняются; откатывается только текущая неудачная отправка |
-| Значок на основной левой панели | значок KIMI | значок KIMI FORK | ✅ контурный робот KIMI KRINIK с толстой линией, срезанными верхними уголками и квадратными глазами на позициях из фирменного логотипа; цвет следует теме VS Code |
+| Значок на основной левой панели | значок KIMI | значок KIMI FORK | ✅ контурный робот KIMI KRINIK с толстой линией, срезанными верхними уголками и квадратными глазами, расположенными как на фирменном логотипе; цвет следует теме VS Code |
 | Фон, подсказки и меню следуют теме VS Code | — | — | ✅ |
 
 ### 2. Установка
 
-Версия 1.0.0 собирается и проходит проверку; её `.vsix` выйдет в
+Версия 1.0.0 опубликована в
 [релизах](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases). Кнопка СКАЧАТЬ выше забирает
 `kimi-code-universal.vsix` — он ставится на Windows, macOS и Linux; там же лежат пакеты для конкретных платформ
 (например `kimi-code-win32-x64.vsix` и `kimi-code-darwin-arm64.vsix`). Установите файл через
 **Extensions → ⋯ → Install from VSIX…**. У KIMI KRINIK свой ID расширения: оно встаёт рядом с официальным Kimi Code и
 KIMI FORK, ваши проекты и сессии остаются на месте.
 
-### 3. Основа и благодарности
+### 3. Известные проблемы
+
+Часть сообщённых проблем остаётся открытой в [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues). Мы не заявляем их как исправленные и продолжим работу над ними в следующих версиях.
+
+### 4. Основа и благодарности
 
 - **[Kimi Code](https://github.com/MoonshotAI/kimi-code)** от Moonshot AI: движок, harness и само монорепо (MIT; расширение
   в `apps/vscode` — Apache-2.0). Наша основа — upstream `56145f849`. На каждый новый официальный релиз мы делаем rebase и
@@ -208,7 +216,7 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/版本-1.0.0_开发中-1E1E1E.svg" alt="版本：1.0.0 开发中">
+  <img src="https://img.shields.io/badge/版本-1.0.0-1E1E1E.svg" alt="版本：1.0.0">
   <a href="https://github.com/MoonshotAI/kimi-code"><img src="https://img.shields.io/badge/引擎-Kimi_Code_2.7.2-2C7BE5.svg" alt="引擎：Kimi Code 2.7.2"></a>
   <a href="https://github.com/gxgleo67/kimi-code-vscode-fork"><img src="https://img.shields.io/badge/界面-KIMI_FORK-8E44AD.svg" alt="界面：KIMI FORK"></a>
   <a href="apps/vscode/LICENSE"><img src="https://img.shields.io/badge/许可证-Apache--2.0-yellow.svg" alt="许可证：Apache-2.0"></a>
@@ -250,24 +258,28 @@ KIMI FORK, ваши проекты и сессии остаются на мес�
 | 历史 replay 与内部事件 | — | — | ✅ 原子 replay 不出现空白帧；内部 hook 结果不会成为助手文本 |
 | 上下文圆环与队列反馈 | — | ✅ | ✅ 蓝色 → 黄色 → 红橙色平滑渐变，消息入队时仅脉冲一次 |
 | 窄宽度下的 Control Panel | — | ✅ | ✅ 仅在实际溢出时横向滚动，边缘渐隐，单击执行操作 |
-| Control Panel 的按钮组成与顺序 | 固定面板 | 固定面板 | ✅ 复选框隐藏按钮但保留对应功能；上移和下移操作会保存从左到右的按钮顺序 |
+| Control Panel 的按钮组成与顺序 | 固定面板 | 固定面板 | ✅ 复选框隐藏按钮但保留对应功能；上移和下移操作会保存从左到右的按钮顺序；鼠标悬停在八个已验证的聊天按钮（添加文件或媒体、历史记录、设置齿轮、发送消息、停止 AI 智能体、会话、创建新聊天和浮动滚动到底部按钮）上时显示指针光标 |
 | 通用设置 | VS Code 设置 | VS Code 设置 | ✅ 一个本地化对话框集中管理编辑器行为、上下文共享和全部四个上下文阈值，ON/OFF 说明分行显示 |
 | Control Panel Skill 选择器 | — | — | ✅ 可滚动列表以粗体显示技能名称，以常规字体显示本地化描述；Steer 开启时立即发送，关闭时进入普通队列 |
 | Control Panel 状态提示 | — | — | ✅ ON/OFF 全大写并带轻微绿色/红色着色，支持全部三种语言 |
-| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如构建 55 显示为 `v1.0.0 (55)` |
+| Action Menu 中的构建标识 | — | — | ✅ 版本与构建号，例如构建 60 显示为 `v1.0.0 (60)` |
 | 延迟到达的 preflight 错误 | 可能出现通用 internal error | 可能出现通用 internal error | ✅ 无关及更新的聊天消息保持不变，仅回滚当前失败的发送 |
 | 左侧 Activity Bar 标识 | KIMI 图标 | KIMI FORK 图标 | ✅ KIMI KRINIK 机器人采用粗轮廓、顶部切角和位于两侧的方形眼睛，颜色跟随 VS Code 前景色 |
 | 背景、提示框与菜单跟随 VS Code 主题 | — | — | ✅ |
 
 ### 2. 安装
 
-1.0.0 版本正在构建与测试，其 `.vsix` 将发布在
+1.0.0 版本已发布在
 [Releases](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/releases)。上方下载按钮获取
 `kimi-code-universal.vsix`，可安装于 Windows、macOS 和 Linux；同时也提供各平台专用包（例如
 `kimi-code-win32-x64.vsix`、`kimi-code-darwin-arm64.vsix`）。通过 **Extensions → ⋯ → Install from VSIX…** 安装。KIMI KRINIK
 拥有独立的扩展 ID，可与官方 Kimi Code 和 KIMI FORK 并存，项目与会话保持原样。
 
-### 3. 基础与致谢
+### 3. 已知问题
+
+部分已报告的问题仍在 [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues) 中保持开放。我们不会将这些问题视为已修复，并将在后续版本中继续处理。
+
+### 4. 基础与致谢
 
 - **[Kimi Code](https://github.com/MoonshotAI/kimi-code)**（Moonshot AI）：引擎、harness 与本 monorepo（MIT；`apps/vscode`
   中的扩展为 Apache-2.0）。我们的基线是上游 `56145f849`。每当官方发布新版本，我们都会 rebase，并把自己的改动保留在新版本之上。

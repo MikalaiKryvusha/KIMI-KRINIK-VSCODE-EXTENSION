@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-2026-11-26
+2026-11-27
 
 The first independent KIMI KRINIK release combines the official Kimi Code 2.7.2 engine with the KIMI FORK interface and the KIMI KRINIK product changes.
 
@@ -15,12 +15,13 @@ The first independent KIMI KRINIK release combines the official Kimi Code 2.7.2 
 - Choose models and reasoning effort through one picker with search and favorites; resumed sessions retain their own effort.
 - Use English, Russian and Chinese with a selected-first language dialog.
 - Configure approval, question, error and turn-complete sounds with per-event volume and packaged voice clips in all three languages.
-- Keep the prompt that owns the visible response in a sticky bubble. Expand full text and media with synchronized 200ms bubble/container motion and reduced-motion support.
+- Keep the prompt that owns the visible response in a sticky bubble. Expand full text and media with synchronized 200 ms bubble/container motion and reduced-motion support.
 - Use Copy and Fork under each assistant text item; Copy includes only the adjacent text.
 - Send image, video and media-only prompts, preserve multiline input and open the same media viewer after replay.
 - Read live session status, background tasks, todos, queue state and the version/build identity.
 - Use the pink KIMI KRINIK robot in responses and its thick-outlined, clipped-corner shape in the VS Code Activity Bar.
 - Install one universal VSIX on Windows, macOS and Linux, or choose one of six platform-specific packages.
+- See the pointer cursor on eight verified chat controls: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom.
 
 ### Fixed
 
@@ -29,7 +30,12 @@ The first independent KIMI KRINIK release combines the official Kimi Code 2.7.2 
 - Keep internal hook output out of assistant messages and sticky prompt selection.
 - Keep sticky appearance, exit, replacement, expansion and collapse synchronized without moving the reading anchor.
 - Keep sound selectors usable when an event is Off and prevent replayed events from producing attention sounds.
+- Preserve distinct assistant responses and genuine idle completion across late steering acknowledgements, fallback prompts and running-to-idle transitions.
 
 ### Distribution
 
-The universal package has no target-platform marker. Platform-specific packages cover darwin-x64, darwin-arm64, linux-x64, linux-arm64, win32-x64 and win32-arm64. Package verification does not claim a real run on an operating system that was not available for testing.
+The universal package has no target-platform marker. Platform-specific packages cover darwin-x64, darwin-arm64, linux-x64, linux-arm64, win32-x64 and win32-arm64. The win32-x64 and universal packages passed a fresh Extension Host smoke on Windows; every package passed static and entry-import verification.
+
+### Known issues
+
+Some reported issues remain open in [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues). They are not represented as fixed and will be addressed in future releases.

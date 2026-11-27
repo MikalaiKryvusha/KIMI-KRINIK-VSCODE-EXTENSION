@@ -18,6 +18,7 @@ This application is available in English, Russian and Chinese.
 - **Sticky prompts.** Keep the prompt that owns the visible response at the top. Expand full text and media with synchronized bubble/container animation and without losing the reading position.
 - **Per-text actions.** Copy one adjacent assistant text item or fork the conversation from that point.
 - **Customizable Control Panel.** Hide buttons without disabling their features, change their order, and use real Plan, Goal, Swarm, Skill and secondary-model controls.
+- **Pointer controls.** See the pointer cursor on eight verified chat controls: Add file or media, History, Settings gear, Send, Stop, Session, Create new chat and floating scroll-to-bottom.
 - **Models and effort.** Use one picker for model and reasoning effort, with search, favorites and session-specific restored values.
 - **Sounds and voice.** Configure a sound and volume for approvals, questions, errors and turn completion. Use packaged clips in English, Russian and Chinese; replay stays silent.
 - **KIMI KRINIK identity.** Use the pink robot in responses and its thick-outlined, clipped-corner shape in the VS Code Activity Bar. Read the version and build number in Action Menu.
@@ -34,9 +35,15 @@ Open a folder, select the KIMI KRINIK robot in the Activity Bar and sign in. The
 
 When VS Code and the Kimi Code terminal app resolve to the same `KIMI_CODE_HOME`, they share configuration, login state and sessions. Do not run the same session in both applications at the same time: cross-process session locking is not guaranteed.
 
-The `KIMI_CODE_HOME` system environment variable selects a different data home. Legacy Kimi Code OAuth and MCP OAuth credentials require fresh authorization after migration.
+The `KIMI_CODE_HOME` system environment variable selects a different data home. Migrating legacy data from `~/.kimi` to `~/.kimi-code` requires fresh authorization for legacy Kimi Code OAuth and MCP OAuth credentials.
+
+## Known issues
+
+Some reported issues remain open in [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues). They are not represented as fixed and will be addressed in future releases.
 
 ## Support, credits and license
+
+Kimi account and provider data processing is governed by the [Kimi Privacy Policy](https://www.kimi.com/user/agreement/userPrivacy?version=v2).
 
 Use [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues) for defects and questions. Read [the changelog](CHANGELOG.md) for KIMI KRINIK releases.
 
@@ -62,6 +69,7 @@ KIMI KRINIK — самостоятельное расширение VS Code дл
 - **Закреплённый запрос.** Запрос, которому принадлежит видимый ответ, остаётся вверху. Полный текст и медиа раскрываются с синхронной анимацией пузыря и контейнера, позиция чтения сохраняется.
 - **Действия с каждым блоком.** Copy копирует только соседний текстовый блок агента, а Fork создаёт новый разговор с этой точки.
 - **Настраиваемая Control Panel.** Галочки скрывают кнопки без отключения функций. Порядок кнопок меняется, а Plan, Goal, Swarm, Skill и дополнительная модель выполняют реальные действия.
+- **Курсор-указатель.** При наведении на восемь проверенных кнопок чата — «Добавить файл или медиа», «История», «Шестерёнка настроек», «Отправить сообщение», «Остановить агента», «Сессия», «Создать новый чат» и плавающую кнопку прокрутки вниз — появляется курсор-указатель.
 - **Модель и рассуждения.** Одно меню объединяет выбор модели и уровня рассуждений, поиск и избранное. Восстановленная сессия сохраняет собственный уровень.
 - **Звуки и голос.** Для одобрений, вопросов, ошибок и завершения задачи настраиваются звук и громкость. Готовые записи есть на английском, русском и китайском; восстановление истории не озвучивается.
 - **Идентичность KIMI KRINIK.** В ответах показывается розовый робот, а на Activity Bar — его контурный силуэт со срезанными уголками. В Action Menu видны версия и номер билда.
@@ -78,9 +86,15 @@ KIMI KRINIK — самостоятельное расширение VS Code дл
 
 Если VS Code и терминальное приложение Kimi Code используют один `KIMI_CODE_HOME`, они делят конфигурацию, вход и сессии. Не работайте с одной сессией в обоих приложениях одновременно: блокировки между процессами не гарантируются.
 
-Системная переменная `KIMI_CODE_HOME` выбирает другой каталог данных. После миграции старые Kimi Code OAuth и MCP OAuth требуют новой авторизации.
+Системная переменная `KIMI_CODE_HOME` выбирает другой каталог данных. При переносе данных из `~/.kimi` в `~/.kimi-code` старые Kimi Code OAuth и MCP OAuth требуют новой авторизации.
+
+## Известные проблемы
+
+Часть сообщённых проблем остаётся открытой в [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues). Мы не заявляем их как исправленные и продолжим работу над ними в следующих версиях.
 
 ## Поддержка, основа и лицензия
+
+Обработка данных аккаунта Kimi и провайдера регулируется [политикой конфиденциальности Kimi](https://www.kimi.com/user/agreement/userPrivacy?version=v2).
 
 Для дефектов и вопросов используйте [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues). Релизы KIMI KRINIK записаны в [журнал изменений](CHANGELOG.md).
 
@@ -106,6 +120,7 @@ KIMI KRINIK 是用于 Kimi 智能体的独立 VS Code 扩展，将官方 Kimi Co
 - **置顶用户消息。** 当前可见回复所属的用户消息保持在顶部。展开全文与媒体时，气泡和外部容器同步运动，并保留阅读位置。
 - **逐文本块操作。** Copy 仅复制相邻的助手文本块，Fork 从该位置创建新会话。
 - **可定制的 Control Panel。** 隐藏按钮时保留对应功能，并可调整按钮顺序。Plan、Goal、Swarm、Skill 和次级模型均执行真实操作。
+- **指针光标。** 鼠标悬停在八个已验证的聊天按钮（添加文件或媒体、历史记录、设置齿轮、发送消息、停止 AI 智能体、会话、创建新聊天和浮动滚动到底部按钮）上时显示指针光标。
 - **模型与推理强度。** 在同一个选择器中搜索和收藏模型、选择推理强度；恢复的会话保留自己的设置。
 - **声音与语音。** 为审批、问题、错误和任务完成设置声音与音量。提供英语、俄语和中文的内置录音；恢复历史时保持静音。
 - **KIMI KRINIK 标识。** 回复中使用粉色机器人，Activity Bar 使用带切角的粗轮廓机器人。Action Menu 显示版本与构建号。
@@ -122,9 +137,15 @@ KIMI KRINIK 是用于 Kimi 智能体的独立 VS Code 扩展，将官方 Kimi Co
 
 当 VS Code 和 Kimi Code 终端应用使用同一个 `KIMI_CODE_HOME` 时，它们共享配置、登录状态和会话。请勿在两个应用中同时运行同一会话：无法保证跨进程会话锁定。
 
-系统环境变量 `KIMI_CODE_HOME` 用于选择其他数据目录。迁移后，旧的 Kimi Code OAuth 和 MCP OAuth 凭据需要重新授权。
+系统环境变量 `KIMI_CODE_HOME` 用于选择其他数据目录。从 `~/.kimi` 向 `~/.kimi-code` 迁移旧数据后，旧的 Kimi Code OAuth 和 MCP OAuth 凭据需要重新授权。
+
+## 已知问题
+
+部分已报告的问题仍在 [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues) 中保持开放。我们不会将这些问题视为已修复，并将在后续版本中继续处理。
 
 ## 支持、基础与许可证
+
+Kimi 账户和供应商的数据处理受 [Kimi 隐私政策](https://www.kimi.com/user/agreement/userPrivacy?version=v2) 约束。
 
 通过 [GitHub Issues](https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues) 报告问题或提问。KIMI KRINIK 的发布记录见[更新日志](CHANGELOG.md)。
 
