@@ -133,6 +133,50 @@ describe("combined model and effort picker", () => {
     expect(boundary.saveConfig).toHaveBeenLastCalledWith({ model: "other", thinking: false, effort: "off", effortChanged: true });
   });
 
+  it("keeps keyboard Enter on a favorite scoped to the native favorite action", async () => {
+    const user = userEvent.setup();
+    render(<ModelPicker availableModels={MODELS} hasConversationHistory={false} />);
+
+    await user.click(screen.getByTestId("model-picker"));
+    await user.click(screen.getByText("More models..."));
+    screen.getByRole("button", { name: "Star Other" }).focus();
+    await user.keyboard("{Enter}");
+
+    expect(useFavoriteModels.getState().favorites).toEqual(["other"]);
+    expect(useSettingsStore.getState().currentModel).toBe("reasoning");
+    expect(screen.getByPlaceholderText("Search models...")).not.toBeNull();
+    expect(boundary.saveConfig).not.toHaveBeenCalled();
+  });
+
+  it("keeps keyboard Enter on a provider scoped to the native filter action", async () => {
+    const user = userEvent.setup();
+    render(<ModelPicker availableModels={MODELS} hasConversationHistory={false} />);
+
+    await user.click(screen.getByTestId("model-picker"));
+    await user.click(screen.getByText("More models..."));
+    screen.getByRole("button", { name: "other" }).focus();
+    await user.keyboard("{Enter}");
+
+    expect(useSettingsStore.getState().currentModel).toBe("reasoning");
+    expect(screen.getByPlaceholderText("Search models...")).not.toBeNull();
+    expect(screen.getByRole("option", { name: /Other/ })).not.toBeNull();
+    expect(screen.queryByRole("option", { name: /Reasoning/ })).toBeNull();
+    expect(boundary.saveConfig).not.toHaveBeenCalled();
+  });
+
+  it("keeps keyboard Arrow navigation and Enter model selection intact", async () => {
+    const user = userEvent.setup();
+    render(<ModelPicker availableModels={MODELS} hasConversationHistory={false} />);
+
+    await user.click(screen.getByTestId("model-picker"));
+    await user.click(screen.getByText("More models..."));
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    expect(useSettingsStore.getState().currentModel).toBe("plain");
+    expect(boundary.saveConfig).toHaveBeenLastCalledWith({ model: "plain", thinking: false, effort: "off", effortChanged: true });
+    expect(screen.queryByPlaceholderText("Search models...")).toBeNull();
+  });
+
   it("filters providers and resets the full picker on reopen", async () => {
     const user = userEvent.setup();
     render(<ModelPicker availableModels={MODELS} hasConversationHistory={false} />);

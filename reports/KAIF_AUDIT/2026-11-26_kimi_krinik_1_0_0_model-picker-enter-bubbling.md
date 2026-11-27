@@ -25,3 +25,13 @@ kaif-fp: apps/vscode/webview-ui/src/components/ModelPickerDialog.tsx :: nested-e
 **Do not touch:** Enter from search selecting the active row, Arrow navigation, mouse selection and effort persistence.
 
 **Meta:** links bugs/27, the internal model-picker map and EXP-0002. UI skeptic used the real ModelPickerDialog, real stores and `userEvent.keyboard("{Enter}")`; no packaged-VSIX claim.
+
+## Remediation — 2026-11-27 10:05 +03:00
+
+Hygiene: the new favorite/provider keyboard cases were red on the original component: favorite stayed empty and provider changed currentModel to `other`. The Arrow/Enter control stayed green. After one nested-button early return, model picker is 11/11, full extension 676 passed / 1 skipped, typecheck, root lint and build-55 package/static audit pass. No global `preventDefault` or `stopPropagation` was added.
+
+Functional run: PASS on the real packaged build-55 webview. Enter on Star K2.7 toggled only favorite, leaving `testkit-model` and the dialog unchanged. Enter on Kimi Code activated only its provider filter. Search + ArrowDown + Enter deliberately selected K2.8 and closed the dialog; testkit was restored through the public keyboard path. The provider screenshot was opened and read. Build 55 is installed on main/isolated with matching source/installed hashes; main was not reloaded. Evidence: `testcases/reports/2026-11-27_phase2_model_picker.md` and `.tmp/k5-vscode/55-provider-enter.webp`.
+
+TWINS: searched `DialogContent ... onKeyDown`, both Enter comparison syntaxes and nested-button guards across webview source — found 0 other dialog-level active-row handlers with nested favorite/provider buttons.
+
+TWINS-MECH: searched the forms a parent keyboard handler can use to reinterpret bubbled child-button activation as list selection: parent React keyboard props, single/double-quote Enter comparisons and native-button ancestor guards. Other Enter handlers are directly input-scoped and do not own a nested list/button set.

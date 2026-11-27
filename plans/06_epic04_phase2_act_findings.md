@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 2 — Пять Act-находок аудита»
-> **Статус:** шаги 4.1–4.4 выполнены на owning public boundaries; 4.1–4.2 имеют full 670/1, typecheck/lint/build-53 audit и Extension Host smoke, 4.3 имеет red-before, 73/73 bridge+Control Panel, typecheck/lint, 4.4 имеет red-before и packaged build-54 fresh-host Glass/Voice/Alert/Chime; `model-picker-enter-bubbling`, packaged acceptance остальных механизмов и accumulated-main открыты · [TESTED: 2026-11-27 · 60/60 runtime+controller and 16/16 status pills in `testcases/reports/2026-11-27_phase2_context_queue.md`; packaged guest/main acceptance not verified]
+> **Статус:** шаги 4.1–4.5 выполнены на owning public boundaries; 4.4 имеет packaged build-54 fresh-host Glass/Voice/Alert/Chime, 4.5 имеет packaged build-55 real keyboard favorite/provider/search acceptance; full extension 676/1, typecheck/lint и win32-x64 build-55 audit зелёные. Packaged guest acceptance context/queue/secondary и accumulated-main остаются открытыми · [TESTED: 2026-11-27 · 4.4 fresh host and 4.5 packaged keyboard in `testcases/reports/2026-11-27_phase2_sound_defaults.md` / `2026-11-27_phase2_model_picker.md`; other guest/main paths not verified]
 > **Вовне:** каждая находка обновляет audit card, owning bug/issue при наличии, `STATUS.md` и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -75,16 +75,18 @@ Evidence: build-53 fresh host and manifest/shared checks were red at 2026-11-27 
 
 Anchor: Epic 04 Phase 2 — «model-picker Enter … red-before public-interface regression».
 
-- [ ] В `model-picker.test.tsx` сфокусировать favorite и provider и нажать Enter: currentModel не меняется, диалог остаётся открытым, native favorite/filter action выполняется. Search/list Enter остаётся control.
-- [ ] Запустить на исходном компоненте и зафиксировать выбор active row + закрытие диалога.
-- [ ] Пропускать nested buttons в dialog-level Enter branch без глобального preventDefault/stopPropagation; mouse и Arrow navigation не менять.
-- [ ] Verification: favorite toggles only favorite, provider toggles only filter, currentModel/dialog сохраняются, search/list selection не сломан.
+- [x] В `model-picker.test.tsx` сфокусировать favorite и provider и нажать Enter: currentModel не меняется, диалог остаётся открытым, native favorite/filter action выполняется. Search/list Enter остаётся control.
+- [x] Запустить на исходном компоненте и зафиксировать выбор active row + закрытие диалога.
+- [x] Пропускать nested buttons в dialog-level Enter branch без глобального preventDefault/stopPropagation; mouse и Arrow navigation не менять.
+- [x] Verification: favorite toggles only favorite, provider toggles only filter, currentModel/dialog сохраняются, search/list selection не сломан.
+
+Evidence: favorite/provider checks were red at 2026-11-27 09:52:48 +03:00; model picker is 11/11 and full extension 676/1 with typecheck/lint green. On packaged build 55, real Enter toggled only K2.7 favorite, Kimi Code Enter changed only its filter, and search + ArrowDown + Enter still selected K2.8. Build 55 is installed on main/isolated with matching hashes; main was not reloaded. [TESTED: 2026-11-27 · real packaged keyboard path and screenshot in `testcases/reports/2026-11-27_phase2_model_picker.md`].
 
 ### 4.6 Общая и packaged проверка
 
 Anchor: Epic 04 gates — «affected suites, full extension, typecheck, lint и packaged VSIX paths зелёные».
 
-- [ ] Прогнать affected suites, полный `apps/vscode/test`, `pnpm --filter kimi-code-kaif run typecheck`, `pnpm lint` и win32-x64 package/audit после всех пяти исправлений.
+- [x] Прогнать affected suites, полный `apps/vscode/test`, `pnpm --filter kimi-code-kaif run typecheck`, `pnpm lint` и win32-x64 package/audit после всех пяти исправлений.
 - [ ] Установить следующий build на main и isolated profiles, проверить running build и выполнить реальные fresh defaults, secondary-only, keyboard и queue paths в guest.
 - [ ] Записать `testcases/reports/2026-11-27_phase2_act_findings.md` с Hygiene, Functional run, Found, Traces, Verdict и REAL WORLD.
 - [ ] Обновить audit cards/`STATUS.md`/issues и чекбоксы плана; затем `/skill:fable-judge` перед commit/push и перед написанием Phase 3.

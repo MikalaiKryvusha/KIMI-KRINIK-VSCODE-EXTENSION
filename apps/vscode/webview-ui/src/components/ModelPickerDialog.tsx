@@ -93,6 +93,7 @@ export function ModelPickerDialog({ open, onOpenChange, models }: ModelPickerDia
       event.preventDefault();
       setActiveIndex((previous) => Math.max(previous - 1, 0));
     } else if (event.key === "Enter") {
+      if ((event.target as HTMLElement).closest("button")) return;
       const model = filtered[activeIndex];
       if (model) choose(model.id);
     }
