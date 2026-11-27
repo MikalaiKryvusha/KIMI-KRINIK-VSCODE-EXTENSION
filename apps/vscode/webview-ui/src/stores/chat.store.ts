@@ -95,6 +95,7 @@ export interface QueuedItem {
   id: string;
   content: string | ContentPart[];
   model: string;
+  accepted?: boolean;
 }
 
 export interface ChatState {
@@ -246,7 +247,7 @@ function doSend(state: ChatState, content: string | ContentPart[], model: string
 }
 
 function drainNextQueuedItem(): void {
-  const next = useChatStore.getState().queue[0];
+  const next = useChatStore.getState().queue.find((item) => item.accepted !== true);
   if (next !== undefined) useChatStore.getState().steerQueueItem(next.id);
 }
 
@@ -604,16 +605,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (queueSteerInFlight !== null) return;
     const index = queue.findIndex((item) => item.id === id);
     const item = queue[index];
-    if (item === undefined) return;
+    if (item === undefined || item.accepted === true) return;
 
     set({ queueSteerInFlight: id });
     get().removeFromQueue(id);
     appendOptimisticTurn(id, item.content);
-    const restore = () => {
+    const restore = (accepted = false) => {
       set((state) => ({
         queue: state.queue.some((queued) => queued.id === id)
           ? state.queue
-          : [...state.queue.slice(0, index), item, ...state.queue.slice(index)],
+          : [...state.queue.slice(0, index), { ...item, ...(accepted ? { accepted: true } : {}) }, ...state.queue.slice(index)],
       }));
     };
 
@@ -628,7 +629,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const draining = get().pendingInput?.drainQueue === true;
       if (response.submission.state === "queued" && !draining) {
         discardOptimisticTurn(id);
-        restore();
+        restore(true);
         set({ isStreaming: true });
         return;
       }
@@ -676,7 +677,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       return;
     }
 
-    const [next, ...rest] = queue;
+    const nextIndex = queue.findIndex((item) => item.accepted !== true);
+    if (nextIndex < 0) return;
+    const next = queue[nextIndex]!;
+    const rest = queue.filter((_, index) => index !== nextIndex);
     const clientId = randomUUID();
 
     set(

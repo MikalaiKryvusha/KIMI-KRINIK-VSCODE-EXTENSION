@@ -1,6 +1,7 @@
 # Audit 001 · Family: blocked context-control submissions
 
 **Mechanism:** a resolved but rejected-at-delivery submission is written into the delivered-stage history, preventing later retries.
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/33
 **Already guarded by:** successful delivery and rejected empty-skill paths; blocked results are not guarded.
 **Occurrences:** F1.
 
@@ -25,3 +26,7 @@ kaif-fp: apps/vscode/src/runtime/context-window-control.ts :: blocked-delivery-m
 **Do not touch:** threshold calculations, prompt wording, highest-stage coalescing, compaction reset and exactly-once handling of accepted running/queued results.
 
 **Meta:** links `bugs/28_DONE_context_window_control_empty_skills_rejected.md`, EXP-0015 and GOAL.md criterion 2. Skeptic independently ran the real SessionRuntime public path and observed `{"identicalBlockedForceEvents":2,"steerCalls":1,"firstPrompt":true}`. This was a controlled public-boundary probe, not a packaged-VSIX or owner-profile run.
+
+## Resolution — 2026-11-27 02:45 +03:00
+
+Delivery now returns the submission result and `said` commits only for accepted `running | queued`; blocked remains retryable. The new public runtime regression was red before the fix and green afterward: two identical blocked force observations submit twice, and a later accepted running submits once more. Runtime+controller is 60/60 with a fourth post-acceptance observation, full extension 670/1, typecheck/lint and build-53 audit green. Packaged guest and accumulated-main acceptance remain open. Evidence: `testcases/reports/2026-11-27_phase2_context_queue.md`.

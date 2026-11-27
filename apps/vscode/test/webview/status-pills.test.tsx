@@ -11,6 +11,10 @@ const NEW_TURN_STEER: SteerChatResult = {
   ok: true,
   submission: { promptId: "prompt-new-turn", createdAt: "2026-11-24T00:00:00.000Z", state: "running", turnId: 8, steered: false },
 };
+const ACCEPTED_QUEUED_STEER: SteerChatResult = {
+  ok: true,
+  submission: { promptId: "prompt-accepted-queue", createdAt: "2026-11-24T00:00:00.000Z", state: "queued", steered: false },
+};
 
 const boundary = vi.hoisted(() => ({
   on: vi.fn(),
@@ -185,6 +189,62 @@ describe("live status pills", () => {
       expect(boundary.streamChat).toHaveBeenCalledTimes(1);
       expect(boundary.streamChat.mock.calls[0]?.[0]).toBe("second");
       expect(useChatStore.getState().queue).toEqual([]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("accepted queued steer is not resent when the previous turn completes first", async () => {
+    let acceptSteer: (value: SteerChatResult) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((resolve) => { acceptSteer = resolve; }));
+    useChatStore.setState({
+      isStreaming: true,
+      queue: [{ id: "q1", content: "first", model: "plain" }],
+    });
+    useChatStore.getState().steerQueueItem("q1");
+    acceptSteer(ACCEPTED_QUEUED_STEER);
+    await vi.waitFor(() => expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q1"]));
+
+    vi.useFakeTimers();
+    try {
+      useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 7 });
+      vi.advanceTimersByTime(50);
+      expect(boundary.streamChat).not.toHaveBeenCalled();
+
+      useChatStore.getState().processEvent({ type: "TurnBegin", payload: { user_input: "first", turnIndex: 8, clientId: "q1" } });
+      expect(useChatStore.getState().queue).toEqual([]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("drains later queued items after an accepted prefix", async () => {
+    let acceptSteer: (value: SteerChatResult) => void = () => undefined;
+    boundary.steerChat.mockImplementation(() => new Promise((resolve) => { acceptSteer = resolve; }));
+    useChatStore.setState({
+      isStreaming: true,
+      queue: [
+        { id: "q1", content: "first", model: "plain" },
+        { id: "q2", content: "second", model: "plain" },
+        { id: "q3", content: "third", model: "plain" },
+      ],
+    });
+    useChatStore.getState().steerQueueItem("q1");
+    acceptSteer(ACCEPTED_QUEUED_STEER);
+    await vi.waitFor(() => expect(useChatStore.getState().queue.map((item) => item.id)).toEqual(["q1", "q2", "q3"]));
+
+    vi.useFakeTimers();
+    try {
+      useChatStore.getState().processEvent({ type: "stream_complete", result: { status: "finished" }, turnIndex: 7 });
+      vi.advanceTimersByTime(50);
+      expect(boundary.streamChat).toHaveBeenCalledTimes(1);
+      expect(boundary.streamChat.mock.calls[0]?.[0]).toBe("second");
+      const clientId = (boundary.streamChat.mock.calls[0]![5] as { clientId: string }).clientId;
+      boundary.steerChat.mockResolvedValue(RUNNING_STEER);
+
+      useChatStore.getState().processEvent({ type: "QueueBatchReady", payload: { clientId } });
+      await vi.waitFor(() => expect(boundary.steerChat).toHaveBeenCalledTimes(2));
+      expect(boundary.steerChat.mock.calls[1]?.[0]).toBe("third");
     } finally {
       vi.useRealTimers();
     }

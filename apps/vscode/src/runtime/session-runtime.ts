@@ -116,7 +116,8 @@ export class SessionRuntime {
       this.contextWindowController = new ContextWindowController(
         options.contextWindowControl,
         async (line) => {
-          if (!this.closed) await this.session.steer(line);
+          if (this.closed) return { state: "blocked" as const };
+          return this.session.steer(line);
         },
         (message, error) => this.log(message, error),
       );

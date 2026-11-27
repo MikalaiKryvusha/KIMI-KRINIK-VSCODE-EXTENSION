@@ -14,6 +14,7 @@ function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: 
   const text = Content.getText(content);
   const hasMedia = Content.hasMedia(content);
   const isFirst = queue[0]?.id === id;
+  const accepted = queue.find((item) => item.id === id)?.accepted === true;
 
   const handleSteer = () => steerQueueItem(id);
 
@@ -24,7 +25,7 @@ function QueueItem({ id, content, isStreaming, onEdit }: { id: string; content: 
         {hasMedia && text && <span className="text-[10px] text-muted-foreground">{t("queue.withMedia")}</span>}
       </div>
       <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-        {isStreaming && (
+        {isStreaming && !accepted && (
           <Button
             variant="ghost"
             size="icon"

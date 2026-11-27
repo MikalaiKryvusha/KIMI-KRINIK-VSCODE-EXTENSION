@@ -1148,4 +1148,40 @@ describe("Context Window Control runtime delivery", () => {
     expect(log).not.toHaveBeenCalled();
     await runtime.close();
   });
+
+  it("retries Context Window Control after a blocked submission", async () => {
+    const sdk = createFakeSession();
+    const runtime = new SessionRuntime({
+      session: sdk.session,
+      legacyApproval: DEFAULT_LEGACY_APPROVAL,
+      broadcast: vi.fn(),
+      captureBaseline: vi.fn(),
+      log: vi.fn(),
+      contextWindowControl: async () => ({
+        enabled: true,
+        autoCompact: false,
+        thresholds: { warnPct: 70, cutPct: 75, closePct: 80, forcePct: 90 },
+      }),
+    });
+    sdk.setSteerResult({ promptId: "prompt-blocked", createdAt: "2026-11-24T00:00:00.000Z", state: "blocked", steered: false });
+    const status = {
+      type: "agent.status.updated",
+      sessionId: "session-1",
+      agentId: "main",
+      contextTokens: 802_161,
+      maxContextTokens: 1_048_576,
+    } as const;
+
+    sdk.emit(status);
+    sdk.emit(status);
+    await vi.waitFor(() => expect(sdk.steerInputs).toHaveLength(2));
+
+    sdk.setSteerResult(RUNNING_STEER_RESULT);
+    sdk.emit(status);
+    await vi.waitFor(() => expect(sdk.steerInputs).toHaveLength(3));
+    sdk.emit(status);
+    await new Promise<void>((resolve) => { setImmediate(resolve); });
+    expect(sdk.steerInputs).toHaveLength(3);
+    await runtime.close();
+  });
 });

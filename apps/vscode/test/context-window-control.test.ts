@@ -60,7 +60,7 @@ describe("KIMI KRINIK context-window decisions", () => {
   });
 
   it("delivers one system prompt per stage and delivers it again after a compaction reset", async () => {
-    const deliver = vi.fn(async (_line: string) => undefined);
+    const deliver = vi.fn(async (_line: string) => ({ state: "running" as const }));
     const log = vi.fn();
     const controller = new ContextWindowController(
       async () => ({ enabled: true, autoCompact: false, thresholds: DEFAULT_CONTEXT_WINDOW_THRESHOLDS }),

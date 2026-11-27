@@ -1,6 +1,7 @@
 # Audit 001 · Family: accepted queued steer is resubmitted
 
 **Mechanism:** an engine-accepted queued item is returned to the sendable local queue and can be sent again by terminal queue advancement before its durable start arrives.
+**GitHub issue:** https://github.com/MikalaiKryvusha/KIMI-KRINIK-VSCODE-EXTENSION/issues/34
 **Already guarded by:** repeat-click suppression and running/rejected queue paths; the accepted-queued/terminal ordering is unguarded.
 **Occurrences:** F1.
 
@@ -25,3 +26,7 @@ kaif-fp: apps/vscode/webview-ui/src/stores/chat.store.ts :: accepted-queue-termi
 **Do not touch:** immediate queue removal, repeat-click suppression, original-index restoration for ok:false/blocked/rejected outcomes and whole-batch draining after a genuine sending window.
 
 **Meta:** links bugs 20/22, EXP-0012 and `researches/54_chat_pipeline_reliability.md` (“Do not auto-resend uncertainty”). Skeptic reproduced through the real store; packaged-VSIX timing remains to be covered after the fix.
+
+## Resolution — 2026-11-27 02:45 +03:00
+
+Accepted items now remain visible with `accepted:true` but are excluded from automatic selection and repeat lightning until durable `TurnBegin` removes them. The batch helper uses the same selector, so an accepted prefix cannot strand Q2/Q3. The real-store regression was red before the fix and green afterward: previous completion no longer resends Q1, while rejected/blocked restoration and batch controls remain intact. Status pills 16/16 including the accepted-prefix Q2/Q3 batch path, full extension 670/1, typecheck/lint and build-53 audit green. Packaged guest and accumulated-main acceptance remain open. Evidence: `testcases/reports/2026-11-27_phase2_context_queue.md`.

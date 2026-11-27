@@ -114,6 +114,10 @@ export interface ContextWindowRuntimeConfig extends ContextWindowLoopControl {
 
 export type ContextWindowConfigProvider = () => Promise<ContextWindowRuntimeConfig>;
 
+export interface ContextWindowDeliveryResult {
+  readonly state: "running" | "queued" | "blocked";
+}
+
 export class ContextWindowController {
   private said: number[] = [];
   private generation = 0;
@@ -121,7 +125,7 @@ export class ContextWindowController {
 
   constructor(
     private readonly config: ContextWindowConfigProvider,
-    private readonly deliver: (line: string) => Promise<void>,
+    private readonly deliver: (line: string) => Promise<ContextWindowDeliveryResult>,
     private readonly log: (message: string, error: unknown) => void,
   ) {}
 
@@ -137,8 +141,8 @@ export class ContextWindowController {
         return;
       }
       if (generation !== this.generation) return;
-      await this.deliver(`<system>${decision.line}</system>`);
-      if (generation === this.generation) this.said = decision.said;
+      const result = await this.deliver(`<system>${decision.line}</system>`);
+      if (generation === this.generation && result.state !== "blocked") this.said = decision.said;
     }).catch((error: unknown) => {
       this.log("Context Window Control observation failed", error);
     });

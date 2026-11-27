@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 2 — Пять Act-находок аудита»
-> **Статус:** готов к исполнению; Phase 1 judge VERIFIED WITH CAVEATS, accumulated main/audible output остаётся открытым · [TESTED: 2026-11-27 · parent anchors, existing suites and scoped requirements lint checked; implementation not started]
+> **Статус:** шаги 4.1–4.2 выполнены, включая multi-item batch path, full 670/1, typecheck/lint/build-53 audit and Extension Host smoke green; `secondary-primary-default`, `sound-default-manifest`, `model-picker-enter-bubbling` и packaged acceptance открыты · [TESTED: 2026-11-27 · 60/60 runtime+controller and 16/16 status pills in `testcases/reports/2026-11-27_phase2_context_queue.md`; packaged guest/main acceptance not verified]
 > **Вовне:** каждая находка обновляет audit card, owning bug/issue при наличии, `STATUS.md` и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -35,19 +35,19 @@
 
 Anchor: Epic 04 Phase 2 — «context blocked retry … red-before public-interface regression и packaged-path verification».
 
-- [ ] В `Context Window Control runtime delivery` добавить public runtime regression: два одинаковых blocked force observations → две `session.steer` submissions; поздний accepted running → ровно одно дальнейшее принятое действие.
-- [ ] Запустить на исходном коде и записать, что после первого blocked повторной отправки нет.
-- [ ] Вернуть `PromptSubmissionResult` из delivery в controller; `said` записывать только после accepted running/queued. Сохранить blocked без успешной отметки, generation reset, coalescing и accepted exactly-once.
-- [ ] Verification: targeted runtime/controller tests зелёные; реальный SDK/provider boundary подтверждает blocked retry без автоматического resend принятого сообщения.
+- [x] В `Context Window Control runtime delivery` добавить public runtime regression: два одинаковых blocked force observations → две `session.steer` submissions; поздний accepted running → ровно одно дальнейшее принятое действие.
+- [x] Запустить на исходном коде и записать, что после первого blocked повторной отправки нет.
+- [x] Вернуть `PromptSubmissionResult` из delivery в controller; `said` записывать только после accepted running/queued. Сохранить blocked без успешной отметки, generation reset, coalescing и accepted exactly-once.
+- [x] Verification: targeted runtime/controller tests зелёные; реальный SDK/provider boundary подтверждает blocked retry без автоматического resend принятого сообщения.
 
 ### 4.2 Accepted queued resubmission
 
 Anchor: Epic 04 Phase 2 — «accepted queued resubmission … red-before public-interface regression».
 
-- [ ] В `status-pills.test.tsx` добавить accepted `state: "queued"`: Q1 восстановлен в visible queue, прежний completion наступает до durable start; ожидание не вызывает `streamChat`; поздний `TurnBegin(clientId=q1)` удаляет Q1 и оставляет Q2.
-- [ ] Запустить на исходном store и зафиксировать повторную `streamChat` отправку Q1.
-- [ ] Пометить restored accepted item как engine-accepted; automatic selection пропускает его, visible presentation и ручное восстановление rejected/blocked сохраняются. Не использовать timer/idle probe для разрешения неопределённости.
-- [ ] Verification: accepted item не отправляется повторно, durable promotion удаляет его, rejected items восстанавливаются по исходному индексу, whole-batch draining не сломан.
+- [x] В `status-pills.test.tsx` добавить accepted `state: "queued"`: Q1 восстановлен в visible queue, прежний completion наступает до durable start; ожидание не вызывает `streamChat`; поздний `TurnBegin(clientId=q1)` удаляет Q1 и оставляет Q2.
+- [x] Запустить на исходном store и зафиксировать повторную `streamChat` отправку Q1.
+- [x] Пометить restored accepted item как engine-accepted; automatic selection пропускает его, visible presentation и ручное восстановление rejected/blocked сохраняются. Не использовать timer/idle probe для разрешения неопределённости.
+- [x] Verification: accepted item не отправляется повторно, durable promotion удаляет его, rejected items восстанавливаются по исходному индексу, whole-batch draining не сломан.
 
 ### 4.3 Secondary primary default
 
