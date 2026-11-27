@@ -58,7 +58,7 @@
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
 >      field-dropped-in-rebuild, red-accepted-unread, defaults-overwrite-session-state,
       late-cancellation-masquerades-as-live-flip, self-host-reload, terminal-state-not-propagated,
-      session-env-contamination -->
+      session-env-contamination, stale-stand-served-old-build -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -79,6 +79,7 @@
 > | `self-host-reload` | a live acceptance reload restarts the Extension Host that is executing the agent itself |
 | `terminal-state-not-propagated` | a periodic or queued trigger fires without knowing the session's terminal lifecycle state |
 | `session-env-contamination` | an inherited agent-session variable redirects a test from its fixture to the live session |
+| `stale-stand-served-old-build` | a supposed restart keeps an old application process and its stale build or configuration alive |
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -149,6 +150,7 @@ mechanized: read the running build from the action menu `v1.0.0 (NN)` before any
 **Context:** the isolated build-42 acceptance probed the webview and saw build-40 classes although build 42 was installed.
 **Tried / did:** Playwright `browser.close()` over `chromium.connectOverCDP` was used to stop the isolated instance after build 40; the next launch then attached to the STILL-RUNNING old process, whose CDP port 9223 kept serving the old build.
 **Result:** ❌→✅ — the action menu proved `v1.0.0 (40)`; killing the old PID tree and relaunching gave build 42 and all probes passed.   → link: testcases/reports/2026-11-26_build_42_sticky_animation_subagent_chevron.md
+**2026-11-27 update:** the same stale process hid a newly configured build-55 hook. Closing the actual isolated window with Ctrl+Shift+W, checking the old PID gone and the next root PID different is the non-destructive alternative; the fresh host then passed blocked-context acceptance. Route: `HOUSE_RULES.md` tools; evidence: `testcases/reports/2026-11-27_phase2_act_findings.md`.
 **Lesson:** `browser.close()` over a CDP connection closes the connection, not the VS Code process; a new launch then attaches to the stale instance. Kill the isolated instance by PID tree, and read the running build number from the action menu before trusting any isolated measurement.
 **Repro:** install a new VSIX, `taskkill` the previous isolated PID from `.tmp/k5-vscode/code.pid`, relaunch, then check `v1.0.0 (NN)` in the action menu.
 **Trigger:** any isolated VS Code acceptance or a DOM reading that contradicts the just-installed build → verify the running process before suspecting the code.
