@@ -12,8 +12,8 @@
 //      agent WRITES the phrase file first (the owner sees the Write in the harness) and speaks it with `--file`; the moment in the name is
 //      the machine's clock at the moment of speaking — the tool renames a file whose stamp is stale, never trusts the agent's sense of time.
 //
-// Engines (machine resources, reached through the environment, never a path inside the project):
-//   KAIF_VOICE_FILE_TOOL — JSON array, a complete file-based command prefix with `{file}`; it wins and runs BEFORE the renderer below
+// Engines (machine resources reached through the project marker or the environment, never a hardcoded path):
+//   contour.voiceFileTool / KAIF_VOICE_FILE_TOOL — JSON array, a complete file-based command prefix with `{file}`; it wins and runs BEFORE the renderer below
 //                          (the origin's Silero + Glass, bugs/148; the phrase is logged first);
 //   KAIF_VOICE_RENDER    — JSON array, a command prefix called with `<text> <out.wav> <voice>` (e.g. a renderer with longer pauses on
 //                          punctuation); tried first;
@@ -67,6 +67,13 @@ export function projectRoot(start = process.cwd()) {
   }
 }
 const readJson = (p) => { try { return JSON.parse(readFileSync(p, 'utf8').replace(/^\uFEFF/, '')); } catch { return null; } };
+export function configuredFileVoice(root, env = process.env) {
+  let custom = (readJson(join(root, KAIF_JSON)) || {}).contour?.voiceFileTool || null;
+  if (env.KAIF_VOICE_FILE_TOOL) {
+    try { custom = JSON.parse(env.KAIF_VOICE_FILE_TOOL); } catch { custom = null; }
+  }
+  return Array.isArray(custom) && custom.length && custom.every((x) => typeof x === 'string') ? custom : null;
+}
 // The log directory — `.kaif/kaif.json` → `contour.voiceLog` (relative to the project), default `voice`.
 export function voiceLogDir(root) {
   const c = (readJson(join(root, KAIF_JSON)) || {}).contour || {};
@@ -191,8 +198,11 @@ export function voiceSoftSelftest(log = console.log) {
     writeFileSync(fresh, 'The judge is ready.');
     ok(logPhrase(r, 'The judge is ready.', { file: fresh, now: at }) === 'voice/2026-11-07_11-31-30_judge-ready.txt' && existsSync(fresh),
       'voice log: a full stamp within two minutes of the clock is kept as the agent wrote it');
-    writeFileSync(join(r, KAIF_JSON), JSON.stringify({ contour: { voiceLog: 'docs/said/' } }));
+    writeFileSync(join(r, KAIF_JSON), JSON.stringify({ contour: { voiceLog: 'docs/said/', voiceFileTool: ['python', 'say.py', '{file}'] } }));
     ok(logPhrase(r, 'Done.', { now: at }) === 'docs/said/2026-11-07_11-32-05_done.txt', 'voice log: contour.voiceLog names another folder');
+    ok(configuredFileVoice(r, {}).join(' ') === 'python say.py {file}', 'voice file tool: contour.voiceFileTool is read without an environment variable');
+    ok(configuredFileVoice(r, { KAIF_VOICE_FILE_TOOL: '["override","{file}"]' })[0] === 'override', 'voice file tool: the environment overrides the marker');
+    ok(configuredFileVoice(r, { KAIF_VOICE_FILE_TOOL: 'not json' }) === null, 'voice file tool: a malformed override fails closed to the silent renderer path');
   } finally { rmSync(r, { recursive: true, force: true }); }
   const f = softFilter();
   ok(f.includes('atempo=0.9,') && f.includes('bass=g=6:f=140') && f.includes('lowpass=f=4200') && f.includes('adelay=2000:all=1')
@@ -224,9 +234,7 @@ function main(args) {
     console.log('voice log: ' + loggedFile);
   }
   // The owner's configured file-based engine (Silero + Glass at the origin) wins over this tool's own beep-based renderer (bugs/148).
-  let fileVoice = null;
-  try { const custom = process.env.KAIF_VOICE_FILE_TOOL ? JSON.parse(process.env.KAIF_VOICE_FILE_TOOL) : null;
-    if (Array.isArray(custom) && custom.length && custom.every((x) => typeof x === 'string')) fileVoice = custom; } catch { /* use the renderer below */ }
+  const fileVoice = configuredFileVoice(projectRoot());
   if (fileVoice) {
     const scratch = loggedFile ? '' : mkdtempSync(join(tmpdir(), 'kaif-voice-file-'));
     const phraseFile = loggedFile ? resolve(projectRoot(), loggedFile) : join(scratch, 'phrase.txt');

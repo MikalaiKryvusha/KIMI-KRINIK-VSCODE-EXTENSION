@@ -61,7 +61,7 @@ import {
   ownedStem, // bugs/141 (origin #199): a page lock is named by the same rule as its decision record
 } from './core.mjs';
 import { texts, PARSER } from './texts.mjs';
-import { logPhrase, voiceSoftSelftest } from './voice-soft.mjs';
+import { logPhrase, voiceSoftSelftest, configuredFileVoice } from './voice-soft.mjs';
 
 // ── Constants (canonical defaults DEF; the owner's envelope — depart only by the owner's word) ─
 const ALIVE_INTERVAL_MS = 15000;      // DEF4: page→server pulse, envelope 10–60 s
@@ -310,7 +310,8 @@ export function callWav(voicePcm = Buffer.alloc(0), { beeps = true, rate = CALL_
   return Buffer.concat([h, data]);
 }
 // 2.10 TK7 (c): the composition of the call on this machine, as words — the dry run prints it (the sound itself is judged by the owner's ear)
-export function callShape(env = process.env, win = IS_WIN) {
+export function callShape(env = process.env, win = IS_WIN, fileVoice = null) {
+  if (Array.isArray(fileVoice) && fileVoice.length) return 'configured contour.voiceFileTool only — the file tool owns its signal; no contour beeps';
   const lead = (CALL_LEAD_SILENCE_MS / 1000).toFixed(1) + ' s silence';
   const beeps = 'beeps ' + CALL_BEEPS.map(([hz]) => hz).join('/') + ' Hz ' + CALL_BEEPS.map(([, ms]) => ms).join('/') + ' ms, full level';
   const pause = (CALL_AFTER_BEEPS_MS / 1000).toFixed(1) + ' s pause';
@@ -367,7 +368,7 @@ export function callDoor(root, text, { dryRun = false, log = console.log, signal
     log('CALL' + (cfg.session ? ' · ' + cfg.session : '') + ' (dry run, no sound): ' + phrase);
     // 2.10 TK7 (c), #165: what the engine would get and what the sound would be made of — said, not played
     log('  spoken: ' + speakable(phrase.replace(/[*_`#>[\]()«»"]/g, ' ').replace(/\s{2,}/g, ' ').trim(), cfg));
-    log('  sound: ' + callShape());
+    log('  sound: ' + callShape(process.env, IS_WIN, configuredFileVoice(root)));
     return phrase;
   }
   // 2.10, decision №156: what the agent says aloud is kept in the project — voice/<stamp>_<meaning>.txt (voice-soft.mjs); the meaning is
@@ -394,10 +395,10 @@ function callPhraseBare(ctx, cfg) {
 }
 
 // ── The signal (C8/I33): beeps → console → voice; quiet hours on top (I6) ─────────────────────
-// The rich voice engine is a MACHINE resource reached through the environment (KAIF_VOICE_TOOL — a
-// node script taking `<phrase> --play --voice <name>`; KAIF_VOICE; KAIF_SAPI_VOICE) — never a path
-// inside the project. Without it the contour drops to the system voice of the deployment language
-// (Windows SAPI by culture · macOS `say`), and without that — to beeps + banner, saying so.
+// The rich voice engine is a MACHINE resource reached through contour.voiceFileTool or the environment (KAIF_VOICE_TOOL — a
+// node script taking `<phrase> --play --voice <name>`; KAIF_VOICE; KAIF_SAPI_VOICE). A configured file tool owns its complete
+// signal and bypasses the contour's beeps and system-voice fallback. Without configured tools the contour drops to the system
+// voice of the deployment language (Windows SAPI by culture · macOS `say`), and without that — to beeps + banner, saying so.
 // 2.10 TK7b (judge TK7, hunt 7 — «one voice at a time» held only through one page): ONE VOICE AT A TIME across processes — a page's call and
 // the `--call` of two sessions never sound together. A call takes the voice lock (pid + moment, in the contour's temp folder; created
 // exclusively) and gives it back when its sound has ended; a call that finds it taken waits. A lock whose process is gone or older than
@@ -456,6 +457,23 @@ export function signalCall(root, rawPhrase, { quiet = null, log = console.log } 
   if (isQuiet) { log(qn.hard ? 'Call-free window of the owner (noCalls) — beeps and voice suppressed; the page is up silently.' : 'Quiet hours (I6) — beeps and voice suppressed; the page is up silently.'); return; }
   const lang = cfg.language;
   const dir = tmpDirOf(root);
+  const fileVoice = configuredFileVoice(root);
+  if (fileVoice) {
+    log('CALL: voice — configured contour.voiceFileTool; no contour beeps or system-voice fallback.');
+    whenVoiceFree(root, (release) => {
+      mkdirSync(dir, { recursive: true });
+      const phraseFile = join(dir, 'call-file-phrase-' + process.pid + '.txt');
+      writeFileSync(phraseFile, phrase + '\n', 'utf8');
+      const command = fileVoice.map((part) => part.replaceAll('{file}', phraseFile));
+      const child = spawn(command[0], command.slice(1), { cwd: root, stdio: 'ignore', timeout: VOICE_TIMEOUT_MS });
+      child.on('exit', (code) => {
+        if (code !== 0) log('CALL: configured voice file tool exited ' + code + '; the banner did the call without fallback beeps.');
+        release();
+      });
+      child.on('error', () => { log('CALL: configured voice file tool could not start; the banner did the call without fallback beeps.'); release(); });
+    });
+    return;
+  }
   const psq = (p) => String(p).replace(/'/g, "''"); // a PowerShell single-quoted string
   let done = () => {}; // TK7b: gives the voice lock back — set when the voice is taken, called on every path where the sound has ended
   // TK7 (c): the call file is played ONCE through the sound card (I34), the voice timeout as its deadline (DEF7); never blocks (I32)
@@ -3254,7 +3272,8 @@ export async function selftest(log = console.log) {
     const rich = pcmOfWav(callWav(voice, { rate: 48000 }));
     ok(pcmOfWav(stereo) === null && rich && rich.rate === 48000 && rich.pcm.subarray(0, 2 * 48000).every((x) => x === 0) && rich.pcm.subarray(rich.pcm.length - 600).equals(voice)
       && callShape({}, true).startsWith('ONE file') && callShape({ KAIF_VOICE_TOOL: 'x' }, true).startsWith('ONE file')
-      && callShape({ KAIF_VOICE_TOOL: 'x', KAIF_VOICE_BEEPS: 'embedded' }, true).startsWith('KAIF_VOICE_TOOL only'),
+      && callShape({ KAIF_VOICE_TOOL: 'x', KAIF_VOICE_BEEPS: 'embedded' }, true).startsWith('KAIF_VOICE_TOOL only')
+      && callShape({}, true, ['python', '{file}']).includes('no contour beeps'),
       'TK7 #165: a stereo voice is not glued in; a rich tool\'s voice at its own rate is glued with silence and beeps made at that rate; the dry run names the composition');
     // TK7b (judge TK7, hunt 5): a cut file is no voice (never a throw in the child's exit handler — I32); a data chunk without samples is no voice
     const safe = (b) => { try { return pcmOfWav(b); } catch { return 'threw'; } };
