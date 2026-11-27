@@ -25,3 +25,17 @@ kaif-fp: apps/vscode/src/handlers/config.handler.ts :: secondary-write-overwrite
 **Do not touch:** deliberate primary model/effort selection, above-default effort persistence from bugs/27 and resumed-session restoration.
 
 **Meta:** links EXP-0005, bugs/27 and `.changeset/kaif-secondary-model.md`. Host skeptic independently ran the real SaveConfig handler and persistence. Its output corrects only the reviewer's test-count detail, which does not refute the defect.
+
+## Remediation — 2026-11-27 09:27 +03:00
+
+Hygiene: the two new public `BridgeHandler` cases were red on the original code and observed the exact primary A write. After the fix, bridge-handler + Control Panel settings are 73/73, extension/webview typecheck and root lint pass. Secondary S and its effort are validated and persisted through the real TOML writer; global B and resumed runtime A receive no primary setters. Existing deliberate primary and `effortChanged:false` controls remain green. Evidence: `testcases/reports/2026-11-27_phase2_secondary_primary.md`.
+
+Functional run: NONE. Packaged guest and accumulated-main acceptance remain open; this card is not DONE.
+
+Fix: `secondaryOnly` is true only for a defined secondary selection with `effortChanged:false`; that case skips the primary block. Deliberate primary saves, primary-only `effortChanged:false` and mixed primary+secondary requests retain the previous path and ordering.
+
+TWINS: searched `secondaryModel|secondary_model`, `effortChanged` and `defaultModel: params.model` across TypeScript — found 0 other mixed primary/secondary save sites. TUI and app-core use secondary-only patches.
+
+TWINS-MECH: searched all observed spellings of the combined-save mechanism: camelCase/snake_case secondary fields, effort-change marker and primary-default assignment. Only VS Code `SaveConfig` combines them.
+
+BOTH-WAYS: global config and resumed runtime are both asserted untouched, so neither direction of the default/session overwrite remains unguarded.

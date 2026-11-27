@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 2 — Пять Act-находок аудита»
-> **Статус:** шаги 4.1–4.2 выполнены, включая multi-item batch path, full 670/1, typecheck/lint/build-53 audit and Extension Host smoke green; `secondary-primary-default`, `sound-default-manifest`, `model-picker-enter-bubbling` и packaged acceptance открыты · [TESTED: 2026-11-27 · 60/60 runtime+controller and 16/16 status pills in `testcases/reports/2026-11-27_phase2_context_queue.md`; packaged guest/main acceptance not verified]
+> **Статус:** шаги 4.1–4.3 выполнены на owning public boundaries; 4.1–4.2 имеют full 670/1, typecheck/lint/build-53 audit и Extension Host smoke, 4.3 имеет red-before, 73/73 bridge+Control Panel, typecheck/lint; `sound-default-manifest`, `model-picker-enter-bubbling` и packaged acceptance открыты · [TESTED: 2026-11-27 · 60/60 runtime+controller and 16/16 status pills in `testcases/reports/2026-11-27_phase2_context_queue.md`; packaged guest/main acceptance not verified]
 > **Вовне:** каждая находка обновляет audit card, owning bug/issue при наличии, `STATUS.md` и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -53,10 +53,12 @@ Anchor: Epic 04 Phase 2 — «accepted queued resubmission … red-before public
 
 Anchor: Epic 04 Phase 2 — «secondary primary default … red-before public-interface regression».
 
-- [ ] В `bridge-handler.test.ts` смоделировать global B, resumed A и secondary S с `effortChanged:false`; потребовать, что `setConfig`, `setModel` и `setThinking` не вызываются для primary, а S сохраняется.
-- [ ] Запустить на исходном handler и зафиксировать запись primary A.
-- [ ] Ветвить secondary-only persistence до primary setters, сохранив deliberate primary save и `effortChanged:false` без secondaryModel как control.
-- [ ] Verification: primary config остаётся B, secondary S валидно записано, primary runtime A не меняется, ошибка secondary save не оставляет скрытой primary записи.
+- [x] В `bridge-handler.test.ts` смоделировать global B, resumed A и secondary S с `effortChanged:false`; потребовать, что `setConfig`, `setModel` и `setThinking` не вызываются для primary, а S сохраняется.
+- [x] Запустить на исходном handler и зафиксировать запись primary A.
+- [x] Ветвить secondary-only persistence до primary setters, сохранив deliberate primary save и `effortChanged:false` без secondaryModel как control.
+- [x] Verification: primary config остаётся B, secondary S валидно записано, primary runtime A не меняется, ошибка secondary save не оставляет скрытой primary записи.
+
+Evidence: red at 2026-11-27 09:23:24 +03:00, then 73/73 bridge+Control Panel tests, typecheck and lint green. Hygiene and boundary details: `testcases/reports/2026-11-27_phase2_secondary_primary.md`. Functional packaged/main run remains open under §4.6.
 
 ### 4.4 Sound default manifest
 

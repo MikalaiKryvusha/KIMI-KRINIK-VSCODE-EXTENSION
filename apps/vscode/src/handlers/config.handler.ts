@@ -47,22 +47,25 @@ const saveConfig: Handler<SessionConfig, { ok: boolean }> = async (params, ctx) 
   const config = await ctx.harness.getConfig({ reload: true });
   const full = thinkingConfig(effort);
   const patch = effortChanged ? full : { enabled: full.enabled };
-  if (
-    config.defaultModel !== params.model
-    || config.thinking?.enabled !== patch.enabled
-    || (effortChanged && config.thinking?.effort !== patch.effort)
-  ) {
-    await ctx.harness.setConfig({
-      defaultModel: params.model,
-      thinking: patch,
-    });
-  }
+  const secondaryOnly = params.secondaryModel !== undefined && !effortChanged;
+  if (!secondaryOnly) {
+    if (
+      config.defaultModel !== params.model
+      || config.thinking?.enabled !== patch.enabled
+      || (effortChanged && config.thinking?.effort !== patch.effort)
+    ) {
+      await ctx.harness.setConfig({
+        defaultModel: params.model,
+        thinking: patch,
+      });
+    }
 
-  const runtime = ctx.getSession();
-  if (runtime !== undefined) {
-    const status = await runtime.session.getStatus();
-    if (status.model !== params.model) await runtime.session.setModel(params.model);
-    if (status.thinkingEffort !== effort) await runtime.session.setThinking(effort);
+    const runtime = ctx.getSession();
+    if (runtime !== undefined) {
+      const status = await runtime.session.getStatus();
+      if (status.model !== params.model) await runtime.session.setModel(params.model);
+      if (status.thinkingEffort !== effort) await runtime.session.setThinking(effort);
+    }
   }
   if (params.secondaryModel !== undefined) {
     const selection = params.secondaryModel;

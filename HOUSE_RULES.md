@@ -101,6 +101,7 @@
 | Общий русский Silero | `F:/krinik_tts/README.md` | локальный offline TTS и прямой `voice-say.mjs`; для обращений владельца сначала применяй контур Glass из R1 |
 | Имя владельца и проекта в звонке | `.kaif/kaif.json` → `contour` | `callName`, `spokenProjectName`, file-based voice tool |
 | GitHub Issues | Аутентифицированный `gh` CLI; перед операцией `gh auth status`, создание через `gh issue create --body-file <UTF-8 file>` | R9: локальный документ и публичный issue; MCP GitHub может не иметь авторизации |
+| Метки времени KAIF | В Kimi Write/Edit сначала `date`, затем записывать явное локальное время; плейсхолдер `⟦NOW⟧` здесь отклоняется без `updatedInput` | Фактические моменты в документах без незаполненных плейсхолдеров |
 
 ## 3. Инструменты проекта
 

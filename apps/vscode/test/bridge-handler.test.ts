@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -17,6 +17,7 @@ const host = vi.hoisted(() => {
   };
   const harness = {
     homeDir: "/tmp/kimi-code-test-home",
+    configPath: "",
     close: vi.fn(async () => undefined),
     getConfig: vi.fn(),
     setConfig: vi.fn(async () => undefined),
@@ -86,6 +87,7 @@ let workspaceState: { get: ReturnType<typeof vi.fn>; update: ReturnType<typeof v
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), "kimi-vscode-bridge-"));
   host.workspaceFolders.splice(0, host.workspaceFolders.length, { uri: new host.Uri(root) });
+  host.harness.configPath = join(root, "config.toml");
   showLogs = vi.fn();
   writeLog = vi.fn();
   host.harness.resumeSession.mockReset();
@@ -692,6 +694,25 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
     } as never);
   }
 
+  function mockSecondaryOnlySave() {
+    host.harness.getConfig.mockResolvedValue({
+      defaultModel: "global/b",
+      thinking: { enabled: false, effort: "low" },
+      models: {
+        "global/b": effortModel,
+        "resumed/a": effortModel,
+        "secondary/s": effortModel,
+      },
+    } as never);
+    const session = {
+      getStatus: vi.fn(async () => ({ model: "resumed/a", thinkingEffort: "high" })),
+      setModel: vi.fn(async () => undefined),
+      setThinking: vi.fn(async () => undefined),
+    };
+    vi.spyOn(bridge.runtime, "getSessionForView").mockReturnValue({ session } as never);
+    return session;
+  }
+
   it("persists a non-top effort as the global default", async () => {
     mockConfig();
 
@@ -781,6 +802,59 @@ describe("Webview config saves (thinking effort persistence parity with the TUI)
       defaultModel: "kimi/reasoning",
       thinking: { enabled: true },
     });
+  });
+
+  it("persists a secondary-only selection without changing primary config or runtime", async () => {
+    const session = mockSecondaryOnlySave();
+    await writeFile(host.harness.configPath, "[loop_control]\nauto_compact = false\n", "utf8");
+
+    const result = await bridge.handle(
+      {
+        id: "rpc-1",
+        method: Methods.SaveConfig,
+        params: {
+          model: "resumed/a",
+          thinking: true,
+          effort: "high",
+          effortChanged: false,
+          secondaryModel: { model: "secondary/s", defaultEffort: "high" },
+        },
+      },
+      "view-1",
+    );
+
+    expect(result).toEqual({ id: "rpc-1", result: { ok: true } });
+    expect(host.harness.setConfig).not.toHaveBeenCalled();
+    expect(session.setModel).not.toHaveBeenCalled();
+    expect(session.setThinking).not.toHaveBeenCalled();
+    expect(await readFile(host.harness.configPath, "utf8")).toContain(
+      '[secondary_model]\nmodel = "secondary/s"\ndefault_effort = "high"',
+    );
+  });
+
+  it("does not write primary state when secondary-only persistence fails", async () => {
+    const session = mockSecondaryOnlySave();
+    host.harness.configPath = join(root, "missing", "config.toml");
+
+    const result = await bridge.handle(
+      {
+        id: "rpc-1",
+        method: Methods.SaveConfig,
+        params: {
+          model: "resumed/a",
+          thinking: true,
+          effort: "high",
+          effortChanged: false,
+          secondaryModel: { model: "secondary/s" },
+        },
+      },
+      "view-1",
+    );
+
+    expect(result).toHaveProperty("error");
+    expect(host.harness.setConfig).not.toHaveBeenCalled();
+    expect(session.setModel).not.toHaveBeenCalled();
+    expect(session.setThinking).not.toHaveBeenCalled();
   });
 
   it("skips the config write entirely when nothing changed", async () => {
