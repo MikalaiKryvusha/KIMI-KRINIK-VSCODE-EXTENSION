@@ -4,7 +4,7 @@
 
 ## 1. Work
 
-Close `sound-default-manifest#F1`. Basis: `GOAL.md` owner-approved defaults, `plans/06_epic04_phase2_act_findings.md` §4.4 and the owning audit card. Required fresh values are Glass/Voice/Alert/Chime; saved choices, partial-map normalization, migration and audio playback are controls, not redesign targets.
+Close `sound-default-manifest#F1`. Basis: `GOAL.md` owner-approved defaults, `plans/06_DONE_epic04_phase2_act_findings.md` §4.4 and the owning audit card. Required fresh values are Glass/Voice/Alert/Chime; saved choices, partial-map normalization, migration and audio playback are controls, not redesign targets.
 
 ## 2. Contour
 
@@ -62,7 +62,7 @@ Deleted-text sweep: remaining Voice/Voice/Voice/Off mentions are historical pre-
 - `apps/vscode/test/sounds.test.ts` — manifest/shared and choice-description oracle.
 - `apps/vscode/test/extension-host/index.cjs` — independent fresh-host expected values and printed actual settings.
 - `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` — packaged build 54.
-- `plans/06_epic04_phase2_act_findings.md` §4.4 and the owning audit card.
+- `plans/06_DONE_epic04_phase2_act_findings.md` §4.4 and the owning audit card.
 
 ## 7. Verdict
 

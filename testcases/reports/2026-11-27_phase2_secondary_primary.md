@@ -4,7 +4,7 @@
 
 ## 1. Work
 
-Close the public-handler mechanism in `secondary-primary-default#F1`. Basis: `plans/06_epic04_phase2_act_findings.md` §4.3 and `reports/KAIF_AUDIT/2026-11-26_kimi_krinik_1_0_0_secondary-primary-default.md`. Packaged guest and accumulated-main acceptance remain separate Phase 2 gates.
+Close the public-handler mechanism in `secondary-primary-default#F1`. Basis: `plans/06_DONE_epic04_phase2_act_findings.md` §4.3 and `reports/KAIF_AUDIT/2026-11-26_kimi_krinik_1_0_0_secondary-primary-default.md`. Packaged guest and accumulated-main acceptance remain separate Phase 2 gates.
 
 ## 2. Contour
 
@@ -51,7 +51,7 @@ BOTH-WAYS: the regression guards both sides of the invariant — global config r
 - `apps/vscode/test/bridge-handler.test.ts` — secondary-only success and failure regressions.
 - `apps/vscode/src/handlers/config.handler.ts` — `secondaryOnly` bypasses only the primary block.
 - `apps/vscode/test/webview/control-panel-settings.test.tsx` — existing secondary selection/clear payload controls.
-- `plans/06_epic04_phase2_act_findings.md` §4.3 and the owning audit card.
+- `plans/06_DONE_epic04_phase2_act_findings.md` §4.3 and the owning audit card.
 
 ## 7. Verdict
 

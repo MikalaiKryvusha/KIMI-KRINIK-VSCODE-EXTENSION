@@ -30,3 +30,9 @@ kaif-fp: apps/vscode/src/runtime/context-window-control.ts :: blocked-delivery-m
 ## Resolution — 2026-11-27 02:45 +03:00
 
 Delivery now returns the submission result and `said` commits only for accepted `running | queued`; blocked remains retryable. The new public runtime regression was red before the fix and green afterward: two identical blocked force observations submit twice, and a later accepted running submits once more. Runtime+controller is 60/60 with a fourth post-acceptance observation, full extension 670/1, typecheck/lint and build-53 audit green. Packaged guest and accumulated-main acceptance remain open. Evidence: `testcases/reports/2026-11-27_phase2_context_queue.md`.
+
+## Packaged guest verification — 2026-11-27 11:13 +03:00
+
+Functional run: PASS on real packaged build 55. After a positive smoke, the isolated user path `/clear` → `/import large-context.md` (810,000 chars) produced the forced 90% stage. An isolated `UserPromptSubmit` hook blocked only the control prompt twice. Durable session `session_4143f2fd-671d-4714-92c8-a264565e4faf` records `prompt.completed` reasons blocked, blocked, completed for the three control submissions; provider received one accepted control turn. A later ordinary seed caused no fourth control submission. Derived evidence: `.tmp/k5-vscode/phase2-guest-summary.json`; full Phase 2 report: `testcases/reports/2026-11-27_phase2_act_findings.md`.
+
+Accumulated running-main remains unverified and is not part of this packaged PASS.

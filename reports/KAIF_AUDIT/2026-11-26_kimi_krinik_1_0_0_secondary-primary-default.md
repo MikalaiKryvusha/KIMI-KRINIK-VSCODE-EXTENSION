@@ -39,3 +39,9 @@ TWINS: searched `secondaryModel|secondary_model`, `effortChanged` and `defaultMo
 TWINS-MECH: searched all observed spellings of the combined-save mechanism: camelCase/snake_case secondary fields, effort-change marker and primary-default assignment. Only VS Code `SaveConfig` combines them.
 
 BOTH-WAYS: global config and resumed runtime are both asserted untouched, so neither direction of the default/session overwrite remains unguarded.
+
+## Packaged guest verification — 2026-11-27 11:13 +03:00
+
+Functional run: PASS on real packaged build 55, superseding the earlier NONE. Session A was resumed as `testkit-model · МАКС` while global default B was `kimi-code/kimi-for-coding`. Selecting secondary S=`kimi-code/k3` through «Субагенты» left current A and thinking effort max unchanged, persisted B and S, and showed the secondary selection dot. A fresh isolated VS Code restart then initialized the primary UI as K2.8 Preview, proving the future default is B. Selected evidence fields: `.tmp/k5-vscode/phase2-guest-summary.json`; full Phase 2 report: `testcases/reports/2026-11-27_phase2_act_findings.md`.
+
+A new-chat click retains the current store selection by design and was not used as the global-default oracle. Accumulated running-main remains a separate gate.

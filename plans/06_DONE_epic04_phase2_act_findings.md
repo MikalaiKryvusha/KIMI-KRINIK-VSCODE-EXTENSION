@@ -2,7 +2,7 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `plans/04_EPIC_release_blocker_remediation.md` — «Phase 2 — Пять Act-находок аудита»
-> **Статус:** шаги 4.1–4.5 выполнены на owning public boundaries; 4.4 имеет packaged build-54 fresh-host Glass/Voice/Alert/Chime, 4.5 имеет packaged build-55 real keyboard favorite/provider/search acceptance; full extension 676/1, typecheck/lint и win32-x64 build-55 audit зелёные. Packaged guest acceptance context/queue/secondary и accumulated-main остаются открытыми · [TESTED: 2026-11-27 · 4.4 fresh host and 4.5 packaged keyboard in `testcases/reports/2026-11-27_phase2_sound_defaults.md` / `2026-11-27_phase2_model_picker.md`; other guest/main paths not verified]
+> **Статус:** ✅ DONE на packaged boundaries 2026-11-27 11:13 +03:00; все пять Act-находок имеют red-before regressions и packaged observations, full extension 676/1, typecheck/lint и win32-x64 build-55 audit зелёные. Accumulated running-main остаётся более поздним release gate · [TESTED: 2026-11-27 · all five packaged mechanisms in `testcases/reports/2026-11-27_phase2_act_findings.md`]
 > **Вовне:** каждая находка обновляет audit card, owning bug/issue при наличии, `STATUS.md` и `testcases/reports/`; следующий operational plan пишется после закрытия фазы
 
 ## 1. Вектор цели
@@ -87,9 +87,9 @@ Evidence: favorite/provider checks were red at 2026-11-27 09:52:48 +03:00; model
 Anchor: Epic 04 gates — «affected suites, full extension, typecheck, lint и packaged VSIX paths зелёные».
 
 - [x] Прогнать affected suites, полный `apps/vscode/test`, `pnpm --filter kimi-code-kaif run typecheck`, `pnpm lint` и win32-x64 package/audit после всех пяти исправлений.
-- [ ] Установить следующий build на main и isolated profiles, проверить running build и выполнить реальные fresh defaults, secondary-only, keyboard и queue paths в guest.
-- [ ] Записать `testcases/reports/2026-11-27_phase2_act_findings.md` с Hygiene, Functional run, Found, Traces, Verdict и REAL WORLD.
-- [ ] Обновить audit cards/`STATUS.md`/issues и чекбоксы плана; затем `/skill:fable-judge` перед commit/push и перед написанием Phase 3.
+- [x] Установить следующий build на main и isolated profiles, проверить running build и выполнить реальные fresh defaults, secondary-only, keyboard и queue paths в guest.
+- [x] Записать `testcases/reports/2026-11-27_phase2_act_findings.md` с Hygiene, Functional run, Found, Traces, Verdict и REAL WORLD.
+- [x] Обновить audit cards/`STATUS.md`/issues и чекбоксы плана; затем `/skill:fable-judge` перед commit/push и перед написанием Phase 3.
 
 ## 5. Риски и stop rules
 
@@ -106,3 +106,13 @@ Anchor: Epic 04 gates — «affected suites, full extension, typecheck, lint и 
 - Пять Act-находки выполняются как одна фаза с отдельными красными границами и evidence на каждую, а не как один общий diff без владельца результата.
 - Изменения используют существующие state/config/event contracts; новых RPC, dependencies или архитектурных stores не требуется.
 - Packaged acceptance разделяет fresh-profile defaults и накопленный main-profile boundary; DONE не выводится из unit tests.
+- Blocked context проверен изолированным `UserPromptSubmit` fixture, который блокирует только control prompt дважды; product hook config не изменён.
+- Accepted queued воспроизведён через manual compaction quiescence; approval pause и read-only tool оказались неподходящими stand variants и не использованы как product verdict.
+- Для реального restart isolated применяется штатный close window с проверкой PID, потому что CDP disconnect не завершал старый процесс.
+- Global secondary default проверен fresh initialization на B; new-chat current store selection сознательно не используется как oracle.
+
+## 7. ✅ STATUS: DONE (2026-11-27 11:13 +03:00)
+
+Все пять Act-находок закрыты на owning public boundaries и на реальных packaged paths builds 54/55. Full extension 676 passed / 1 skipped, typecheck, lint, VSIX audit и fresh Extension Host smoke зелёные. Issues #33/#34 получили post-fix comments. Сводное доказательство: `testcases/reports/2026-11-27_phase2_act_findings.md`.
+
+Граница DONE: только Epic 04 Phase 2. Accumulated running-main, `bugs/25`/`bugs/11` и final hardening продолжаются в `plans/07_epic04_phase3_message_visibility_steering.md` и последующих фазах; релиз не публиковался.

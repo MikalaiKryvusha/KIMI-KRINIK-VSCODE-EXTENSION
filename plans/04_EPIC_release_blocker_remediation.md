@@ -2,9 +2,9 @@
 
 > **Создан:** 2026-11-27
 > **Родитель:** `researches/59_release_blocker_remediation.md`; `GOAL.md`; `STATUS.md`; `reports/KAIF_AUDIT/2026-11-26_kimi_krinik_1_0_0_SUMMARY.md`
-> **Статус:** активен; начат 2026-11-27 00:18 +03:00 · [TESTED: 2026-11-27 · phase anchors, source paths and scoped requirements lint checked; no product functional run claimed]
+> **Статус:** активен; Phase 1 завершена с caveats, Phase 2 закрыта на packaged build 55 2026-11-27 11:13 +03:00, Phase 3 активна · [TESTED: 2026-11-27 · Phase 2 all five packaged mechanisms in `testcases/reports/2026-11-27_phase2_act_findings.md`; phases 3–4 not complete]
 > **Вовне:** исправления и доказательства обновляют локальные bug-документы и связанные GitHub Issues по `HOUSE_RULES.md` R9; публикация релиза не входит в эпик
-> **Потомки:** `plans/05_epic04_phase1_steering_attention.md`
+> **Потомки:** `plans/05_epic04_phase1_steering_attention.md`, `plans/06_DONE_epic04_phase2_act_findings.md`, `plans/07_epic04_phase3_message_visibility_steering.md`
 
 ## 1. Вектор цели
 

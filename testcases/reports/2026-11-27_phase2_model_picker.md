@@ -4,7 +4,7 @@
 
 ## 1. Work
 
-Close `model-picker-enter-bubbling#F1`. Basis: `plans/06_epic04_phase2_act_findings.md` §4.5 and the owning audit card. Enter on favorite/provider must run only that native button action; currentModel and dialog visibility must remain unchanged. Search/list Enter, Arrow navigation, mouse selection and effort persistence are controls.
+Close `model-picker-enter-bubbling#F1`. Basis: `plans/06_DONE_epic04_phase2_act_findings.md` §4.5 and the owning audit card. Enter on favorite/provider must run only that native button action; currentModel and dialog visibility must remain unchanged. Search/list Enter, Arrow navigation, mouse selection and effort persistence are controls.
 
 ## 2. Contour
 
@@ -60,7 +60,7 @@ TWINS-MECH: a parent keyboard handler interpreted bubbled child-button activatio
 - `apps/vscode/test/webview/model-picker.test.tsx` — favorite/provider/Arrow keyboard contracts.
 - `.tmp/k5-vscode/55-provider-enter.webp` — real packaged provider state, opened and read.
 - `apps/vscode/artifacts/vsix/kimi-code-win32-x64.vsix` — packaged build 55.
-- `plans/06_epic04_phase2_act_findings.md` §4.5 and the owning audit card.
+- `plans/06_DONE_epic04_phase2_act_findings.md` §4.5 and the owning audit card.
 
 ## 7. Verdict
 

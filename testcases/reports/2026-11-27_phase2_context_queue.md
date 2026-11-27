@@ -4,7 +4,7 @@
 
 ## 1. Work
 
-Close two Act findings: `context-blocked-retry#F1` and `queue-accepted-resubmission#F1`. Basis: their audit cards and `plans/06_epic04_phase2_act_findings.md` §4.1–4.2. The other three Act findings remain open.
+Close two Act findings: `context-blocked-retry#F1` and `queue-accepted-resubmission#F1`. Basis: their audit cards and `plans/06_DONE_epic04_phase2_act_findings.md` §4.1–4.2. The other three Act findings remain open.
 
 ## 2. Contour
 
@@ -53,7 +53,7 @@ Functional run: no new guest scenario was executed for these two changes. Public
 - `apps/vscode/test/session-runtime.test.ts` — `retries Context Window Control after a blocked submission`.
 - `apps/vscode/test/webview/status-pills.test.tsx` — `accepted queued steer is not resent when the previous turn completes first`.
 - `apps/vscode/src/runtime/context-window-control.ts`, `session-runtime.ts`, `webview-ui/src/stores/chat.store.ts`, `components/QueuedMessagesPanel.tsx`.
-- `plans/06_epic04_phase2_act_findings.md`.
+- `plans/06_DONE_epic04_phase2_act_findings.md`.
 
 ## 7. Verdict
 

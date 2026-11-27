@@ -30,3 +30,9 @@ kaif-fp: apps/vscode/webview-ui/src/stores/chat.store.ts :: accepted-queue-termi
 ## Resolution — 2026-11-27 02:45 +03:00
 
 Accepted items now remain visible with `accepted:true` but are excluded from automatic selection and repeat lightning until durable `TurnBegin` removes them. The batch helper uses the same selector, so an accepted prefix cannot strand Q2/Q3. The real-store regression was red before the fix and green afterward: previous completion no longer resends Q1, while rejected/blocked restoration and batch controls remain intact. Status pills 16/16 including the accepted-prefix Q2/Q3 batch path, full extension 670/1, typecheck/lint and build-53 audit green. Packaged guest and accumulated-main acceptance remain open. Evidence: `testcases/reports/2026-11-27_phase2_context_queue.md`.
+
+## Packaged guest verification — 2026-11-27 11:13 +03:00
+
+Functional run: PASS on real packaged build 55. With AUTO STEER OFF during held manual compaction, lightning returned Q1 as engine-accepted queued: Q1 stayed visible in the queue and lightning disappeared. Releasing compaction completed the previous work before durable Q1 start. Final provider evidence is exactly three requests — seed, compaction and Q1 — with Q1 occurring once in one main-lane request. Durable start removed Q1 from the visible queue; final response and screenshot were read at `.tmp/k5-vscode/55-accepted-queue-final.webp`. Derived evidence: `.tmp/k5-vscode/phase2-guest-summary.json`; full Phase 2 report: `testcases/reports/2026-11-27_phase2_act_findings.md`.
+
+Accumulated running-main remains unverified and is not part of this packaged PASS.
